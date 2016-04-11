@@ -18,19 +18,18 @@ public class AlchemyPotion extends Potion {
 	@Override
 	public boolean isReady(int tick, int level) {
         return ready;
-    }
+	}
 	
 	@Override
 	public boolean isInstant() {
         return ready;
-    }
+	}
 	
 	@Override
-    public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc)
-    {
-        mc.getTextureManager().bindTexture(new ResourceLocation(""));
+	public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
+		mc.getTextureManager().bindTexture(new ResourceLocation(""));
         mc.currentScreen.drawTexturedModalRect(x + 6, y + 7, 0, 0, 18, 18);
-    }
+	}
 	
 	@Override
 	public void affectEntity(Entity source, Entity indirect, EntityLivingBase living, int level, double health) {
