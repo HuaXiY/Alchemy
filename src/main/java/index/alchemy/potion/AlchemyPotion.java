@@ -13,7 +13,12 @@ import net.minecraft.util.ResourceLocation;
 
 public class AlchemyPotion extends Potion {
 	
+	public static final ResourceLocation RESOURCE_LOCATION = new AlchemyResourceLocation("potion");
+	
+	private static int current_id = -1;
+	
 	private boolean ready;
+	private int id;
 	
 	@Override
 	public boolean isReady(int tick, int level) {
@@ -27,8 +32,8 @@ public class AlchemyPotion extends Potion {
 	
 	@Override
 	public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		mc.getTextureManager().bindTexture(new ResourceLocation(""));
-        mc.currentScreen.drawTexturedModalRect(x + 6, y + 6, 0, 0, 18, 18);
+		mc.getTextureManager().bindTexture(RESOURCE_LOCATION);
+        mc.currentScreen.drawTexturedModalRect(x + 6, y + 6, id % 16 * 16, id / 16, 16, 16);
 	}
 	
 	@Override
@@ -43,6 +48,7 @@ public class AlchemyPotion extends Potion {
 	public AlchemyPotion(String name, boolean isbad, int color, boolean ready) {
 		super(isbad, color);
 		this.ready = ready;
+		id = ++current_id;
 		potionRegistry.register(-1, new AlchemyResourceLocation(name), this);
 		if (this instanceof IPlayerTickable) 
 			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
