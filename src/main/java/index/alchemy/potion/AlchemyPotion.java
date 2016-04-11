@@ -28,7 +28,7 @@ public class AlchemyPotion extends Potion {
 	@Override
 	public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
 		mc.getTextureManager().bindTexture(new ResourceLocation(""));
-        mc.currentScreen.drawTexturedModalRect(x + 6, y + 7, 0, 0, 18, 18);
+        mc.currentScreen.drawTexturedModalRect(x + 6, y + 6, 0, 0, 18, 18);
 	}
 	
 	@Override
