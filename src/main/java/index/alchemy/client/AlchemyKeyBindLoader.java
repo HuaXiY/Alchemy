@@ -1,5 +1,7 @@
-package index.alchemy.core;
+package index.alchemy.client;
 
+import index.alchemy.core.Constants;
+import index.alchemy.core.Init;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;

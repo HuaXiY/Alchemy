@@ -1,6 +1,7 @@
-package index.alchemy.core;
+package index.alchemy.client;
 
 import index.alchemy.api.Alway;
+import index.alchemy.core.Init;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,27 +21,27 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyColorLoader {
 	
-private static List<Object> item_color = new LinkedList<Object>(), block_color = new LinkedList<Object>();
+	private static List item_color = new LinkedList(), block_color = new LinkedList();
 	
-	public static <T extends Item & IItemColor> void addItemColor(T t) {
+	public static <T extends Item & IColorItem> void addItemColor(T t) {
 		item_color.add(t);
 	}
 	
-	public static <T extends Block & IBlockColor> void addBlockColor(T t) {
+	public static <T extends Block & IColorBlock> void addBlockColor(T t) {
 		block_color.add(t);
 	}
 	
-	public static void registerItemColor() {
+	public static <T extends Item & IColorItem> void registerItemColor() {
 		ItemColors colors = Minecraft.getMinecraft().getItemColors();
-		for (Object obj : item_color) {
-			colors.registerItemColorHandler((IItemColor) obj, (Item) obj);
+		for (T t : (List<T>) item_color) {
+			colors.registerItemColorHandler(t.getItemColor(), t);
 		}
 	}
 	
-	public static void registerBlockColor() {
+	public static <T extends Block & IColorBlock> void registerBlockColor() {
 		BlockColors colors = Minecraft.getMinecraft().getBlockColors();
-		for (Object obj : block_color) {
-			colors.registerBlockColorHandler((IBlockColor) obj, (Block) obj);
+		for (T t : (List<T>) block_color) {
+			colors.registerBlockColorHandler(t.getBlockColor(), t);
 		}
 	}
 	
