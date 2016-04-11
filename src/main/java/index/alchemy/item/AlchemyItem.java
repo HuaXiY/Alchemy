@@ -1,7 +1,8 @@
 package index.alchemy.item;
 
 import index.alchemy.api.Alway;
-import index.alchemy.core.AlchemyColorLoader;
+import index.alchemy.client.AlchemyColorLoader;
+import index.alchemy.client.IColorItem;
 import index.alchemy.core.Constants;
 import index.alchemy.core.IResourceLocation;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -47,14 +48,14 @@ public class AlchemyItem extends Item implements IResourceLocation {
 		this(name, null);
 	}
 	
-	public <T extends Item & IItemColor> AlchemyItem(String name, TextFormatting formatting) {
+	public <T extends Item & IColorItem> AlchemyItem(String name, TextFormatting formatting) {
 		name_color = formatting == null ? "" : formatting.toString();
 		setCreativeTab(CREATIVE_TABS);
 		setUnlocalizedName(name);
 		setRegistryName(name);
 		registerItem();
 		if (Alway.isClient()) {
-			if (this instanceof IItemColor)
+			if (this instanceof IColorItem)
 				AlchemyColorLoader.addItemColor((T) this);
 		}
 	}

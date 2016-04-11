@@ -1,6 +1,6 @@
 package index.alchemy.enchantment;
 
-import index.alchemy.core.AlchemyResourceLocation;
+import index.alchemy.client.AlchemyResourceLocation;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;

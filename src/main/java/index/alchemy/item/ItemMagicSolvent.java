@@ -1,7 +1,8 @@
 package index.alchemy.item;
 
+import index.alchemy.client.AlchemyResourceLocation;
+import index.alchemy.client.IColorItem;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.Constants;
 
 import java.util.LinkedList;
@@ -24,7 +25,7 @@ import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemMagicSolvent extends AlchemyItem implements IItemColor, IBrewingRecipe {
+public class ItemMagicSolvent extends AlchemyItem implements IColorItem, IBrewingRecipe {
 	
 	public static final ResourceLocation BOTTLE = new AlchemyResourceLocation("solvent_bottle");
 	
@@ -42,10 +43,16 @@ public class ItemMagicSolvent extends AlchemyItem implements IItemColor, IBrewin
 	public boolean canUseItemStack(EntityLivingBase living, ItemStack item) {
 		return false;
 	}
-
+	
 	@Override
-	public int getColorFromItemstack(ItemStack item, int index) {
-		return index == 0 ? color : -1;
+	@SideOnly(Side.CLIENT)
+	public IItemColor getItemColor() {
+		return new IItemColor() {
+			@Override
+			public int getColorFromItemstack(ItemStack item, int index) {
+				return index == 0 ? color : -1;
+			}
+		};
 	}
 
 	@Override

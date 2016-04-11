@@ -1,5 +1,6 @@
 package index.alchemy.network;
 
+import index.alchemy.api.Alway;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -19,7 +20,9 @@ public class AlchemyNetworkHandler {
 		registerPacket(MessageSpaceRingPickUp.class, Side.SERVER);
 		registerPacket(MessageAlacrityCallback.class, Side.SERVER);
 		
-		registerPacket(MessageParticle.class, Side.CLIENT);
+		if (Alway.isClient()) {
+			registerPacket(MessageParticle.class, Side.CLIENT);
+		}
 	}
 
 	private static void registerPacket(Class clazz, Side side) {

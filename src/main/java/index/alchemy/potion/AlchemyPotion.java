@@ -1,6 +1,6 @@
 package index.alchemy.potion;
 
-import index.alchemy.core.AlchemyResourceLocation;
+import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.core.CommonProxy;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.IPlayerTickable;

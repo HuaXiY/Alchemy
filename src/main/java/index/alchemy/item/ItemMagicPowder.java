@@ -1,7 +1,8 @@
 package index.alchemy.item;
 
+import index.alchemy.client.AlchemyResourceLocation;
+import index.alchemy.client.IColorItem;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.AlchemyResourceLocation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +23,7 @@ import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemMagicPowder extends AlchemyItem implements IItemColor {
+public class ItemMagicPowder extends AlchemyItem implements IColorItem {
 	
 	public static final ResourceLocation POWDER = new AlchemyResourceLocation("powder");
 	
@@ -30,10 +31,9 @@ public class ItemMagicPowder extends AlchemyItem implements IItemColor {
 	protected Item material;
 	
 	@SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean advanced)
-    {
+	public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean advanced) {
 		tooltip.add("");
-    }
+	}
 	
 	@Override
 	public boolean canUseItemStack(EntityLivingBase living, ItemStack item) {
@@ -41,8 +41,14 @@ public class ItemMagicPowder extends AlchemyItem implements IItemColor {
 	}
 	
 	@Override
-	public int getColorFromItemstack(ItemStack item, int index) {
-		return index == 0 ? color : -1;
+	@SideOnly(Side.CLIENT)
+	public IItemColor getItemColor() {
+		return new IItemColor() {
+			@Override
+			public int getColorFromItemstack(ItemStack item, int index) {
+				return index == 0 ? color : -1;
+			}
+		};
 	}
 	
 	@Override
@@ -59,5 +65,5 @@ public class ItemMagicPowder extends AlchemyItem implements IItemColor {
 		this.color = color;
 		this.material = material;
 	}
-	
+
 }
