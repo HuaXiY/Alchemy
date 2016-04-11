@@ -12,6 +12,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
@@ -24,6 +26,13 @@ public class AlchemyItem extends Item implements IResourceLocation {
 			return AlchemyItemLoader.scroll_ice_screen;
 		}
 	};
+	
+	private String name_color;
+	
+	@Override
+	public String getItemStackDisplayName(ItemStack item) {
+        return name_color + super.getItemStackDisplayName(item);
+    }
 
 	@Override
 	public ResourceLocation getResourceLocation() {
@@ -34,7 +43,12 @@ public class AlchemyItem extends Item implements IResourceLocation {
 		return living instanceof EntityPlayer;
 	}
 	
-	public <T extends Item & IItemColor> AlchemyItem(String name) {
+	public AlchemyItem(String name) {
+		this(name, null);
+	}
+	
+	public <T extends Item & IItemColor> AlchemyItem(String name, TextFormatting formatting) {
+		name_color = formatting == null ? "" : formatting.toString();
 		setCreativeTab(CREATIVE_TABS);
 		setUnlocalizedName(name);
 		setRegistryName(name);

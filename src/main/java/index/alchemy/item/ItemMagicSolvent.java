@@ -99,7 +99,7 @@ public class ItemMagicSolvent extends AlchemyItem implements IItemColor, IBrewin
 		}
 		
 		public String getTextWithoutFormattingCodes() {
-			return formatting.getTextWithoutFormattingCodes(toString());
+			return formatting + toString();
 		}
 		
 		public static Type random() {
