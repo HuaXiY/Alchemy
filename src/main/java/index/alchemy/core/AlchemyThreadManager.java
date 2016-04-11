@@ -56,15 +56,20 @@ public final class AlchemyThreadManager {
 					else
 						addThread();
 				if (list.size() > 0) {
+					lock.lock();
+					Runnable run = list.get(0);
+					lock.unlock();
 					try {
-						list.get(0).run();
+						run.run();
 					} catch (Throwable e) {
 						System.err.println("[ThreadManager]Catch a Throwable in runtime loop: ");
 						System.err.println("**********************************************************");
 						e.printStackTrace();
 						System.err.println("**********************************************************");
 					}
+					lock.lock();
 					list.remove(0);
+					lock.unlock();
 					skip = 0;
 				} else
 					try {
