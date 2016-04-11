@@ -20,6 +20,7 @@ public class AlchemyPotion extends Potion {
 	@Override
 	public boolean isInstant() {
         return ready;
+        // test
     }
 	
 	@Override
