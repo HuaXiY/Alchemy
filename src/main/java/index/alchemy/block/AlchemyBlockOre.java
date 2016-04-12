@@ -69,6 +69,11 @@ public class AlchemyBlockOre extends AlchemyBlock implements IColorBlock, IOreDi
 			}
 		};
 	}
+
+	@Override
+	public String getNameInOreDictionary() {
+		return Tool._toUp(getRegistryName().getResourcePath());
+	}
 	
 	public AlchemyBlockOre(String name, Item drop, int color) {
 		this(name, drop, 1, 0, 0, color, false);
@@ -82,11 +87,6 @@ public class AlchemyBlockOre extends AlchemyBlock implements IColorBlock, IOreDi
 		this.max_xp = max_xp;
 		this.color = color;
 		this.drop_fortune = drop_fortune;
-	}
-
-	@Override
-	public String getNameInOreDictionary() {
-		return Tool._toUp(getRegistryName().getResourcePath());
 	}
 
 }

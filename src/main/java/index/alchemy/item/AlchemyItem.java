@@ -4,6 +4,7 @@ import index.alchemy.api.Alway;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.IColorItem;
 import index.alchemy.core.Constants;
+import index.alchemy.core.IOreDictionary;
 import index.alchemy.core.IResourceLocation;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -18,13 +19,14 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class AlchemyItem extends Item implements IResourceLocation {
 	
 	public static final CreativeTabs CREATIVE_TABS = new CreativeTabs(Constants.MODID) {
 		@Override
 		public Item getTabIconItem() {
-			return AlchemyItemLoader.scroll_ice_screen;
+			return AlchemyItemLoader.solvent_lapis_lazuli;
 		}
 	};
 	
@@ -48,25 +50,27 @@ public class AlchemyItem extends Item implements IResourceLocation {
 		this(name, null);
 	}
 	
-	public <T extends Item & IColorItem> AlchemyItem(String name, TextFormatting formatting) {
+	public AlchemyItem(String name, TextFormatting formatting) {
 		name_color = formatting == null ? "" : formatting.toString();
 		setCreativeTab(CREATIVE_TABS);
 		setUnlocalizedName(name);
 		setRegistryName(name);
 		registerItem();
-		if (Alway.isClient()) {
-			if (this instanceof IColorItem)
-				AlchemyColorLoader.addItemColor((T) this);
-		}
 	}
 	
-	public void registerItem() {
+	public <T extends Item & IColorItem> void registerItem() {
 		GameRegistry.register(this);
 		AlchemyItemLoader.ALL_ITEM.add(this);
 		
-		if (Alway.isClient())
+		if (Alway.isClient()) {
 			ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(
 					getResourceLocation(), "inventory"));
+			if (this instanceof IColorItem)
+				AlchemyColorLoader.addItemColor((T) this);
+		}
+		
+		if (this instanceof IOreDictionary)
+			OreDictionary.registerOre(((IOreDictionary) this).getNameInOreDictionary(), new ItemStack(this));
 	}
 	
 }
