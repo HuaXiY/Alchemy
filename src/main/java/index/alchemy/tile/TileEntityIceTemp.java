@@ -1,4 +1,4 @@
-package index.alchemy.block;
+package index.alchemy.tile;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;

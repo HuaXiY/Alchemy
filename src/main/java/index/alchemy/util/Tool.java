@@ -211,4 +211,9 @@ public class Tool {
 		throw new RuntimeException("Can't search Method: " + args + ", in: " + clazz);
 	}
 	
+	public static final String _toUp(String str) {
+		int i = str.indexOf('_');
+		return i == -1 ? "" : str.substring(0, i) + str.substring(i + 1, i + 2).toUpperCase() + str.substring(i + 2);
+	}
+	
 }

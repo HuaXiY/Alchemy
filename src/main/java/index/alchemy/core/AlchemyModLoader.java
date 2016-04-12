@@ -69,7 +69,7 @@ public class AlchemyModLoader {
 			throw new RuntimeException("Before this has been instantiate.");
 	}
 	
-	public static final String mc_dir;
+	public static final String mc_dir;LivingSetAttackTargetEvent 
 	public static final boolean is_modding;
 	public static Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>();
 	

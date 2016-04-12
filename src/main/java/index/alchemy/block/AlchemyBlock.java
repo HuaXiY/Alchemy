@@ -2,7 +2,9 @@ package index.alchemy.block;
 
 import index.alchemy.api.Alway;
 import index.alchemy.core.Constants;
+import index.alchemy.core.IOreDictionary;
 import index.alchemy.core.IResourceLocation;
+import index.alchemy.core.ITileEntity;
 import index.alchemy.item.AlchemyItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -17,6 +19,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class AlchemyBlock extends Block implements IResourceLocation {
 	
@@ -38,10 +41,6 @@ public class AlchemyBlock extends Block implements IResourceLocation {
 		return true;
 	}
 	
-	public Class<? extends TileEntity> getTileEntityClass() {
-		return null;
-	}
-	
 	public void registerBlock() {
 		Item item = new ItemBlock(this).setRegistryName(getRegistryName());
 		GameRegistry.register(this);
@@ -52,7 +51,11 @@ public class AlchemyBlock extends Block implements IResourceLocation {
 					getResourceLocation(), "inventory"));
 			item.setFull3D();
 		}
-		if (getTileEntityClass() != null)
-			GameRegistry.registerTileEntity(getTileEntityClass(), getUnlocalizedName());
+		if (this instanceof ITileEntity)
+			GameRegistry.registerTileEntity(((ITileEntity) this).getTileEntityClass(), getUnlocalizedName());
+		if (this instanceof IOreDictionary)
+			OreDictionary.registerOre(((IOreDictionary) this).getNameInOreDictionary(), new ItemStack(this));
 	}
+
+	
 }

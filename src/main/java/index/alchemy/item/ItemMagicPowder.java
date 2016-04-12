@@ -41,6 +41,11 @@ public class ItemMagicPowder extends AlchemyItem implements IColorItem {
 	}
 	
 	@Override
+	public ResourceLocation getResourceLocation() {
+		return POWDER;
+	}
+	
+	@Override
 	@SideOnly(Side.CLIENT)
 	public IItemColor getItemColor() {
 		return new IItemColor() {
@@ -49,11 +54,6 @@ public class ItemMagicPowder extends AlchemyItem implements IColorItem {
 				return index == 0 ? color : -1;
 			}
 		};
-	}
-	
-	@Override
-	public ResourceLocation getResourceLocation() {
-		return POWDER;
 	}
 	
 	public ItemMagicPowder(String name, int color, Item material) {
