@@ -163,7 +163,7 @@ public class AlchemyModLoader {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) throws ClassNotFoundException {
 		event_system = new AlchemyEventSystem(this);
-		config = new AlchemyConfigLoader(event);
+		config = new AlchemyConfigLoader(event.getSuggestedConfigurationFile());
 		init(event.getModState());
 	}
 	

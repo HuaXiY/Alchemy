@@ -20,16 +20,14 @@ public class AlchemyEnchantment extends Enchantment {
 	protected int max_level;
 	
 	@Override
-	public int getMinLevel()
-    {
-        return 1;
-    }
+	public int getMinLevel() {
+		return 1;
+	}
 
 	@Override
-    public int getMaxLevel()
-    {
-        return max_level;
-    }
+	public int getMaxLevel() {
+		return max_level;
+	}
 
 	public AlchemyEnchantment(String name, Rarity rarity, EnumEnchantmentType type, int max_level, EntityEquipmentSlot... slots) {
 		super(rarity, type, slots);

@@ -5,5 +5,7 @@ import index.alchemy.core.Init;
 
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyWorldGeneratorLoader {
+	
+	public static void init() {}
 
 }
