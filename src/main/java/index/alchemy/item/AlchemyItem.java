@@ -17,6 +17,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
+import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -71,6 +73,9 @@ public class AlchemyItem extends Item implements IResourceLocation {
 		
 		if (this instanceof IOreDictionary)
 			OreDictionary.registerOre(((IOreDictionary) this).getNameInOreDictionary(), new ItemStack(this));
+		
+		if (this instanceof IBrewingRecipe)
+			BrewingRecipeRegistry.addRecipe((IBrewingRecipe) this);
 	}
 	
 }

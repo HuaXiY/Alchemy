@@ -1,7 +1,6 @@
 package index.alchemy.item;
 
 import index.alchemy.client.AlchemyResourceLocation;
-import index.alchemy.client.IColorItem;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 
@@ -25,11 +24,9 @@ import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemMagicSolvent extends AlchemyItem implements IColorItem, IBrewingRecipe {
+public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe {
 	
-	public static final ResourceLocation BOTTLE = new AlchemyResourceLocation("solvent_bottle");
-	
-	protected int color, metadata;
+	protected int metadata;
 	protected Item material;
 	
 	@Override
@@ -45,17 +42,6 @@ public class ItemMagicSolvent extends AlchemyItem implements IColorItem, IBrewin
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public IItemColor getItemColor() {
-		return new IItemColor() {
-			@Override
-			public int getColorFromItemstack(ItemStack item, int index) {
-				return index == 0 ? color : -1;
-			}
-		};
-	}
-
-	@Override
 	public boolean isInput(ItemStack input) {
 		return input.getItem() == Items.potionitem && input.getMetadata() == 0;
 	}
@@ -68,11 +54,6 @@ public class ItemMagicSolvent extends AlchemyItem implements IColorItem, IBrewin
 	@Override
 	public ItemStack getOutput(ItemStack input, ItemStack ingredient) {
 		return new ItemStack(this, 1, 0, Type.randomOutput());
-	}
-	
-	@Override
-	public ResourceLocation getResourceLocation() {
-		return BOTTLE;
 	}
 	
 	public static enum Type {
@@ -136,11 +117,9 @@ public class ItemMagicSolvent extends AlchemyItem implements IColorItem, IBrewin
 	}
 	
 	public ItemMagicSolvent(String name, int color, Item material, int metadata) {
-		super("solvent_" + name);
-		this.color = color;
+		super("solvent_" + name, "solvent_bottle", color);
 		this.material = material;
 		setMaxStackSize(1);
-		BrewingRecipeRegistry.addRecipe(this);
 	}
 	
 }
