@@ -2,6 +2,7 @@ package index.alchemy.block;
 
 import index.alchemy.api.Alway;
 import index.alchemy.client.AlchemyColorLoader;
+import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorBlock;
 import index.alchemy.core.Constants;
 import index.alchemy.core.IOreDictionary;
@@ -25,18 +26,26 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class AlchemyBlock extends Block implements IResourceLocation {
 	
+	protected ResourceLocation icon_name;
+	
+	@Override
+	public ResourceLocation getResourceLocation() {
+		return icon_name == null ? getRegistryName(): icon_name;
+	}
+	
 	public AlchemyBlock(String name, Material material) {
+		this(name, material, null);
+	}
+	
+	public AlchemyBlock(String name, Material material, String icon) {
 		super(material);
+		if (icon != null)
+			icon_name = new AlchemyResourceLocation(icon);
 		if (hasCreativeTab())
 			setCreativeTab(AlchemyItem.CREATIVE_TABS);
 		setUnlocalizedName(name);
 		setRegistryName(name);
 		registerBlock();
-	}
-	
-	@Override
-	public ResourceLocation getResourceLocation() {
-		return getRegistryName();
 	}
 	
 	public boolean hasCreativeTab() {

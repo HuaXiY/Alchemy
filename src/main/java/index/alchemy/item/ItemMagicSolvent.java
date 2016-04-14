@@ -117,7 +117,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 	}
 	
 	public ItemMagicSolvent(String name, int color, Item material, int metadata) {
-		super("solvent_" + name, "solvent_bottle", color);
+		super(name, "solvent_bottle", color);
 		this.material = material;
 		setMaxStackSize(1);
 	}

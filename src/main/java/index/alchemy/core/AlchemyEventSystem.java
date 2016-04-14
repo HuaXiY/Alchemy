@@ -12,6 +12,7 @@ import index.alchemy.network.MessageSpaceRingPickUp;
 import index.alchemy.potion.AlchemyPotionLoader;
 import index.alchemy.potion.PotionEternal;
 import index.alchemy.potion.PotionMultipleXP;
+import index.alchemy.potion.PotionPeace;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -86,9 +88,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 		((PotionEternal) AlchemyPotionLoader.eternal).onLivingHurt(event);
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onPlayerPickupXP(PlayerPickupXpEvent event) {
 		((PotionMultipleXP) AlchemyPotionLoader.multiple_xp).onPlayerPickupXP(event);
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
+		((PotionPeace) AlchemyPotionLoader.peace).onLivingSetAttackTarget(event);
 	}
 
 	@Override

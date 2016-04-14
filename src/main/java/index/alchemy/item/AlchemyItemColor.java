@@ -11,14 +11,7 @@ import index.alchemy.client.IColorItem;
 
 public class AlchemyItemColor extends AlchemyItem implements IColorItem {
 	
-	protected static ResourceLocation icon_name;
-	
 	protected int color;
-	
-	@Override
-	public ResourceLocation getResourceLocation() {
-		return icon_name;
-	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -36,9 +29,8 @@ public class AlchemyItemColor extends AlchemyItem implements IColorItem {
 	}
 	
 	public AlchemyItemColor(String name, String icon_name, int color, TextFormatting formatting) {
-		super(name, formatting);
-		this.icon_name = new AlchemyResourceLocation(icon_name);
+		super(name, formatting, icon_name);
 		this.color = color;
 	}
-
+	
 }

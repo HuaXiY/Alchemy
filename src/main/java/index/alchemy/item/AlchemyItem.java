@@ -2,6 +2,7 @@ package index.alchemy.item;
 
 import index.alchemy.api.Alway;
 import index.alchemy.client.AlchemyColorLoader;
+import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorItem;
 import index.alchemy.core.Constants;
 import index.alchemy.core.IOreDictionary;
@@ -34,6 +35,8 @@ public class AlchemyItem extends Item implements IResourceLocation {
 	
 	private String name_color;
 	
+	protected ResourceLocation icon_name;
+	
 	@Override
 	public String getItemStackDisplayName(ItemStack item) {
         return name_color + super.getItemStackDisplayName(item);
@@ -41,7 +44,7 @@ public class AlchemyItem extends Item implements IResourceLocation {
 
 	@Override
 	public ResourceLocation getResourceLocation() {
-		return getRegistryName();
+		return icon_name == null ? getRegistryName(): icon_name;
 	}
 	
 	public boolean canUseItemStack(EntityLivingBase living, ItemStack item) {
@@ -49,11 +52,21 @@ public class AlchemyItem extends Item implements IResourceLocation {
 	}
 	
 	public AlchemyItem(String name) {
-		this(name, null);
+		this(name, null, null);
 	}
 	
 	public AlchemyItem(String name, TextFormatting formatting) {
+		this(name, formatting, null);
+	}
+	
+	public AlchemyItem(String name, String icon) {
+		this(name, null, icon);
+	}
+	
+	public AlchemyItem(String name, TextFormatting formatting, String icon) {
 		name_color = formatting == null ? "" : formatting.toString();
+		if (icon != null)
+			icon_name = new AlchemyResourceLocation(icon);
 		setCreativeTab(CREATIVE_TABS);
 		setUnlocalizedName(name);
 		setRegistryName(name);
