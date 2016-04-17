@@ -3,6 +3,7 @@ package index.alchemy.potion;
 import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.core.CommonProxy;
 import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IPlayerTickable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -50,8 +51,12 @@ public class AlchemyPotion extends Potion {
 		this.ready = ready;
 		id = ++current_id;
 		potionRegistry.register(-1, new AlchemyResourceLocation(name), this);
+		
 		if (this instanceof IPlayerTickable) 
 			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
+		
+		if (this instanceof IEventHandle)
+			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
 	}
 	
 }

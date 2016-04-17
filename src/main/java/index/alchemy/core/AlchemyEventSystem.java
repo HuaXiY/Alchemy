@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
@@ -48,6 +49,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class AlchemyEventSystem implements IGuiHandler {
+	
+	public static final EventType[]
+			EVENT_BUS = new EventType[]{ EventType.EVENT_BUS },
+			TERRAIN_GEN_BUS = new EventType[]{ EventType.TERRAIN_GEN_BUS },
+			ORE_GEN_BUS = new EventType[]{ EventType.ORE_GEN_BUS };
 	
 	public static final List<IPlayerTickable> 
 			SERVER_TICKABLE = new LinkedList<IPlayerTickable>(),
@@ -83,21 +89,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 			tickable.onTick(event.player);
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onLivingHurt(LivingHurtEvent event) {
-		((PotionEternal) AlchemyPotionLoader.eternal).onLivingHurt(event);
-	}
-	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onPlayerPickupXP(PlayerPickupXpEvent event) {
-		((PotionMultipleXP) AlchemyPotionLoader.multiple_xp).onPlayerPickupXP(event);
-	}
-	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
-		((PotionPeace) AlchemyPotionLoader.peace).onLivingSetAttackTarget(event);
-	}
-
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		switch (ID) {
@@ -119,6 +110,17 @@ public class AlchemyEventSystem implements IGuiHandler {
 	public AlchemyEventSystem(Object mod) {
 		MinecraftForge.EVENT_BUS.register(this);
 		NetworkRegistry.INSTANCE.registerGuiHandler(mod, this);
+	}
+	
+	public static void registerEventHandle(IEventHandle handle) {
+		for (EventType type : handle.getEventType()) {
+			if (type == EventType.EVENT_BUS)
+				MinecraftForge.EVENT_BUS.register(handle);
+			else if (type == EventType.TERRAIN_GEN_BUS)
+				MinecraftForge.TERRAIN_GEN_BUS.register(handle);
+			else if (type == EventType.ORE_GEN_BUS)
+				MinecraftForge.ORE_GEN_BUS.register(handle);
+		}
 	}
 
 }

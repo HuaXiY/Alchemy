@@ -4,8 +4,11 @@ import index.alchemy.api.Alway;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorItem;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.Constants;
+import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IOreDictionary;
+import index.alchemy.core.IPlayerTickable;
 import index.alchemy.core.IResourceLocation;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -89,6 +92,12 @@ public class AlchemyItem extends Item implements IResourceLocation {
 		
 		if (this instanceof IBrewingRecipe)
 			BrewingRecipeRegistry.addRecipe((IBrewingRecipe) this);
+		
+		if (this instanceof IPlayerTickable)
+			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
+		
+		if (this instanceof IEventHandle)
+			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
 	}
 	
 }

@@ -21,16 +21,16 @@ public class AlchemyItemLoader {
 	
 	public static final List<AlchemyItem> ALL_ITEM = new LinkedList<AlchemyItem>();
 	
-	public static ItemMagicSolvent 
+	public static final ItemMagicSolvent 
 			solvent_lapis_lazuli = new ItemMagicSolvent("lapis_lazuli", 0x307CCB, Items.dye, 4);
 	
-	public static AlchemyItemScroll 
+	public static final AlchemyItemScroll 
 			scroll_boom = new ItemScrollBOOM(),
 			scroll_ice_screen = new ItemScrollIceScreen(),
 			scroll_lightning = new ItemScrollLightning(),
 			scroll_tp = new ItemScrollTP();
 	
-	public static ItemRingSpace 
+	public static final ItemRingSpace 
 			ring_space = new ItemRingSpace();
 	
 	public static void init() {

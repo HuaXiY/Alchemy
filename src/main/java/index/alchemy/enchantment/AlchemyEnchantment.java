@@ -1,6 +1,9 @@
 package index.alchemy.enchantment;
 
 import index.alchemy.client.AlchemyResourceLocation;
+import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.IEventHandle;
+import index.alchemy.core.IPlayerTickable;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -33,6 +36,12 @@ public class AlchemyEnchantment extends Enchantment {
 		super(rarity, type, slots);
 		this.max_level = max_level;
 		enchantmentRegistry.register(-1, new AlchemyResourceLocation(name), this);
+		
+		if (this instanceof IPlayerTickable)
+			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
+		
+		if (this instanceof IEventHandle)
+			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
 	}
 
 }

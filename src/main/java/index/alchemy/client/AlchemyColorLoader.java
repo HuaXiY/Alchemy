@@ -21,7 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyColorLoader {
 	
-	private static List item_color = new LinkedList(), block_color = new LinkedList();
+	private static final List item_color = new LinkedList(), block_color = new LinkedList();
 	
 	public static <T extends Item & IColorItem> void addItemColor(T t) {
 		item_color.add(t);

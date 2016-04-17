@@ -4,8 +4,11 @@ import index.alchemy.api.Alway;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorBlock;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.Constants;
+import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IOreDictionary;
+import index.alchemy.core.IPlayerTickable;
 import index.alchemy.core.IResourceLocation;
 import index.alchemy.core.ITileEntity;
 import index.alchemy.item.AlchemyItem;
@@ -71,6 +74,12 @@ public class AlchemyBlock extends Block implements IResourceLocation {
 		
 		if (this instanceof IOreDictionary)
 			OreDictionary.registerOre(((IOreDictionary) this).getNameInOreDictionary(), new ItemStack(this));
+		
+		if (this instanceof IPlayerTickable)
+			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
+		
+		if (this instanceof IEventHandle)
+			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
 	}
 
 	

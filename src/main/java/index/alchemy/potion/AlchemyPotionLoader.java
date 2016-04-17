@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyPotionLoader extends PotionType {
 	
-	public static Potion
+	public static final Potion
 			feather_fall = new PotionFeatherFall(),
 			alacrity = new PotionAlacrity(),
 			soul_withered = new PotionSoulWithered(),

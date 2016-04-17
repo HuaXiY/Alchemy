@@ -19,10 +19,10 @@ public class ItemScrollLightning extends AlchemyItemScroll {
 	@Override
 	public void useScroll(ItemStack item, World world, EntityPlayer player, int type) {
 		for (EntityLivingBase entity : player.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, 
-				new AxisAlignedBB(player.posX - 30d, player.posY - 30d, player.posZ - 30d,
-						player.posX + 30d, player.posY + 30d, player.posZ + 30d))) {
+				new AxisAlignedBB(player.posX - 30D, player.posY - 30D, player.posZ - 30D,
+						player.posX + 30D, player.posY + 30D, player.posZ + 30D))) {
             if(!(entity instanceof EntityPlayer))
-            	world.spawnEntityInWorld(new EntityLightningBolt(world, entity.posX, entity.posY, entity.posZ, false));
+            	world.addWeatherEffect(new EntityLightningBolt(world, entity.posX, entity.posY, entity.posZ, false));
         }
 	}
 }

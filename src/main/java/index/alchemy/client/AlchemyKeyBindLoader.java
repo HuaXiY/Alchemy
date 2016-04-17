@@ -13,7 +13,7 @@ import org.lwjgl.input.Keyboard;
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyKeyBindLoader {
 	
-	public static KeyBinding
+	public static final KeyBinding
 			key_space_ring = new KeyBinding("key.space_ring", Keyboard.KEY_R, Constants.MODID),
 			key_space_ring_pickup = new KeyBinding("key.space_ring_pickup", Keyboard.KEY_C, Constants.MODID);
 	

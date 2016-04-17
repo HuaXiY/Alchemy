@@ -37,7 +37,7 @@ public class AlchemyBlockLoader {
 	
 	public static final List<AlchemyBlock> ALL_BLOCK= new LinkedList<AlchemyBlock>();
 	
-	public static Block ice_temp = new BlockIceTemp();
+	public static final Block ice_temp = new BlockIceTemp();
 	
 	public static void init() {
 		replaceBlock();
