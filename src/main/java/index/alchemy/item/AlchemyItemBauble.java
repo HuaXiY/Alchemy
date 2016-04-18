@@ -13,7 +13,7 @@ import baubles.api.BaubleType;
 import baubles.api.BaublesApi;
 import baubles.api.IBauble;
 
-public abstract class AlchemyItemBauble extends AlchemyItem implements IBauble, IBaubleEquipment {
+public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment {
 	
 
 	public static class AlchemyItemAmulet extends AlchemyItemBauble {
@@ -28,8 +28,8 @@ public abstract class AlchemyItemBauble extends AlchemyItem implements IBauble, 
 			return BaublesApi.getBaubles((EntityPlayer) player).getStackInSlot(0) == null;
 		}
 		
-		public AlchemyItemAmulet(String name) {
-			super(name);
+		public AlchemyItemAmulet(String name, int color) {
+			super(name, "amulet", color);
 		}
 		
 	}
@@ -62,8 +62,12 @@ public abstract class AlchemyItemBauble extends AlchemyItem implements IBauble, 
 	        return new ActionResult(EnumActionResult.PASS, item);
 	    }
 		
-		public AlchemyItemRing(String name) {
-			super(name);
+		public AlchemyItemRing(String name, int color) {
+			super(name, "ring", color);
+		}
+		
+		public boolean isOnly() {
+			return true;
 		}
 		
 	}
@@ -81,8 +85,8 @@ public abstract class AlchemyItemBauble extends AlchemyItem implements IBauble, 
 		}
 		
 		
-		public AlchemyItemBelt(String name) {
-			super(name);
+		public AlchemyItemBelt(String name, int color) {
+			super(name, "belt", color);
 		}
 		
 	}
@@ -93,19 +97,19 @@ public abstract class AlchemyItemBauble extends AlchemyItem implements IBauble, 
 	}
 
 	@Override
-	public void onWornTick(ItemStack item, EntityLivingBase player) {}
+	public void onWornTick(ItemStack item, EntityLivingBase living) {}
 
 	@Override
-	public void onEquipped(ItemStack item, EntityLivingBase player) {}
+	public void onEquipped(ItemStack item, EntityLivingBase living) {}
 
 	@Override
-	public void onUnequipped(ItemStack item, EntityLivingBase player) {}
+	public void onUnequipped(ItemStack item, EntityLivingBase living) {}
 
 	@Override
-	public abstract boolean canEquip(ItemStack item, EntityLivingBase player);
+	public abstract boolean canEquip(ItemStack item, EntityLivingBase living);
 
 	@Override
-	public boolean canUnequip(ItemStack itemstack, EntityLivingBase player) {
+	public boolean canUnequip(ItemStack item, EntityLivingBase living) {
 		return true;
 	}
 	
@@ -131,12 +135,8 @@ public abstract class AlchemyItemBauble extends AlchemyItem implements IBauble, 
 		return null;
 	}
 	
-	public boolean isOnly() {
-		return true;
-	}
-	
-	public AlchemyItemBauble(String name) {
-		super(name);
+	public AlchemyItemBauble(String name, String icon_name, int color) {
+		super(name, icon_name, color);
 		setMaxStackSize(1);
 	}
 

@@ -44,7 +44,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory {
 	}
 	
 	public ItemRingSpace(String name, int size) {
-		super(name);
+		super(name, 0x6600CC);
 		this.size = size;
 	}
 	
