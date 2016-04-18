@@ -41,7 +41,7 @@ public class ItemScrollTP extends ItemScroll {
 			nbt.setDouble("z", player.posZ);
 			up.setTag(SCROLL_TP, nbt);
 			world.playSound(player, player.posX, player.posY, player.posZ, 
-					SoundEvent.soundEventRegistry.getObject(new ResourceLocation("entity.experience_orb.pickup")),
+					SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.experience_orb.pickup")),
 					SoundCategory.NEUTRAL, 1F, world.rand.nextFloat() * 0.1F + 0.9F);
 		}
 	}

@@ -38,7 +38,7 @@ public class WorldGeneratorRedDragonNest extends AlchemyWorldGenerator {
 	private boolean should(World world, int x, int z, StructureBoundingBox box) {
 		for (int i = 0, xlen = box.getXSize(); i < xlen; i++) {
 			for (int k = 0, zlen = box.getZSize(); k < zlen; k++) {
-				if (world.getBlockState(new BlockPos(x + i, Alway.SEA_LEVEL, z + k)).getBlock() != Blocks.water) 
+				if (world.getBlockState(new BlockPos(x + i, Alway.SEA_LEVEL, z + k)).getBlock() != Blocks.WATER) 
 					return false;
 			}
 		}

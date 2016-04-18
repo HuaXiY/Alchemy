@@ -41,7 +41,7 @@ public class PotionPeace extends AlchemyPotion implements IEventHandle {
 	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
 		if (event.getEntityLiving() instanceof EntityLiving && event.getEntityLiving().isNonBoss() &&
 			event.getTarget() != null && event.getTarget().isPotionActive(this) &&
-			event.getEntityLiving().getCombatTracker().func_94550_c() != event.getTarget()) {
+			event.getEntityLiving().getCombatTracker().getBestAttacker() != event.getTarget()) {
 			EntityPlayer player = EntityAIFindEntityNearestHelper.<EntityPlayer>findNearest(
 					(EntityLiving) event.getEntityLiving(), EntityPlayer.class, isPotion);
 			try {

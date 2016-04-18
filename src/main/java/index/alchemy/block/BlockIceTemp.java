@@ -28,10 +28,10 @@ public class BlockIceTemp extends AlchemyBlock implements ITileEntity {
 	}
 	
 	public BlockIceTemp() {
-		super("ice_temp", Material.ice);
+		super("ice_temp", Material.ICE);
 		setHardness(0.5F);
 		setLightOpacity(3);
-		setStepSound(SoundType.GLASS);
+		setSoundType(SoundType.GLASS);
 		setBlockUnbreakable();
 	}
 	

@@ -70,7 +70,7 @@ public class AlchemyBlockLoader {
         		if (Block.class.isAssignableFrom(field.getType())){
     				Block block = (Block) field.get(null);
     				if (block == toReplace){
-    					ResourceLocation registryName = Block.blockRegistry.getNameForObject(block);
+    					ResourceLocation registryName = Block.REGISTRY.getNameForObject(block);
     					int id = Block.getIdFromBlock(block);
     					System.out.println("Replacing block - " + id + " / " + registryName);
     					

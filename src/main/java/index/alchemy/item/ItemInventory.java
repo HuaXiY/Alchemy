@@ -123,13 +123,13 @@ public class ItemInventory implements IInventory, RandomAccess {
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
 		updateFlag();
-		return ItemStackHelper.func_188382_a(contents, index, count);
+		return ItemStackHelper.getAndSplit(contents, index, count);
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		updateFlag();
-		return ItemStackHelper.func_188383_a(contents, index);
+		return ItemStackHelper.getAndRemove(contents, index);
 	}
 
 	@Override

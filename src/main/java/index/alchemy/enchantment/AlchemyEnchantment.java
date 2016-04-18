@@ -35,7 +35,7 @@ public class AlchemyEnchantment extends Enchantment {
 	public AlchemyEnchantment(String name, Rarity rarity, EnumEnchantmentType type, int max_level, EntityEquipmentSlot... slots) {
 		super(rarity, type, slots);
 		this.max_level = max_level;
-		enchantmentRegistry.register(-1, new AlchemyResourceLocation(name), this);
+		REGISTRY.register(-1, new AlchemyResourceLocation(name), this);
 		
 		if (this instanceof IPlayerTickable)
 			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);

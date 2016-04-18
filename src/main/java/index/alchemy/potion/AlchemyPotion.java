@@ -50,7 +50,7 @@ public class AlchemyPotion extends Potion {
 		super(isbad, color);
 		this.ready = ready;
 		id = ++current_id;
-		potionRegistry.register(-1, new AlchemyResourceLocation(name), this);
+		REGISTRY.register(-1, new AlchemyResourceLocation(name), this);
 		
 		if (this instanceof IPlayerTickable) 
 			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);

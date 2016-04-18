@@ -37,10 +37,10 @@ public class AlchemyPotionLoader extends PotionType {
 			peace = new PotionPeace();
 	
 	public static final Predicate<ItemStack> 
-			nether_wart = getItemPredicate(Items.nether_wart),
-			red_stone = getItemPredicate(Items.redstone),
-			glow_stone_dust = getItemPredicate(Items.glowstone_dust),
-			fermented_spider_eye = getItemPredicate(Items.fermented_spider_eye);
+			nether_wart = getItemPredicate(Items.NETHER_WART),
+			red_stone = getItemPredicate(Items.REDSTONE),
+			glow_stone_dust = getItemPredicate(Items.GLOWSTONE_DUST),
+			fermented_spider_eye = getItemPredicate(Items.FERMENTED_SPIDER_EYE);
 	
 	public static Predicate<ItemStack> getItemPredicate(final Item item) {
 		return getItemPredicate(item, 0);
@@ -65,7 +65,7 @@ public class AlchemyPotionLoader extends PotionType {
 		}
 		
 		current_type = new PotionType(effects);
-		if (!potionTypeRegistry.containsKey(new ResourceLocation(name)))
+		if (!REGISTRY.containsKey(new ResourceLocation(name)))
 			registerPotionType(name, current_type = new PotionType(effects));
 		registerPotionTypeConversion(input, item, input = current_type);
 		
@@ -78,7 +78,7 @@ public class AlchemyPotionLoader extends PotionType {
 			}
 			
 			current_type = new PotionType(effects);
-			if (!potionTypeRegistry.containsKey(new ResourceLocation("strong_" + name)))
+			if (!REGISTRY.containsKey(new ResourceLocation("strong_" + name)))
 				registerPotionType("strong_" + name, current_type = new PotionType(effects));
 			registerPotionTypeConversion(input, glow_stone_dust, current_type);
 		}
@@ -92,7 +92,7 @@ public class AlchemyPotionLoader extends PotionType {
 			}
 			
 			current_type = new PotionType(effects);
-			if (!potionTypeRegistry.containsKey(new ResourceLocation("long_" + name)))
+			if (!REGISTRY.containsKey(new ResourceLocation("long_" + name)))
 				registerPotionType("long_" + name, current_type);
 			registerPotionTypeConversion(input, red_stone, current_type);
 		}
@@ -114,7 +114,7 @@ public class AlchemyPotionLoader extends PotionType {
 		}
 		
 		current_type1 = new PotionType(effects1);
-		if (!potionTypeRegistry.containsKey(new ResourceLocation(name1)))
+		if (!REGISTRY.containsKey(new ResourceLocation(name1)))
 			registerPotionType(name1, current_type1);
 		current_type0 = new PotionType(effects2);
 		
@@ -141,7 +141,7 @@ public class AlchemyPotionLoader extends PotionType {
 			}
 			
 			current_type1 = new PotionType(effects1);
-			if (!potionTypeRegistry.containsKey(new ResourceLocation("strong_" + name1)))
+			if (!REGISTRY.containsKey(new ResourceLocation("strong_" + name1)))
 				registerPotionType("strong_" + name1, current_type1);
 			current_type2 = new PotionType(effects2);
 			
@@ -166,7 +166,7 @@ public class AlchemyPotionLoader extends PotionType {
 			}
 			
 			current_type1 = new PotionType(effects1);
-			if (!potionTypeRegistry.containsKey(new ResourceLocation("strong_" + name1)))
+			if (!REGISTRY.containsKey(new ResourceLocation("strong_" + name1)))
 				registerPotionType("long_" + name1, current_type1);
 			current_type3 = new PotionType(effects2);
 			
@@ -177,11 +177,11 @@ public class AlchemyPotionLoader extends PotionType {
 			registerPotionTypeConversion(current_type3, fermented_spider_eye, current_type1);
 		}
 		
-		if (!potionTypeRegistry.containsKey(new ResourceLocation(name2)))
+		if (!REGISTRY.containsKey(new ResourceLocation(name2)))
 			registerPotionType(name2, current_type0);
-		if (current_type2 != null && !potionTypeRegistry.containsKey(new ResourceLocation("strong_" + name2)))
+		if (current_type2 != null && !REGISTRY.containsKey(new ResourceLocation("strong_" + name2)))
 			registerPotionType("strong_" + name2, current_type2);
-		if (current_type3 != null && !potionTypeRegistry.containsKey(new ResourceLocation("long_" + name2)))
+		if (current_type3 != null && !REGISTRY.containsKey(new ResourceLocation("long_" + name2)))
 			registerPotionType("long_" + name2, current_type3);
 		
 	}
@@ -206,35 +206,35 @@ public class AlchemyPotionLoader extends PotionType {
 	}
 	
 	public static void init() {
-		registerItemPotionAndPutrid(PotionTypes.awkward, false, true, 20 * 60 * 3, "luck", "unluck",
-				getItemPredicate(Items.emerald), null, new Potion[]{MobEffects.luck}, new Potion[]{MobEffects.unluck});
+		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "luck", "unluck",
+				getItemPredicate(Items.EMERALD), null, new Potion[]{MobEffects.LUCK}, new Potion[]{MobEffects.UNLUCK});
 		
-		registerItemPotionAndPutrid(PotionTypes.awkward, false, true, 20 * 45, "feather_fall", "levitation",
-				getItemPredicate(Items.feather), null, new Potion[]{feather_fall}, new Potion[]{MobEffects.levitation});
+		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 45, "feather_fall", "levitation",
+				getItemPredicate(Items.FEATHER), null, new Potion[]{feather_fall}, new Potion[]{MobEffects.LEVITATION});
 		
-		registerItemPotion(PotionTypes.awkward, true, true, 20 * 45, "hunger", 
-				getItemPredicate(Items.rotten_flesh), MobEffects.hunger);
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 45, "hunger", 
+				getItemPredicate(Items.ROTTEN_FLESH), MobEffects.HUNGER);
 		
-		registerItemPotion(PotionTypes.awkward, true, true, 20 * 60 * 3, "haste", 
-				getItemPredicate(Items.blaze_rod), MobEffects.digSpeed);
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "haste", 
+				getItemPredicate(Items.BLAZE_ROD), MobEffects.HASTE);
 		
-		registerItemPotion(PotionTypes.awkward, true, true, 20 * 60 * 3, "resistance", 
-				getItemPredicate(Items.golden_apple), MobEffects.resistance, MobEffects.absorption);
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "resistance", 
+				getItemPredicate(Items.GOLDEN_APPLE), MobEffects.RESISTANCE, MobEffects.ABSORPTION);
 		
-		registerItemPotion(PotionTypes.awkward, false, true, 20 * 45, "alacrity", 
-				getItemPredicate(Items.diamond), alacrity);
+		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 45, "alacrity", 
+				getItemPredicate(Items.DIAMOND), alacrity);
 		
-		registerItemPotion(PotionTypes.awkward, false, true, 20 * 3, "eternal", 
-				getItemPredicate(Items.diamond), eternal);
+		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 3, "eternal", 
+				getItemPredicate(Items.DIAMOND), eternal);
 		
-		registerItemPotion(PotionTypes.awkward, true, true, 20 * 60 * 3, "multiple_xp", 
-				getItemPredicate(Items.diamond), multiple_xp);
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "multiple_xp", 
+				getItemPredicate(Items.DIAMOND), multiple_xp);
 		
-		registerItemPotion(PotionTypes.awkward, false, true, 20 * 60 * 3, "peace", 
-				getItemPredicate(Items.diamond), peace);
+		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "peace", 
+				getItemPredicate(Items.DIAMOND), peace);
 
-		registerItemPotion(PotionTypes.awkward, false, false, 1, "dead_or_alive", 
-				getItemPredicate(Items.diamond), dead_or_alive);
+		registerItemPotion(PotionTypes.AWKWARD, false, false, 1, "dead_or_alive", 
+				getItemPredicate(Items.DIAMOND), dead_or_alive);
 		
 	}
 }

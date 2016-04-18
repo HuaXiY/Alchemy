@@ -80,7 +80,7 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 	}
 	
 	public BlockOre(String name, Item drop, int drop_num, int min_xp, int max_xp, int color, boolean drop_fortune) {
-		super(name, Material.rock);
+		super(name, Material.ROCK);
 		this.drop = drop;
 		this.drop_num = drop_num;
 		this.min_xp = min_xp;

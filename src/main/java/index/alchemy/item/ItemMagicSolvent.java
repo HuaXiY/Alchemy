@@ -43,7 +43,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 	
 	@Override
 	public boolean isInput(ItemStack input) {
-		return input.getItem() == Items.potionitem && input.getMetadata() == 0;
+		return input.getItem() == Items.POTIONITEM && input.getMetadata() == 0;
 	}
 
 	@Override
