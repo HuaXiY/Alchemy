@@ -15,11 +15,11 @@ import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class PotionPeace extends AlchemyPotion implements IEventHandle {
+public class PotionIgnore extends AlchemyPotion implements IEventHandle {
 	
-	public static Predicate<EntityPlayer> isPotion = new Predicate<EntityPlayer>() {
+	public static final Predicate<EntityPlayer> isPotion = new Predicate<EntityPlayer>() {
         public boolean apply(EntityPlayer player) {
-            return !player.isPotionActive(AlchemyPotionLoader.peace);
+            return !player.isPotionActive(AlchemyPotionLoader.ignore);
         }
     };
 	
@@ -28,8 +28,8 @@ public class PotionPeace extends AlchemyPotion implements IEventHandle {
 		attackTarget.setAccessible(true);
 	}
 	
-	public PotionPeace() {
-		super("peace", false, 0xFFFFFF);
+	public PotionIgnore() {
+		super("ignore", false, 0xFFFFFF);
 	}
 	
 	@Override

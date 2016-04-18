@@ -34,7 +34,7 @@ public class AlchemyPotionLoader extends PotionType {
 			eternal = new PotionEternal(),
 			dead_or_alive = new PotionDeadOrAlive(),
 			multiple_xp = new PotionMultipleXP(),
-			peace = new PotionPeace();
+			ignore = new PotionIgnore();
 	
 	public static final Predicate<ItemStack> 
 			nether_wart = getItemPredicate(Items.NETHER_WART),
@@ -230,8 +230,8 @@ public class AlchemyPotionLoader extends PotionType {
 		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "multiple_xp", 
 				getItemPredicate(Items.DIAMOND), multiple_xp);
 		
-		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "peace", 
-				getItemPredicate(Items.DIAMOND), peace);
+		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "ignore", 
+				getItemPredicate(Items.DIAMOND), ignore);
 
 		registerItemPotion(PotionTypes.AWKWARD, false, false, 1, "dead_or_alive", 
 				getItemPredicate(Items.DIAMOND), dead_or_alive);
