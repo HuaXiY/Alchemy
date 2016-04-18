@@ -15,9 +15,8 @@ public class ItemAmuletGuard extends AlchemyItemAmulet {
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
 		if (living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getLastAttackerTime() - living.ticksExisted > RECOVERY_CD) {
 			PotionEffect effect = living.getActivePotionEffect(MobEffects.ABSORPTION);
-			int amplifier = effect == null ? 0 : effect.getAmplifier() + 1;
-			if (amplifier < 5)
-				living.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 2, amplifier));
+			int amplifier = Math.min(effect == null ? 0 : effect.getAmplifier() + 1, 5);
+			living.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 2, amplifier));
 		}
 	}
 
