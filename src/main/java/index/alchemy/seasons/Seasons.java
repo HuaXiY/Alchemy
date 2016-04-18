@@ -7,42 +7,41 @@ import net.minecraft.world.World;
 
 public class Seasons {
 	
-	public static final int Spring = 0, Summer = 1, Autumn = 2, Winter = 3, Null = -1;
-	public static int auto_cycle = 28 * 24000;
-	public static List<Seasons> ls = new ArrayList<Seasons>();
-	public World world;
-	public int last_seasons, seasons, cycle;
+	public static final int SPRING = 0, SUMMER = 1, AUTUMN = 2, WINTER = 3, NULL = -1;
+	public static final List<Seasons> seasons_list = new ArrayList<Seasons>();
+	private World world;
+	private int last_seasons, seasons, cycle;
 	
 	public static Seasons findSeasons(World world) {
-		for (Seasons s : ls) 
+		for (Seasons s : seasons_list) 
 			if (s.world == world) return s;
 		Seasons s;
-		ls.add(s = new Seasons(world));
+		seasons_list.add(s = new Seasons(world));
 		return s;
 	}
 	
 	public Seasons(World world) {
-		this(world, auto_cycle);
+		this(world, 28 * 24000);
 	}
 	
 	public Seasons(World world, int cycle) {
 		this.world = world;
 		this.cycle = cycle;
 		
-		nextSeasons();
+		nextTick();
 		last_seasons = seasons;
-		ls.add(this);
+		seasons_list.add(this);
 	}
 	
 	public void onTick() {
-		nextSeasons();
+		nextTick();
 		if (last_seasons != seasons) {
 			
 			
 		}
 	}
 	
-	public void nextSeasons() {
+	public void nextTick() {
 		last_seasons = seasons;
 		seasons = (int) (world.getWorldTime() % cycle) % 4;
 	}

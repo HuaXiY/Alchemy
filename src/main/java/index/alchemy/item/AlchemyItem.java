@@ -36,7 +36,7 @@ public class AlchemyItem extends Item implements IResourceLocation {
 		}
 	};
 	
-	private String name_color;
+	protected String name_color;
 	
 	protected ResourceLocation icon_name;
 	

@@ -21,7 +21,7 @@ public class PotionEternal extends AlchemyPotion implements IEventHandle {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingHurt(LivingHurtEvent event) {
 		if (event.getEntityLiving().isPotionActive(this)) {
-			event.setAmount(Math.min(event.getEntityLiving().getHealth() - 0.1F, event.getAmount()));
+			event.setAmount(Math.min(event.getEntityLiving().getHealth() - 0.01F, event.getAmount()));
 		}
 	}
 

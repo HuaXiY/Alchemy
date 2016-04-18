@@ -16,7 +16,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
-public abstract class AlchemyItemScroll extends AlchemyItem {
+public abstract class ItemScroll extends AlchemyItem {
 	
 	public static final String SCROOL_TYPE = "scroll_type", SCROOL_USE = "scroll_use";
 	
@@ -53,7 +53,7 @@ public abstract class AlchemyItemScroll extends AlchemyItem {
 	public boolean sync, instant, infinite, next;
 	public int max;
 	
-	public AlchemyItemScroll(String name, int time, int size, boolean sync, int max) {
+	public ItemScroll(String name, int time, int size, boolean sync, int max) {
 		super(name);
 		setNoRepair();
 		setMaxDamage(time);

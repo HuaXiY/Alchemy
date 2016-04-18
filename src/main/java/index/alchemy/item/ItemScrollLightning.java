@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 
-public class ItemScrollLightning extends AlchemyItemScroll {
+public class ItemScrollLightning extends ItemScroll {
 	public ItemScrollLightning() {
 		super("scroll_lightning", 30, 64, true, 1);
 	}

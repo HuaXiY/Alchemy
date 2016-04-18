@@ -25,7 +25,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class AlchemyBlockOre extends AlchemyBlock implements IColorBlock, IOreDictionary {
+public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionary {
 	
 	public static final Random RANDOM = new Random();
 	public static final ResourceLocation ORE = new AlchemyResourceLocation("ore");
@@ -75,11 +75,11 @@ public class AlchemyBlockOre extends AlchemyBlock implements IColorBlock, IOreDi
 		return Tool._toUp(getRegistryName().getResourcePath());
 	}
 	
-	public AlchemyBlockOre(String name, Item drop, int color) {
+	public BlockOre(String name, Item drop, int color) {
 		this(name, drop, 1, 0, 0, color, false);
 	}
 	
-	public AlchemyBlockOre(String name, Item drop, int drop_num, int min_xp, int max_xp, int color, boolean drop_fortune) {
+	public BlockOre(String name, Item drop, int drop_num, int min_xp, int max_xp, int color, boolean drop_fortune) {
 		super(name, Material.rock);
 		this.drop = drop;
 		this.drop_num = drop_num;

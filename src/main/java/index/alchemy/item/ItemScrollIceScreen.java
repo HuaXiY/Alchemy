@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemScrollIceScreen extends AlchemyItemScroll {
+public class ItemScrollIceScreen extends ItemScroll {
 	public ItemScrollIceScreen() {
 		super("scroll_ice_screen", 0, 64, false, 1);
 	}

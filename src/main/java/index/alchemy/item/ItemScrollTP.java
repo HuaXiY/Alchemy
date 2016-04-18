@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
-public class ItemScrollTP extends AlchemyItemScroll {
+public class ItemScrollTP extends ItemScroll {
 	public static final String SCROLL_TP = "scroll_tp";
 	public ItemScrollTP() {
 		super(SCROLL_TP, 100, 1, true, 10);

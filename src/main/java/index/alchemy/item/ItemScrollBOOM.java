@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 
-public class ItemScrollBOOM extends AlchemyItemScroll {
+public class ItemScrollBOOM extends ItemScroll {
 	public ItemScrollBOOM() {
 		super("scroll_boom", 30, 64, true, 1);
 	}
