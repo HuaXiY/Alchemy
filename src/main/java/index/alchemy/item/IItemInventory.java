@@ -5,6 +5,6 @@ import net.minecraft.item.ItemStack;
 
 public interface IItemInventory {
 	
-	public ItemInventory getItemInventory(EntityPlayer player);
+	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item);
 	
 }

@@ -57,21 +57,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void handleKeyInput(KeyInputEvent event) {
-		if (AlchemyKeyBindLoader.key_space_ring.isPressed()) {
-			if (AlchemyItemLoader.ring_space.isEquipmented(Minecraft.getMinecraft().thePlayer))
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
-		} else if (AlchemyKeyBindLoader.key_space_ring_pickup.isPressed()) {
-			if (AlchemyItemLoader.ring_space.isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-					ClientProxy.ring_space_pickup_last_time - Minecraft.getMinecraft().theWorld.getWorldTime() > 20 * 3) {
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickUp());
-				ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().theWorld.getWorldTime();
-			}
-		}
-	}
-	
 	@SubscribeEvent
 	public void onPlayerTick(PlayerTickEvent event) {
 		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)

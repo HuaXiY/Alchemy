@@ -30,8 +30,8 @@ public class AlchemyItemLoader {
 			scroll_lightning = new ItemScrollLightning(),
 			scroll_tp = new ItemScrollTP();
 	
-	public static final ItemRingSpace 
-			ring_space = new ItemRingSpace();
+	public static final ItemRingSpace ring_space = new ItemRingSpace();
+	public static final ItemAmuletGuard amulet_guard = new ItemAmuletGuard();
 	
 	public static void init() {
 		
