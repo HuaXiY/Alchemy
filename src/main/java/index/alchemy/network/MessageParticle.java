@@ -8,6 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MessageParticle implements IMessage, IMessageHandler<MessageParticle, IMessage> {
 	
@@ -23,6 +25,7 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(MessageParticle message, MessageContext ctx) {
 		SDouble6Packect d6p[] = message.d6p;
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;

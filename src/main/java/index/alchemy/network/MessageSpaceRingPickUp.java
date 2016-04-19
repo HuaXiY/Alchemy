@@ -23,7 +23,7 @@ public class MessageSpaceRingPickUp implements IMessage, IMessageHandler<Message
 	
 	@Override
 	public IMessage onMessage(MessageSpaceRingPickUp message, MessageContext ctx) {
-		AlchemyItemLoader.ring_space.pickUp(ctx.getServerHandler().playerEntity);
+		AlchemyItemLoader.ring_space.pickup(ctx.getServerHandler().playerEntity);
 		return null;
 	}
 	

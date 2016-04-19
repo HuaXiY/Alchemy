@@ -75,6 +75,11 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 		return Tool._toUp(getRegistryName().getResourcePath());
 	}
 	
+	@Override
+	public ItemStack getItemStackInOreDictionary() {
+		return new ItemStack(this);
+	}
+	
 	public BlockOre(String name, Item drop, int color) {
 		this(name, drop, 1, 0, 0, color, false);
 	}

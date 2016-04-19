@@ -22,6 +22,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import index.alchemy.client.AlchemyKeyBindLoader;
@@ -33,14 +35,16 @@ import index.alchemy.core.EventType;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.gui.GUIID;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
+import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
 import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.network.INetworkMessage;
 import index.alchemy.network.MessageOpenGui;
 import index.alchemy.network.MessageParticle;
-import index.alchemy.network.MessageSpaceRingPickUp;
 import index.alchemy.network.SDouble6Packect;
 import index.alchemy.util.Cache;
+import io.netty.buffer.ByteBuf;
 
-public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IEventHandle {
+public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IEventHandle, INetworkMessage<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
 	
@@ -59,6 +63,45 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void handleKeyInput(KeyInputEvent event) {
+		if (AlchemyKeyBindLoader.key_space_ring.isPressed()) {
+			if (isEquipmented(Minecraft.getMinecraft().thePlayer))
+				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
+		} else if (AlchemyKeyBindLoader.key_space_ring_pickup.isPressed()) {
+			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
+					ClientProxy.ring_space_pickup_last_time - Minecraft.getMinecraft().theWorld.getWorldTime() > PICKUP_CD) {
+				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickup());
+				ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().theWorld.getWorldTime();
+			}
+		}
+	}
+	
+	public static class MessageSpaceRingPickup implements IMessage {
+		@Override
+		public void fromBytes(ByteBuf buf) {}
+
+		@Override
+		public void toBytes(ByteBuf buf) {}
+	}
+	
+	@Override
+	public Class<MessageSpaceRingPickup> getMessageClass() {
+		return MessageSpaceRingPickup.class;
+	}
+	
+	@Override
+	public Side getMessageSide() {
+		return Side.SERVER;
+	}
+	
+	@Override
+	public IMessage onMessage(MessageSpaceRingPickup message, MessageContext ctx) {
+		AlchemyItemLoader.ring_space.pickup(ctx.getServerHandler().playerEntity);
+		return null;
+	}
+	
 	public ItemRingSpace() {
 		this("ring_space", 9 * 6);
 	}
@@ -68,26 +111,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 		this.size = size;
 	}
 	
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void handleKeyInput(KeyInputEvent event) {
-		if (AlchemyKeyBindLoader.key_space_ring.isPressed()) {
-			if (AlchemyItemLoader.ring_space.isEquipmented(Minecraft.getMinecraft().thePlayer))
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
-		} else if (AlchemyKeyBindLoader.key_space_ring_pickup.isPressed()) {
-			if (AlchemyItemLoader.ring_space.isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-					ClientProxy.ring_space_pickup_last_time - Minecraft.getMinecraft().theWorld.getWorldTime() > PICKUP_CD) {
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickUp());
-				ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().theWorld.getWorldTime();
-			}
-		}
-	}
-	
-	public void pickUp(EntityPlayer player) {
-		ItemStack content = getFormPlayer(player);
-		if (content == null)
-			return;
-		ItemInventory inventory = getItemInventory(player, content);
+	public void pickup(EntityPlayer player) {
+		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
 		if (inventory == null)
 			return;
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, 
@@ -105,8 +130,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 		if (list.size() > 0) {
 			inventory.updateNBT();
 			for (EntityPlayerMP mp : player.worldObj.getEntitiesWithinAABB(EntityPlayerMP.class,
-					new AxisAlignedBB(player.posX - 16, player.posY - 64, player.posZ - 16,
-							player.posX + 16, player.posY + 64, player.posZ + 16)))
+					new AxisAlignedBB(player.posX - 16D, player.posY - 64D, player.posZ - 16D,
+							player.posX + 16D, player.posY + 64D, player.posZ + 16D)))
 				AlchemyNetworkHandler.networkWrapper.sendTo(new MessageParticle(EnumParticleTypes.PORTAL.getParticleID(),
 						d6p.toArray(new SDouble6Packect[d6p.size()])), (EntityPlayerMP) mp);
 		}

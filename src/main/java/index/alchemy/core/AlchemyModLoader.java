@@ -39,6 +39,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -152,16 +154,17 @@ public class AlchemyModLoader {
 	
 	public static void init(Class<?> clazz) {
 		try {
+			logger.info("Starting init class: " + clazz.getName());
 			clazz.getMethod("init").invoke(null);
-			logger.info("Successful init class: " + clazz.getName());
+			logger.info("Successful !");
 		} catch (Exception e) {
-			logger.error("Failed to init class: " + clazz.getName());
 			e.printStackTrace();
+			logger.error("Failed !");
 		}
 	}
 	
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) throws ClassNotFoundException {
+	public void preInit(FMLPreInitializationEvent event) {
 		event_system = new AlchemyEventSystem(this);
 		config = new AlchemyConfigLoader(event.getSuggestedConfigurationFile());
 		init(event.getModState());

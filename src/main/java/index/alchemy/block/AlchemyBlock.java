@@ -5,10 +5,12 @@ import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorBlock;
 import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Constants;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IOreDictionary;
 import index.alchemy.core.IPlayerTickable;
+import index.alchemy.core.IRegister;
 import index.alchemy.core.IResourceLocation;
 import index.alchemy.core.ITileEntity;
 import index.alchemy.item.AlchemyItem;
@@ -27,7 +29,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class AlchemyBlock extends Block implements IResourceLocation {
+public class AlchemyBlock extends Block implements IResourceLocation, IRegister {
 	
 	protected ResourceLocation icon_name;
 	
@@ -48,38 +50,16 @@ public class AlchemyBlock extends Block implements IResourceLocation {
 			setCreativeTab(AlchemyItem.CREATIVE_TABS);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		registerBlock();
+		register();
 	}
 	
 	public boolean hasCreativeTab() {
 		return true;
 	}
 	
-	public <T extends Block & IColorBlock> void registerBlock() {
-		Item item = new ItemBlock(this).setRegistryName(getRegistryName());
-		GameRegistry.register(this);
-		GameRegistry.register(item);
-		AlchemyBlockLoader.ALL_BLOCK.add(this);
-		
-		if (Alway.isClient()) {
-			ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(
-					getResourceLocation(), "inventory"));
-			if (this instanceof IColorBlock)
-				AlchemyColorLoader.addBlockColor((T) this);
-			item.setFull3D();
-		}
-		
-		if (this instanceof ITileEntity)
-			GameRegistry.registerTileEntity(((ITileEntity) this).getTileEntityClass(), getUnlocalizedName());
-		
-		if (this instanceof IOreDictionary)
-			OreDictionary.registerOre(((IOreDictionary) this).getNameInOreDictionary(), new ItemStack(this));
-		
-		if (this instanceof IPlayerTickable)
-			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
-		
-		if (this instanceof IEventHandle)
-			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
+	@Override
+	public void register() {
+		AlchemyInitHook.init_impl(this);
 	}
 
 	

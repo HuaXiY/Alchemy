@@ -5,27 +5,32 @@ import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
-	public static SimpleNetworkWrapper networkWrapper;
+	public static final SimpleNetworkWrapper networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MODID);
 	private static int register = -1;
 
 	public static void init() {
-		networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MODID);
-		
-		registerPacket(MessageOpenGui.class, Side.SERVER);
-		registerPacket(MessageSpaceRingPickUp.class, Side.SERVER);
-		registerPacket(MessageAlacrityCallback.class, Side.SERVER);
-		
-		if (Alway.isClient()) {
-			registerPacket(MessageParticle.class, Side.CLIENT);
-		}
+		registerMessage(MessageOpenGui.class, Side.SERVER);
+		registerMessage(MessageSpaceRingPickUp.class, Side.SERVER);
+		registerMessage(MessageAlacrityCallback.class, Side.SERVER);
+		registerMessage(MessageParticle.class, Side.CLIENT);
 	}
 
-	private static void registerPacket(Class clazz, Side side) {
+	public static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz, Side side) {
 		networkWrapper.registerMessage(clazz, clazz, ++register, side);
+	}
+	
+	public static <T extends IMessage, R extends IMessageHandler<T, IMessage>> void registerMessage(Class<T> message, Class<R> handle, Side side) {
+		networkWrapper.registerMessage(handle, message, ++register, side);
+	}
+	
+	public static void registerMessage(INetworkMessage<IMessage> handle) {
+		networkWrapper.registerMessage(handle, handle.getMessageClass(), ++register, handle.getMessageSide());
 	}
 }

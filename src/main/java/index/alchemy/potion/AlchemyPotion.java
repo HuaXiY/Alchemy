@@ -1,18 +1,22 @@
 package index.alchemy.potion;
 
 import index.alchemy.client.AlchemyResourceLocation;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.CommonProxy;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IPlayerTickable;
+import index.alchemy.core.IRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AlchemyPotion extends Potion {
+public class AlchemyPotion extends Potion implements IRegister {
 	
 	public static final ResourceLocation RESOURCE_LOCATION = new AlchemyResourceLocation("potion");
 	
@@ -32,6 +36,7 @@ public class AlchemyPotion extends Potion {
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
 		mc.getTextureManager().bindTexture(RESOURCE_LOCATION);
 		mc.currentScreen.drawTexturedModalRect(x + 6, y + 6, id % 16 * 16, id / 16, 16, 16);
@@ -50,13 +55,13 @@ public class AlchemyPotion extends Potion {
 		super(isbad, color);
 		this.ready = ready;
 		id = ++current_id;
-		REGISTRY.register(-1, new AlchemyResourceLocation(name), this);
-		
-		if (this instanceof IPlayerTickable) 
-			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
-		
-		if (this instanceof IEventHandle)
-			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
+		setRegistryName(name);
+		register();
+	}
+	
+	@Override
+	public void register() {
+		AlchemyInitHook.init_impl(this);
 	}
 	
 }

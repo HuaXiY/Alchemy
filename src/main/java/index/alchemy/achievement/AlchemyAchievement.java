@@ -1,13 +1,15 @@
 package index.alchemy.achievement;
 
 import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.IEventHandle;
+import index.alchemy.core.IRegister;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 
-public class AlchemyAchievement extends Achievement {
+public class AlchemyAchievement extends Achievement implements IRegister {
 	
 	public AlchemyAchievement(String name, int column, int row, Item icon, Achievement parent) {
 		super("achievement." + name, name, column, row, icon, parent);
@@ -32,8 +34,12 @@ public class AlchemyAchievement extends Achievement {
 		else 
 			setSpecial().registerStat();
 		
-		if (this instanceof IEventHandle)
-			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
+		register();
+	}
+
+	@Override
+	public void register() {
+		AlchemyInitHook.init(this);
 	}
 	
 }

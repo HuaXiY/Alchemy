@@ -2,13 +2,15 @@ package index.alchemy.enchantment;
 
 import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IPlayerTickable;
+import index.alchemy.core.IRegister;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
-public class AlchemyEnchantment extends Enchantment {
+public class AlchemyEnchantment extends Enchantment implements IRegister {
 	
 	public static final EntityEquipmentSlot[] 
 			SLOT_ARMOR = new EntityEquipmentSlot[]{
@@ -35,13 +37,13 @@ public class AlchemyEnchantment extends Enchantment {
 	public AlchemyEnchantment(String name, Rarity rarity, EnumEnchantmentType type, int max_level, EntityEquipmentSlot... slots) {
 		super(rarity, type, slots);
 		this.max_level = max_level;
-		REGISTRY.register(-1, new AlchemyResourceLocation(name), this);
-		
-		if (this instanceof IPlayerTickable)
-			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
-		
-		if (this instanceof IEventHandle)
-			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
+		setRegistryName(name);
+		register();
+	}
+	
+	@Override
+	public void register() {
+		AlchemyInitHook.init_impl(this);
 	}
 
 }

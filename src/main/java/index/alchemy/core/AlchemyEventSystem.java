@@ -2,6 +2,7 @@ package index.alchemy.core;
 
 import index.alchemy.client.AlchemyKeyBindLoader;
 import index.alchemy.container.ContainerItemInventory;
+import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.gui.GUIID;
 import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.item.IItemInventory;
@@ -63,20 +64,28 @@ public class AlchemyEventSystem implements IGuiHandler {
 			tickable.onTick(event.player);
 	}
 	
+	@SubscribeEvent
+	public void onInitHook(InitHookEvent event) {
+		AlchemyModLoader.logger.info("	init: <" + event.init.getClass().getName() + "> " + event.init);
+	}
+	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		switch (ID) {
 			case GUIID.SPACE_RING:
-				return new ContainerChest(player.inventory, AlchemyItemLoader.ring_space.getItemInventory(player), player);
+				return new ContainerChest(player.inventory, AlchemyItemLoader.ring_space.getItemInventory(player, 
+						AlchemyItemLoader.ring_space.getFormPlayer(player)), player);
 		}
 		return null;
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		switch (ID) {
 			case GUIID.SPACE_RING:
-				return new GuiChest(player.inventory, AlchemyItemLoader.ring_space.getItemInventory(player));
+				return new GuiChest(player.inventory, AlchemyItemLoader.ring_space.getItemInventory(player,
+						AlchemyItemLoader.ring_space.getFormPlayer(player)));
 		}
 		return null;
 	}

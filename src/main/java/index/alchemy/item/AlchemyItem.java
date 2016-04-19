@@ -5,10 +5,12 @@ import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorItem;
 import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Constants;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IOreDictionary;
 import index.alchemy.core.IPlayerTickable;
+import index.alchemy.core.IRegister;
 import index.alchemy.core.IResourceLocation;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -27,7 +29,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class AlchemyItem extends Item implements IResourceLocation {
+public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 	
 	public static final CreativeTabs CREATIVE_TABS = new CreativeTabs(Constants.MODID) {
 		@Override
@@ -73,31 +75,12 @@ public class AlchemyItem extends Item implements IResourceLocation {
 		setCreativeTab(CREATIVE_TABS);
 		setUnlocalizedName(name);
 		setRegistryName(name);
-		registerItem();
+		register();
 	}
 	
-	public <T extends Item & IColorItem> void registerItem() {
-		GameRegistry.register(this);
-		AlchemyItemLoader.ALL_ITEM.add(this);
-		
-		if (Alway.isClient()) {
-			ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(
-					getResourceLocation(), "inventory"));
-			if (this instanceof IColorItem)
-				AlchemyColorLoader.addItemColor((T) this);
-		}
-		
-		if (this instanceof IOreDictionary)
-			OreDictionary.registerOre(((IOreDictionary) this).getNameInOreDictionary(), new ItemStack(this));
-		
-		if (this instanceof IBrewingRecipe)
-			BrewingRecipeRegistry.addRecipe((IBrewingRecipe) this);
-		
-		if (this instanceof IPlayerTickable)
-			AlchemyEventSystem.registerPlayerTickable((IPlayerTickable) this);
-		
-		if (this instanceof IEventHandle)
-			AlchemyEventSystem.registerEventHandle((IEventHandle) this);
+	@Override
+	public void register() {
+		AlchemyInitHook.init_impl(this);
 	}
 	
 }

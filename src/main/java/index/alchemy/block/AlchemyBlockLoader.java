@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import index.alchemy.api.Alway;
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
 import index.alchemy.item.AlchemyItem;
@@ -34,8 +35,6 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyBlockLoader {
-	
-	public static final List<AlchemyBlock> ALL_BLOCK= new LinkedList<AlchemyBlock>();
 	
 	public static final Block ice_temp = new BlockIceTemp();
 	
@@ -72,7 +71,7 @@ public class AlchemyBlockLoader {
     				if (block == toReplace){
     					ResourceLocation registryName = Block.REGISTRY.getNameForObject(block);
     					int id = Block.getIdFromBlock(block);
-    					System.out.println("Replacing block - " + id + " / " + registryName);
+    					AlchemyModLoader.logger.info("Replacing block - " + id + " / " + registryName);
     					
     					Block newBlock = blockClass.newInstance();
     					FMLControlledNamespacedRegistry<Block> registry = GameData.getBlockRegistry();

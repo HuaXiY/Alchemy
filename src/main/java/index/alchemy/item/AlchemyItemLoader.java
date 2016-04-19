@@ -19,8 +19,6 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyItemLoader {
 	
-	public static final List<AlchemyItem> ALL_ITEM = new LinkedList<AlchemyItem>();
-	
 	public static final ItemMagicSolvent 
 			solvent_lapis_lazuli = new ItemMagicSolvent("lapis_lazuli", 0x307CCB, Items.DYE, 4);
 	
