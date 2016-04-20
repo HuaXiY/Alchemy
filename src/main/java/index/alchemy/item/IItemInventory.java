@@ -7,4 +7,6 @@ public interface IItemInventory {
 	
 	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item);
 	
+	public String getInventoryUnlocalizedName();
+	
 }

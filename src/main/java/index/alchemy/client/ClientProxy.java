@@ -1,5 +1,6 @@
-package index.alchemy.core;
+package index.alchemy.client;
 
+import index.alchemy.core.CommonProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

@@ -27,9 +27,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import index.alchemy.client.AlchemyKeyBindingLoader;
+import index.alchemy.client.ClientProxy;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.ClientProxy;
 import index.alchemy.core.Constants;
 import index.alchemy.core.EventType;
 import index.alchemy.core.IEventHandle;
@@ -54,8 +54,12 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item) {
 		if (item == null)
 			return null;
-		return new ItemInventory(player, item, size, 
-				I18n.translateToLocal("inventory." + getUnlocalizedName().substring(Constants.ITEM)));
+		return new ItemInventory(player, item, size, I18n.translateToLocal(getInventoryUnlocalizedName()));
+	}
+	
+	@Override
+	public String getInventoryUnlocalizedName() {
+		return "inventory." + getUnlocalizedName().substring(Constants.ITEM);
 	}
 	
 	@Override
@@ -66,7 +70,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void handleKeyInput(KeyInputEvent event) {
-		if (AlchemyKeyBindingLoader.key_space_ring.isPressed()) {
+		if (AlchemyKeyBindingLoader.key_space_ring_open.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer))
 				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
 		} else if (AlchemyKeyBindingLoader.key_space_ring_pickup.isPressed()) {

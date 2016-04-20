@@ -1,13 +1,13 @@
 [
 {
-  "modid": "thirst_alchemy",
-  "name": "Thirst & Alchemy Mod",
-  "description": "The nasty mod that makes you wanna drink! And alchemy :D",
+  "modid": "alchemy",
+  "name": "Alchemy Mod",
+  "description": "Alchemy :D",
   "credits": "LexManos, cpw",
-  "version": "1.9.0",
-  "mcversion": "1.7.10",
+  "version": "0.1.1",
+  "mcversion": "1.9",
   "url": "",
-  "authorList": [ "tarun1998", "Mickeyxiami" ],
+  "authorList": [ "Mickeyxiami" ],
   "dependencies": [ "mod_MinecraftForge" ]
 }
 ]

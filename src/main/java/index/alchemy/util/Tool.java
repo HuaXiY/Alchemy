@@ -43,12 +43,19 @@ public class Tool {
 		return to;
 	}
 
-	public static final boolean isSubclass(Class<?> supers, Class<?> cls) {
+	public static final boolean isSubclass(Class<?> supers, Class<?> clazz) {
 		do
-			if (supers == cls)
+			if (supers == clazz)
 				return true;
-		while ((cls = cls.getSuperclass()) != null);
+		while ((clazz = clazz.getSuperclass()) != null);
 		return false;
+	}
+	
+	public static final boolean isInstance(Class<?> supers, Class<?> clazz) {
+		for (Class<?> i : clazz.getInterfaces())
+			if (i == supers)
+				return true;
+		return isSubclass(supers, clazz);
 	}
 
 	public static final PrintWriter getPrintWriter(String path) {

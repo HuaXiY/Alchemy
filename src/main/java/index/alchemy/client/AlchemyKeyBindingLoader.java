@@ -14,7 +14,7 @@ import org.lwjgl.input.Keyboard;
 public class AlchemyKeyBindingLoader {
 	
 	public static final KeyBinding
-			key_space_ring = new AlchemyKeyBinding("key.space_ring", Keyboard.KEY_R, Constants.MODID),
+			key_space_ring_open = new AlchemyKeyBinding("key.space_ring_open", Keyboard.KEY_R, Constants.MODID),
 			key_space_ring_pickup = new AlchemyKeyBinding("key.space_ring_pickup", Keyboard.KEY_C, Constants.MODID);
 	
 	public static void init() {}

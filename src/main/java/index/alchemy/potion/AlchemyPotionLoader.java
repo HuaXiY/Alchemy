@@ -1,5 +1,6 @@
 package index.alchemy.potion;
 
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Init;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.util.Tool;
@@ -186,6 +187,11 @@ public class AlchemyPotionLoader extends PotionType {
 			registerPotionType("long_" + name2, current_type3);
 		
 	}
+	
+	public static void registerPotionType(String name, PotionType potion) {
+		potion.setRegistryName(name);
+        AlchemyInitHook.init_impl(potion);
+    }
 	
 	public static Method registerPotionTypeConversion;
 	

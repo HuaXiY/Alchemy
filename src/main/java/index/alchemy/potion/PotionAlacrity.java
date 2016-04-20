@@ -7,7 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import index.alchemy.core.ClientProxy;
+import index.alchemy.client.ClientProxy;
 import index.alchemy.core.IPlayerTickable;
 import index.alchemy.entity.AlchemyDamageSourceLoader;
 import index.alchemy.network.AlchemyNetworkHandler;

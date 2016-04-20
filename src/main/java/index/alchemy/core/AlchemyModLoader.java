@@ -91,7 +91,7 @@ public class AlchemyModLoader {
 		
 		if (!str.contains("alchemy.info")) {
 			mod_path = str + "/bin/";
-			mc_dir = str + "/eclipse";
+			mc_dir = str;
 			is_modding = true;
 		} else {
 			mod_path = str.replace("\\", "/").replace("!/alchemy.info", "").replace("jar:", "");
@@ -152,7 +152,7 @@ public class AlchemyModLoader {
 		
 	}
 	
-	@SidedProxy(clientSide = Constants.PACKAGE + ".core.ClientProxy", serverSide = Constants.PACKAGE + ".core.CommonProxy")
+	@SidedProxy(clientSide = Constants.PACKAGE + ".client.ClientProxy", serverSide = Constants.PACKAGE + ".core.CommonProxy")
 	public static CommonProxy commonProxy;
 	
 	public static void init(ModState state) {
@@ -183,7 +183,6 @@ public class AlchemyModLoader {
 		event_system = new AlchemyEventSystem(this);
 		config = new AlchemyConfigLoader(event.getSuggestedConfigurationFile());
 		init(event.getModState());
-		throw new AlchemyRuntimeExcption(new RuntimeException());
 	}
 	
 	@EventHandler

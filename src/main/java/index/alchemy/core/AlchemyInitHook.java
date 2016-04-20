@@ -10,6 +10,7 @@ import index.alchemy.world.IGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -18,6 +19,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
@@ -41,10 +43,6 @@ public class AlchemyInitHook {
 	
 	public static void init_impl(Impl impl) {
 		init(impl);
-	}
-	
-	public static void init_impl(Impl impl, ResourceLocation res) {
-		init(impl.setRegistryName(res));
 	}
 	
 	public static <I extends Item & IColorItem, B extends Block & IColorBlock,
@@ -81,7 +79,7 @@ public class AlchemyInitHook {
 			
 			if (obj instanceof Item) {
 				
-				if (obj instanceof IItemColor)
+				if (obj instanceof IColorItem)
 					AlchemyColorLoader.addItemColor((I) obj);
 				
 				if (obj instanceof IResourceLocation)
@@ -96,6 +94,9 @@ public class AlchemyInitHook {
 					AlchemyColorLoader.addBlockColor((B) obj);
 				
 			}
+			
+			if (obj instanceof KeyBinding)
+				ClientRegistry.registerKeyBinding((KeyBinding) obj);
 			
 		}
 		
