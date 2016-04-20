@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import index.alchemy.client.AlchemyKeyBindLoader;
+import index.alchemy.client.AlchemyKeyBindingLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.ClientProxy;
@@ -66,10 +66,10 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void handleKeyInput(KeyInputEvent event) {
-		if (AlchemyKeyBindLoader.key_space_ring.isPressed()) {
+		if (AlchemyKeyBindingLoader.key_space_ring.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer))
 				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
-		} else if (AlchemyKeyBindLoader.key_space_ring_pickup.isPressed()) {
+		} else if (AlchemyKeyBindingLoader.key_space_ring_pickup.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
 					ClientProxy.ring_space_pickup_last_time - Minecraft.getMinecraft().theWorld.getWorldTime() > PICKUP_CD) {
 				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickup());

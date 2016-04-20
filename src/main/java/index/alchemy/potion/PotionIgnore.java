@@ -7,6 +7,7 @@ import com.google.common.base.Predicate;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.EventType;
 import index.alchemy.core.IEventHandle;
+import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.entity.ai.EntityAIFindEntityNearestHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -47,7 +48,7 @@ public class PotionIgnore extends AlchemyPotion implements IEventHandle {
 			try {
 				attackTarget.set(event.getEntityLiving(), null);
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				throw new AlchemyRuntimeExcption(e);
 			}
 		}
 	}

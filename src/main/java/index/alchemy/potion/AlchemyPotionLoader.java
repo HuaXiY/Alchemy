@@ -1,6 +1,7 @@
 package index.alchemy.potion;
 
 import index.alchemy.core.Init;
+import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.util.Tool;
 
 import java.lang.reflect.Method;
@@ -192,16 +193,16 @@ public class AlchemyPotionLoader extends PotionType {
 		try {
 			(registerPotionTypeConversion = Tool.searchMethod(
 					PotionHelper.class, PotionType.class, Predicate.class, PotionType.class)).setAccessible(true);
-		} catch (Throwable t) {
-			throw new RuntimeException(t.getMessage());
+		} catch (Exception e) {
+			throw new AlchemyRuntimeExcption(e);
 		}
 	}
 	
 	public static void registerPotionTypeConversion(PotionType input, Predicate<ItemStack> reagentPredicate, PotionType output){
 		try {
 			registerPotionTypeConversion.invoke(null, input, reagentPredicate, output);
-		} catch (Throwable t) {
-			throw new RuntimeException(t.getMessage());
+		} catch (Exception e) {
+			throw new AlchemyRuntimeExcption(e);
 		}
 	}
 	

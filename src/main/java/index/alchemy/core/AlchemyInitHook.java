@@ -35,6 +35,10 @@ public class AlchemyInitHook {
 		
 	}
 	
+	public static void push_event(Object obj) {
+		MinecraftForge.EVENT_BUS.post(new InitHookEvent(obj));
+	}
+	
 	public static void init_impl(Impl impl) {
 		init(impl);
 	}
@@ -53,7 +57,7 @@ public class AlchemyInitHook {
 			init(new ItemBlock((Block) obj).setRegistryName(((Block) obj).getRegistryName()));
 		
 		if (obj instanceof ITileEntity)
-			GameRegistry.registerTileEntity(((ITileEntity) obj).getTileEntityClass(), ((ITileEntity) obj).getUnlocalizedName());
+			GameRegistry.registerTileEntity(((ITileEntity) obj).getTileEntityClass(), ((ITileEntity) obj).getTileEntityName());
 		
 		if (obj instanceof IOreDictionary)
 			OreDictionary.registerOre(((IOreDictionary) obj).getNameInOreDictionary(), ((IOreDictionary) obj).getItemStackInOreDictionary());
@@ -95,7 +99,7 @@ public class AlchemyInitHook {
 			
 		}
 		
-		MinecraftForge.EVENT_BUS.post(new InitHookEvent(obj));
+		push_event(obj);
 		
 	}
 

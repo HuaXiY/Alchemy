@@ -23,6 +23,11 @@ public class BlockIceTemp extends AlchemyBlock implements ITileEntity {
 	}
 	
 	@Override
+	public String getTileEntityName() {
+		return getUnlocalizedName();
+	}
+	
+	@Override
 	public TileEntity createNewTileEntity(World world, int i) {
 		return new TileEntityIceTemp();
 	}
@@ -34,5 +39,5 @@ public class BlockIceTemp extends AlchemyBlock implements ITileEntity {
 		setSoundType(SoundType.GLASS);
 		setBlockUnbreakable();
 	}
-	
+
 }

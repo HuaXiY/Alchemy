@@ -11,11 +11,11 @@ import org.lwjgl.input.Keyboard;
 
 @SideOnly(Side.CLIENT)
 @Init(state = ModState.PREINITIALIZED)
-public class AlchemyKeyBindLoader {
+public class AlchemyKeyBindingLoader {
 	
 	public static final KeyBinding
-			key_space_ring = new KeyBinding("key.space_ring", Keyboard.KEY_R, Constants.MODID),
-			key_space_ring_pickup = new KeyBinding("key.space_ring_pickup", Keyboard.KEY_C, Constants.MODID);
+			key_space_ring = new AlchemyKeyBinding("key.space_ring", Keyboard.KEY_R, Constants.MODID),
+			key_space_ring_pickup = new AlchemyKeyBinding("key.space_ring_pickup", Keyboard.KEY_C, Constants.MODID);
 	
 	public static void init() {}
 

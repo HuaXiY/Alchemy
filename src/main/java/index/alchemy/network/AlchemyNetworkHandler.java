@@ -1,6 +1,7 @@
 package index.alchemy.network;
 
 import index.alchemy.api.Alway;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -17,17 +18,13 @@ public class AlchemyNetworkHandler {
 
 	public static void init() {
 		registerMessage(MessageOpenGui.class, Side.SERVER);
-		registerMessage(MessageSpaceRingPickUp.class, Side.SERVER);
 		registerMessage(MessageAlacrityCallback.class, Side.SERVER);
 		registerMessage(MessageParticle.class, Side.CLIENT);
 	}
 
-	public static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz, Side side) {
+	private static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz, Side side) {
 		networkWrapper.registerMessage(clazz, clazz, ++register, side);
-	}
-	
-	public static <T extends IMessage, R extends IMessageHandler<T, IMessage>> void registerMessage(Class<T> message, Class<R> handle, Side side) {
-		networkWrapper.registerMessage(handle, message, ++register, side);
+		AlchemyInitHook.push_event(clazz);
 	}
 	
 	public static void registerMessage(INetworkMessage<IMessage> handle) {

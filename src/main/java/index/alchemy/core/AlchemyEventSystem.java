@@ -1,6 +1,5 @@
 package index.alchemy.core;
 
-import index.alchemy.client.AlchemyKeyBindLoader;
 import index.alchemy.container.ContainerItemInventory;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.gui.GUIID;

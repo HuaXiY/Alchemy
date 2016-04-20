@@ -1,6 +1,7 @@
 package index.alchemy.client;
 
 import index.alchemy.api.Alway;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Init;
 
 import java.util.LinkedList;
@@ -35,6 +36,7 @@ public class AlchemyColorLoader {
 		ItemColors colors = Minecraft.getMinecraft().getItemColors();
 		for (T t : (List<T>) item_color) {
 			colors.registerItemColorHandler(t.getItemColor(), t);
+			AlchemyInitHook.push_event(t);
 		}
 	}
 	
@@ -42,6 +44,7 @@ public class AlchemyColorLoader {
 		BlockColors colors = Minecraft.getMinecraft().getBlockColors();
 		for (T t : (List<T>) block_color) {
 			colors.registerBlockColorHandler(t.getBlockColor(), t);
+			AlchemyInitHook.push_event(t);
 		}
 	}
 	

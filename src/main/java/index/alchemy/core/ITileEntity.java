@@ -7,6 +7,6 @@ public interface ITileEntity extends ITileEntityProvider {
 	
 	public Class<? extends TileEntity> getTileEntityClass();
 	
-	public String getUnlocalizedName();
+	public String getTileEntityName();
 
 }

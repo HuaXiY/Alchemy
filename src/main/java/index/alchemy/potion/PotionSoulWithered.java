@@ -1,6 +1,6 @@
 package index.alchemy.potion;
 
-import index.alchemy.core.AlchemyDamageSourceLoader;
+import index.alchemy.entity.AlchemyDamageSourceLoader;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
 
