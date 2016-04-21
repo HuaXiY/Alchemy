@@ -79,14 +79,8 @@ public class DLang {
 	public static void save(String name) {
 		AlchemyModLoader.logger.info("        save: " + name);
 		File file = new File(lang_dir, name);
-		Map<String, String> map = new LinkedHashMap<String, String>();
 		try {
-			String lang = Tool.read(file);
-			for (String line : lang.split("\n")) {
-				String mapping[] = line.split("=");
-				if (mapping.length == 2)
-					map.put(mapping[0], mapping[1]);
-			}
+			Map<String, String> map = getMap(file);
 			StringBuilder builder = new StringBuilder("//MODID\n" + Constants.MODID + "=" +
 					Tool.isNullOr(map.get(Constants.MODID), Constants.MODID) + "\n");
 			for (Field field : DLang.class.getDeclaredFields())
