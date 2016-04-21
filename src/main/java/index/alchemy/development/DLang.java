@@ -148,7 +148,7 @@ public class DLang {
 	}
 	
 	public static void init(ItemMagicSolvent.Type type) {
-		miscMap.put(type.PREFIX + type.name().toLowerCase(), "");
+		miscMap.put(ItemMagicSolvent.Type.PREFIX + type.name().toLowerCase(), "");
 	}
 
 }

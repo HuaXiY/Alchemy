@@ -40,7 +40,7 @@ public class DMain {
 			try {
 				method.invoke(null, obj);
 			} catch (Exception e) {
-				AlchemyModLoader.logger.warn("Catch a Exception in init method with class(" + method.getDeclaringClass().getName() + ")");
+				AlchemyModLoader.logger.warn("Catch a Exception in init(Object) method with class(" + method.getDeclaringClass().getName() + ")");
 				e.printStackTrace();
 			}
 	}
