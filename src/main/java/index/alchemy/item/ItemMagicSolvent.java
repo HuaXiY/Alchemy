@@ -1,6 +1,7 @@
 package index.alchemy.item;
 
 import index.alchemy.client.AlchemyResourceLocation;
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 
@@ -68,7 +69,10 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 		
 		Type(TextFormatting formatting) {
 			this.formatting = formatting;
+			AlchemyInitHook.init(this);
 		}
+		
+		public static final String PREFIX = "solvent.type.";
 		
 		private static final String EFFECT = "solvent_effect";
 		private static final Random RANDOM = new Random();
@@ -83,7 +87,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 		
 		@Override
 		public String toString() {
-			return I18n.translateToLocal("solvent.type." + name().toLowerCase());
+			return I18n.translateToLocal(PREFIX + name().toLowerCase());
 		}
 		
 		public String getTextWithoutFormattingCodes() {

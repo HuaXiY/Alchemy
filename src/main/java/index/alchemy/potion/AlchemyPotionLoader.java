@@ -66,9 +66,9 @@ public class AlchemyPotionLoader extends PotionType {
 			effects[index++] = new PotionEffect(potion, current_time);
 		}
 		
-		current_type = new PotionType(effects);
+		current_type = new PotionType(name, effects);
 		if (!REGISTRY.containsKey(new ResourceLocation(name)))
-			registerPotionType(name, current_type = new PotionType(effects));
+			registerPotionType(name, current_type);
 		registerPotionTypeConversion(input, item, input = current_type);
 		
 		if (levelII) {
@@ -79,9 +79,9 @@ public class AlchemyPotionLoader extends PotionType {
 				effects[index++] = new PotionEffect(potion, current_time, 1);
 			}
 			
-			current_type = new PotionType(effects);
+			current_type = new PotionType(name, effects);
 			if (!REGISTRY.containsKey(new ResourceLocation("strong_" + name)))
-				registerPotionType("strong_" + name, current_type = new PotionType(effects));
+				registerPotionType("strong_" + name, current_type);
 			registerPotionTypeConversion(input, glow_stone_dust, current_type);
 		}
 		
@@ -93,7 +93,7 @@ public class AlchemyPotionLoader extends PotionType {
 				effects[index++] = new PotionEffect(potion, current_time);
 			}
 			
-			current_type = new PotionType(effects);
+			current_type = new PotionType(name, effects);
 			if (!REGISTRY.containsKey(new ResourceLocation("long_" + name)))
 				registerPotionType("long_" + name, current_type);
 			registerPotionTypeConversion(input, red_stone, current_type);
@@ -115,10 +115,10 @@ public class AlchemyPotionLoader extends PotionType {
 			effects2[index++] = new PotionEffect(potion, current_time);
 		}
 		
-		current_type1 = new PotionType(effects1);
+		current_type1 = new PotionType(name1, effects1);
 		if (!REGISTRY.containsKey(new ResourceLocation(name1)))
 			registerPotionType(name1, current_type1);
-		current_type0 = new PotionType(effects2);
+		current_type0 = new PotionType(name2, effects2);
 		
 		registerPotionTypeConversion(input, item1, input1 = current_type1);
 		
@@ -142,10 +142,10 @@ public class AlchemyPotionLoader extends PotionType {
 				effects2[index++] = new PotionEffect(potion, current_time);
 			}
 			
-			current_type1 = new PotionType(effects1);
+			current_type1 = new PotionType(name1, effects1);
 			if (!REGISTRY.containsKey(new ResourceLocation("strong_" + name1)))
 				registerPotionType("strong_" + name1, current_type1);
-			current_type2 = new PotionType(effects2);
+			current_type2 = new PotionType(name2, effects2);
 			
 			registerPotionTypeConversion(input1, glow_stone_dust, current_type1);
 			registerPotionTypeConversion(input2, glow_stone_dust, current_type2);
@@ -167,10 +167,10 @@ public class AlchemyPotionLoader extends PotionType {
 				effects2[index++] = new PotionEffect(potion, current_time);
 			}
 			
-			current_type1 = new PotionType(effects1);
+			current_type1 = new PotionType(name1, effects1);
 			if (!REGISTRY.containsKey(new ResourceLocation("strong_" + name1)))
 				registerPotionType("long_" + name1, current_type1);
-			current_type3 = new PotionType(effects2);
+			current_type3 = new PotionType(name2, effects2);
 			
 			registerPotionTypeConversion(input1, red_stone, current_type1);
 			registerPotionTypeConversion(input2, red_stone, current_type3);

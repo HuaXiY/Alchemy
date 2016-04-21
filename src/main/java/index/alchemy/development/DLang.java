@@ -1,6 +1,7 @@
 package index.alchemy.development;
 
 import index.alchemy.item.IItemInventory;
+import index.alchemy.item.ItemMagicSolvent;
 import index.alchemy.util.Tool;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionType;
 
 public class DLang {
 	
@@ -53,19 +55,30 @@ public class DLang {
 	}
 	
 	public static void init(Potion potion) {
-		//potionMap.put(potion.get, value)
+		potionMap.put(potion.getName(), "");
+	}
+	
+	public static void init(PotionType potion) {
+		potionMap.put(potion.getNamePrefixed("potion.effect."), "");
+		potionMap.put(potion.getNamePrefixed("splash_potion.effect."), "");
+		potionMap.put(potion.getNamePrefixed("lingering_potion.effect."), "");
+		potionMap.put(potion.getNamePrefixed("tipped_arrow.effect."), "");
 	}
 	
 	public static void init(Enchantment enchantment) {
-		
+		enchantmentMap.put(enchantment.getName(), "");
 	}
 	
 	public static void init(KeyBinding key) {
-		
+		keyMap.put(key.getKeyDescription(), "");
 	}
 	
 	public static void init(IItemInventory inventory) {
-		
+		inventoryMap.put(inventory.getInventoryUnlocalizedName(), "");
+	}
+	
+	public static void init(ItemMagicSolvent.Type type) {
+		miscMap.put(key, value);
 	}
 
 }

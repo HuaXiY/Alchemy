@@ -55,7 +55,8 @@ public class AlchemyPotion extends Potion implements IRegister {
 		super(isbad, color);
 		this.ready = ready;
 		id = ++current_id;
-		setRegistryName(name);
+		setPotionName("effect." + name);
+		setRegistryName("potion_" + name);
 		register();
 	}
 	
