@@ -20,6 +20,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionType;
 import net.minecraft.util.DamageSource;
@@ -117,7 +118,8 @@ public class DLang {
 	}
 	
 	public static void init(Item item) {
-		itemMap.put(item.getUnlocalizedName() + ".name", "");
+		if (!(item instanceof ItemBlock))
+			itemMap.put(item.getUnlocalizedName() + ".name", "");
 	}
 	
 	public static void init(Block block) {
