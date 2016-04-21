@@ -2,6 +2,7 @@ package index.alchemy.core;
 
 import index.alchemy.container.ContainerItemInventory;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
+import index.alchemy.development.DMain;
 import index.alchemy.gui.GUIID;
 import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.item.IItemInventory;
@@ -65,7 +66,9 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent
 	public void onInitHook(InitHookEvent event) {
-		AlchemyModLoader.logger.info("	init: <" + event.init.getClass().getName() + "> " + event.init);
+		AlchemyModLoader.logger.info("    init: <" + event.init.getClass().getName() + "> " + event.init);
+		if (AlchemyModLoader.is_modding)
+			DMain.init(event.init);
 	}
 	
 	@Override

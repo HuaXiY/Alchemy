@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import index.alchemy.api.Alway;
 import index.alchemy.block.AlchemyBlockLoader;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.development.DMain;
 import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.potion.AlchemyPotionLoader;
@@ -54,7 +55,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Mod(modid = Constants.MODID, version = Constants.VERSION)
+@Mod(modid = Constants.MODID, version = Constants.MOD_VERSION)
 public class AlchemyModLoader {
 	
 	public static final Logger logger = LogManager.getLogger(Constants.MODID);
@@ -63,6 +64,9 @@ public class AlchemyModLoader {
 	
 	@Instance(Constants.MODID)
 	public static AlchemyModLoader instance;
+	
+	@SidedProxy(clientSide = Constants.MOD_PACKAGE + ".client.ClientProxy", serverSide = Constants.MOD_PACKAGE + ".core.CommonProxy")
+	public static CommonProxy proxy;
 	
 	private AlchemyEventSystem event_system;
 	private AlchemyConfigLoader config;
@@ -107,7 +111,7 @@ public class AlchemyModLoader {
 		
 		if (is_modding) {
 			List<String> temp = new LinkedList<String>();
-			Tool.getAllFile(new File(mod_path + Constants.PACKAGE.replace('.', '/')), temp);
+			Tool.getAllFile(new File(mod_path + Constants.MOD_PACKAGE.replace('.', '/')), temp);
 			for (String name : temp)
 				if (name.endsWith(".class"))
 					class_list.add(name.replace("\\", "/").replace(mod_path, "")
@@ -138,6 +142,8 @@ public class AlchemyModLoader {
 			if (name.startsWith("index."))
 				try {
 					Class<?> clazz = Class.forName(name, false, loader);
+					if (is_modding)
+						DMain.init(clazz);
 					for (Init init : clazz.getAnnotationsByType(Init.class)) {
 						SideOnly[] side = clazz.getAnnotationsByType(SideOnly.class);
 						if (side.length > 0 && Alway.getSide() != side[0].value())
@@ -151,9 +157,6 @@ public class AlchemyModLoader {
 		}
 		
 	}
-	
-	@SidedProxy(clientSide = Constants.PACKAGE + ".client.ClientProxy", serverSide = Constants.PACKAGE + ".core.CommonProxy")
-	public static CommonProxy commonProxy;
 	
 	public static void init(ModState state) {
 		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
@@ -188,6 +191,7 @@ public class AlchemyModLoader {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		init(event.getModState());
+		init(ModState.AVAILABLE);
 	}
 	
 }

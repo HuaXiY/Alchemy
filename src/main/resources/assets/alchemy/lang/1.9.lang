@@ -1,6 +1,5 @@
 //MODID
-alchemy=炼金术
-
+alchemy=alchemy
 //itemMap
 tile.ice_temp.name=
 item.lapis_lazuli.name=
@@ -66,8 +65,8 @@ tipped_arrow.effect.dead_or_alive=
 //enchantmentMap
 
 //keyMap
-key.space_ring_open=打开空间戒指
-key.space_ring_pickup=收进空间戒指
+key.space_ring_open=
+key.space_ring_pickup=
 
 //damageMap
 death.attack.soul_withred=%1$s

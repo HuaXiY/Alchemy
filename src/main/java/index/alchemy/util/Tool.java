@@ -92,34 +92,22 @@ public class Tool {
 		}
 	}
 
-	public static final String read(String path, String name) throws Exception {
+	public static final String read(String path, String name) throws IOException {
 		return read(path + File.separatorChar + name);
 	}
 
-	public static final String read(String path) throws Exception {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new InputStreamReader(
-					new FileInputStream(path), "UTF-8"));
-			StringBuilder content = new StringBuilder();
-			String line;
-			while ((line = reader.readLine()) != null)
-				content.append(line + "\n");
-			return content.toString();
-		} finally {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	public static final String read(String path) throws IOException {
+		return read(new FileInputStream(path));
 	}
 	
-	public static final String read(InputStream in) throws Exception {
+	public static final String read(File file) throws IOException {
+		return read(new FileInputStream(file));
+	}
+	
+	public static final String read(InputStream in) throws IOException {
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(
-					in, "UTF-8"));
+			reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			StringBuilder content = new StringBuilder();
 			String line;
 			while ((line = reader.readLine()) != null)
@@ -135,19 +123,22 @@ public class Tool {
 		}
 	}
 
-	public static final String read(File file) throws Exception {
-		return read(new FileInputStream(file));
-	}
-
-	public static final boolean save(String path, String name, String str) {
+	public static final boolean save(String path, String name, String str) throws IOException {
 		return save(path + File.separatorChar + name, str);
 	}
+	
+	public static final boolean save(String path, String str) throws IOException {
+		return save(new FileOutputStream(path), str);
+	}
+	
+	public static final boolean save(File file, String str) throws IOException {
+		return save(new FileOutputStream(file), str);
+	}
 
-	public static final boolean save(String path, String str) {
+	public static final boolean save(FileOutputStream out, String str) {
 		PrintWriter pfp = null;
 		try {
-			pfp = new PrintWriter(new OutputStreamWriter(new FileOutputStream(
-					path), "utf-8"));
+			pfp = new PrintWriter(new OutputStreamWriter(out, "utf-8"));
 			pfp.print(str);
 			return true;
 		} catch (Exception e) {
@@ -172,6 +163,10 @@ public class Tool {
 	
 	public static final <T> T isNullOr(T t, T or) {
 		return t == null ? or : t;
+	}
+	
+	public static final String isEmptyOr(String str, String or) {
+		return str == null || str.isEmpty() ? or : str;
 	}
 	
 	public static final <T> T get(Class cls, int index) {
@@ -219,8 +214,10 @@ public class Tool {
 	}
 	
 	public static final String _toUp(String str) {
-		int i = str.indexOf('_');
-		return i == -1 ? "" : str.substring(0, i) + str.substring(i + 1, i + 2).toUpperCase() + str.substring(i + 2);
+		int i;
+		while ((i = str.indexOf('_')) != -1)
+			str = str.substring(0, i) + str.substring(i + 1, i + 2).toUpperCase() + str.substring(i + 2);
+		return str;
 	}
 	
 }
