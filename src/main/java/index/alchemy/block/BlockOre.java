@@ -28,7 +28,6 @@ import net.minecraftforge.oredict.OreDictionary;
 public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionary {
 	
 	public static final Random RANDOM = new Random();
-	public static final ResourceLocation ORE = new AlchemyResourceLocation("ore");
 	
 	private Item drop;
 	private int drop_num, min_xp, max_xp, color;
@@ -52,11 +51,6 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 	@Override
 	public int getExpDrop(IBlockState state, IBlockAccess world, BlockPos pos, int fortune) {
 		return max_xp == 0 ? 0 : min_xp + RANDOM.nextInt(max_xp + fortune);
-	}
-	
-	@Override
-	public ResourceLocation getResourceLocation() {
-		return ORE;
 	}
 	
 	@Override
@@ -85,7 +79,7 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 	}
 	
 	public BlockOre(String name, Item drop, int drop_num, int min_xp, int max_xp, int color, boolean drop_fortune) {
-		super(name, Material.ROCK);
+		super(name, Material.ROCK, "ore");
 		this.drop = drop;
 		this.drop_num = drop_num;
 		this.min_xp = min_xp;

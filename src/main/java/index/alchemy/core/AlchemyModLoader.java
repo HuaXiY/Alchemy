@@ -172,7 +172,7 @@ public class AlchemyModLoader {
 	public static void init(Class<?> clazz) {
 		try {
 			logger.info("Starting init class: " + clazz.getName());
-			clazz.getMethod("init").invoke(null);
+			clazz.getDeclaredMethod("init").invoke(null);
 			logger.info("Successful !");
 		} catch (Exception e) {
 			logger.error("Failed !");

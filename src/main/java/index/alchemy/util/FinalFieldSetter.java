@@ -10,7 +10,7 @@ public final class FinalFieldSetter {
     static {
         try {
             INSTANCE = new FinalFieldSetter();
-        } catch (final ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -32,16 +32,15 @@ public final class FinalFieldSetter {
         final Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
         unsafeField.setAccessible(true);
 
-        this.unsafeObj = unsafeField.get(null);
+        unsafeObj = unsafeField.get(null);
 
-        this.putObjectMethod = unsafeClass.getMethod("putObject", Object.class,
-            long.class, Object.class);
-        this.objectFieldOffsetMethod = unsafeClass.getMethod("objectFieldOffset",
-            Field.class);
-        this.staticFieldOffsetMethod = unsafeClass.getMethod("staticFieldOffset",
-            Field.class);
-        this.staticFieldBaseMethod = unsafeClass.getMethod("staticFieldBase",
-            Field.class);
+        putObjectMethod = unsafeClass.getDeclaredMethod("putObject", Object.class, long.class, Object.class);
+        
+        objectFieldOffsetMethod = unsafeClass.getDeclaredMethod("objectFieldOffset", Field.class);
+        
+        staticFieldOffsetMethod = unsafeClass.getDeclaredMethod("staticFieldOffset", Field.class);
+        
+        staticFieldBaseMethod = unsafeClass.getDeclaredMethod("staticFieldBase", Field.class);
     }
 
     public static FinalFieldSetter getInstance() {
@@ -51,18 +50,16 @@ public final class FinalFieldSetter {
     public void set(final Object o, final Field field, final Object value) throws Exception {
 
         final Object fieldBase = o;
-        final long fieldOffset = (Long) this.objectFieldOffsetMethod.invoke(
-            this.unsafeObj, field);
+        final long fieldOffset = (Long) objectFieldOffsetMethod.invoke(unsafeObj, field);
 
-        this.putObjectMethod.invoke(this.unsafeObj, fieldBase, fieldOffset, value);
+        putObjectMethod.invoke(unsafeObj, fieldBase, fieldOffset, value);
     }
 
     public void setStatic(final Field field, final Object value) throws Exception {
 
-        final Object fieldBase = this.staticFieldBaseMethod.invoke(this.unsafeObj, field);
-        final long fieldOffset = (Long) this.staticFieldOffsetMethod.invoke(
-            this.unsafeObj, field);
+        final Object fieldBase = staticFieldBaseMethod.invoke(unsafeObj, field);
+        final long fieldOffset = (Long) staticFieldOffsetMethod.invoke(unsafeObj, field);
 
-        this.putObjectMethod.invoke(this.unsafeObj, fieldBase, fieldOffset, value);
+        putObjectMethod.invoke(unsafeObj, fieldBase, fieldOffset, value);
     }
 }

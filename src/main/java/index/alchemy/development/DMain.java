@@ -23,12 +23,12 @@ public class DMain {
 		if (Alway.getSide() == Side.CLIENT)
 			for (DInit dinit : clazz.getAnnotationsByType(DInit.class)) {
 				try {
-					init_obj.add(clazz.getMethod("init", Object.class));
+					init_obj.add(clazz.getDeclaredMethod("init", Object.class));
 				} catch (NoSuchMethodException e) {
 					AlchemyModLoader.logger.warn("Can't find init(Object) method in: " + clazz.getName());
 				}
 				try {
-					init.add(clazz.getMethod("init"));
+					init.add(clazz.getDeclaredMethod("init"));
 				} catch (NoSuchMethodException e) {
 					AlchemyModLoader.logger.warn("Can't find init method in: " + clazz.getName());
 				}
