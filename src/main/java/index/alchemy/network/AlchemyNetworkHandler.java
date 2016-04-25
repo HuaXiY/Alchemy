@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
-	public static final SimpleNetworkWrapper networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MODID);
+	public static final SimpleNetworkWrapper networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MOD_ID);
 	private static int register = -1;
 
 	public static void init() {

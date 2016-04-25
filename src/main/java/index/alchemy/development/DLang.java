@@ -30,16 +30,17 @@ public class DLang {
 	
 	public static final String SUFFIX = ".lang";
 	
-	public static String lang_dir = DMain.resources + "/lang";
+	private static final String lang_dir = DMain.resources + "/lang";
 	
-	public static Set<String> mcSet = new HashSet<String>(); 
+	private static Set<String> mcSet = new HashSet<String>(); 
 	
-	public static Map<String, String> itemMap, blockMap, potionMap, enchantmentMap, keyMap, damageMap, inventoryMap, miscMap;
-	public static Map<Class<?>, Method> _funcMap;
+	private static Map<String, String> itemMap, blockMap, potionMap, enchantmentMap, keyMap, damageMap, inventoryMap, miscMap;
+	private static Map<Class<?>, Method> _funcMap;
 	static {
 		for (Field field : DLang.class.getDeclaredFields())
 			if (field.getType() == Map.class)
 				try {
+					field.setAccessible(true);
 					field.set(null, new LinkedHashMap());
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -71,9 +72,9 @@ public class DLang {
 	
 	public static void save() {
 		File dir = new File(lang_dir);
-		for (String file : dir.list())
-			if (file.endsWith(SUFFIX))
-				save(file);
+		for (String name : dir.list())
+			if (name.endsWith(SUFFIX) && !name.matches(".*\\d.*"))
+				save(name);
 	}
 	
 	public static void save(String name) {
@@ -81,10 +82,11 @@ public class DLang {
 		File file = new File(lang_dir, name);
 		try {
 			Map<String, String> map = getMap(file);
-			StringBuilder builder = new StringBuilder("//MODID\n" + Constants.MODID + "=" +
-					Tool.isNullOr(map.get(Constants.MODID), Constants.MODID) + "\n");
+			StringBuilder builder = new StringBuilder("//MODID\n" + Constants.MOD_ID + "=" +
+					Tool.isNullOr(map.get(Constants.MOD_ID), Constants.MOD_ID) + "\n");
 			for (Field field : DLang.class.getDeclaredFields())
 				if (field.getType() == Map.class && !field.getName().startsWith("_")) {
+					field.setAccessible(true);
 					builder.append("\n//" + field.getName() + "\n");
 					for (Entry<String, String> entry : ((Map<String, String>) field.get(null)).entrySet())
 						if (!mcSet.contains(entry.getKey()))

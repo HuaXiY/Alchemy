@@ -1,7 +1,7 @@
 package index.alchemy.block;
 
-import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorBlock;
+import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.IOreDictionary;
 import index.alchemy.util.Tool;
 

@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import index.alchemy.api.Alway;
 import index.alchemy.block.AlchemyBlockLoader;
+import index.alchemy.config.AlchemyConfigLoader;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
 import index.alchemy.item.AlchemyItemLoader;
@@ -38,9 +39,10 @@ import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoaderState.ModState;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ICrashCallable;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -55,28 +57,21 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Mod(modid = Constants.MODID, version = Constants.MOD_VERSION)
+@Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.MOD_VERSION)
 public class AlchemyModLoader {
 	
-	public static final Logger logger = LogManager.getLogger(Constants.MODID);
+	public static final Logger logger = LogManager.getLogger(Constants.MOD_ID);
 	
-	public static URLClassLoader loader;
-	
-	@Instance(Constants.MODID)
+	@Instance(Constants.MOD_ID)
 	public static AlchemyModLoader instance;
 	
 	@SidedProxy(clientSide = Constants.MOD_PACKAGE + ".client.ClientProxy", serverSide = Constants.MOD_PACKAGE + ".core.CommonProxy")
 	public static CommonProxy proxy;
 	
 	private AlchemyEventSystem event_system;
-	private AlchemyConfigLoader config;
 	
 	public AlchemyEventSystem getEventSystem() {
 		return event_system;
-	}
-	
-	public AlchemyConfigLoader getConfig() {
-		return config;
 	}
 	
 	public AlchemyModLoader() {
@@ -144,15 +139,15 @@ public class AlchemyModLoader {
 					Class<?> clazz = Class.forName(name, false, loader);
 					if (is_modding)
 						DMain.init(clazz);
-					for (Init init : clazz.getAnnotationsByType(Init.class)) {
-						SideOnly[] side = clazz.getAnnotationsByType(SideOnly.class);
-						if (side.length > 0 && Alway.getSide() != side[0].value())
-							break;
-						List<Class<?>> list = init_map.get(init.state());
-						if (list == null)
-							init_map.put(init.state(), list = new LinkedList<Class<?>>());
-						list.add(clazz);
-					}
+					AlchemyConfigLoader.init(clazz);
+					Init init = clazz.getAnnotation(Init.class);
+					SideOnly side = clazz.getAnnotation(SideOnly.class);
+					if (init == null || !init.enable() || side != null && Alway.getSide() != side.value())
+						continue;
+					List<Class<?>> list = init_map.get(init.state());
+					if (list == null)
+						init_map.put(init.state(), list = new LinkedList<Class<?>>());
+					list.add(clazz);
 				} catch (ClassNotFoundException e) {}
 		}
 		
@@ -172,7 +167,7 @@ public class AlchemyModLoader {
 	public static void init(Class<?> clazz) {
 		try {
 			logger.info("Starting init class: " + clazz.getName());
-			clazz.getDeclaredMethod("init").invoke(null);
+			clazz.getMethod("init").invoke(null);
 			logger.info("Successful !");
 		} catch (Exception e) {
 			logger.error("Failed !");
@@ -181,10 +176,8 @@ public class AlchemyModLoader {
 	}
 	
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) throws MalformedURLException {
-		loader = new URLClassLoader(new URL[]{event.getSourceFile().toURI().toURL()});
+	public void preInit(FMLPreInitializationEvent event) {
 		event_system = new AlchemyEventSystem(this);
-		config = new AlchemyConfigLoader(event.getSuggestedConfigurationFile());
 		init(event.getModState());
 	}
 	

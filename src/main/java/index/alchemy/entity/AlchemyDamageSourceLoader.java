@@ -8,8 +8,9 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 public class AlchemyDamageSourceLoader {
 
 	public static final DamageSource
-			soul_withred = new AlchemyDamageSource("soul_withred").setMagicDamage().setDamageBypassesArmor().setDamageAllowedInCreativeMode(),
-			dead_magic = new AlchemyDamageSource("dead_magic").setMagicDamage().setDamageBypassesArmor().setDamageAllowedInCreativeMode();
+			soul_withred = new AlchemyDamageSource("soul_withred").setMagicDamage().setDamageBypassesArmor(),
+			dead_magic = new AlchemyDamageSource("dead_magic").setMagicDamage().setDamageBypassesArmor(),
+			plague = new AlchemyDamageSource("plague").setMagicDamage().setDamageBypassesArmor();
 	
 	public static void init() {}
 	

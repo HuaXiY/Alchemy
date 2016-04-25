@@ -15,6 +15,9 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
 
+import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.Constants;
+
 public class Tool {
 	
 	public static final void where() {
@@ -91,15 +94,16 @@ public class Tool {
 			return null;
 		}
 	}
-
-	public static final String read(String path, String name) throws IOException {
-		return read(path + File.separatorChar + name);
-	}
-
-	public static final String read(String path) throws IOException {
-		return read(new FileInputStream(path));
-	}
 	
+	public static final String readSafe(File file) {
+		try {
+			return read(file);
+		} catch (IOException e) {
+			AlchemyModLoader.logger.error("Can't read: " + file.getPath() + "\n" + e.getMessage());
+			return "";
+		}
+	}
+
 	public static final String read(File file) throws IOException {
 		return read(new FileInputStream(file));
 	}
@@ -122,15 +126,16 @@ public class Tool {
 			}
 		}
 	}
+	
+	public static final boolean saveSafe(File file, String str) {
+		try {
+			return save(file, str);
+		} catch (IOException e) {
+			AlchemyModLoader.logger.error("Can't save: " + file.getPath() + "\n" + e.getMessage());
+			return false;
+		}
+	}
 
-	public static final boolean save(String path, String name, String str) throws IOException {
-		return save(path + File.separatorChar + name, str);
-	}
-	
-	public static final boolean save(String path, String str) throws IOException {
-		return save(new FileOutputStream(path), str);
-	}
-	
 	public static final boolean save(File file, String str) throws IOException {
 		return save(new FileOutputStream(file), str);
 	}
@@ -215,7 +220,7 @@ public class Tool {
 	
 	public static final String _toUp(String str) {
 		int i;
-		while ((i = str.indexOf('_')) != -1)
+		while ((i = str.indexOf('_')) != -1 && str.length() > i + 2)
 			str = str.substring(0, i) + str.substring(i + 1, i + 2).toUpperCase() + str.substring(i + 2);
 		return str;
 	}

@@ -29,18 +29,18 @@ public final class FinalFieldSetter {
 
         final Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
 
-        final Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
+        final Field unsafeField = unsafeClass.getField("theUnsafe");
         unsafeField.setAccessible(true);
 
         unsafeObj = unsafeField.get(null);
 
-        putObjectMethod = unsafeClass.getDeclaredMethod("putObject", Object.class, long.class, Object.class);
+        putObjectMethod = unsafeClass.getMethod("putObject", Object.class, long.class, Object.class);
         
-        objectFieldOffsetMethod = unsafeClass.getDeclaredMethod("objectFieldOffset", Field.class);
+        objectFieldOffsetMethod = unsafeClass.getMethod("objectFieldOffset", Field.class);
         
-        staticFieldOffsetMethod = unsafeClass.getDeclaredMethod("staticFieldOffset", Field.class);
+        staticFieldOffsetMethod = unsafeClass.getMethod("staticFieldOffset", Field.class);
         
-        staticFieldBaseMethod = unsafeClass.getDeclaredMethod("staticFieldBase", Field.class);
+        staticFieldBaseMethod = unsafeClass.getMethod("staticFieldBase", Field.class);
     }
 
     public static FinalFieldSetter getInstance() {

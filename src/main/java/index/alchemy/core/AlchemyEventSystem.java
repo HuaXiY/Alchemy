@@ -28,6 +28,8 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -69,6 +71,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 		AlchemyModLoader.logger.info("    init: <" + event.init.getClass().getName() + "> " + event.init);
 		if (AlchemyModLoader.is_modding)
 			DMain.init(event.init);
+	}
+	
+	@SubscribeEvent
+	public void on(PlaceEvent event) {
+		System.out.println("Place on: " + event.getPos());
 	}
 	
 	@Override

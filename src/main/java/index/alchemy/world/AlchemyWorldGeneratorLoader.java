@@ -3,7 +3,7 @@ package index.alchemy.world;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import index.alchemy.core.Init;
 
-//@Init(state = ModState.PREINITIALIZED)
+@Init(state = ModState.PREINITIALIZED, enable = false)
 public class AlchemyWorldGeneratorLoader {
 	
 	public static final AlchemyWorldGenerator

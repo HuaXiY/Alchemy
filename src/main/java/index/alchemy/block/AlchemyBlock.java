@@ -2,10 +2,10 @@ package index.alchemy.block;
 
 import index.alchemy.api.Alway;
 import index.alchemy.client.AlchemyColorLoader;
-import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorBlock;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.Constants;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IOreDictionary;

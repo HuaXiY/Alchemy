@@ -11,7 +11,7 @@ import index.alchemy.item.ItemScroll;
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyAchievementLoader {
 	
-	public static final AchievementPage alchemy = new AchievementPage(Constants.MODID);
+	public static final AchievementPage alchemy = new AchievementPage(Constants.MOD_ID);
 	
 	public static final Achievement 
 			use_scroll = new AchievementUseItem("use_scroll", 1, 2, AlchemyItemLoader.scroll_lightning, ItemScroll.class, null);

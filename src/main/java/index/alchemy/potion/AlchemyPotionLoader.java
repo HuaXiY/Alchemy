@@ -213,12 +213,8 @@ public class AlchemyPotionLoader extends PotionType {
 	}
 	
 	public static void init() {
-		System.out.println(PotionType.REGISTRY.containsKey(new ResourceLocation("luck")));
-		System.out.println(PotionType.getPotionTypeForName("luck"));
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "luck", "unluck",
 				getItemPredicate(Items.EMERALD), null, new Potion[]{MobEffects.LUCK}, new Potion[]{MobEffects.UNLUCK});
-		System.out.println(PotionType.REGISTRY.containsKey(new ResourceLocation("luck")));
-		System.out.println(PotionType.getPotionTypeForName("luck"));
 		
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 45, "feather_fall", "levitation",
 				getItemPredicate(Items.FEATHER), null, new Potion[]{feather_fall}, new Potion[]{MobEffects.LEVITATION});

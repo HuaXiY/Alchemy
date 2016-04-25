@@ -1,8 +1,7 @@
 //MODID
-alchemy=炼金术
+Alchemy=Alchemy
 
 //itemMap
-tile.ice_temp.name=
 item.lapis_lazuli.name=
 item.scroll_boom.name=
 item.scroll_ice_screen.name=
@@ -72,8 +71,15 @@ key.space_ring_pickup=收进空间戒指
 //damageMap
 death.attack.soul_withred=%1$s
 death.attack.dead_magic=%1$s
+death.attack.plague=%1$s
 
 //inventoryMap
 inventory.ring_space=
 
 //miscMap
+solvent.type.null=
+solvent.type.unstable=
+solvent.type.powerful=
+solvent.type.benign=
+solvent.type.wonderful=
+solvent.type.dangerous=

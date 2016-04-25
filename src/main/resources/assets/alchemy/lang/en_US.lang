@@ -1,7 +1,7 @@
 //MODID
-alchemy=alchemy
+Alchemy=Alchemy
+
 //itemMap
-tile.ice_temp.name=
 item.lapis_lazuli.name=
 item.scroll_boom.name=
 item.scroll_ice_screen.name=
@@ -65,14 +65,21 @@ tipped_arrow.effect.dead_or_alive=
 //enchantmentMap
 
 //keyMap
-key.space_ring_open=key.space_ring_pickup
+key.space_ring_open=
 key.space_ring_pickup=
 
 //damageMap
 death.attack.soul_withred=%1$s
 death.attack.dead_magic=%1$s
+death.attack.plague=%1$s
 
 //inventoryMap
 inventory.ring_space=
 
 //miscMap
+solvent.type.null=
+solvent.type.unstable=
+solvent.type.powerful=
+solvent.type.benign=
+solvent.type.wonderful=
+solvent.type.dangerous=

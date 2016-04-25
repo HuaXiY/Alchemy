@@ -9,10 +9,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class PotionEternal extends AlchemyPotion implements IEventHandle {
 
-	public PotionEternal() {
-		super("eternal", false, 0xFBD860);
-	}
-	
 	@Override
 	public EventType[] getEventType() {
 		return AlchemyEventSystem.EVENT_BUS;
@@ -23,6 +19,10 @@ public class PotionEternal extends AlchemyPotion implements IEventHandle {
 		if (event.getEntityLiving().isPotionActive(this)) {
 			event.setAmount(Math.min(event.getEntityLiving().getHealth() - 0.01F, event.getAmount()));
 		}
+	}
+	
+	public PotionEternal() {
+		super("eternal", false, 0xFBD860);
 	}
 
 }

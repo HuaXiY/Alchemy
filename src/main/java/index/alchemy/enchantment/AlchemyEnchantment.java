@@ -1,8 +1,8 @@
 package index.alchemy.enchantment;
 
-import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IPlayerTickable;
 import index.alchemy.core.IRegister;

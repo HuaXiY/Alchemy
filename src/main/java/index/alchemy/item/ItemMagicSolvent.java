@@ -1,8 +1,8 @@
 package index.alchemy.item;
 
-import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.Constants;
 
 import java.util.LinkedList;
@@ -114,7 +114,11 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 			return NULL;
 		}
 		
+		public static void init() {}
+		
 	}
+	
+	static { Type.init(); }
 	
 	public ItemMagicSolvent(String name, int color, Item material) {
 		this(name, color, material, 0);

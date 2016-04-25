@@ -2,10 +2,10 @@ package index.alchemy.item;
 
 import index.alchemy.api.Alway;
 import index.alchemy.client.AlchemyColorLoader;
-import index.alchemy.client.AlchemyResourceLocation;
 import index.alchemy.client.IColorItem;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.Constants;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IOreDictionary;
@@ -31,7 +31,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 	
-	public static final CreativeTabs CREATIVE_TABS = new CreativeTabs(Constants.MODID) {
+	public static final CreativeTabs CREATIVE_TABS = new CreativeTabs(Constants.MOD_ID) {
 		@Override
 		public Item getTabIconItem() {
 			return AlchemyItemLoader.solvent_lapis_lazuli;

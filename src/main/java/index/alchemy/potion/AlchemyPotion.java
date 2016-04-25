@@ -1,7 +1,9 @@
 package index.alchemy.potion;
 
-import index.alchemy.client.AlchemyResourceLocation;
+import java.util.Random;
+
 import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.CommonProxy;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.IEventHandle;
@@ -17,6 +19,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class AlchemyPotion extends Potion implements IRegister {
+	
+	protected static final Random RANDOM = new Random();
 	
 	public static final ResourceLocation RESOURCE_LOCATION = new AlchemyResourceLocation("potion");
 	
@@ -35,11 +39,17 @@ public class AlchemyPotion extends Potion implements IRegister {
 		return ready;
 	}
 	
-	@Override
+	/*@Override
 	@SideOnly(Side.CLIENT)
 	public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
 		mc.getTextureManager().bindTexture(RESOURCE_LOCATION);
 		mc.currentScreen.drawTexturedModalRect(x + 6, y + 6, id % 16 * 16, id / 16, 16, 16);
+	}*/
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getStatusIconIndex() {
+		Minecraft.getMinecraft().renderEngine.bindTexture(RESOURCE_LOCATION);
+		return id;
 	}
 	
 	@Override

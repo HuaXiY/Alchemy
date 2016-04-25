@@ -15,21 +15,11 @@ import net.minecraft.util.ResourceLocation;
 @DInit
 public class DModels {
 	
-public static final String SUFFIX = ".json";
-	
-	public static String models_dir = DMain.resources + "/models", default_item_json = "", default_block_json = "";
-	static {
-		try {
-			default_item_json = Tool.read(new File(models_dir + "/item", Constants.MC_VERSION + SUFFIX));
-		} catch (IOException e) {
-			AlchemyModLoader.logger.warn("Can't load: " + Constants.MC_VERSION + SUFFIX);
-		}
-		try {
-			default_item_json = Tool.read(new File(models_dir + "block", Constants.MC_VERSION + SUFFIX));
-		} catch (IOException e) {
-			AlchemyModLoader.logger.warn("Can't load: " + Constants.MC_VERSION + SUFFIX);
-		}
-	}
+	public static final String SUFFIX = ".json";
+		
+	private static final String models_dir = DMain.resources + "/models",
+			default_item_json = Tool.readSafe(new File(models_dir + "/item", Constants.MC_VERSION + SUFFIX)),
+			default_block_json = Tool.readSafe(new File(models_dir + "block", Constants.MC_VERSION + SUFFIX));
 	
 	public static void init() {}
 	

@@ -2,7 +2,8 @@ package index.alchemy.core;
 
 public class Constants {
 	public static final String 
-		MODID = "alchemy",
+		MOD_ID = "Alchemy",
+		MOD_NAME = "Alchemy",
 		MOD_VERSION = "@MOD_VERSION@",
 		MOD_PACKAGE = "index.alchemy",
 		MC_VERSION = "1.9",

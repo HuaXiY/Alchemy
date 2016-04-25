@@ -9,11 +9,9 @@ import net.minecraft.entity.EntityLivingBase;
 
 public class PotionDeadOrAlive extends AlchemyPotion {
 	
-	public Random random = new Random();
-	
 	@Override
 	public void performEffect(EntityLivingBase living, int level) {
-		float f = random.nextFloat() * living.getMaxHealth() * 2 - living.getMaxHealth();
+		float f = RANDOM.nextFloat() * living.getMaxHealth() * 2 - living.getMaxHealth();
 		if (f > 0)
 			living.heal(f);
 		else 

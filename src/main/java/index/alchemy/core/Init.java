@@ -13,4 +13,6 @@ public @interface Init {
 	
 	public ModState state() default ModState.UNLOADED;
 	
+	public boolean enable() default true;
+	
 }

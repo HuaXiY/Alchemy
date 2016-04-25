@@ -16,14 +16,7 @@ public class DBlockState {
 	
 	public static final String SUFFIX = ".json";
 	
-	public static String states_dir = DMain.resources + "/blockstates", default_json = "";
-	static {
-		try {
-			default_json = Tool.read(new File(states_dir, Constants.MC_VERSION + SUFFIX));
-		} catch (IOException e) {
-			AlchemyModLoader.logger.warn("Can't load: " + Constants.MC_VERSION + SUFFIX);
-		}
-	}
+	private static final String states_dir = DMain.resources + "/blockstates", default_json = Tool.readSafe(new File(states_dir, Constants.MC_VERSION + SUFFIX));
 	
 	public static void init() {}
 	
