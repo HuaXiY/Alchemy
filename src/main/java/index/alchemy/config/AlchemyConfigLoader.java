@@ -23,13 +23,7 @@ public class AlchemyConfigLoader {
 	public static final List<Field> config_list = new LinkedList<Field>();
 	
 	private static Configuration configuration;
-	
-	@Config(category = "hello", comment = "This is a test")
-	public static String test = "hello world";
-	
-	@Config(category = "int", comment = "miaomiaomiao", min = 450, max = 23333)
-	public static int i = 12450;
-
+		
 	public static void init() {
 		configuration = new Configuration(new File(config_dir + Constants.MOD_NAME + SUFFIX));
 		configuration.load();

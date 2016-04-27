@@ -8,6 +8,8 @@ import index.alchemy.core.IPlayerTickable;
 import index.alchemy.core.IRegister;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
 public class AlchemyEnchantment extends Enchantment implements IRegister {
@@ -23,6 +25,7 @@ public class AlchemyEnchantment extends Enchantment implements IRegister {
 				EntityEquipmentSlot.OFFHAND};
 	
 	protected int max_level;
+	protected boolean treasure;
 	
 	@Override
 	public int getMinLevel() {
@@ -33,7 +36,17 @@ public class AlchemyEnchantment extends Enchantment implements IRegister {
 	public int getMaxLevel() {
 		return max_level;
 	}
-
+	
+	@Override
+	public boolean isTreasureEnchantment() {
+        return treasure;
+    }
+	
+	public Enchantment setTreasureEnchantment() {
+		treasure = true;
+		return this;
+	}
+	
 	public AlchemyEnchantment(String name, Rarity rarity, EnumEnchantmentType type, int max_level, EntityEquipmentSlot... slots) {
 		super(rarity, type, slots);
 		this.max_level = max_level;

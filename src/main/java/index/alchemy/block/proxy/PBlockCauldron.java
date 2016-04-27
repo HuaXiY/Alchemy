@@ -2,6 +2,7 @@ package index.alchemy.block.proxy;
 
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.ITileEntity;
+import index.alchemy.tile.TileEntityCauldron;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -10,12 +11,12 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity {
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
-		return null;
+		return new TileEntityCauldron();
 	}
 
 	@Override
 	public Class<? extends TileEntity> getTileEntityClass() {
-		return null;
+		return TileEntityCauldron.class;
 	}
 
 	@Override

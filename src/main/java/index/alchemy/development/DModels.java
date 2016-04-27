@@ -19,7 +19,7 @@ public class DModels {
 		
 	private static final String models_dir = DMain.resources + "/models",
 			default_item_json = Tool.readSafe(new File(models_dir + "/item", Constants.MC_VERSION + SUFFIX)),
-			default_block_json = Tool.readSafe(new File(models_dir + "block", Constants.MC_VERSION + SUFFIX));
+			default_block_json = Tool.readSafe(new File(models_dir + "/block", Constants.MC_VERSION + SUFFIX));
 	
 	public static void init() {}
 	

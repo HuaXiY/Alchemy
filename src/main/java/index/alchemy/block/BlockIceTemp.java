@@ -18,6 +18,11 @@ public class BlockIceTemp extends AlchemyBlock implements ITileEntity {
 	}
 	
 	@Override
+	public TileEntity createNewTileEntity(World world, int i) {
+		return new TileEntityIceTemp();
+	}
+	
+	@Override
 	public Class<? extends TileEntity> getTileEntityClass() {
 		return TileEntityIceTemp.class;
 	}
@@ -25,11 +30,6 @@ public class BlockIceTemp extends AlchemyBlock implements ITileEntity {
 	@Override
 	public String getTileEntityName() {
 		return getUnlocalizedName();
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(World world, int i) {
-		return new TileEntityIceTemp();
 	}
 	
 	public BlockIceTemp() {

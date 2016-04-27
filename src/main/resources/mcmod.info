@@ -1,11 +1,12 @@
 [
 {
-  "modid": "alchemy",
-  "name": "Alchemy Mod",
+  "modid": "Alchemy",
+  "name": "Alchemy",
   "description": "Alchemy :D",
   "credits": "LexManos, cpw",
   "version": "0.1.1",
   "mcversion": "1.9",
+  "logoFile": "assets/alchemy/textures/logo.png",
   "url": "",
   "authorList": [ "Mickeyxiami" ],
   "dependencies": [ "mod_MinecraftForge" ]

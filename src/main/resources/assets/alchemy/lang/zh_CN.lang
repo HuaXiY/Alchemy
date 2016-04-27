@@ -63,6 +63,7 @@ lingering_potion.effect.dead_or_alive=
 tipped_arrow.effect.dead_or_alive=
 
 //enchantmentMap
+enchantment.null=
 
 //keyMap
 key.space_ring_open=打开空间戒指

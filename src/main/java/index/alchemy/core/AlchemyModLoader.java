@@ -51,6 +51,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -62,26 +63,35 @@ public class AlchemyModLoader {
 	
 	public static final Logger logger = LogManager.getLogger(Constants.MOD_ID);
 	
+	@Deprecated
 	@Instance(Constants.MOD_ID)
 	public static AlchemyModLoader instance;
+	
+	public static Object instance() {
+		if (instance != null)
+			return instance;
+		throw new AlchemyRuntimeExcption(new NullPointerException("index.alchemy.core.AlchemyModLoader.instance"));
+	}
 	
 	@SidedProxy(clientSide = Constants.MOD_PACKAGE + ".client.ClientProxy", serverSide = Constants.MOD_PACKAGE + ".core.CommonProxy")
 	public static CommonProxy proxy;
 	
-	private AlchemyEventSystem event_system;
-	
-	public AlchemyEventSystem getEventSystem() {
-		return event_system;
-	}
-	
 	public AlchemyModLoader() {
 		if (instance != null)
-			throw new RuntimeException("Before this has been instantiate.");
+			throw new AlchemyRuntimeExcption(new RuntimeException("Before this has been instantiate."));
 	}
 	
 	public static final String mc_dir; 
 	public static final boolean is_modding;
-	public static Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>();
+	public static Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>() {
+		@Override
+		public List<Class<?>> get(Object key) {
+			List<Class<?>> result = super.get(key);
+			if (result == null)
+				put((ModState) key, result = new LinkedList());
+			return result;
+		}
+	};
 	
 	static {
 		String str = AlchemyModLoader.class.getResource("/alchemy.info").toString()
@@ -142,26 +152,22 @@ public class AlchemyModLoader {
 					AlchemyConfigLoader.init(clazz);
 					Init init = clazz.getAnnotation(Init.class);
 					SideOnly side = clazz.getAnnotation(SideOnly.class);
-					if (init == null || !init.enable() || side != null && Alway.getSide() != side.value())
-						continue;
-					List<Class<?>> list = init_map.get(init.state());
-					if (list == null)
-						init_map.put(init.state(), list = new LinkedList<Class<?>>());
-					list.add(clazz);
+					if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))
+						init_map.get(init.state()).add(clazz);
 				} catch (ClassNotFoundException e) {}
 		}
 		
 	}
 	
 	public static void init(ModState state) {
-		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
 		logger.info("************************************   " + state + " START   ************************************");
+		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
 		for (Class clazz : init_map.get(state)) {
 			bar.step(clazz.getSimpleName());
 			init(clazz);
 		}
-		logger.info("************************************   " + state + "  END    ************************************");
 		ProgressManager.pop(bar);
+		logger.info("************************************   " + state + "  END    ************************************");
 	}
 	
 	public static void init(Class<?> clazz) {
@@ -171,19 +177,25 @@ public class AlchemyModLoader {
 			logger.info("Successful !");
 		} catch (Exception e) {
 			logger.error("Failed !");
+			init(ModState.ERRORED);
 			throw new AlchemyRuntimeExcption(e);
 		}
 	}
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		event_system = new AlchemyEventSystem(this);
-		init(event.getModState());
+		init(ModState.CONSTRUCTED);
+		init(ModState.PREINITIALIZED);
+	}
+	
+	@EventHandler
+	public void init(FMLInitializationEvent event) {
+		init(ModState.INITIALIZED);
 	}
 	
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		init(event.getModState());
+		init(ModState.POSTINITIALIZED);
 		init(ModState.AVAILABLE);
 	}
 	

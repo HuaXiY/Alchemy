@@ -99,7 +99,8 @@ public class Tool {
 		try {
 			return read(file);
 		} catch (IOException e) {
-			AlchemyModLoader.logger.error("Can't read: " + file.getPath() + "\n" + e.getMessage());
+			AlchemyModLoader.logger.error("Can't read: " + file.getPath());
+			AlchemyModLoader.logger.error(e.getMessage());
 			return "";
 		}
 	}
@@ -131,7 +132,8 @@ public class Tool {
 		try {
 			return save(file, str);
 		} catch (IOException e) {
-			AlchemyModLoader.logger.error("Can't save: " + file.getPath() + "\n" + e.getMessage());
+			AlchemyModLoader.logger.error("Can't save: " + file.getPath());
+			AlchemyModLoader.logger.error(e.getMessage());
 			return false;
 		}
 	}

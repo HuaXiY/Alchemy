@@ -21,7 +21,7 @@ public class MessageOpenGui implements IMessage, IMessageHandler<MessageOpenGui,
 	@Override
 	public IMessage onMessage(MessageOpenGui message, MessageContext ctx) {
 		EntityPlayer player = ctx.getServerHandler().playerEntity;
-		player.openGui(AlchemyModLoader.instance, message.id, player.worldObj,
+		player.openGui(AlchemyModLoader.instance(), message.id, player.worldObj,
 				(int) player.posX, (int) player.posY, (int) player.posZ);
 		return null;
 	}

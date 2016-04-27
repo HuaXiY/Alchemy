@@ -10,6 +10,7 @@ import index.alchemy.item.ItemInventory;
 import index.alchemy.network.MessageOpenGui;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.MessageSpaceRingPickUp;
+import index.alchemy.util.Tool;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,10 +26,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
+import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -40,7 +46,10 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Init(state = ModState.CONSTRUCTED)
 public class AlchemyEventSystem implements IGuiHandler {
+	
+	public static final AlchemyEventSystem INSTANCE = new AlchemyEventSystem();
 	
 	public static final EventType[]
 			EVENT_BUS = new EventType[]{ EventType.EVENT_BUS },
@@ -73,11 +82,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 			DMain.init(event.init);
 	}
 	
-	@SubscribeEvent
-	public void on(PlaceEvent event) {
-		System.out.println("Place on: " + event.getPos());
-	}
-	
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		switch (ID) {
@@ -99,11 +103,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 		return null;
 	}
 	
-	public AlchemyEventSystem(Object mod) {
-		MinecraftForge.EVENT_BUS.register(this);
-		NetworkRegistry.INSTANCE.registerGuiHandler(mod, this);
-	}
-	
 	public static void registerEventHandle(IEventHandle handle) {
 		for (EventType type : handle.getEventType()) {
 			if (type == EventType.EVENT_BUS)
@@ -113,6 +112,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 			else if (type == EventType.ORE_GEN_BUS)
 				MinecraftForge.ORE_GEN_BUS.register(handle);
 		}
+	}
+	
+	public static void init() {}
+	
+	public AlchemyEventSystem() {
+		MinecraftForge.EVENT_BUS.register(this);
+		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyModLoader.instance(), this);
 	}
 
 }
