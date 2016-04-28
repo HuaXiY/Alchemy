@@ -29,7 +29,7 @@ public final class FinalFieldSetter {
 
         final Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
 
-        final Field unsafeField = unsafeClass.getField("theUnsafe");
+        final Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
         unsafeField.setAccessible(true);
 
         unsafeObj = unsafeField.get(null);
