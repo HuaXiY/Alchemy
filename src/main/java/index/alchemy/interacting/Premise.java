@@ -19,7 +19,7 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
 
-@Init(state = ModState.PREINITIALIZED)
+@Init(state = ModState.CONSTRUCTED)
 public class Premise {
 	
 	public static final List<String> MODID_LIST = new LinkedList<String>();

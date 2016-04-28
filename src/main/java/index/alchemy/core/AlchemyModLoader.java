@@ -1,5 +1,8 @@
 package index.alchemy.core;
 
+import java.awt.Canvas;
+import java.awt.Frame;
+import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +24,8 @@ import java.util.jar.JarFile;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
 
 import index.alchemy.api.Alway;
 import index.alchemy.block.AlchemyBlockLoader;
@@ -33,6 +38,7 @@ import index.alchemy.potion.AlchemyPotionLoader;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -183,7 +189,14 @@ public class AlchemyModLoader {
 	}
 	
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
+	public void preInit(FMLPreInitializationEvent event) throws LWJGLException {
+		Frame frame = new Frame(Display.getTitle());
+		Canvas canvas = new Canvas();
+		frame.setBounds(Display.getX(), Display.getY(), Display.getWidth(), Display.getHeight());
+		canvas.setVisible(true);
+		frame.setVisible(true);
+		frame.add(canvas);
+		Display.setParent(canvas);
 		init(ModState.CONSTRUCTED);
 		init(ModState.PREINITIALIZED);
 	}

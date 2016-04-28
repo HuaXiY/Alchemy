@@ -1,6 +1,7 @@
 # Alchemy
 [![Gitter](https://badges.gitter.im/Mickeyxiami/Alchemy.svg)](https://gitter.im/Mickeyxiami/Alchemy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 <br>
+<img src="https://github.com/Mickeyxiami/Alchemy/blob/master/src%2Fmain%2Fresources%2Fassets%2Falchemy%2Ftextures%2Flogo.png" />
 An open-source Minecraft Forge Mod
 <hr>
 Organizer:
