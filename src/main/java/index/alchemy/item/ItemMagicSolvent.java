@@ -1,26 +1,17 @@
 package index.alchemy.item;
 
-import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.Constants;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.client.renderer.color.IItemColor;
+import index.alchemy.core.AlchemyInitHook;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

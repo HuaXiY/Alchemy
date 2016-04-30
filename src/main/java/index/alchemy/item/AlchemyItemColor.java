@@ -1,13 +1,11 @@
 package index.alchemy.item;
 
+import index.alchemy.client.IColorItem;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import index.alchemy.client.IColorItem;
-import index.alchemy.core.AlchemyResourceLocation;
 
 public class AlchemyItemColor extends AlchemyItem implements IColorItem {
 	

@@ -1,19 +1,7 @@
 package index.alchemy.item;
 
 import index.alchemy.core.Init;
-import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
-import index.alchemy.util.Tool;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPotion;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.potion.PotionHelper;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
 @Init(state = ModState.PREINITIALIZED)

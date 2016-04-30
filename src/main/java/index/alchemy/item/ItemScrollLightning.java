@@ -1,14 +1,10 @@
 package index.alchemy.item;
 
-import java.util.Iterator;
-import java.util.List;
-
+import index.alchemy.util.AABBHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 
 public class ItemScrollLightning extends ItemScroll {
@@ -18,9 +14,7 @@ public class ItemScrollLightning extends ItemScroll {
 	
 	@Override
 	public void useScroll(ItemStack item, World world, EntityPlayer player, int type) {
-		for (EntityLivingBase entity : player.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, 
-				new AxisAlignedBB(player.posX - 30D, player.posY - 30D, player.posZ - 30D,
-						player.posX + 30D, player.posY + 30D, player.posZ + 30D))) {
+		for (EntityLivingBase entity : player.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(player, 30D))) {
             if(!(entity instanceof EntityPlayer))
             	world.addWeatherEffect(new EntityLightningBolt(world, entity.posX, entity.posY, entity.posZ, false));
         }
