@@ -4,13 +4,14 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.api.Alway;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 @Init(state = ModState.AVAILABLE)
 public class DMain {
 	
@@ -19,19 +20,17 @@ public class DMain {
 	public static final List<Method> init_obj = new LinkedList<Method>(), init = new LinkedList<Method>();
 	
 	public static void init(Class<?> clazz) {
-		if (Alway.getSide() == Side.CLIENT) {
-			DInit dInit = clazz.getAnnotation(DInit.class);
-			if (dInit != null) {
-				try {
-					init_obj.add(clazz.getMethod("init", Object.class));
-				} catch (NoSuchMethodException e) {
-					AlchemyModLoader.logger.warn("Can't find init(Object) method in: " + clazz.getName());
-				}
-				try {
-					init.add(clazz.getMethod("init"));
-				} catch (NoSuchMethodException e) {
-					AlchemyModLoader.logger.warn("Can't find init method in: " + clazz.getName());
-				}
+		DInit dInit = clazz.getAnnotation(DInit.class);
+		if (dInit != null) {
+			try {
+				init_obj.add(clazz.getMethod("init", Object.class));
+			} catch (NoSuchMethodException e) {
+				AlchemyModLoader.logger.warn("Can't find init(Object) method in: " + clazz.getName());
+			}
+			try {
+				init.add(clazz.getMethod("init"));
+			} catch (NoSuchMethodException e) {
+				AlchemyModLoader.logger.warn("Can't find init method in: " + clazz.getName());
 			}
 		}
 	}

@@ -24,7 +24,7 @@ public class PotionIgnore extends AlchemyPotion implements IEventHandle {
     };
 	
 	private static Field attackTarget = EntityLiving.class.getDeclaredFields()[10];
-	static {	
+	static {
 		attackTarget.setAccessible(true);
 	}
 	

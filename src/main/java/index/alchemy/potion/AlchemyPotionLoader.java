@@ -3,6 +3,7 @@ package index.alchemy.potion;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Init;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.interacting.ModItems;
 import index.alchemy.util.Tool;
 
 import java.lang.reflect.Method;
@@ -26,7 +27,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 // This is register ItemPotion in the Minecraft.
 // Not guaranteed to work in another version, Field name and
 // position will change with the version.
-@Init(state = ModState.PREINITIALIZED)
+@Init(state = ModState.INITIALIZED)
 public class AlchemyPotionLoader extends PotionType {
 	
 	public static final Potion
@@ -53,6 +54,15 @@ public class AlchemyPotionLoader extends PotionType {
 			@Override
 			public boolean apply(ItemStack input) {
 				return input.getItem() == item && input.getMetadata() == metadata;
+			}
+		};
+	}
+	
+	public static Predicate<ItemStack> getItemPredicate(final ItemStack item) {
+		return new Predicate<ItemStack>() {
+			@Override
+			public boolean apply(ItemStack input) {
+				return ItemStack.areItemsEqual(input, item);
 			}
 		};
 	}
@@ -214,7 +224,7 @@ public class AlchemyPotionLoader extends PotionType {
 	
 	public static void init() {
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "luck", "unluck",
-				getItemPredicate(Items.EMERALD), null, new Potion[]{MobEffects.LUCK}, new Potion[]{MobEffects.UNLUCK});
+				getItemPredicate(ModItems.bop$flower_miners_delight), null, new Potion[]{MobEffects.LUCK}, new Potion[]{MobEffects.UNLUCK});
 		
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 45, "feather_fall", "levitation",
 				getItemPredicate(Items.FEATHER), null, new Potion[]{feather_fall}, new Potion[]{MobEffects.LEVITATION});

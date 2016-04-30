@@ -92,7 +92,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	
 	@Override
 	public IMessage onMessage(MessageSpaceRingPickup message, MessageContext ctx) {
-		AlchemyItemLoader.ring_space.pickup(ctx.getServerHandler().playerEntity);
+		pickup(ctx.getServerHandler().playerEntity);
 		return null;
 	}
 	
