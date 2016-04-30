@@ -9,7 +9,6 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
-import index.alchemy.util.Tool;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 

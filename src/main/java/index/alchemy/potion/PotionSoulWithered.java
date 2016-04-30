@@ -2,7 +2,6 @@ package index.alchemy.potion;
 
 import index.alchemy.entity.AlchemyDamageSourceLoader;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
 
 public class PotionSoulWithered extends AlchemyPotion {
 	

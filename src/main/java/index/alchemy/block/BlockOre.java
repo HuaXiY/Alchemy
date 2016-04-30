@@ -1,29 +1,19 @@
 package index.alchemy.block;
 
-import index.alchemy.client.IColorBlock;
-import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.IOreDictionary;
-import index.alchemy.util.Tool;
-
 import java.util.Random;
 
+import index.alchemy.client.IColorBlock;
+import index.alchemy.core.IOreDictionary;
+import index.alchemy.util.Tool;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionary {
 	

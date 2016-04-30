@@ -1,17 +1,13 @@
 package index.alchemy.client;
 
-import index.alchemy.api.Alway;
-import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.Init;
-
 import java.util.LinkedList;
 import java.util.List;
 
+import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.Init;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.LoaderState.ModState;

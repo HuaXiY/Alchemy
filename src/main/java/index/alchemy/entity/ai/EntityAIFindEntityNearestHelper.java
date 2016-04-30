@@ -4,14 +4,11 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 
-import scala.collection.parallel.ParIterableLike.Find;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
 
 public class EntityAIFindEntityNearestHelper {

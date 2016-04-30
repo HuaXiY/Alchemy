@@ -1,10 +1,6 @@
 package index.alchemy.potion;
 
 import index.alchemy.entity.AlchemyDamageSourceLoader;
-
-import java.util.Random;
-
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 
 public class PotionDeadOrAlive extends AlchemyPotion {

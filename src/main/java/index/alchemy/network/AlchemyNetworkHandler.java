@@ -1,6 +1,5 @@
 package index.alchemy.network;
 
-import index.alchemy.api.Alway;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;

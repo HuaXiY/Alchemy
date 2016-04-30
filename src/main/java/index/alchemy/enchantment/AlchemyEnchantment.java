@@ -1,15 +1,9 @@
 package index.alchemy.enchantment;
 
-import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.IEventHandle;
-import index.alchemy.core.IPlayerTickable;
 import index.alchemy.core.IRegister;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
 public class AlchemyEnchantment extends Enchantment implements IRegister {

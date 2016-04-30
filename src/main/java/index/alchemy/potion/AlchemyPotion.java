@@ -4,16 +4,11 @@ import java.util.Random;
 
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.CommonProxy;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.IEventHandle;
-import index.alchemy.core.IPlayerTickable;
 import index.alchemy.core.IRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

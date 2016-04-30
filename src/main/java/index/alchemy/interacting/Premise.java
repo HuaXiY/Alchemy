@@ -8,16 +8,14 @@ import javax.swing.JOptionPane;
 
 import org.lwjgl.opengl.Display;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiErrorScreen;
-import net.minecraftforge.fml.client.SplashProgress;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.LoaderState.ModState;
 import index.alchemy.api.Alway;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
+import net.minecraftforge.fml.client.SplashProgress;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderState.ModState;
 
 @Init(state = ModState.CONSTRUCTED)
 public class Premise {

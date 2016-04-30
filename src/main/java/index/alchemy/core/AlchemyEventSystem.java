@@ -1,45 +1,19 @@
 package index.alchemy.core;
 
-import index.alchemy.container.ContainerItemInventory;
+import java.util.LinkedList;
+import java.util.List;
+
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.development.DMain;
 import index.alchemy.gui.GUIID;
 import index.alchemy.item.AlchemyItemLoader;
-import index.alchemy.item.IItemInventory;
-import index.alchemy.item.ItemInventory;
-import index.alchemy.network.MessageOpenGui;
-import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.MessageSpaceRingPickUp;
-import index.alchemy.util.Tool;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import org.lwjgl.input.Keyboard;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerChest;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
 import net.minecraftforge.fml.common.LoaderState.ModState;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;

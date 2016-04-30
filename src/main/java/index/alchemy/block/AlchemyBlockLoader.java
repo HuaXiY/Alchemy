@@ -2,36 +2,22 @@ package index.alchemy.block;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import index.alchemy.api.Alway;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
 import index.alchemy.core.Init;
-import index.alchemy.item.AlchemyItem;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelBlock;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntIdentityHashBiMap;
-import net.minecraft.util.ObjectIntIdentityMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyBlockLoader {

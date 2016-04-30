@@ -1,10 +1,6 @@
 package index.alchemy.potion;
 
-import index.alchemy.core.IPlayerTickable;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.potion.Potion;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class PotionFeatherFall extends AlchemyPotion {
 	

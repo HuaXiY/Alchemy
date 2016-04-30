@@ -1,70 +1,39 @@
 package index.alchemy.core;
 
-import java.awt.Canvas;
-import java.awt.Frame;
-import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
 
 import index.alchemy.api.Alway;
-import index.alchemy.block.AlchemyBlockLoader;
 import index.alchemy.config.AlchemyConfigLoader;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
-import index.alchemy.item.AlchemyItemLoader;
-import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.potion.AlchemyPotionLoader;
 import index.alchemy.util.Tool;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.client.renderer.color.ItemColors;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoaderState.ModState;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.ICrashCallable;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ProgressManager;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
-import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.MOD_VERSION)
+@Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.MOD_VERSION, dependencies = "required-after:BiomesOPlenty")
 public class AlchemyModLoader {
 	
 	public static final Logger logger = LogManager.getLogger(Constants.MOD_ID);
@@ -190,13 +159,13 @@ public class AlchemyModLoader {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) throws LWJGLException {
-		Frame frame = new Frame(Display.getTitle());
+		/*Frame frame = new Frame(Display.getTitle());
 		Canvas canvas = new Canvas();
 		frame.setBounds(Display.getX(), Display.getY(), Display.getWidth(), Display.getHeight());
 		canvas.setVisible(true);
 		frame.setVisible(true);
 		frame.add(canvas);
-		Display.setParent(canvas);
+		Display.setParent(canvas);*/
 		init(ModState.CONSTRUCTED);
 		init(ModState.PREINITIALIZED);
 	}

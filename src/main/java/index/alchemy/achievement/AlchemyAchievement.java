@@ -1,8 +1,6 @@
 package index.alchemy.achievement;
 
-import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IRegister;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;

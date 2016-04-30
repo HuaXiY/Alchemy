@@ -2,21 +2,19 @@ package index.alchemy.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.io.InputStreamReader;
-import java.io.FileInputStream;
 import java.io.OutputStreamWriter;
-import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.LinkedList;
 import java.util.List;
 
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
 
 public class Tool {
 	

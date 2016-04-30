@@ -1,21 +1,20 @@
 package index.alchemy.potion;
 
+import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.EventType;
+import index.alchemy.core.IEventHandle;
+import index.alchemy.entity.AlchemyDamageSourceLoader;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.EventType;
-import index.alchemy.core.IEventHandle;
-import index.alchemy.entity.AlchemyDamageSourceLoader;
 
 public class PotionPlague extends AlchemyPotion implements IEventHandle {
 	

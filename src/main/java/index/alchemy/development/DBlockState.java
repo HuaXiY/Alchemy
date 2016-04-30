@@ -1,13 +1,11 @@
 package index.alchemy.development;
 
-import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
-import index.alchemy.core.IResourceLocation;
-import index.alchemy.util.Tool;
-
 import java.io.File;
 import java.io.IOException;
 
+import index.alchemy.core.Constants;
+import index.alchemy.core.IResourceLocation;
+import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 
