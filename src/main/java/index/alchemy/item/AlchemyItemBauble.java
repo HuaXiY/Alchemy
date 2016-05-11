@@ -28,6 +28,19 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 			return PlayerHandler.getPlayerBaubles((EntityPlayer) player).getStackInSlot(0) == null;
 		}
 		
+		@Override
+		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+			if (Alway.isServer() && canEquip(item, player)) {
+				IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+				if (inventory.getStackInSlot(0) == null) {
+					inventory.setInventorySlotContents(0, item.copy());
+					item.stackSize--;
+					return new ActionResult(EnumActionResult.SUCCESS, item);
+				}
+			}
+	        return new ActionResult(EnumActionResult.PASS, item);
+	    }
+		
 		public AlchemyItemAmulet(String name, int color) {
 			super(name, "amulet", color);
 		}
@@ -84,6 +97,18 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 			return PlayerHandler.getPlayerBaubles((EntityPlayer) player).getStackInSlot(3) == null;
 		}
 		
+		@Override
+		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+			if (Alway.isServer() && canEquip(item, player)) {
+				IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+				if (inventory.getStackInSlot(3) == null) {
+					inventory.setInventorySlotContents(3, item.copy());
+					item.stackSize--;
+					return new ActionResult(EnumActionResult.SUCCESS, item);
+				}
+			}
+	        return new ActionResult(EnumActionResult.PASS, item);
+	    }
 		
 		public AlchemyItemBelt(String name, int color) {
 			super(name, "belt", color);
@@ -111,6 +136,10 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	@Override
 	public boolean canUnequip(ItemStack item, EntityLivingBase living) {
 		return true;
+	}
+	
+	public boolean isEquipmented(EntityLivingBase living) {
+		return living instanceof EntityPlayer && isEquipmented((EntityPlayer) living);
 	}
 	
 	@Override

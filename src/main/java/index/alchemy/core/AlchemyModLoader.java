@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.annotation.Nullable;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
@@ -38,6 +40,7 @@ public class AlchemyModLoader {
 	
 	public static final Logger logger = LogManager.getLogger(Constants.MOD_ID);
 	
+	@Nullable
 	@Deprecated
 	@Instance(Constants.MOD_ID)
 	public static AlchemyModLoader instance;
@@ -58,12 +61,21 @@ public class AlchemyModLoader {
 	
 	public static final String mc_dir; 
 	public static final boolean is_modding;
-	public static Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>() {
+	public static final Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>() {
 		@Override
 		public List<Class<?>> get(Object key) {
 			List<Class<?>> result = super.get(key);
 			if (result == null)
 				put((ModState) key, result = new LinkedList());
+			return result;
+		}
+	};
+	public static final Map<String, List<Class<?>>> instance_map = new LinkedHashMap<String, List<Class<?>>>() {
+		@Override
+		public List<Class<?>> get(Object key) {
+			List<Class<?>> result = super.get(key);
+			if (result == null)
+				put((String) key, result = new LinkedList());
 			return result;
 		}
 	};
@@ -129,6 +141,9 @@ public class AlchemyModLoader {
 					SideOnly side = clazz.getAnnotation(SideOnly.class);
 					if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))
 						init_map.get(init.state()).add(clazz);
+					InitInstance instance = clazz.getAnnotation(InitInstance.class);
+					if (instance != null)
+						instance_map.get(instance.value()).add(clazz);
 				} catch (ClassNotFoundException e) {}
 		}
 		

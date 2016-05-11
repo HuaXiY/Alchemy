@@ -17,10 +17,10 @@ public class AlchemyItemLoader {
 			scroll_tp = new ItemScrollTP();
 	
 	public static final ItemRingSpace ring_space = new ItemRingSpace();
-	public static final ItemAmuletGuard amulet_guard = new ItemAmuletGuard();
+	public static final ItemRingTime rint_time = new ItemRingTime();
+	public static final ItemBeltGuard amulet_guard = new ItemBeltGuard();
+	public static final ItemAmuletHeal amulet_heal = new ItemAmuletHeal();
 	
-	public static void init() {
-		
-	}
+	public static void init() {}
 	
 }

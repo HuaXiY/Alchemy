@@ -13,11 +13,9 @@ public class PotionSoulWithered extends AlchemyPotion {
 	
 	@Override
 	public void performEffect(EntityLivingBase living, int level) {
-		if (living.isPotionActive(this)) {
-			level = Math.max(level + 1, 1);
-			float hp = living.getHealth(), max_hp = living.getMaxHealth();
-			living.attackEntityFrom(AlchemyDamageSourceLoader.soul_withred, Math.max(hp * 0.02F * level, max_hp * 0.01F + level));
-		}
+		level = Math.max(level + 1, 1);
+		float hp = living.getHealth(), max_hp = living.getMaxHealth();
+		living.attackEntityFrom(AlchemyDamageSourceLoader.soul_withred, Math.max(hp * 0.02F * level, max_hp * 0.01F + level));
 	}
 
 	public PotionSoulWithered() {

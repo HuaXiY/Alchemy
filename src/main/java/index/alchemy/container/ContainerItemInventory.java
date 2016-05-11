@@ -18,15 +18,15 @@ public class ContainerItemInventory extends Container {
 		int offset = (row - 4) * 18;
 
 		for (int i = 0; i < row; i++)
-        	for (int k = 0; k < 9; ++k)
-        		addSlotToContainer(new Slot(inventory, k + i * 9, 8 + k * 18, 18 + i * 18));
+			for (int k = 0; k < 9; ++k)
+				addSlotToContainer(new Slot(inventory, k + i * 9, 8 + k * 18, 18 + i * 18));
 
 		for (int i = 0; i < 3; i++)
 			for (int k = 0; k < 9; k++)
 				addSlotToContainer(new Slot(player, k + i * 9 + 9, 8 + k * 18, 103 + i * 18 + offset));
 
 		for (int i = 0; i < 9; ++i)
-        	addSlotToContainer(new Slot(player, i, 8 + i * 18, 161 + offset));
+			addSlotToContainer(new Slot(player, i, 8 + i * 18, 161 + offset));
 		
 	}
 
@@ -36,29 +36,26 @@ public class ContainerItemInventory extends Container {
 	}
 	
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
-    {
-        ItemStack copy = null;
-        Slot slot = inventorySlots.get(index);
+	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+		ItemStack copy = null;
+		Slot slot = inventorySlots.get(index);
 
-        if (slot != null && slot.getHasStack())
-        {
-            ItemStack item = slot.getStack();
-            copy = item.copy();
+		if (slot != null && slot.getHasStack()) {
+			ItemStack item = slot.getStack();
+			copy = item.copy();
 
-            if (index < row * 9) {
-                if (!mergeItemStack(item, row * 9, inventorySlots.size(), true))
-                	return null;
-            }
-            else if (!mergeItemStack(item, 0, row * 9, false))
-            	return null;
+			if (index < row * 9) {
+				if (!mergeItemStack(item, row * 9, inventorySlots.size(), true))
+					return null;
+			} else if (!mergeItemStack(item, 0, row * 9, false))
+				return null;
 
-            if (item.stackSize == 0)
-            	slot.putStack(null);
-            else
-            	slot.onSlotChanged();
-        }
+			if (item.stackSize == 0)
+				slot.putStack(null);
+			else
+				slot.onSlotChanged();
+		}
 
-        return copy;
-    }
+		return copy;
+	}
 }

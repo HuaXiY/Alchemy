@@ -65,7 +65,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
 		} else if (AlchemyKeyBindingLoader.key_space_ring_pickup.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-					ClientProxy.ring_space_pickup_last_time - Minecraft.getMinecraft().theWorld.getWorldTime() > PICKUP_CD) {
+					Minecraft.getMinecraft().theWorld.getWorldTime() - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
 				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickup());
 				ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().theWorld.getWorldTime();
 			}

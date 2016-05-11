@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
+import biomesoplenty.api.block.BOPBlocks;
+import biomesoplenty.api.item.BOPItems;
 import index.alchemy.core.Init;
 import index.alchemy.util.FinalFieldSetter;
 import net.minecraft.block.Block;
@@ -20,17 +22,17 @@ public class ModItems {
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface ItemTransform {
 		
-		public String name() default "";
+		public String value() default "";
 
 	}
 	
 	//  Biomes O' Plenty
 
-	@Source(clazz = "biomesoplenty.api.item.BOPItems")
+	@Source(BOPItems.class)
 	public static final Item 
 			bop$gem = null;
 	
-	@ItemTransform(name = "bop$gem")
+	@ItemTransform("bop$gem")
 	public static final ItemStack
 			bop$gem_amethyst = null,							//  末影紫晶 ---- 空间
 			bop$gem_ruby = null,								//  红宝石 ---- 生命
@@ -41,12 +43,12 @@ public class ModItems {
 			bop$gem_sapphire = null,							//  蓝宝石  ---- 净化
 			bop$gem_amber = null;								//  琥珀  ---- 时间
 	
-	@Source(clazz = "biomesoplenty.api.block.BOPBlocks")
+	@Source(BOPBlocks.class)
 	public static final  Item 
 			bop$flower_0 = null,
 			bop$flower_1 = null;
 	
-	@ItemTransform(name = "bop$flower_0")
+	@ItemTransform( "bop$flower_0")
 	public static final ItemStack
 			bop$flower_clover = null,							//  苜蓿 ---- 混沌
 			bop$flower_swampflower = null,				//  沼泽花 ---- 黑暗
@@ -65,7 +67,7 @@ public class ModItems {
 			bop$flower_lily_of_the_valley = null,		//  谷百合 ---- 祝福
 			bop$flower_burning_blossom = null;		//  火焰花 ---- 狂暴
 	
-	@ItemTransform(name = "bop$flower_1")
+	@ItemTransform("bop$flower_1")
 	public static final ItemStack
 			bop$flower_lavender = null,						//  熏衣草 ---- 和平
 			bop$flower_goldenrod = null,					//  秋麒麟草 ---- 永恒
@@ -76,15 +78,10 @@ public class ModItems {
 	
 	public static void init() throws Exception {
 		String last = null;
-		Class<?> clazz =null;
 		for (Field field : ModItems.class.getFields()) {
 			Source source = field.getAnnotation(Source.class);
-			if (source != null) {
-				if (!source.clazz().equals(last)) {
-					last = source.clazz();
-					clazz = Class.forName(last);
-				}
-				Object obj = clazz.getField(field.getName().replaceAll(".*\\$", "")).get(null);
+			if (source != null && source.value() != null) {
+				Object obj = source.value().getField(field.getName().replaceAll(".*\\$", "")).get(null);
 				FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
 			}
 		}
@@ -94,8 +91,8 @@ public class ModItems {
 		for (Field field : ModItems.class.getFields()) {
 			ItemTransform transform = field.getAnnotation(ItemTransform.class);
 			if (transform != null) {
-				if (!transform.name().equals(last)) {
-					last = transform.name();
+				if (!transform.value().equals(last)) {
+					last = transform.value();
 					item = (Item) ModItems.class.getField(last).get(null);
 					index = 0;
 				}

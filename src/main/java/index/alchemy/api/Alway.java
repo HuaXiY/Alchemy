@@ -1,5 +1,8 @@
 package index.alchemy.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -11,8 +14,13 @@ public class Alway {
 	
 	public static final int SEA_LEVEL = 62;
 	
+	public static final Map<Thread, Side> SIDE_MAPPING = new HashMap<Thread, Side>();
+	
 	public static Side getSide() {
-		return FMLCommonHandler.instance().getEffectiveSide();
+		Side side = SIDE_MAPPING.get(Thread.currentThread());
+		if (side == null)
+			SIDE_MAPPING.put(Thread.currentThread(), side = FMLCommonHandler.instance().getEffectiveSide());
+		return side;
 	}
 	
 	public static boolean isServer() {

@@ -6,7 +6,7 @@ public class PotionFeatherFall extends AlchemyPotion {
 	
 	@Override
 	public void performEffect(EntityLivingBase living, int level) {
-		if (living.isPotionActive(this) && !living.onGround && living.motionY < 0) {
+		if (!living.onGround && living.motionY < 0) {
 			living.motionY *= 0.75;
 			living.fallDistance = 0;
 		}

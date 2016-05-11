@@ -17,7 +17,6 @@ public class AlchemyNetworkHandler {
 
 	public static void init() {
 		registerMessage(MessageOpenGui.class, Side.SERVER);
-		registerMessage(MessageAlacrityCallback.class, Side.SERVER);
 		registerMessage(MessageParticle.class, Side.CLIENT);
 	}
 

@@ -49,8 +49,7 @@ public class AlchemyBlockLoader {
 			ItemBlockSpecial item, Class<?> tileEntityClass, String tile){
 		Field modifiersField = null;
     	try{
-    		modifiersField = Field.class.getDeclaredField("modifiers");
-    		modifiersField.setAccessible(true);
+    		modifiersField = Tool.setAccessible(Field.class.getDeclaredField("modifiers"));
     		for(Field field : Blocks.class.getDeclaredFields()){
         		if (Block.class.isAssignableFrom(field.getType())){
     				Block block = (Block) field.get(null);
@@ -70,8 +69,7 @@ public class AlchemyBlockLoader {
     					map.put(newBlock, registryName);
     					
     					if (item != null) {
-    						Field ItemBlockSpecial = item.getClass().getDeclaredFields()[0];
-        					ItemBlockSpecial.setAccessible(true);
+    						Field ItemBlockSpecial = Tool.setAccessible(item.getClass().getDeclaredFields()[0]);
         					modifiersField.setInt(ItemBlockSpecial, modifiersField.getInt(ItemBlockSpecial) & ~Modifier.FINAL);
         					ItemBlockSpecial.set(item, newBlock);
     					}

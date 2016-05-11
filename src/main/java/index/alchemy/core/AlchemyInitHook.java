@@ -1,6 +1,9 @@
 package index.alchemy.core;
 
+import java.util.concurrent.Callable;
+
 import index.alchemy.api.Alway;
+import index.alchemy.capability.AlchemyCapability;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.IColorBlock;
 import index.alchemy.client.IColorItem;
@@ -16,6 +19,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
+import net.minecraftforge.common.capabilities.Capability.IStorage;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -43,7 +48,7 @@ public class AlchemyInitHook {
 	}
 	
 	public static <I extends Item & IColorItem, B extends Block & IColorBlock,
-				   R extends Item & IResourceLocation> void init(Object obj) {
+				   R extends Item & IResourceLocation, C> void init(Object obj) {
 		
 		if (obj instanceof Impl)
 			GameRegistry.register((Impl) obj);
@@ -71,6 +76,9 @@ public class AlchemyInitHook {
 		
 		if (obj instanceof INetworkMessage)
 			AlchemyNetworkHandler.registerMessage((INetworkMessage) obj);
+		
+		if (obj instanceof AlchemyCapability)
+			CapabilityManager.INSTANCE.register((Class<C>) obj.getClass(), (IStorage<C>) obj, (Callable<C>) obj);
 		
 		if (Alway.isClient()) {
 			
@@ -100,5 +108,5 @@ public class AlchemyInitHook {
 		push_event(obj);
 		
 	}
-
+	
 }

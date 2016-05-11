@@ -4,19 +4,17 @@ import java.lang.reflect.Field;
 
 import index.alchemy.api.Alway;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
-import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
+import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
+import index.alchemy.util.Tool;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.CombatTracker;
 
-public class ItemAmuletGuard extends AlchemyItemAmulet {
+public class ItemBeltGuard extends AlchemyItemBelt {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 3, RECOVERY_CD = 20 * 6, MAX_ABSORPTION = 20;
 	
-	private static Field lastDamageTime = CombatTracker.class.getDeclaredFields()[2];
-	static {
-		lastDamageTime.setAccessible(true);
-	}
+	private static Field lastDamageTime = Tool.setAccessible(CombatTracker.class.getDeclaredFields()[2]);
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
@@ -30,8 +28,8 @@ public class ItemAmuletGuard extends AlchemyItemAmulet {
 		}
 	}
 
-	public ItemAmuletGuard() {
-		super("amulet_guard", 0xFFCC00);
+	public ItemBeltGuard() {
+		super("belt_guard", 0xFFCC00);
 	}
 
 }

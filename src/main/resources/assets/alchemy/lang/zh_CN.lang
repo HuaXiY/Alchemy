@@ -8,7 +8,9 @@ item.scroll_ice_screen.name=
 item.scroll_lightning.name=
 item.scroll_tp.name=
 item.ring_space.name=
-item.amulet_guard.name=
+item.ring_time.name=
+item.belt_guard.name=
+item.amulet_heal.name=
 
 //blockMap
 tile.ice_temp.name=
@@ -68,6 +70,7 @@ enchantment.null=
 //keyMap
 key.space_ring_open=打开空间戒指
 key.space_ring_pickup=收进空间戒指
+key.time_ring_leap=
 
 //damageMap
 death.attack.soul_withred=%1$s

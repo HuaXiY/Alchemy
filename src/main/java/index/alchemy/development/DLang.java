@@ -38,9 +38,8 @@ public class DLang {
 	private static Map<Class<?>, Method> _funcMap;
 	static {
 		for (Field field : DLang.class.getDeclaredFields())
-			if (field.getType() == Map.class)
+			if (Tool.setAccessible(field).getType() == Map.class)
 				try {
-					field.setAccessible(true);
 					field.set(null, new LinkedHashMap());
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -85,8 +84,7 @@ public class DLang {
 			StringBuilder builder = new StringBuilder("//MODID\n" + Constants.MOD_ID + "=" +
 					Tool.isNullOr(map.get(Constants.MOD_ID), Constants.MOD_ID) + "\n");
 			for (Field field : DLang.class.getDeclaredFields())
-				if (field.getType() == Map.class && !field.getName().startsWith("_")) {
-					field.setAccessible(true);
+				if (Tool.setAccessible(field).getType() == Map.class && !field.getName().startsWith("_")) {
 					builder.append("\n//" + field.getName() + "\n");
 					for (Entry<String, String> entry : ((Map<String, String>) field.get(null)).entrySet())
 						if (!mcSet.contains(entry.getKey()))

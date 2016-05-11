@@ -203,16 +203,8 @@ public class AlchemyPotionLoader extends PotionType {
         AlchemyInitHook.init_impl(potion);
     }
 	
-	public static Method registerPotionTypeConversion;
-	
-	static {
-		try {
-			(registerPotionTypeConversion = Tool.searchMethod(
-					PotionHelper.class, PotionType.class, Predicate.class, PotionType.class)).setAccessible(true);
-		} catch (Exception e) {
-			throw new AlchemyRuntimeExcption(e);
-		}
-	}
+	public static Method registerPotionTypeConversion = Tool.setAccessible(Tool.searchMethod(
+			PotionHelper.class, PotionType.class, Predicate.class, PotionType.class));
 	
 	public static void registerPotionTypeConversion(PotionType input, Predicate<ItemStack> reagentPredicate, PotionType output){
 		try {

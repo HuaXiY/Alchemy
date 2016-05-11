@@ -14,7 +14,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -34,12 +36,73 @@ public class AlchemyEventSystem implements IGuiHandler {
 			SERVER_TICKABLE = new LinkedList<IPlayerTickable>(),
 			CLIENT_TICKABLE = new LinkedList<IPlayerTickable>();
 	
+	public static final List<IContinuedRunnable>
+			SERVER_RUNNABLE = new LinkedList<IContinuedRunnable>(),
+			SERVER_TEMP = new LinkedList<IContinuedRunnable>(),
+			CLIENT_RUNNABLE = new LinkedList<IContinuedRunnable>(),
+			CLIENT_TEMP = new LinkedList<IContinuedRunnable>();
+	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		if (tickable.getSide() != null)
 			(tickable.getSide() == Side.SERVER ? SERVER_TICKABLE : CLIENT_TICKABLE).add(tickable);
 		else {
 			SERVER_TICKABLE.add(tickable);
 			CLIENT_TICKABLE.add(tickable);
+		}
+	}
+	
+	public static void addDelayedRunnable (final Runnable runnable, final int tick, Side side) {
+		addContinuedRunnable(new IContinuedRunnable() {
+			int c_tick = tick;
+			@Override
+			public boolean run() {
+				if (--c_tick == 0) {
+					runnable.run();
+					return true;
+				}
+				return false;
+			}
+		}, side);
+	}
+	
+	public static void addContinuedRunnable (final IIndexRunnable runnable, final int tick, Side side) {
+		addContinuedRunnable(new IContinuedRunnable() {
+			int c_tick = tick;
+			@Override
+			public boolean run() {
+				runnable.run(tick - c_tick);
+				return --c_tick == 0;
+			}
+		}, side);
+	}
+	
+	public static void addContinuedRunnable(IContinuedRunnable runnable, Side side) {
+		if (side == null) {
+			SERVER_RUNNABLE.add(runnable);
+			CLIENT_RUNNABLE.add(runnable);
+		} else
+			(side.isServer() ? SERVER_RUNNABLE : CLIENT_RUNNABLE).add(runnable);
+	}
+	
+	@SubscribeEvent
+	public void onServerTick(ServerTickEvent event) {
+		if (!SERVER_RUNNABLE.isEmpty()) {
+			for (IContinuedRunnable runnable : SERVER_RUNNABLE)
+				if (runnable.run())
+					SERVER_TEMP.add(runnable);
+			SERVER_RUNNABLE.removeAll(SERVER_TEMP);
+			SERVER_TEMP.clear();
+		}
+	}
+	
+	@SubscribeEvent
+	public void onClientTick(ClientTickEvent event) {
+		if (!CLIENT_RUNNABLE.isEmpty()) {
+			for (IContinuedRunnable runnable : CLIENT_RUNNABLE)
+				if (runnable.run())
+					CLIENT_TEMP.add(runnable);
+			CLIENT_RUNNABLE.removeAll(CLIENT_TEMP);
+			CLIENT_TEMP.clear();
 		}
 	}
 	
