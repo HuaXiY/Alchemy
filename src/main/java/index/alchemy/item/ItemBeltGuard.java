@@ -21,7 +21,7 @@ public class ItemBeltGuard extends AlchemyItemBelt {
 		try {
 			if (Alway.isServer() && living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION
 					&& living.ticksExisted - living.getLastAttackerTime() > RECOVERY_CD
-					&& living.ticksExisted - ((Integer) lastDamageTime.get(living.getCombatTracker())) > RECOVERY_CD)
+					&& living.ticksExisted - (Integer) lastDamageTime.get(living.getCombatTracker()) > RECOVERY_CD)
 				living.setAbsorptionAmount(living.getAbsorptionAmount() + 1);
 		} catch (Exception e) {
 			throw new AlchemyRuntimeExcption(e);

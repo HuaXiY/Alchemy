@@ -149,7 +149,15 @@ public class AlchemyModLoader {
 		
 	}
 	
+	private static ModState state;
+	
+	@Nullable
+	public static ModState getState() {
+		return state;
+	}
+	
 	public static void init(ModState state) {
+		AlchemyModLoader.state = state;
 		logger.info("************************************   " + state + " START   ************************************");
 		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
 		for (Class clazz : init_map.get(state)) {

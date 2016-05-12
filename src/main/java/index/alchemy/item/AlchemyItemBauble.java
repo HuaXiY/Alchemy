@@ -57,8 +57,10 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		@Override
 		public boolean canEquip(ItemStack item, EntityLivingBase player) {
 			IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
-			return isOnly() ? inventory.getStackInSlot(1) == null || inventory.getStackInSlot(2) == null :
-				inventory.getStackInSlot(1) == null || inventory.getStackInSlot(1).getItem() != this && inventory.getStackInSlot(2) == null;
+			return isOnly() ?
+				inventory.getStackInSlot(2) == null && (inventory.getStackInSlot(1) == null || inventory.getStackInSlot(1).getItem() != this) ||
+				inventory.getStackInSlot(1) == null && (inventory.getStackInSlot(2) == null || inventory.getStackInSlot(2).getItem() != this) : 
+				inventory.getStackInSlot(1) == null || inventory.getStackInSlot(2) == null;
 		}
 		
 		@Override

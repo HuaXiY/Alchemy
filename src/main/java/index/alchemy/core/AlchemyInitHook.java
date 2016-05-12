@@ -7,6 +7,8 @@ import index.alchemy.capability.AlchemyCapability;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.IColorBlock;
 import index.alchemy.client.IColorItem;
+import index.alchemy.client.render.HUDManager;
+import index.alchemy.client.render.ICoolDown;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.INetworkMessage;
 import index.alchemy.world.IGenerator;
@@ -102,6 +104,9 @@ public class AlchemyInitHook {
 			
 			if (obj instanceof KeyBinding)
 				ClientRegistry.registerKeyBinding((KeyBinding) obj);
+			
+			if (obj instanceof ICoolDown)
+				HUDManager.registerCoolDown((ICoolDown) obj);
 			
 		}
 		

@@ -2,10 +2,10 @@ package index.alchemy.potion;
 
 import java.util.Random;
 
+import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.IRegister;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
@@ -43,7 +43,7 @@ public class AlchemyPotion extends Potion implements IRegister {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getStatusIconIndex() {
-		Minecraft.getMinecraft().renderEngine.bindTexture(RESOURCE_LOCATION);
+		HUDManager.bind(RESOURCE_LOCATION);
 		return id;
 	}
 	

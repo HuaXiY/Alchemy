@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.development.DMain;
 import index.alchemy.gui.GUIID;
@@ -14,6 +15,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -47,8 +50,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 			CLIENT_RUNNABLE = new LinkedList<IContinuedRunnable>(),
 			CLIENT_TEMP = new LinkedList<IContinuedRunnable>();
 	
-	public static final Set<Object> HOOK_KEY_INPUT = new HashSet<Object>();
-	private static boolean hookKeyInputState = false;
+	public static final Set<Object> HOOK_INPUT = new HashSet<Object>();
+	private static boolean hookInputState = false;
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		if (tickable.getSide() != null)
@@ -145,26 +148,33 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static void addKeyInputHook(Object obj) {
-		if (HOOK_KEY_INPUT.isEmpty()) {
-			hookKeyInputState = true;
+	public static void addInputHook(Object obj) {
+		if (HOOK_INPUT.isEmpty()) {
+			hookInputState = true;
 			addContinuedRunnable(new IContinuedRunnable() {
 				@Override
 				public boolean run(Phase phase) {
 					if (phase == Phase.START)
 						KeyBinding.unPressAllKeys();
-					return !hookKeyInputState;
+					return !hookInputState;
 				}
 			}, Side.CLIENT);
 		}
-		HOOK_KEY_INPUT.add(obj);
+		HOOK_INPUT.add(obj);
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static void removeKeyInputHook(Object obj) {
-		HOOK_KEY_INPUT.remove(obj);
-		if (HOOK_KEY_INPUT.isEmpty())
-			hookKeyInputState = false;
+	public static void removeInputHook(Object obj) {
+		HOOK_INPUT.remove(obj);
+		if (HOOK_INPUT.isEmpty())
+			hookInputState = false;
+	}
+	
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void renderBar(RenderGameOverlayEvent event) {
+		if (event.getType() == ElementType.ALL)
+			HUDManager.render();
 	}
 	
 	public static void registerEventHandle(IEventHandle handle) {
