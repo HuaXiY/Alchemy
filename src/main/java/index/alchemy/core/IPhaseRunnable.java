@@ -2,8 +2,8 @@ package index.alchemy.core;
 
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
-public interface IIndexRunnable {
+public interface IPhaseRunnable {
 	
-	public boolean run(int index, Phase phase);
+	public boolean run(Phase phase);
 
 }

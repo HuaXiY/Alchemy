@@ -2,12 +2,12 @@ package index.alchemy.capability;
 
 import java.util.LinkedList;
 
+import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.EventType;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.InitInstance;
-import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -29,7 +29,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 			
 			public final double x, y, z;
 			public final float yaw, pitch;
-			public final float health;
+			public final float health, absorption;
 			public final int food, air;
 			
 			public TimeNode(EntityPlayer player) {
@@ -39,23 +39,30 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 				yaw = player.rotationYaw;
 				pitch = player.rotationPitch;
 				health = player.getHealth();
+				absorption = player.getAbsorptionAmount();
 				food = player.getFoodStats().getFoodLevel();
 				air = player.getAir();
 			}
 			
 			@SideOnly(Side.CLIENT)
 			public void updatePlayerOnClient(EntityPlayer player) {
-				player.posX = x;
-				player.posY = y;
-				player.posZ = z;
+				player.setPosition(x, y, z);
 				player.rotationYaw = yaw;
 				player.rotationPitch = pitch;
+				player.motionX = 0;
+				player.motionY = 0;
+				player.motionZ = 0;
 			}
 			
 			public void updatePlayerOnServer(EntityPlayer player) {
 				player.setHealth(health);
+				player.setAbsorptionAmount(absorption);
 				player.getFoodStats().setFoodLevel(food);
 				player.setAir(air);
+				player.motionX = 0;
+				player.motionY = 0;
+				player.motionZ = 0;
+				player.fallDistance = 0;
 			}
 			
 		}
@@ -100,8 +107,6 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	public Class<TimeSnapshot> getDataClass() {
 		return TimeSnapshot.class;
 	}
-	
-
 
 	@Override
 	public EventType[] getEventType() {
@@ -110,7 +115,8 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	
 	@SubscribeEvent
 	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent.Entity event) {
-		event.addCapability(RESOURCE, new TimeSnapshot());
+		if (event.getEntity() instanceof EntityPlayer)
+			event.addCapability(RESOURCE, new TimeSnapshot());
 	}
 
 }

@@ -61,7 +61,9 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void handleKeyInput(KeyInputEvent event) {
 		if (AlchemyKeyBindingLoader.key_space_ring_open.isPressed()) {
-			if (isEquipmented(Minecraft.getMinecraft().thePlayer))
+			if (Minecraft.getMinecraft().currentScreen != null)
+				Minecraft.getMinecraft().displayGuiScreen(null);
+			else if (isEquipmented(Minecraft.getMinecraft().thePlayer))
 				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
 		} else if (AlchemyKeyBindingLoader.key_space_ring_pickup.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&

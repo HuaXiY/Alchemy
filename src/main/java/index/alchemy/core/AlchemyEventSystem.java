@@ -1,20 +1,25 @@
 package index.alchemy.core;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.development.DMain;
 import index.alchemy.gui.GUIID;
 import index.alchemy.item.AlchemyItemLoader;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoaderState.ModState;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -42,6 +47,9 @@ public class AlchemyEventSystem implements IGuiHandler {
 			CLIENT_RUNNABLE = new LinkedList<IContinuedRunnable>(),
 			CLIENT_TEMP = new LinkedList<IContinuedRunnable>();
 	
+	public static final Set<Object> HOOK_KEY_INPUT = new HashSet<Object>();
+	private static boolean hookKeyInputState = false;
+	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		if (tickable.getSide() != null)
 			(tickable.getSide() == Side.SERVER ? SERVER_TICKABLE : CLIENT_TICKABLE).add(tickable);
@@ -51,27 +59,29 @@ public class AlchemyEventSystem implements IGuiHandler {
 		}
 	}
 	
-	public static void addDelayedRunnable (final Runnable runnable, final int tick, Side side) {
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onPlayerTick(PlayerTickEvent event) {
+		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)
+			tickable.onTick(event.player, event.phase);
+	}
+	
+	public static void addDelayedRunnable(final IPhaseRunnable runnable, final int tick, Side side) {
 		addContinuedRunnable(new IContinuedRunnable() {
 			int c_tick = tick;
 			@Override
-			public boolean run() {
-				if (--c_tick == 0) {
-					runnable.run();
-					return true;
-				}
-				return false;
+			public boolean run(Phase phase) {
+				return (c_tick < 0 || phase == Phase.START && --c_tick < 0) && runnable.run(phase);
 			}
 		}, side);
 	}
 	
-	public static void addContinuedRunnable (final IIndexRunnable runnable, final int tick, Side side) {
+	public static void addContinuedRunnable(final IIndexRunnable runnable, final int tick, Side side) {
 		addContinuedRunnable(new IContinuedRunnable() {
 			int c_tick = tick;
 			@Override
-			public boolean run() {
-				runnable.run(tick - c_tick);
-				return --c_tick == 0;
+			public boolean run(Phase phase) {
+				boolean flag = runnable.run(tick - c_tick, phase);
+				return (c_tick < 1 || phase == Phase.START && --c_tick < 1) && flag;
 			}
 		}, side);
 	}
@@ -84,32 +94,26 @@ public class AlchemyEventSystem implements IGuiHandler {
 			(side.isServer() ? SERVER_RUNNABLE : CLIENT_RUNNABLE).add(runnable);
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onServerTick(ServerTickEvent event) {
 		if (!SERVER_RUNNABLE.isEmpty()) {
 			for (IContinuedRunnable runnable : SERVER_RUNNABLE)
-				if (runnable.run())
+				if (runnable.run(event.phase))
 					SERVER_TEMP.add(runnable);
 			SERVER_RUNNABLE.removeAll(SERVER_TEMP);
 			SERVER_TEMP.clear();
 		}
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onClientTick(ClientTickEvent event) {
 		if (!CLIENT_RUNNABLE.isEmpty()) {
 			for (IContinuedRunnable runnable : CLIENT_RUNNABLE)
-				if (runnable.run())
+				if (runnable.run(event.phase))
 					CLIENT_TEMP.add(runnable);
 			CLIENT_RUNNABLE.removeAll(CLIENT_TEMP);
 			CLIENT_TEMP.clear();
 		}
-	}
-	
-	@SubscribeEvent
-	public void onPlayerTick(PlayerTickEvent event) {
-		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)
-			tickable.onTick(event.player);
 	}
 	
 	@SubscribeEvent
@@ -138,6 +142,29 @@ public class AlchemyEventSystem implements IGuiHandler {
 						AlchemyItemLoader.ring_space.getFormPlayer(player)));
 		}
 		return null;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static void addKeyInputHook(Object obj) {
+		if (HOOK_KEY_INPUT.isEmpty()) {
+			hookKeyInputState = true;
+			addContinuedRunnable(new IContinuedRunnable() {
+				@Override
+				public boolean run(Phase phase) {
+					if (phase == Phase.START)
+						KeyBinding.unPressAllKeys();
+					return !hookKeyInputState;
+				}
+			}, Side.CLIENT);
+		}
+		HOOK_KEY_INPUT.add(obj);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static void removeKeyInputHook(Object obj) {
+		HOOK_KEY_INPUT.remove(obj);
+		if (HOOK_KEY_INPUT.isEmpty())
+			hookKeyInputState = false;
 	}
 	
 	public static void registerEventHandle(IEventHandle handle) {

@@ -2,6 +2,9 @@ package index.alchemy.item;
 
 import java.util.Iterator;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
@@ -10,6 +13,8 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.EventType;
 import index.alchemy.core.IEventHandle;
 import index.alchemy.core.IIndexRunnable;
+import index.alchemy.core.IPhaseRunnable;
+import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingTime.MessageTimeLeap;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -22,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,6 +37,12 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 	
 	public static final int USE_CD = 20 * 30;
 	public static final String NBT_KEY_CD = "time_leap";
+	
+	@Override
+	public void onUnequipped(ItemStack item, EntityLivingBase living) {
+		if (living instanceof EntityPlayer)
+			living.getCapability(AlchemyCapabilityLoader.time_leap, null).list.clear();
+	}
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
@@ -83,31 +95,44 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 		return null;
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public void timeLeapOnClinet(final EntityPlayer player) {
 		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
 		final Iterator<TimeNode> iterator = snapshot.list.iterator();
 		snapshot.setUpdate(false);
+		AlchemyEventSystem.addKeyInputHook(this);
 		AlchemyEventSystem.addContinuedRunnable(new IIndexRunnable() {
+			int flag = TimeSnapshot.SIZE / 2 - 1;
 			@Override
-			public void run(int index) {
+			public boolean run(int index, Phase phase) {
+				boolean result = false;
 				if (iterator.hasNext())
 					iterator.next().updatePlayerOnClient(player);
-				if (index + 1 == TimeSnapshot.SIZE)
+				if (result = index >= flag) {
 					snapshot.setUpdate(true);
+					AlchemyEventSystem.removeKeyInputHook(ItemRingTime.this);
+				}
+				return result;
 			}
-		}, TimeSnapshot.SIZE, Side.CLIENT);
+		}, TimeSnapshot.SIZE / 2, Side.CLIENT);
 	}
 	
-	public void timeLeapOnServer(EntityPlayer player) {
+	public void timeLeapOnServer(final EntityPlayer player) {
 		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
-		snapshot.list.getLast().updatePlayerOnServer(player);
+		final Iterator<TimeNode> iterator = snapshot.list.iterator();
 		snapshot.setUpdate(false);
-		AlchemyEventSystem.addDelayedRunnable(new Runnable() {
+		AlchemyEventSystem.addContinuedRunnable(new IIndexRunnable() {
+			int flag = TimeSnapshot.SIZE / 2 - 1;
 			@Override
-			public void run() {
-				snapshot.setUpdate(true);
+			public boolean run(int index, Phase phase) {
+				boolean result = false;
+				if (iterator.hasNext())
+					iterator.next().updatePlayerOnServer(player);
+				if (result = index >= flag)
+					snapshot.setUpdate(true);
+				return result;
 			}
-		}, TimeSnapshot.SIZE, Side.SERVER);
+		}, TimeSnapshot.SIZE / 2, Side.SERVER);
 		/*
 		System.out.println("leap");
 		if (isEquipmented(player) && player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD) > USE_CD) {
