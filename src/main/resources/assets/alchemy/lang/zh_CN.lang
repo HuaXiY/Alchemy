@@ -9,8 +9,10 @@ item.scroll_lightning.name=
 item.scroll_tp.name=
 item.ring_space.name=
 item.ring_time.name=
+item.alive.name=
 item.belt_guard.name=
 item.amulet_heal.name=
+item.amulet_purify.name=
 
 //blockMap
 tile.ice_temp.name=

@@ -28,6 +28,7 @@ public class ModItems {
 	
 	//  Biomes O' Plenty
 
+	@Deprecated
 	@Source(BOPItems.class)
 	public static final Item 
 			bop$gem = null;
@@ -43,6 +44,7 @@ public class ModItems {
 			bop$gem_sapphire = null,							//  蓝宝石  ---- 净化
 			bop$gem_amber = null;								//  琥珀  ---- 时间
 	
+	@Deprecated
 	@Source(BOPBlocks.class)
 	public static final  Item 
 			bop$flower_0 = null,
@@ -100,11 +102,11 @@ public class ModItems {
 			}
 		}
 		
-		for (Field field : ModItems.class.getFields()) {
+		/*for (Field field : ModItems.class.getFields()) {
 			Object obj = field.get(null);
 			System.out.println(field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
 				obj instanceof ItemStack ? ((ItemStack) obj).getDisplayName() : ""));
-		}
+		}*/
 	}
 	
 }

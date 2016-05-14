@@ -14,14 +14,12 @@ import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.INetworkMessage;
-import index.alchemy.network.MessageOpenGui;
-import index.alchemy.network.MessageParticle;
-import index.alchemy.network.SDouble6Packect;
+import index.alchemy.network.SDouble6Package;
+import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -64,7 +62,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 			if (Minecraft.getMinecraft().currentScreen != null)
 				Minecraft.getMinecraft().displayGuiScreen(null);
 			else if (isEquipmented(Minecraft.getMinecraft().thePlayer))
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageOpenGui(GUIID.SPACE_RING));
+				AlchemyNetworkHandler.openGui(GUIID.SPACE_RING);
 		} else if (AlchemyKeyBindingLoader.key_space_ring_pickup.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
 					Minecraft.getMinecraft().theWorld.getWorldTime() - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
@@ -114,22 +112,17 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, 
 				new AxisAlignedBB(player.posX - 5D, player.posY - 5D, player.posZ - 5D,
 						player.posX + 5D, player.posY + 5D, player.posZ + 5D));
-		List<SDouble6Packect> d6p = new LinkedList<SDouble6Packect>(); 
+		List<SDouble6Package> d6p = new LinkedList<SDouble6Package>(); 
 		for (EntityItem entity : list) {
 			inventory.mergeItemStack(entity.getEntityItem());
 			if (entity.getEntityItem().stackSize < 1) {
-				for (int i = 0; i < 3; i++)
-					d6p.add(new SDouble6Packect(entity.posX, entity.posY, entity.posZ, 1, 1, 1));
+				d6p.add(new SDouble6Package(entity.posX, entity.posY, entity.posZ, 0, 0, 0));
 				entity.setDead();
 			}
 		}
 		if (list.size() > 0) {
 			inventory.updateNBT();
-			for (EntityPlayerMP mp : player.worldObj.getEntitiesWithinAABB(EntityPlayerMP.class,
-					new AxisAlignedBB(player.posX - 16D, player.posY - 64D, player.posZ - 16D,
-							player.posX + 16D, player.posY + 64D, player.posZ + 16D)))
-				AlchemyNetworkHandler.networkWrapper.sendTo(new MessageParticle(EnumParticleTypes.PORTAL.getParticleID(),
-						d6p.toArray(new SDouble6Packect[d6p.size()])), (EntityPlayerMP) mp);
+			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player, 64D), player.worldObj, d6p);
 		}
 	}
 

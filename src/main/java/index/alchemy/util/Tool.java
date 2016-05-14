@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -46,6 +47,10 @@ public class Tool {
 				}
 		}
 		return to;
+	}
+	
+	public static final <T> T[] toArray(List<T> list, Class<T> type) {
+		return list.toArray((T[]) Array.newInstance(type, list.size()));
 	}
 
 	public static final boolean isSubclass(Class<?> supers, Class<?> clazz) {
@@ -223,6 +228,13 @@ public class Tool {
 		while ((i = str.indexOf('_')) != -1 && str.length() > i + 2)
 			str = str.substring(0, i) + str.substring(i + 1, i + 2).toUpperCase() + str.substring(i + 2);
 		return str;
+	}
+	
+	public static final String getString(char c, int len) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < len; i++)
+			builder.append(c);
+		return builder.toString();
 	}
 	
 }

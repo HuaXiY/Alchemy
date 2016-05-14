@@ -56,7 +56,7 @@ public class AlchemyModLoader {
 	
 	public AlchemyModLoader() {
 		if (instance != null)
-			throw new AlchemyRuntimeExcption(new RuntimeException("Before this has been instantiate."));
+			throw new AlchemyRuntimeExcption(new RuntimeException("Before this has been instantiate"));
 	}
 	
 	public static final String mc_dir; 
@@ -156,16 +156,22 @@ public class AlchemyModLoader {
 		return state;
 	}
 	
+	public static String format(String src, String max) {
+		double fix = (max.length() - src.length()) / 2D;
+		return Tool.getString(' ', (int) Math.floor(fix)) + src + Tool.getString(' ', (int) Math.ceil(fix));
+	}
+	
 	public static void init(ModState state) {
 		AlchemyModLoader.state = state;
-		logger.info("************************************   " + state + " START   ************************************");
+		String state_str = format(state.toString(), ModState.POSTINITIALIZED.toString());
+		logger.info("************************************   " + state_str + " START   ************************************");
 		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
 		for (Class clazz : init_map.get(state)) {
 			bar.step(clazz.getSimpleName());
 			init(clazz);
 		}
 		ProgressManager.pop(bar);
-		logger.info("************************************   " + state + "  END    ************************************");
+		logger.info("************************************   " + state_str + "  END    ************************************");
 	}
 	
 	public static void init(Class<?> clazz) {
