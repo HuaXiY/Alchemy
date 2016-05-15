@@ -5,10 +5,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface ICoolDown {
 	
-	@SideOnly(Side.CLIENT)
 	public int getMaxCD();
 	
-	@SideOnly(Side.CLIENT)
 	public int getResidualCD();
 	
 	@SideOnly(Side.CLIENT)

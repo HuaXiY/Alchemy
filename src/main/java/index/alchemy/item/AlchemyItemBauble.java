@@ -14,7 +14,6 @@ import baubles.api.IBauble;
 import baubles.common.lib.PlayerHandler;
 
 public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment {
-	
 
 	public static class AlchemyItemAmulet extends AlchemyItemBauble {
 		
@@ -25,7 +24,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public boolean canEquip(ItemStack item, EntityLivingBase player) {
-			return PlayerHandler.getPlayerBaubles((EntityPlayer) player).getStackInSlot(0) == null;
+			return ((IInventory) PlayerHandler.getPlayerBaubles((EntityPlayer) player)).getStackInSlot(0) == null;
 		}
 		
 		@Override
@@ -96,7 +95,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public boolean canEquip(ItemStack item, EntityLivingBase player) {
-			return PlayerHandler.getPlayerBaubles((EntityPlayer) player).getStackInSlot(3) == null;
+			return ((IInventory) PlayerHandler.getPlayerBaubles((EntityPlayer) player)).getStackInSlot(3) == null;
 		}
 		
 		@Override
@@ -119,9 +118,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	}
 
 	@Override
-	public BaubleType getBaubleType(ItemStack item) {
-		return null;
-	}
+	public abstract BaubleType getBaubleType(ItemStack item);
 
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {}
@@ -133,7 +130,9 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {}
 
 	@Override
-	public abstract boolean canEquip(ItemStack item, EntityLivingBase living);
+	public boolean canEquip(ItemStack item, EntityLivingBase living) {
+		return true;
+	}
 
 	@Override
 	public boolean canUnequip(ItemStack item, EntityLivingBase living) {
