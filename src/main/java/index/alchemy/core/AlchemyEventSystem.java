@@ -21,6 +21,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
@@ -151,14 +152,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 	public static void addInputHook(Object obj) {
 		if (HOOK_INPUT.isEmpty()) {
 			hookInputState = true;
-			addContinuedRunnable(new IContinuedRunnable() {
+			/*addContinuedRunnable(new IContinuedRunnable() {
 				@Override
 				public boolean run(Phase phase) {
 					if (phase == Phase.START)
 						KeyBinding.unPressAllKeys();
 					return !hookInputState;
 				}
-			}, Side.CLIENT);
+			}, Side.CLIENT);*/
 		}
 		HOOK_INPUT.add(obj);
 	}
@@ -168,6 +169,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 		HOOK_INPUT.remove(obj);
 		if (HOOK_INPUT.isEmpty())
 			hookInputState = false;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void hookKeyInput(KeyInputEvent event) {
+		if (hookInputState)
+			KeyBinding.unPressAllKeys();
 	}
 	
 	@SubscribeEvent

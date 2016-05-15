@@ -22,7 +22,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -54,7 +53,7 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent
 	public void handleKeyInput(KeyInputEvent event) {
 		if (AlchemyKeyBindingLoader.key_time_ring_leap.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&

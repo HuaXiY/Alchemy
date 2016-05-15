@@ -24,7 +24,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -56,7 +55,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent
 	public void handleKeyInput(KeyInputEvent event) {
 		if (AlchemyKeyBindingLoader.key_space_ring_open.isPressed()) {
 			if (Minecraft.getMinecraft().currentScreen != null)
