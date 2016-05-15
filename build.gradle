@@ -54,8 +54,19 @@ minecraft {
     replaceIn 'Constants.java'
 }
 
+task sourcesJar(type: Jar, dependsOn: sourceJar) {
+    from 'build/sources/main/java/'
+    classifier = 'sources'
+    
+	from 'LICENSE'
+}
+
 jar {
     classifier = 'universal'
+}
+
+artifacts {
+    archives sourceJar
 }
 
 dependencies {
@@ -79,13 +90,10 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+	
+	compile fileTree(dir: 'mods', include: ['*.jar'])
 
 }
-
-dependencies { 
-    compile fileTree(dir: 'lib', includes: ['*.jar']) 
-	compile fileTree(dir: 'mods', includes: ['*.jar']) 
-} 
 
 processResources
 {
