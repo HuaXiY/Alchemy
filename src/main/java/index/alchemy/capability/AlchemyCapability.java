@@ -2,8 +2,8 @@ package index.alchemy.capability;
 
 import java.util.concurrent.Callable;
 
+import index.alchemy.api.IRegister;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.IRegister;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;

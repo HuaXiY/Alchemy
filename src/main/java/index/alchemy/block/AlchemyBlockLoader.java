@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import index.alchemy.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Init;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;

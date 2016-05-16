@@ -2,7 +2,7 @@ package index.alchemy.client;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.core.Init;
+import index.alchemy.annotation.Init;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;

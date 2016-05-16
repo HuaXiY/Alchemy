@@ -1,7 +1,7 @@
 package index.alchemy.achievement;
 
+import index.alchemy.api.IRegister;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.IRegister;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

@@ -1,4 +1,4 @@
-package index.alchemy.core;
+package index.alchemy.api;
 
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 

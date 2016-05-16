@@ -1,7 +1,8 @@
 package index.alchemy.world;
 
+import index.alchemy.api.IGenerator;
+import index.alchemy.api.IRegister;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.IRegister;
 
 public abstract class AlchemyWorldGenerator implements IGenerator, IRegister {
 	

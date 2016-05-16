@@ -1,10 +1,10 @@
 package index.alchemy.item;
 
+import index.alchemy.api.IRegister;
+import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.Constants;
-import index.alchemy.core.IRegister;
-import index.alchemy.core.IResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;

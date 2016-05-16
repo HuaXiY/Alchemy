@@ -1,6 +1,6 @@
 package index.alchemy.item;
 
-import index.alchemy.client.IColorItem;
+import index.alchemy.api.IColorItem;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;

@@ -1,8 +1,8 @@
 package index.alchemy.item;
 
+import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.EventType;
-import index.alchemy.core.IEventHandle;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.util.AABBHelper;
 import net.minecraft.entity.EntityLivingBase;

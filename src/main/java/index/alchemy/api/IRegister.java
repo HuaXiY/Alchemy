@@ -1,4 +1,4 @@
-package index.alchemy.core;
+package index.alchemy.api;
 
 public interface IRegister {
 	

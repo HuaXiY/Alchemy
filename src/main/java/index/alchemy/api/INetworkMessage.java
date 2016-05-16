@@ -1,4 +1,4 @@
-package index.alchemy.network;
+package index.alchemy.api;
 
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;

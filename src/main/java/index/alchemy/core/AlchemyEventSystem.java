@@ -5,6 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import index.alchemy.annotation.Init;
+import index.alchemy.api.IContinuedRunnable;
+import index.alchemy.api.IEventHandle;
+import index.alchemy.api.IIndexRunnable;
+import index.alchemy.api.IPhaseRunnable;
+import index.alchemy.api.IPlayerTickable;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.development.DMain;
@@ -55,6 +61,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	private static boolean hookInputState = false;
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
+		AlchemyModLoader.checkState();
 		if (tickable.getSide() != null)
 			(tickable.getSide() == Side.SERVER ? SERVER_TICKABLE : CLIENT_TICKABLE).add(tickable);
 		else {

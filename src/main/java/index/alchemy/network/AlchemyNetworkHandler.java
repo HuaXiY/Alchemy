@@ -2,9 +2,10 @@ package index.alchemy.network;
 
 import java.util.List;
 
+import index.alchemy.annotation.Init;
+import index.alchemy.api.INetworkMessage;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Constants;
-import index.alchemy.core.Init;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumParticleTypes;
@@ -24,12 +25,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class AlchemyNetworkHandler {
 	public static final SimpleNetworkWrapper networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MOD_ID);
 	private static int register = -1;
-
-	public static void init() {
-		registerMessage(MessageOpenGui.class, Side.SERVER);
-		registerMessage(MessageParticle.class, Side.CLIENT);
-		registerMessage(MessageSound.class, Side.CLIENT);
-	}
 
 	private static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz, Side side) {
 		networkWrapper.registerMessage(clazz, clazz, ++register, side);
@@ -55,6 +50,17 @@ public class AlchemyNetworkHandler {
 		SDouble3Float2Package d3f2p[] = Tool.toArray(d3f2ps, SDouble3Float2Package.class);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
 			networkWrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
+	}
+	
+	public static void init() {
+		registerMessage(MessageOpenGui.class, Side.SERVER);
+		registerMessage(MessageParticle.class, Side.CLIENT);
+		registerMessage(MessageSound.class, Side.CLIENT);
+		registerMessage(MessageNBTUpdate.class, Side.CLIENT);
+	}
+	
+	public static void init(Class<?> clazz) {
+		
 	}
 	
 }

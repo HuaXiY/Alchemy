@@ -1,4 +1,4 @@
-package index.alchemy.config;
+package index.alchemy.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,14 +7,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Config {
+public @interface Source {
 	
-	public String category() default "";
-	
-	public String comment() default "";
-	
-	public float min() default Float.MIN_VALUE;
-	
-	public float max() default Float.MAX_VALUE;
+	public Class<?> value();
 	
 }

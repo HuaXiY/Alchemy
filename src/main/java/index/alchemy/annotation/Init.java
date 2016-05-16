@@ -1,14 +1,18 @@
-package index.alchemy.core;
+package index.alchemy.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import net.minecraftforge.fml.common.LoaderState.ModState;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface InitInstance {
+public @interface Init {
 	
-	String value() default "";
+	public ModState state() default ModState.UNLOADED;
+	
+	public boolean enable() default true;
 	
 }

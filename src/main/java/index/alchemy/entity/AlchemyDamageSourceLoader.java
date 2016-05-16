@@ -1,6 +1,6 @@
 package index.alchemy.entity;
 
-import index.alchemy.core.Init;
+import index.alchemy.annotation.Init;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 

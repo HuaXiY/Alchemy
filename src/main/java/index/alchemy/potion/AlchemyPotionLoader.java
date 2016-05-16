@@ -1,7 +1,7 @@
 package index.alchemy.potion;
 
+import index.alchemy.annotation.Init;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.Init;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.interacting.ModItems;
 import index.alchemy.util.Tool;

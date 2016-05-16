@@ -8,7 +8,8 @@ import java.lang.reflect.Field;
 
 import biomesoplenty.api.block.BOPBlocks;
 import biomesoplenty.api.item.BOPItems;
-import index.alchemy.core.Init;
+import index.alchemy.annotation.Init;
+import index.alchemy.annotation.Source;
 import index.alchemy.util.FinalFieldSetter;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;

@@ -2,10 +2,10 @@ package index.alchemy.potion;
 
 import java.util.Random;
 
+import index.alchemy.api.IRegister;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.IRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;

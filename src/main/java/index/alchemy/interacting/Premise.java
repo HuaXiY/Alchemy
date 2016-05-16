@@ -8,10 +8,10 @@ import javax.swing.JOptionPane;
 
 import org.lwjgl.opengl.Display;
 
+import index.alchemy.annotation.Init;
 import index.alchemy.api.Alway;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
-import index.alchemy.core.Init;
 import net.minecraftforge.fml.client.SplashProgress;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;

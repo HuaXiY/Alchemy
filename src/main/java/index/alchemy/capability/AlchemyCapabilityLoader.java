@@ -1,8 +1,8 @@
 package index.alchemy.capability;
 
+import index.alchemy.annotation.Init;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Init;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;

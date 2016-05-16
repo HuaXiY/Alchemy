@@ -2,8 +2,8 @@ package index.alchemy.block;
 
 import java.util.Random;
 
-import index.alchemy.client.IColorBlock;
-import index.alchemy.core.IOreDictionary;
+import index.alchemy.api.IColorBlock;
+import index.alchemy.api.IOreDictionary;
 import index.alchemy.util.Tool;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

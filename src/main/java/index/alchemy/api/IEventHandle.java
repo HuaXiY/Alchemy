@@ -1,4 +1,6 @@
-package index.alchemy.core;
+package index.alchemy.api;
+
+import index.alchemy.core.EventType;
 
 public interface IEventHandle {
 	

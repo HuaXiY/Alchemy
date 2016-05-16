@@ -5,9 +5,10 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
+import index.alchemy.annotation.Config;
+import index.alchemy.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
-import index.alchemy.core.Init;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.util.Tool;
 import net.minecraftforge.common.config.Configuration;
@@ -37,7 +38,10 @@ public class AlchemyConfigLoader {
 			Config config = field.getAnnotation(Config.class);
 			if (config != null) {
 				try {
-					if (field.getType() == int.class)
+					if (field.getType() == boolean.class)
+						field.set(null, Configuration.class.getMethod("getBoolean", String.class, String.class, boolean.class, String.class)
+								.invoke(configuration, field.getName(), config.category(), field.get(null), config.comment()));
+					else if (field.getType() == int.class)
 						field.set(null, Configuration.class.getMethod("getInt", String.class, String.class, int.class, int.class, int.class, String.class)
 								.invoke(configuration, field.getName(), config.category(), field.get(null), ((Number) config.min()).intValue(), ((Number) config.max()).intValue(), config.comment()));
 					else if (field.getType() == float.class)

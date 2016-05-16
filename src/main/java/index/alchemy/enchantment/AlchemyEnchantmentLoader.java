@@ -1,6 +1,6 @@
 package index.alchemy.enchantment;
 
-import index.alchemy.core.Init;
+import index.alchemy.annotation.Init;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 

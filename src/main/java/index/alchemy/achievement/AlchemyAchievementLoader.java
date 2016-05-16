@@ -3,8 +3,8 @@ package index.alchemy.achievement;
 import net.minecraft.stats.Achievement;
 import net.minecraftforge.common.AchievementPage;
 import net.minecraftforge.fml.common.LoaderState.ModState;
+import index.alchemy.annotation.Init;
 import index.alchemy.core.Constants;
-import index.alchemy.core.Init;
 import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.item.ItemScroll;
 

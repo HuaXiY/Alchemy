@@ -1,6 +1,6 @@
 package index.alchemy.item;
 
-import index.alchemy.core.Init;
+import index.alchemy.annotation.Init;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 

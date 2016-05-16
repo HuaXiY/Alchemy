@@ -2,12 +2,13 @@ package index.alchemy.capability;
 
 import java.util.LinkedList;
 
+import index.alchemy.annotation.InitInstance;
+import index.alchemy.api.IEventHandle;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.EventType;
-import index.alchemy.core.IEventHandle;
-import index.alchemy.core.InitInstance;
+import index.alchemy.item.AlchemyItemLoader;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -115,8 +116,10 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	
 	@SubscribeEvent
 	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent.Entity event) {
-		if (event.getEntity() instanceof EntityPlayer)
+		if (event.getEntity() instanceof EntityPlayer) {
 			event.addCapability(RESOURCE, new TimeSnapshot());
+			AlchemyItemLoader.ring_time.onCapabilityInit((EntityPlayer) event.getEntity());
+		}
 	}
 
 }

@@ -1,8 +1,8 @@
 package index.alchemy.potion;
 
+import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.EventType;
-import index.alchemy.core.IEventHandle;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;

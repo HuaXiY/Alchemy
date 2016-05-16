@@ -1,9 +1,9 @@
 package index.alchemy.item;
 
 import index.alchemy.api.Alway;
+import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.EventType;
-import index.alchemy.core.IEventHandle;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;

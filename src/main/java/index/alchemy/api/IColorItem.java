@@ -1,4 +1,4 @@
-package index.alchemy.client;
+package index.alchemy.api;
 
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraftforge.fml.relauncher.Side;

@@ -3,15 +3,20 @@ package index.alchemy.core;
 import java.util.concurrent.Callable;
 
 import index.alchemy.api.Alway;
+import index.alchemy.api.IColorBlock;
+import index.alchemy.api.IColorItem;
+import index.alchemy.api.ICoolDown;
+import index.alchemy.api.IEventHandle;
+import index.alchemy.api.IGenerator;
+import index.alchemy.api.INetworkMessage;
+import index.alchemy.api.IOreDictionary;
+import index.alchemy.api.IPlayerTickable;
+import index.alchemy.api.IResourceLocation;
+import index.alchemy.api.ITileEntity;
 import index.alchemy.capability.AlchemyCapability;
 import index.alchemy.client.AlchemyColorLoader;
-import index.alchemy.client.IColorBlock;
-import index.alchemy.client.IColorItem;
 import index.alchemy.client.render.HUDManager;
-import index.alchemy.client.render.ICoolDown;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.INetworkMessage;
-import index.alchemy.world.IGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.settings.KeyBinding;
@@ -51,6 +56,8 @@ public class AlchemyInitHook {
 	
 	public static <I extends Item & IColorItem, B extends Block & IColorBlock,
 				   R extends Item & IResourceLocation, C> void init(Object obj) {
+		
+		AlchemyModLoader.checkState();
 		
 		if (obj instanceof Impl)
 			GameRegistry.register((Impl) obj);

@@ -4,9 +4,10 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
+import index.alchemy.annotation.DInit;
+import index.alchemy.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
-import index.alchemy.core.Init;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

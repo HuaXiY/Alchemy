@@ -1,8 +1,8 @@
 package index.alchemy.client;
 
+import index.alchemy.api.IRegister;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.Constants;
-import index.alchemy.core.IRegister;
 import net.minecraft.client.settings.KeyBinding;
 
 public class AlchemyKeyBinding extends KeyBinding implements IRegister {

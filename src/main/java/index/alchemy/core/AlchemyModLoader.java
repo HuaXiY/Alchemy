@@ -18,6 +18,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
 
+import index.alchemy.annotation.Init;
+import index.alchemy.annotation.InitInstance;
 import index.alchemy.api.Alway;
 import index.alchemy.config.AlchemyConfigLoader;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
@@ -154,6 +156,11 @@ public class AlchemyModLoader {
 	@Nullable
 	public static ModState getState() {
 		return state;
+	}
+	
+	public static void checkState() {
+		if (getState().ordinal() >= ModState.AVAILABLE.ordinal())
+			throw new AlchemyRuntimeExcption(new RuntimeException("Abnormal state: " + getState().name()));
 	}
 	
 	public static String format(String src, String max) {

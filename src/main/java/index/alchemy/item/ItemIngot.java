@@ -1,7 +1,7 @@
 package index.alchemy.item;
 
 import net.minecraft.item.ItemStack;
-import index.alchemy.core.IOreDictionary;
+import index.alchemy.api.IOreDictionary;
 import index.alchemy.util.Tool;
 
 public class ItemIngot extends AlchemyItemColor implements IOreDictionary {

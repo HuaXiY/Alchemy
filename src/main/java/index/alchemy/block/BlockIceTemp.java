@@ -1,6 +1,6 @@
 package index.alchemy.block;
 
-import index.alchemy.core.ITileEntity;
+import index.alchemy.api.ITileEntity;
 import index.alchemy.tile.TileEntityIceTemp;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;

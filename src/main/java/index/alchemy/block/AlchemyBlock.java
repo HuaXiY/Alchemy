@@ -1,9 +1,9 @@
 package index.alchemy.block;
 
+import index.alchemy.api.IRegister;
+import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.IRegister;
-import index.alchemy.core.IResourceLocation;
 import index.alchemy.item.AlchemyItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

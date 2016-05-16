@@ -3,14 +3,12 @@ package index.alchemy.client.render;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.config.Config;
+import index.alchemy.api.ICoolDown;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -21,14 +19,12 @@ public class HUDManager {
 	public static final String CATEGORY = "HUD";
 	public static final ResourceLocation CD_BG = new AlchemyResourceLocation("textures/gui/cd.png");
 	
-	@Config(category = CATEGORY, comment = "set true to reversal CD render")
-	private static boolean cd_reversal = false;
+	public static int render_num = 4;
 	
 	private static final List<ICoolDown> CD = new LinkedList<ICoolDown>();
 	
 	public static void registerCoolDown(ICoolDown cd) {
-		if (AlchemyModLoader.getState().ordinal() >= ModState.AVAILABLE.ordinal())
-			throw new AlchemyRuntimeExcption(new RuntimeException("Abnormal state: " + AlchemyModLoader.getState().name()));
+		AlchemyModLoader.checkState();
 		CD.add(cd);
 	}
 	
@@ -45,7 +41,7 @@ public class HUDManager {
 		
 		int i = 0, len = CD.size();
 		for (ICoolDown cd : CD) {
-			float cd_per = (float) cd.getResidualCD() / cd.getMaxCD();
+			float cd_per = (float) cd.getResidualCD(Minecraft.getMinecraft().thePlayer) / cd.getMaxCD();
 			if (cd_per <= 0)
 				continue;
 			++i;
@@ -66,13 +62,11 @@ public class HUDManager {
 	}
 	
 	public static int getCDXStart(int i) {
-		// TODO
-		return Minecraft.getMinecraft().displayWidth - CD_SIZE;
+		return Minecraft.getMinecraft().displayWidth - CD_SIZE * (i % render_num);
 	}
 	
 	public static int getCDYStart(int i) {
-		// TODO
-		return Minecraft.getMinecraft().displayHeight - CD_SIZE;
+		return Minecraft.getMinecraft().displayHeight - CD_SIZE * (i / render_num);
 	}
 	
 }

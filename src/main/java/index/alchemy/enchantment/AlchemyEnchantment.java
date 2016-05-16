@@ -1,7 +1,7 @@
 package index.alchemy.enchantment;
 
+import index.alchemy.api.IRegister;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.IRegister;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;

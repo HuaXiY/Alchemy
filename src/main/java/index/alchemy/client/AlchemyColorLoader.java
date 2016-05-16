@@ -3,8 +3,10 @@ package index.alchemy.client;
 import java.util.LinkedList;
 import java.util.List;
 
+import index.alchemy.annotation.Init;
+import index.alchemy.api.IColorBlock;
+import index.alchemy.api.IColorItem;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.Init;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;

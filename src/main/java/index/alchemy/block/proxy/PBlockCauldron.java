@@ -1,7 +1,7 @@
 package index.alchemy.block.proxy;
 
+import index.alchemy.api.ITileEntity;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.ITileEntity;
 import index.alchemy.tile.TileEntityCauldron;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.tileentity.TileEntity;

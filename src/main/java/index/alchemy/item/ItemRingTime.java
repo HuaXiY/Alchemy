@@ -2,19 +2,20 @@ package index.alchemy.item;
 
 import java.util.Iterator;
 
+import index.alchemy.api.Alway;
+import index.alchemy.api.ICoolDown;
+import index.alchemy.api.IEventHandle;
+import index.alchemy.api.IIndexRunnable;
+import index.alchemy.api.INetworkMessage;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
 import index.alchemy.client.AlchemyKeyBindingLoader;
-import index.alchemy.client.render.ICoolDown;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.EventType;
-import index.alchemy.core.IEventHandle;
-import index.alchemy.core.IIndexRunnable;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingTime.MessageTimeLeap;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.INetworkMessage;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -63,6 +64,10 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 				timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
 			}
 		}
+	}
+	
+	public void onCapabilityInit(EntityPlayer player) {
+		player.getEntityData().setInteger(NBT_KEY_CD, 0);
 	}
 	
 	public static class MessageTimeLeap implements IMessage {
@@ -135,16 +140,14 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
 	public int getMaxCD() {
 		return USE_CD;
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public int getResidualCD() {
-		return isEquipmented(Minecraft.getMinecraft().thePlayer) ? 
-				Math.max(0, USE_CD - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+	public int getResidualCD(EntityPlayer player) {
+		return isEquipmented(player) ? 
+				Math.max(0, USE_CD - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : 0;
 	}
 
 	@Override

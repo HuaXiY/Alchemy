@@ -3,11 +3,11 @@ package index.alchemy.potion;
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.api.Alway;
+import index.alchemy.api.IContinuedRunnable;
+import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.ClientProxy;
 import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.IContinuedRunnable;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.INetworkMessage;
 import index.alchemy.potion.PotionAlacrity.MessageAlacrityCallback;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;

@@ -1,8 +1,8 @@
 package index.alchemy.achievement;
 
+import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.EventType;
-import index.alchemy.core.IEventHandle;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;

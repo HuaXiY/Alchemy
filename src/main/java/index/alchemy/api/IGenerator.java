@@ -1,4 +1,4 @@
-package index.alchemy.world;
+package index.alchemy.api;
 
 import net.minecraftforge.fml.common.IWorldGenerator;
 

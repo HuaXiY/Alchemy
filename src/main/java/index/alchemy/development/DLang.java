@@ -1,5 +1,6 @@
 package index.alchemy.development;
 
+import index.alchemy.annotation.DInit;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.item.IItemInventory;

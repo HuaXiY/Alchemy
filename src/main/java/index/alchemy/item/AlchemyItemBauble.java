@@ -163,5 +163,16 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		super(name, icon_name, color);
 		setMaxStackSize(1);
 	}
+	
+	public static ItemStack setBauble(EntityPlayer player, int index, ItemStack item) {
+		IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+		ItemStack result = inventory.getStackInSlot(index);
+		inventory.setInventorySlotContents(index, item);
+		return result;
+	}
+	
+	public static ItemStack getBauble(EntityPlayer player, int index) {
+		return ((IInventory) PlayerHandler.getPlayerBaubles((EntityPlayer) player)).getStackInSlot(index);
+	}
 
 }
