@@ -1,5 +1,6 @@
 package index.alchemy.potion;
 
+import index.alchemy.annotation.Change;
 import index.alchemy.annotation.Init;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
@@ -67,6 +68,7 @@ public class AlchemyPotionLoader extends PotionType {
 		};
 	}
 	
+	@Change
 	public static void registerItemPotion(PotionType input, boolean levelII, boolean long_time, int time,
 			String name, Predicate<ItemStack> item, Potion... output) {
 		PotionEffect[] effects = new PotionEffect[output.length];
@@ -111,6 +113,7 @@ public class AlchemyPotionLoader extends PotionType {
 		
 	}
 	
+	@Change
 	public static void registerItemPotionAndPutrid(PotionType input, boolean levelII, boolean long_time, int time,
 			String name1, String name2, Predicate<ItemStack> item1, Predicate<ItemStack> item2, Potion[] output1, Potion[] output2) {
 		PotionEffect[] effects1 = new PotionEffect[output1.length], effects2 = new PotionEffect[output2.length];
@@ -206,6 +209,7 @@ public class AlchemyPotionLoader extends PotionType {
 	public static Method registerPotionTypeConversion = Tool.setAccessible(Tool.searchMethod(
 			PotionHelper.class, PotionType.class, Predicate.class, PotionType.class));
 	
+	@Change
 	public static void registerPotionTypeConversion(PotionType input, Predicate<ItemStack> reagentPredicate, PotionType output){
 		try {
 			registerPotionTypeConversion.invoke(null, input, reagentPredicate, output);

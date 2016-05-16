@@ -42,6 +42,12 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	public static final AlchemyEventSystem INSTANCE = new AlchemyEventSystem();
 	
+	public static enum EventType {
+		EVENT_BUS,
+		TERRAIN_GEN_BUS,
+		ORE_GEN_BUS
+	}
+	
 	public static final EventType[]
 			EVENT_BUS = new EventType[]{ EventType.EVENT_BUS },
 			TERRAIN_GEN_BUS = new EventType[]{ EventType.TERRAIN_GEN_BUS },
@@ -57,7 +63,10 @@ public class AlchemyEventSystem implements IGuiHandler {
 			CLIENT_RUNNABLE = new LinkedList<IContinuedRunnable>(),
 			CLIENT_TEMP = new LinkedList<IContinuedRunnable>();
 	
+	@SideOnly(Side.CLIENT)
 	public static final Set<Object> HOOK_INPUT = new HashSet<Object>();
+	
+	@SideOnly(Side.CLIENT)
 	private static boolean hookInputState = false;
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {

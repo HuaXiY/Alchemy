@@ -1,5 +1,6 @@
 package index.alchemy.block.proxy;
 
+import index.alchemy.annotation.Change;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.tile.TileEntityCauldron;
@@ -7,6 +8,7 @@ import net.minecraft.block.BlockCauldron;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
+@Change
 public class PBlockCauldron extends BlockCauldron implements ITileEntity {
 
 	@Override

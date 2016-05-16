@@ -3,7 +3,7 @@ package index.alchemy.item;
 import index.alchemy.api.Alway;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.EventType;
+import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;

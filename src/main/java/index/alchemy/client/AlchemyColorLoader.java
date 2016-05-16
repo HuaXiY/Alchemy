@@ -7,6 +7,7 @@ import index.alchemy.annotation.Init;
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
 import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyModLoader;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -23,14 +24,16 @@ public class AlchemyColorLoader {
 	private static final List item_color = new LinkedList(), block_color = new LinkedList();
 	
 	public static <T extends Item & IColorItem> void addItemColor(T t) {
+		AlchemyModLoader.checkState();
 		item_color.add(t);
 	}
 	
 	public static <T extends Block & IColorBlock> void addBlockColor(T t) {
+		AlchemyModLoader.checkState();
 		block_color.add(t);
 	}
 	
-	public static <T extends Item & IColorItem> void registerItemColor() {
+	private static <T extends Item & IColorItem> void registerItemColor() {
 		ItemColors colors = Minecraft.getMinecraft().getItemColors();
 		for (T t : (List<T>) item_color) {
 			colors.registerItemColorHandler(t.getItemColor(), t);
@@ -38,7 +41,7 @@ public class AlchemyColorLoader {
 		}
 	}
 	
-	public static <T extends Block & IColorBlock> void registerBlockColor() {
+	private static <T extends Block & IColorBlock> void registerBlockColor() {
 		BlockColors colors = Minecraft.getMinecraft().getBlockColors();
 		for (T t : (List<T>) block_color) {
 			colors.registerBlockColorHandler(t.getBlockColor(), t);

@@ -58,6 +58,7 @@ public class AlchemyConfigLoader {
 	}
 	
 	public static void init(Class<?> clazz) {
+		AlchemyModLoader.checkState();
 		for (Field field : clazz.getDeclaredFields()) {
 			Config config = field.getAnnotation(Config.class);
 			if (config != null) {

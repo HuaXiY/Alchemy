@@ -9,7 +9,7 @@ import index.alchemy.client.AlchemyKeyBindingLoader;
 import index.alchemy.client.ClientProxy;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.Constants;
-import index.alchemy.core.EventType;
+import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.gui.GUIID;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;

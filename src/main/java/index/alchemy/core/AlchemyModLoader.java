@@ -24,6 +24,7 @@ import index.alchemy.api.Alway;
 import index.alchemy.config.AlchemyConfigLoader;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
+import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.Mod;
@@ -139,6 +140,7 @@ public class AlchemyModLoader {
 					if (is_modding)
 						DMain.init(clazz);
 					AlchemyConfigLoader.init(clazz);
+					AlchemyNetworkHandler.init(clazz);
 					Init init = clazz.getAnnotation(Init.class);
 					SideOnly side = clazz.getAnnotation(SideOnly.class);
 					if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))

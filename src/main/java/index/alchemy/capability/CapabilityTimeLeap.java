@@ -7,7 +7,7 @@ import index.alchemy.api.IEventHandle;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.EventType;
+import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemLoader;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;

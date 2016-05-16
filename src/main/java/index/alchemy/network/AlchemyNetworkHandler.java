@@ -1,11 +1,16 @@
 package index.alchemy.network;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import index.alchemy.annotation.Init;
+import index.alchemy.annotation.Message;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
+import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumParticleTypes;
@@ -23,7 +28,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
+	
 	public static final SimpleNetworkWrapper networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MOD_ID);
+	
+	private static final Map<Class<?>, Side> message_mapping = new LinkedHashMap<Class<?>, Side>();
+	
 	private static int register = -1;
 
 	private static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz, Side side) {
@@ -60,7 +69,13 @@ public class AlchemyNetworkHandler {
 	}
 	
 	public static void init(Class<?> clazz) {
-		
+		AlchemyModLoader.checkState();
+		Message message = clazz.getAnnotation(Message.class);
+		if (message != null)
+			if (message.value() != null)
+				message_mapping.put(clazz, message.value());
+			else
+				throw new AlchemyRuntimeExcption(new RuntimeException(new NullPointerException(clazz + " -> @Message.value()")));
 	}
 	
 }

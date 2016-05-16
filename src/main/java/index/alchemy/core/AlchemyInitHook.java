@@ -2,6 +2,7 @@ package index.alchemy.core;
 
 import java.util.concurrent.Callable;
 
+import index.alchemy.annotation.Change;
 import index.alchemy.api.Alway;
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
@@ -54,6 +55,7 @@ public class AlchemyInitHook {
 		init(impl);
 	}
 	
+	@Change
 	public static <I extends Item & IColorItem, B extends Block & IColorBlock,
 				   R extends Item & IResourceLocation, C> void init(Object obj) {
 		

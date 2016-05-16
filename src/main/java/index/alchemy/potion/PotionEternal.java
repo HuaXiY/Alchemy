@@ -2,7 +2,7 @@ package index.alchemy.potion;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.EventType;
+import index.alchemy.core.AlchemyEventSystem.EventType;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;

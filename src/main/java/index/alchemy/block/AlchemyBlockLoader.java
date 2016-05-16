@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
+import index.alchemy.annotation.Change;
 import index.alchemy.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.FinalFieldSetter;
@@ -38,12 +39,14 @@ public class AlchemyBlockLoader {
 	// This is replace block in the Minecraft.
 	// Not guaranteed to work in another version, Field name and
 	// position will change with the version.
+	@Change
 	@Deprecated
 	public static boolean replaceBlock(Block toReplace, Class<? extends Block> blockClass, ItemBlockSpecial item) {
 		return replaceBlock(toReplace, blockClass, null, item, null, null);
 	}
 	
 	// TODO
+	@Change
 	@Deprecated
 	public static boolean replaceBlock(Block toReplace, Class<? extends Block> blockClass, ResourceLocation resource,
 			ItemBlockSpecial item, Class<?> tileEntityClass, String tile){

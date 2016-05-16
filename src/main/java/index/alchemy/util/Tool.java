@@ -14,7 +14,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import index.alchemy.core.AlchemyModLoader;
 
@@ -235,6 +237,16 @@ public class Tool {
 		for (int i = 0; i < len; i++)
 			builder.append(c);
 		return builder.toString();
+	}
+	
+	public static final Map<String, String> getMapping(String str) {
+		Map<String, String> result = new LinkedHashMap<String, String>();
+		for (String line : str.split("\n")) {
+			String sa[] = line.split("=");
+			if (sa.length == 2)
+				result.put(sa[0], sa[1]);
+		}
+		return result;
 	}
 	
 }
