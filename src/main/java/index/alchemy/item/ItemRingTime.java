@@ -65,10 +65,6 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 		}
 	}
 	
-	public void onCapabilityInit(EntityPlayer player) {
-		player.getEntityData().setInteger(NBT_KEY_CD, 0);
-	}
-	
 	public static class MessageTimeLeap implements IMessage {
 		@Override
 		public void fromBytes(ByteBuf buf) {}
@@ -98,6 +94,7 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
 		final Iterator<TimeNode> iterator = snapshot.list.iterator();
 		snapshot.setUpdate(false);
+		player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
 		AlchemyEventSystem.addInputHook(this);
 		AlchemyEventSystem.addContinuedRunnable(new IIndexRunnable() {
 			int flag = TimeSnapshot.SIZE / 2 - 1;
@@ -116,13 +113,12 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 	}
 	
 	public void timeLeapOnServer(final EntityPlayer player) {
-		if (isEquipmented(player) && player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD) > USE_CD) {
-			player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
+		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
+		final Iterator<TimeNode> iterator = snapshot.list.iterator();
+		if (isEquipmented(player) && snapshot.isUpdate()) {
+			snapshot.setUpdate(false);
 			player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
 			player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, TimeSnapshot.SIZE / 2, 3));
-			final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
-			final Iterator<TimeNode> iterator = snapshot.list.iterator();
-			snapshot.setUpdate(false);
 			AlchemyEventSystem.addContinuedRunnable(new IIndexRunnable() {
 				int flag = TimeSnapshot.SIZE / 2 - 1;
 				@Override
@@ -144,15 +140,16 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 	}
 
 	@Override
-	public int getResidualCD(EntityPlayer player) {
-		return isEquipmented(player) ? 
-				Math.max(0, USE_CD - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+	@SideOnly(Side.CLIENT)
+	public int getResidualCD() {
+		return isEquipmented(Minecraft.getMinecraft().thePlayer) ? 
+				Math.max(0, USE_CD - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getRenderID() {
-		return 1;
+		return 0;
 	}
 
 	@Override

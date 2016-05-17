@@ -3,11 +3,7 @@ package index.alchemy.potion;
 import index.alchemy.annotation.Change;
 import index.alchemy.annotation.Init;
 import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.interacting.ModItems;
-import index.alchemy.util.Tool;
-
-import java.lang.reflect.Method;
 
 import com.google.common.base.Predicate;
 
@@ -81,7 +77,7 @@ public class AlchemyPotionLoader extends PotionType {
 		current_type = new PotionType(name, effects);
 		if (!REGISTRY.containsKey(new ResourceLocation(name)))
 			registerPotionType(name, current_type);
-		registerPotionTypeConversion(input, item, input = current_type);
+		PotionHelper.registerPotionTypeConversion(input, item, input = current_type);
 		
 		if (levelII) {
 			index = 0;
@@ -94,7 +90,7 @@ public class AlchemyPotionLoader extends PotionType {
 			current_type = new PotionType(name, effects);
 			if (!REGISTRY.containsKey(new ResourceLocation("strong_" + name)))
 				registerPotionType("strong_" + name, current_type);
-			registerPotionTypeConversion(input, glow_stone_dust, current_type);
+			PotionHelper.registerPotionTypeConversion(input, glow_stone_dust, current_type);
 		}
 		
 		if (long_time) {
@@ -108,7 +104,7 @@ public class AlchemyPotionLoader extends PotionType {
 			current_type = new PotionType(name, effects);
 			if (!REGISTRY.containsKey(new ResourceLocation("long_" + name)))
 				registerPotionType("long_" + name, current_type);
-			registerPotionTypeConversion(input, red_stone, current_type);
+			PotionHelper.registerPotionTypeConversion(input, red_stone, current_type);
 		}
 		
 	}
@@ -133,14 +129,14 @@ public class AlchemyPotionLoader extends PotionType {
 			registerPotionType(name1, current_type1);
 		current_type0 = new PotionType(name2, effects2);
 		
-		registerPotionTypeConversion(input, item1, input1 = current_type1);
+		PotionHelper.registerPotionTypeConversion(input, item1, input1 = current_type1);
 		
 		input2 = current_type0;
 		if (item2 != null)
-			registerPotionTypeConversion(input, item2, current_type2);
+			PotionHelper.registerPotionTypeConversion(input, item2, current_type2);
 
-		registerPotionTypeConversion(current_type1, fermented_spider_eye, current_type0);
-		registerPotionTypeConversion(current_type0, fermented_spider_eye, current_type1);
+		PotionHelper.registerPotionTypeConversion(current_type1, fermented_spider_eye, current_type0);
+		PotionHelper.registerPotionTypeConversion(current_type0, fermented_spider_eye, current_type1);
 		
 		if (levelII) {
 			effects1 = new PotionEffect[output1.length];
@@ -160,11 +156,11 @@ public class AlchemyPotionLoader extends PotionType {
 				registerPotionType("strong_" + name1, current_type1);
 			current_type2 = new PotionType(name2, effects2);
 			
-			registerPotionTypeConversion(input1, glow_stone_dust, current_type1);
-			registerPotionTypeConversion(input2, glow_stone_dust, current_type2);
+			PotionHelper.registerPotionTypeConversion(input1, glow_stone_dust, current_type1);
+			PotionHelper.registerPotionTypeConversion(input2, glow_stone_dust, current_type2);
 			
-			registerPotionTypeConversion(current_type1, fermented_spider_eye, current_type2);
-			registerPotionTypeConversion(current_type2, fermented_spider_eye, current_type1);
+			PotionHelper.registerPotionTypeConversion(current_type1, fermented_spider_eye, current_type2);
+			PotionHelper.registerPotionTypeConversion(current_type2, fermented_spider_eye, current_type1);
 		}
 		
 		if (long_time) {
@@ -185,11 +181,11 @@ public class AlchemyPotionLoader extends PotionType {
 				registerPotionType("long_" + name1, current_type1);
 			current_type3 = new PotionType(name2, effects2);
 			
-			registerPotionTypeConversion(input1, red_stone, current_type1);
-			registerPotionTypeConversion(input2, red_stone, current_type3);
+			PotionHelper.registerPotionTypeConversion(input1, red_stone, current_type1);
+			PotionHelper.registerPotionTypeConversion(input2, red_stone, current_type3);
 
-			registerPotionTypeConversion(current_type1, fermented_spider_eye, current_type2);
-			registerPotionTypeConversion(current_type3, fermented_spider_eye, current_type1);
+			PotionHelper.registerPotionTypeConversion(current_type1, fermented_spider_eye, current_type2);
+			PotionHelper.registerPotionTypeConversion(current_type3, fermented_spider_eye, current_type1);
 		}
 		
 		if (!REGISTRY.containsKey(new ResourceLocation(name2)))
@@ -205,18 +201,6 @@ public class AlchemyPotionLoader extends PotionType {
 		potion.setRegistryName(name);
         AlchemyInitHook.init_impl(potion);
     }
-	
-	public static Method registerPotionTypeConversion = Tool.setAccessible(Tool.searchMethod(
-			PotionHelper.class, PotionType.class, Predicate.class, PotionType.class));
-	
-	@Change
-	public static void registerPotionTypeConversion(PotionType input, Predicate<ItemStack> reagentPredicate, PotionType output){
-		try {
-			registerPotionTypeConversion.invoke(null, input, reagentPredicate, output);
-		} catch (Exception e) {
-			throw new AlchemyRuntimeExcption(e);
-		}
-	}
 	
 	public static void init() {
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "luck", "unluck",

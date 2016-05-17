@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 import net.minecraftforge.fml.relauncher.Side;
 
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Message {
 	

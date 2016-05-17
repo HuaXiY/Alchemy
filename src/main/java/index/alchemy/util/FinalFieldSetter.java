@@ -3,6 +3,8 @@ package index.alchemy.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import index.alchemy.core.debug.AlchemyRuntimeExcption;
+
 public final class FinalFieldSetter {
 
     private static final FinalFieldSetter INSTANCE;
@@ -11,7 +13,7 @@ public final class FinalFieldSetter {
         try {
             INSTANCE = new FinalFieldSetter();
         } catch (ReflectiveOperationException e) {
-            throw new ExceptionInInitializerError(e);
+            throw new AlchemyRuntimeExcption(e);
         }
     }
 

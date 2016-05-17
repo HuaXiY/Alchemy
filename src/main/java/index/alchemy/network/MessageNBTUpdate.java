@@ -2,6 +2,7 @@ package index.alchemy.network;
 
 import java.util.Iterator;
 
+import index.alchemy.annotation.Message;
 import index.alchemy.item.AlchemyItemBauble;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -11,7 +12,9 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
+@Message(Side.CLIENT)
 public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpdate, IMessage> {
 	
 	public static enum Type {

@@ -1,5 +1,6 @@
 package index.alchemy.core;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,18 +9,15 @@ import java.util.Set;
 import index.alchemy.annotation.Init;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
+import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.development.DMain;
-import index.alchemy.gui.GUIID;
-import index.alchemy.item.AlchemyItemLoader;
-import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ContainerChest;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -53,18 +51,26 @@ public class AlchemyEventSystem implements IGuiHandler {
 			TERRAIN_GEN_BUS = new EventType[]{ EventType.TERRAIN_GEN_BUS },
 			ORE_GEN_BUS = new EventType[]{ EventType.ORE_GEN_BUS };
 	
-	public static final List<IPlayerTickable> 
+	private static final List<IPlayerTickable> 
 			SERVER_TICKABLE = new LinkedList<IPlayerTickable>(),
 			CLIENT_TICKABLE = new LinkedList<IPlayerTickable>();
 	
-	public static final List<IContinuedRunnable>
+	private static final List<IContinuedRunnable>
 			SERVER_RUNNABLE = new LinkedList<IContinuedRunnable>(),
 			SERVER_TEMP = new LinkedList<IContinuedRunnable>(),
 			CLIENT_RUNNABLE = new LinkedList<IContinuedRunnable>(),
 			CLIENT_TEMP = new LinkedList<IContinuedRunnable>();
 	
+	private static final List<IGuiHandle> GUI_HANDLE = new ArrayList<IGuiHandle>();
+	
+	private static int gui_handle_id = -1;
+	
+	private static synchronized int onGuiHanleNext() {
+		return ++gui_handle_id;
+	}
+	
 	@SideOnly(Side.CLIENT)
-	public static final Set<Object> HOOK_INPUT = new HashSet<Object>();
+	private static final Set<Object> HOOK_INPUT = new HashSet<Object>();
 	
 	@SideOnly(Side.CLIENT)
 	private static boolean hookInputState = false;
@@ -143,40 +149,27 @@ public class AlchemyEventSystem implements IGuiHandler {
 			DMain.init(event.init);
 	}
 	
+	public static void registerGuiHandle(IGuiHandle handle) {
+		AlchemyModLoader.checkState();
+		handle.setGuiId(onGuiHanleNext());
+		GUI_HANDLE.add(handle);
+	}
+	
 	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		switch (ID) {
-			case GUIID.SPACE_RING:
-				return new ContainerChest(player.inventory, AlchemyItemLoader.ring_space.getItemInventory(player, 
-						AlchemyItemLoader.ring_space.getFormPlayer(player)), player);
-		}
-		return null;
+	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
+		return GUI_HANDLE.get(id).getServerGuiElement(player, world, x, y, z);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		switch (ID) {
-			case GUIID.SPACE_RING:
-				return new GuiChest(player.inventory, AlchemyItemLoader.ring_space.getItemInventory(player,
-						AlchemyItemLoader.ring_space.getFormPlayer(player)));
-		}
-		return null;
+	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
+		return GUI_HANDLE.get(id).getClientGuiElement(player, world, x, y, z);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public static void addInputHook(Object obj) {
-		if (HOOK_INPUT.isEmpty()) {
+		if (HOOK_INPUT.isEmpty())
 			hookInputState = true;
-			/*addContinuedRunnable(new IContinuedRunnable() {
-				@Override
-				public boolean run(Phase phase) {
-					if (phase == Phase.START)
-						KeyBinding.unPressAllKeys();
-					return !hookInputState;
-				}
-			}, Side.CLIENT);*/
-		}
 		HOOK_INPUT.add(obj);
 	}
 	
@@ -202,6 +195,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	public static void registerEventHandle(IEventHandle handle) {
+		AlchemyModLoader.checkState();
 		for (EventType type : handle.getEventType()) {
 			if (type == EventType.EVENT_BUS)
 				MinecraftForge.EVENT_BUS.register(handle);

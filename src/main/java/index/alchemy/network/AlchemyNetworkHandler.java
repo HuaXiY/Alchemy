@@ -3,6 +3,7 @@ package index.alchemy.network;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.Message;
@@ -33,15 +34,19 @@ public class AlchemyNetworkHandler {
 	
 	private static final Map<Class<?>, Side> message_mapping = new LinkedHashMap<Class<?>, Side>();
 	
-	private static int register = -1;
+	private static int id = -1;
+	
+	private static synchronized int next() {
+		return ++id;
+	}
 
 	private static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz, Side side) {
-		networkWrapper.registerMessage(clazz, clazz, ++register, side);
+		networkWrapper.registerMessage(clazz, clazz, next(), side);
 		AlchemyInitHook.push_event(clazz);
 	}
 	
 	public static void registerMessage(INetworkMessage<IMessage> handle) {
-		networkWrapper.registerMessage(handle, handle.getMessageClass(), ++register, handle.getMessageSide());
+		networkWrapper.registerMessage(handle, handle.getMessageClass(), next(), handle.getMessageSide());
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -61,11 +66,9 @@ public class AlchemyNetworkHandler {
 			networkWrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
 	}
 	
-	public static void init() {
-		registerMessage(MessageOpenGui.class, Side.SERVER);
-		registerMessage(MessageParticle.class, Side.CLIENT);
-		registerMessage(MessageSound.class, Side.CLIENT);
-		registerMessage(MessageNBTUpdate.class, Side.CLIENT);
+	public static <T extends IMessage & IMessageHandler<T, IMessage>> void init() {
+		for (Entry<Class<?>, Side> entry : message_mapping.entrySet())
+			registerMessage((Class<T>) entry.getKey(), entry.getValue());
 	}
 	
 	public static void init(Class<?> clazz) {

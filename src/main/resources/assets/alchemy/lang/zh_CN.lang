@@ -10,7 +10,9 @@ item.scroll_tp.name=
 item.ring_space.name=
 item.ring_time.name=
 item.alive.name=
+item.ring_blessing.name=
 item.belt_guard.name=
+item.belt_tough.name=
 item.amulet_heal.name=
 item.amulet_purify.name=
 

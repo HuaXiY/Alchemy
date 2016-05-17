@@ -6,6 +6,8 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -14,7 +16,19 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 6;
-	public static final float BALANCE_COEFFICIENT = 0.5F;
+	public static final float BALANCE_COEFFICIENT = 0.3F;
+	
+	public static final AttributeModifier KNOCKBACK_RESISTANCE =  new AttributeModifier("belt_tough_bonus", 1D, 0);
+	
+	@Override
+	public void onEquipped(ItemStack item, EntityLivingBase living) {
+		living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).applyModifier(KNOCKBACK_RESISTANCE);
+	}
+
+	@Override
+	public void onUnequipped(ItemStack item, EntityLivingBase living) {
+		living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).removeModifier(KNOCKBACK_RESISTANCE);
+	}
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {

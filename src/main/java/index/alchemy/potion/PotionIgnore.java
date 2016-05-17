@@ -1,15 +1,11 @@
 package index.alchemy.potion;
 
-import java.lang.reflect.Field;
-
 import com.google.common.base.Predicate;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.entity.ai.EntityAIFindEntityNearestHelper;
-import index.alchemy.util.Tool;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,8 +21,6 @@ public class PotionIgnore extends AlchemyPotion implements IEventHandle {
         }
     };
 	
-	private static Field attackTarget = Tool.setAccessible(EntityLiving.class.getDeclaredFields()[10]);
-	
 	public PotionIgnore() {
 		super("ignore", false, 0xFFFFFF);
 	}
@@ -38,18 +32,14 @@ public class PotionIgnore extends AlchemyPotion implements IEventHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
-		if (event.getEntityLiving() instanceof EntityLivingBase && event.getEntityLiving().isNonBoss() &&
+		if (event.getEntityLiving() instanceof EntityLiving && event.getEntityLiving().isNonBoss() &&
 			event.getTarget() != null && event.getTarget().isPotionActive(this) &&
 			event.getEntityLiving().getCombatTracker().getBestAttacker() != event.getTarget()) {
+			EntityLiving living = (EntityLiving) event.getEntityLiving();
 			Class<EntityLivingBase> type = (Class<EntityLivingBase>) 
 					(event.getEntityLiving() instanceof EntityPlayer ? EntityPlayer.class : event.getEntityLiving().getClass());
-			EntityLivingBase living = EntityAIFindEntityNearestHelper.<EntityLivingBase>findNearest(
+			living.attackTarget = EntityAIFindEntityNearestHelper.<EntityLivingBase>findNearest(
 					(EntityLiving) event.getEntityLiving(), type, NOT_ACTIVE);
-			try {
-				attackTarget.set(event.getEntityLiving(), living);
-			} catch (Exception e) {
-				throw new AlchemyRuntimeExcption(e);
-			}
 		}
 	}
 

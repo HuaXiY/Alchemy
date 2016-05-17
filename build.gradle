@@ -50,20 +50,25 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = project.config.mappings_version
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-	def buildnum = (config.build_number!="") ? '.' + config.build_number : ""
-	replace '@MOD_VERSION@', config.mod_version + buildnum
+    def buildnum = (config.build_number!="") ? '.' + config.build_number : ""
+    replace '@MOD_VERSION@', config.mod_version + buildnum
     replaceIn 'Constants.java'
-	
+    
 }
 
 task sourcesJar(type: Jar, dependsOn: sourceJar) {
     from 'build/sources/main/java/'
     classifier = 'sources'
     
-	from 'LICENSE'
+    from 'LICENSE'
+}
+
+def commonManifest = {
+    attributes 'FMLAT': 'alchemy_at.cfg'
 }
 
 jar {
+    manifest commonManifest
     classifier = 'universal'
 }
 
@@ -72,10 +77,7 @@ artifacts {
 }
 
 dependencies {
-	compile files (
-		"libs/Baubles-1.9-1.2.0.2-universal.jar",
-		"libs/BiomesOPlenty-1.9-4.0.2.2018-universal.jar"
-		)
+    compile fileTree(dir: 'mods', include: ['*.jar'])
 }
 
 processResources

@@ -16,12 +16,15 @@ public class AlchemyItemLoader {
 			scroll_lightning = new ItemScrollLightning(),
 			scroll_tp = new ItemScrollTP();
 	
-	public static final ItemRingSpace ring_space = new ItemRingSpace();
-	public static final ItemRingTime ring_time = new ItemRingTime();
-	public static final ItemRingAlive ring_alive = new ItemRingAlive();
-	public static final ItemBeltGuard belt_guard = new ItemBeltGuard();
-	public static final ItemAmuletHeal amulet_heal = new ItemAmuletHeal();
-	public static final ItemAmuletPurify amulet_purify = new ItemAmuletPurify();
+	public static final AlchemyItemBauble
+			ring_space = new ItemRingSpace(),
+			ring_time = new ItemRingTime(),
+			ring_alive = new ItemRingAlive(),
+			ring_blessing = new ItemRingBlessing(),
+			belt_guard = new ItemBeltGuard(),
+			belt_tough = new ItemBeltTough(),
+			amulet_heal = new ItemAmuletHeal(),
+			amulet_purify = new ItemAmuletPurify();
 	
 	public static void init() {}
 	

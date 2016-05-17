@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import index.alchemy.api.IEventHandle;
+import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.AlchemyKeyBindingLoader;
 import index.alchemy.client.ClientProxy;
@@ -18,12 +19,15 @@ import index.alchemy.network.SDouble6Package;
 import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -31,11 +35,13 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IEventHandle, INetworkMessage<MessageSpaceRingPickup> {
+public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IEventHandle, IGuiHandle, INetworkMessage<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
 	
 	protected int size;
+	
+	private int gui_id = -1;
 	
 	@Override
 	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item) {
@@ -64,9 +70,9 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 				AlchemyNetworkHandler.openGui(GUIID.SPACE_RING);
 		} else if (AlchemyKeyBindingLoader.key_space_ring_pickup.isPressed()) {
 			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-					Minecraft.getMinecraft().theWorld.getWorldTime() - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
+					Minecraft.getMinecraft().thePlayer.ticksExisted - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
 				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickup());
-				ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().theWorld.getWorldTime();
+				ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().thePlayer.ticksExisted;
 			}
 		}
 	}
@@ -95,15 +101,6 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 		return null;
 	}
 	
-	public ItemRingSpace() {
-		this("ring_space", 9 * 6);
-	}
-	
-	public ItemRingSpace(String name, int size) {
-		super(name, 0x6600CC);
-		this.size = size;
-	}
-	
 	public void pickup(EntityPlayer player) {
 		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
 		if (inventory == null)
@@ -123,6 +120,37 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 			inventory.updateNBT();
 			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player, 64D), player.worldObj, d6p);
 		}
+	}
+	
+	@Override
+	public void setGuiId(int id) {
+		gui_id = id;
+	}
+
+	@Override
+	public int getGuiId() {
+		return gui_id;
+	}
+
+	@Override
+	public Object getServerGuiElement(EntityPlayer player, World world, int x, int y, int z) {
+		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
+		return inventory == null ? null : new ContainerChest(player.inventory, inventory, player);
+	}
+
+	@Override
+	public Object getClientGuiElement(EntityPlayer player, World world, int x, int y, int z) {
+		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
+		return inventory == null ? null : new GuiChest(player.inventory, inventory);
+	}
+	
+	public ItemRingSpace() {
+		this("ring_space", 9 * 6);
+	}
+	
+	public ItemRingSpace(String name, int size) {
+		super(name, 0x6600CC);
+		this.size = size;
 	}
 
 }

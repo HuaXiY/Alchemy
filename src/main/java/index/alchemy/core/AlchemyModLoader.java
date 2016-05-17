@@ -46,7 +46,7 @@ public class AlchemyModLoader {
 	@Nullable
 	@Deprecated
 	@Instance(Constants.MOD_ID)
-	public static AlchemyModLoader instance;
+	private static AlchemyModLoader instance;
 	
 	public static Object instance() {
 		if (instance != null)
@@ -82,6 +82,17 @@ public class AlchemyModLoader {
 			return result;
 		}
 	};
+	
+	private static ModState state = ModState.UNLOADED;
+	
+	public static ModState getState() {
+		return state;
+	}
+	
+	public static void checkState() {
+		if (getState().ordinal() >= ModState.AVAILABLE.ordinal())
+			throw new AlchemyRuntimeExcption(new RuntimeException("Abnormal state: " + getState().name()));
+	}
 	
 	static {
 		String str = AlchemyModLoader.class.getResource("/alchemy.info").toString()
@@ -153,24 +164,12 @@ public class AlchemyModLoader {
 		
 	}
 	
-	private static ModState state;
-	
-	@Nullable
-	public static ModState getState() {
-		return state;
-	}
-	
-	public static void checkState() {
-		if (getState().ordinal() >= ModState.AVAILABLE.ordinal())
-			throw new AlchemyRuntimeExcption(new RuntimeException("Abnormal state: " + getState().name()));
-	}
-	
 	public static String format(String src, String max) {
 		double fix = (max.length() - src.length()) / 2D;
 		return Tool.getString(' ', (int) Math.floor(fix)) + src + Tool.getString(' ', (int) Math.ceil(fix));
 	}
 	
-	public static void init(ModState state) {
+	private static void init(ModState state) {
 		AlchemyModLoader.state = state;
 		String state_str = format(state.toString(), ModState.POSTINITIALIZED.toString());
 		logger.info("************************************   " + state_str + " START   ************************************");
@@ -197,13 +196,6 @@ public class AlchemyModLoader {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) throws LWJGLException {
-		/*Frame frame = new Frame(Display.getTitle());
-		Canvas canvas = new Canvas();
-		frame.setBounds(Display.getX(), Display.getY(), Display.getWidth(), Display.getHeight());
-		canvas.setVisible(true);
-		frame.setVisible(true);
-		frame.add(canvas);
-		Display.setParent(canvas);*/
 		init(ModState.CONSTRUCTED);
 		init(ModState.PREINITIALIZED);
 	}

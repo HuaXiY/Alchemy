@@ -30,7 +30,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IEventHandle {
 	}
 
 	public ItemRingAlive() {
-		super("alive", 0xED343A);
+		super("ring_alive", 0xED343A);
 	}
 
 }

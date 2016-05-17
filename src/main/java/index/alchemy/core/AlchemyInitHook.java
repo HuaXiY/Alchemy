@@ -9,6 +9,7 @@ import index.alchemy.api.IColorItem;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGenerator;
+import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IPlayerTickable;
@@ -87,6 +88,9 @@ public class AlchemyInitHook {
 		
 		if (obj instanceof INetworkMessage)
 			AlchemyNetworkHandler.registerMessage((INetworkMessage) obj);
+		
+		if (obj instanceof IGuiHandle)
+			AlchemyEventSystem.registerGuiHandle((IGuiHandle) obj);
 		
 		if (obj instanceof AlchemyCapability)
 			CapabilityManager.INSTANCE.register((Class<C>) obj.getClass(), (IStorage<C>) obj, (Callable<C>) obj);

@@ -1,12 +1,15 @@
 package index.alchemy.network;
 
+import index.alchemy.annotation.Message;
 import index.alchemy.core.AlchemyModLoader;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
+@Message(Side.SERVER)
 public class MessageOpenGui implements IMessage, IMessageHandler<MessageOpenGui, IMessage> {
 	
 	public int id;
