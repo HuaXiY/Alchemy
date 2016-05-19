@@ -1,6 +1,7 @@
 package index.alchemy.core;
 
 public class Constants {
+	
 	public static final String 
 		MOD_ID = "Alchemy",
 		MOD_NAME = "Alchemy",
@@ -9,7 +10,4 @@ public class Constants {
 		MC_VERSION = "1.9",
 		E_MAIL = "931920447@qq.com";
 	
-	public static final int 
-		ITEM = "item.".length(),
-		TILE = "tile.".length();
 }

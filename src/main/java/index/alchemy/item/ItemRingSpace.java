@@ -3,13 +3,13 @@ package index.alchemy.item;
 import java.util.LinkedList;
 import java.util.List;
 
+import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.AlchemyKeyBindingLoader;
 import index.alchemy.client.ClientProxy;
 import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.Constants;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.gui.GUIID;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
@@ -35,7 +35,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IEventHandle, IGuiHandle, INetworkMessage<MessageSpaceRingPickup> {
+public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IEventHandle, IGuiHandle, ICoolDown, INetworkMessage<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
 	
@@ -52,7 +52,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	
 	@Override
 	public String getInventoryUnlocalizedName() {
-		return "inventory." + getUnlocalizedName().substring(Constants.ITEM);
+		return getUnlocalizedName().replace("item.", "inventory.");
 	}
 	
 	@Override
@@ -152,5 +152,27 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 		super(name, 0x6600CC);
 		this.size = size;
 	}
+
+	@Override
+	public int getMaxCD() {
+		return PICKUP_CD;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getResidualCD() {
+		return isEquipmented(Minecraft.getMinecraft().thePlayer) ? 
+				Math.max(0, PICKUP_CD - (Minecraft.getMinecraft().thePlayer.ticksExisted - ClientProxy.ring_space_pickup_last_time)) : 0;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getRenderID() {
+		return 1;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void renderCD(int x, int y, int w, int h) {}
 
 }

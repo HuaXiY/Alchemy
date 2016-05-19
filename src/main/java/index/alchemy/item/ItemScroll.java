@@ -147,4 +147,5 @@ public abstract class ItemScroll extends AlchemyItem {
 		else 
 			return nbt.getInteger(SCROOL_TYPE);
 	}
+	
 }
