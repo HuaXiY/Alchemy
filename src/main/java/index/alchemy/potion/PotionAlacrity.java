@@ -2,43 +2,36 @@ package index.alchemy.potion;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.api.Alway;
-import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.ClientProxy;
-import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.potion.PotionAlacrity.MessageAlacrityCallback;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class PotionAlacrity extends AlchemyPotion implements INetworkMessage<MessageAlacrityCallback> {
 	
-	{
-		if (Alway.isClient())
-			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
-				@Override
-				public boolean run(Phase phase) {
-					if (Alway.isPlaying() && phase == Phase.START) {
-						EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-						double v = 1.8, vxz = 4.2;
-						if (--ClientProxy.potion_alacrity_cd <= 0 && player.isPotionActive(PotionAlacrity.this) && player.motionY < 0 &&
-								Keyboard.isKeyDown(ClientProxy.minecraft.gameSettings.keyBindJump.getKeyCode())) {
-							player.motionY += player.motionX == 0 && player.motionZ == 0 ? v * 1.2 : v;
-							player.motionX *= vxz;
-							player.motionZ *= vxz;
-							ClientProxy.potion_alacrity_cd = 40;
-							AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageAlacrityCallback());
-						}
-					}
-					return false;
-				}
-			}, Side.CLIENT);
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void performEffect(EntityLivingBase living, int level) {
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		if (living == player) {
+			double v = 1.8, vxz = 4.2;
+			if (--ClientProxy.potion_alacrity_cd <= 0 && player.isPotionActive(PotionAlacrity.this) && player.motionY < 0 &&
+					Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
+				player.motionY += player.motionX == 0 && player.motionZ == 0 ? v * 1.2 : v;
+				player.motionX *= vxz;
+				player.motionZ *= vxz;
+				ClientProxy.potion_alacrity_cd = 40;
+				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageAlacrityCallback());
+			}
+		}
 	}
 	
 	public static class MessageAlacrityCallback implements IMessage {

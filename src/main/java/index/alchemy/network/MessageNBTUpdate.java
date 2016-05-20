@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Message(Side.CLIENT)
 public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpdate, IMessage> {
@@ -40,6 +41,7 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(MessageNBTUpdate message, MessageContext ctx) {
 		switch (message.type) {
 			case PLAYER_ENTITY_DATA:

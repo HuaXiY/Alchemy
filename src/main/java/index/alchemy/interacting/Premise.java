@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 import org.lwjgl.opengl.Display;
 
 import index.alchemy.annotation.Init;
-import index.alchemy.api.Alway;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import net.minecraftforge.fml.client.SplashProgress;
@@ -33,7 +32,7 @@ public class Premise {
 	}
 	
 	public static void onMiss(String modid) {
-		if (Alway.isClient()) {
+		if (AlchemyModLoader.proxy.isClient()) {
 			SplashProgress.finish();
 			Display.destroy();
 			JDialog dialog = new JDialog();

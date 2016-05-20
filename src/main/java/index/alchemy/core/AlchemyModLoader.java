@@ -63,7 +63,7 @@ public class AlchemyModLoader {
 	}
 	
 	public static final String mc_dir; 
-	public static final boolean is_modding;
+	public static final boolean is_modding, use_dmain;
 	public static final Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>() {
 		@Override
 		public List<Class<?>> get(Object key) {
@@ -109,6 +109,8 @@ public class AlchemyModLoader {
 			is_modding = false;
 		}
 		
+		use_dmain = is_modding && Boolean.getBoolean(System.getProperty("index.alchemy.use_dmain", "false"));
+		
 		List<String> class_list = new LinkedList<String>();
 		
 		try {
@@ -148,7 +150,7 @@ public class AlchemyModLoader {
 			if (name.startsWith("index."))
 				try {
 					Class<?> clazz = Class.forName(name, false, loader);
-					if (is_modding)
+					if (use_dmain)
 						DMain.init(clazz);
 					AlchemyConfigLoader.init(clazz);
 					AlchemyNetworkHandler.init(clazz);

@@ -2,38 +2,39 @@ package index.alchemy.item;
 
 import java.util.Iterator;
 
+import org.lwjgl.input.Keyboard;
+
+import index.alchemy.annotation.KeyEvent;
 import index.alchemy.api.ICoolDown;
-import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IIndexRunnable;
+import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
-import index.alchemy.client.AlchemyKeyBindingLoader;
+import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingTime.MessageTimeLeap;
 import index.alchemy.network.AlchemyNetworkHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetworkMessage<MessageTimeLeap>, ICoolDown {
+public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage<MessageTimeLeap>, ICoolDown {
 	
 	public static final int USE_CD = 20 * 20;
-	public static final String NBT_KEY_CD = "time_leap";
+	public static final String NBT_KEY_CD = "time_leap", KEY_DESCRIPTION = "key.time_ring_leap";
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
@@ -48,20 +49,19 @@ public class ItemRingTime extends AlchemyItemRing implements IEventHandle, INetw
 	}
 
 	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
+	@SideOnly(Side.CLIENT)
+	public KeyBinding[] getKeyBindings() {
+		return new KeyBinding[] {new AlchemyKeyBinding(KEY_DESCRIPTION, Keyboard.KEY_V)};
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void handleKeyInput(KeyInputEvent event) {
-		if (AlchemyKeyBindingLoader.key_time_ring_leap.isPressed()) {
-			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-					Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD) > USE_CD) {
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageTimeLeap());
-				Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
-				timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
-			}
+	@KeyEvent(KEY_DESCRIPTION)
+	public void onKeyTimeLeapPressed(KeyBinding binding) {
+		if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
+				Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD) > USE_CD) {
+			AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageTimeLeap());
+			Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+			timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
 		}
 	}
 	

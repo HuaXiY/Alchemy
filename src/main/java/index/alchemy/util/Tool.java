@@ -161,7 +161,8 @@ public class Tool {
 			e.printStackTrace();
 			return false;
 		} finally {
-			pfp.close();
+			if (pfp != null)
+				pfp.close();
 		}
 	}
 	

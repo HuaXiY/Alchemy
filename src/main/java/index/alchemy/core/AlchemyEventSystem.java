@@ -1,20 +1,29 @@
 package index.alchemy.core;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.lwjgl.input.Keyboard;
+
 import index.alchemy.annotation.Init;
+import index.alchemy.annotation.KeyEvent;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IIndexRunnable;
+import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
+import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,6 +31,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -65,15 +75,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	private static int gui_handle_id = -1;
 	
-	private static synchronized int onGuiHanleNext() {
-		return ++gui_handle_id;
-	}
-	
-	@SideOnly(Side.CLIENT)
 	private static final Set<Object> HOOK_INPUT = new HashSet<Object>();
 	
-	@SideOnly(Side.CLIENT)
 	private static boolean hookInputState = false;
+	
+	private static final Map<KeyBinding, Entry<IInputHandle, Method>> KEY_MAPPING = new HashMap<KeyBinding, Entry<IInputHandle, Method>>();
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		AlchemyModLoader.checkState();
@@ -145,13 +151,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SubscribeEvent
 	public void onInitHook(InitHookEvent event) {
 		AlchemyModLoader.logger.info("    init: <" + event.init.getClass().getName() + "> " + event.init);
-		if (AlchemyModLoader.is_modding)
+		if (AlchemyModLoader.use_dmain)
 			DMain.init(event.init);
 	}
 	
-	public static void registerGuiHandle(IGuiHandle handle) {
+	public static synchronized void registerGuiHandle(IGuiHandle handle) {
 		AlchemyModLoader.checkState();
-		handle.setGuiId(onGuiHanleNext());
+		handle.setGuiId(++gui_handle_id);
 		GUI_HANDLE.add(handle);
 	}
 	
@@ -181,10 +187,44 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	@SideOnly(Side.CLIENT)
+	public static void registerInputHandle(final IInputHandle handle) {
+		for (KeyBinding binding : handle.getKeyBindings()) {
+			ClientRegistry.registerKeyBinding(binding);
+			String description = binding.getKeyDescription();
+			for (final Method method : handle.getClass().getMethods()) {
+				KeyEvent event = method.getAnnotation(KeyEvent.class);
+				if (event != null && event.value().equals(description))
+					KEY_MAPPING.put(binding, new Entry<IInputHandle, Method>() {
+						@Override
+						public Method setValue(Method value) {
+							return null;
+						}
+						@Override
+						public IInputHandle getKey() {
+							return handle;
+						}
+						@Override
+						public Method getValue() {
+							return method;
+						}
+					});
+			}
+		}
+	}
+	
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void hookKeyInput(KeyInputEvent event) {
+	public void onKeyInput(KeyInputEvent event) {
 		if (hookInputState)
 			KeyBinding.unPressAllKeys();
+		else 
+			for (Entry<KeyBinding, Entry<IInputHandle, Method>> entry : KEY_MAPPING.entrySet())
+				if (Keyboard.isKeyDown(entry.getKey().getKeyCode()))
+					try {
+						entry.getValue().getValue().invoke(entry.getValue().getKey(), entry.getKey());
+					} catch (Exception e) {
+						throw new AlchemyRuntimeExcption(e);
+					}
 	}
 	
 	@SubscribeEvent

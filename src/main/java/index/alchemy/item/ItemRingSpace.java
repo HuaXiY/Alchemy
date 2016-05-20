@@ -3,15 +3,16 @@ package index.alchemy.item;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.lwjgl.input.Keyboard;
+
+import index.alchemy.annotation.KeyEvent;
 import index.alchemy.api.ICoolDown;
-import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
+import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
-import index.alchemy.client.AlchemyKeyBindingLoader;
+import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.ClientProxy;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
-import index.alchemy.gui.GUIID;
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -20,6 +21,7 @@ import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
@@ -28,20 +30,19 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IEventHandle, IGuiHandle, ICoolDown, INetworkMessage<MessageSpaceRingPickup> {
+public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
+	public static final String KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
 	protected int size;
 	
-	private int gui_id = -1;
+	private int gui_id;
 	
 	@Override
 	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item) {
@@ -56,24 +57,28 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IE
 	}
 	
 	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
+	@SideOnly(Side.CLIENT)
+	public KeyBinding[] getKeyBindings() {
+		AlchemyModLoader.checkState();
+		return new KeyBinding[] {
+				new AlchemyKeyBinding(KEY_DESCRIPTION_OPEN, Keyboard.KEY_R),
+				new AlchemyKeyBinding(KEY_DESCRIPTION_PICKUP, Keyboard.KEY_C)};
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void handleKeyInput(KeyInputEvent event) {
-		if (AlchemyKeyBindingLoader.key_space_ring_open.isPressed()) {
-			if (Minecraft.getMinecraft().currentScreen != null)
-				Minecraft.getMinecraft().displayGuiScreen(null);
-			else if (isEquipmented(Minecraft.getMinecraft().thePlayer))
-				AlchemyNetworkHandler.openGui(GUIID.SPACE_RING);
-		} else if (AlchemyKeyBindingLoader.key_space_ring_pickup.isPressed()) {
-			if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-					Minecraft.getMinecraft().thePlayer.ticksExisted - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickup());
-				ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().thePlayer.ticksExisted;
-			}
+	@KeyEvent(KEY_DESCRIPTION_OPEN)
+	public void onKeyOpenPressed(KeyBinding binding) {
+		if (isEquipmented(Minecraft.getMinecraft().thePlayer))
+			AlchemyNetworkHandler.openGui(getGuiId());
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@KeyEvent(KEY_DESCRIPTION_PICKUP)
+	public void onKeyPickupPressed(KeyBinding binding) {
+		if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
+				Minecraft.getMinecraft().thePlayer.ticksExisted - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
+			AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickup());
+			ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().thePlayer.ticksExisted;
 		}
 	}
 	

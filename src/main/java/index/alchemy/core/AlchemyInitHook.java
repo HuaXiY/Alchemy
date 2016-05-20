@@ -10,6 +10,7 @@ import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGenerator;
 import index.alchemy.api.IGuiHandle;
+import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IPlayerTickable;
@@ -21,7 +22,6 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.network.AlchemyNetworkHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.model.ModelLoader;
@@ -30,7 +30,6 @@ import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
@@ -115,8 +114,8 @@ public class AlchemyInitHook {
 				
 			}
 			
-			if (obj instanceof KeyBinding)
-				ClientRegistry.registerKeyBinding((KeyBinding) obj);
+			if (obj instanceof IInputHandle)
+				AlchemyEventSystem.registerInputHandle((IInputHandle) obj);
 			
 			if (obj instanceof ICoolDown)
 				HUDManager.registerCoolDown((ICoolDown) obj);
