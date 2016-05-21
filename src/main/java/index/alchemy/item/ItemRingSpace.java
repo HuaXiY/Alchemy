@@ -69,7 +69,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@KeyEvent(KEY_DESCRIPTION_OPEN)
 	public void onKeyOpenPressed(KeyBinding binding) {
 		if (isEquipmented(Minecraft.getMinecraft().thePlayer))
-			AlchemyNetworkHandler.openGui(getGuiId());
+			AlchemyNetworkHandler.openGui(this);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -122,16 +122,6 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		}
 	}
 	
-	@Override
-	public void setGuiId(int id) {
-		gui_id = id;
-	}
-
-	@Override
-	public int getGuiId() {
-		return gui_id;
-	}
-
 	@Override
 	public Object getServerGuiElement(EntityPlayer player, World world, int x, int y, int z) {
 		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));

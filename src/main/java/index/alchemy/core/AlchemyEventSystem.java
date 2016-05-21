@@ -73,8 +73,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	private static final List<IGuiHandle> GUI_HANDLE = new ArrayList<IGuiHandle>();
 	
-	private static int gui_handle_id = -1;
-	
 	private static final Set<Object> HOOK_INPUT = new HashSet<Object>();
 	
 	private static boolean hookInputState = false;
@@ -157,8 +155,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	public static synchronized void registerGuiHandle(IGuiHandle handle) {
 		AlchemyModLoader.checkState();
-		handle.setGuiId(++gui_handle_id);
 		GUI_HANDLE.add(handle);
+	}
+	
+	public static int getGuiIdByGuiHandle(IGuiHandle handle) {
+		return GUI_HANDLE.indexOf(handle);
 	}
 	
 	@Override

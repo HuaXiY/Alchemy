@@ -7,10 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IGuiHandle {
 	
-	public void setGuiId(int id);
-	
-	public int getGuiId();
-	
 	public Object getServerGuiElement(EntityPlayer player, World world, int x, int y, int z);
 	
 	@SideOnly(Side.CLIENT)

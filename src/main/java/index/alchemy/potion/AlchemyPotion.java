@@ -34,12 +34,6 @@ public class AlchemyPotion extends Potion implements IRegister {
 		return ready;
 	}
 	
-	/*@Override
-	@SideOnly(Side.CLIENT)
-	public void renderInventoryEffect(int x, int y, PotionEffect effect, Minecraft mc) {
-		mc.getTextureManager().bindTexture(RESOURCE_LOCATION);
-		mc.currentScreen.drawTexturedModalRect(x + 6, y + 6, id % 16 * 16, id / 16, 16, 16);
-	}*/
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getStatusIconIndex() {

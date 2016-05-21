@@ -7,7 +7,9 @@ import java.util.Map.Entry;
 
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.Message;
+import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
@@ -30,7 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
 	
-	public static final SimpleNetworkWrapper networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MOD_ID);
+	public static final SimpleNetworkWrapper network_wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MOD_ID);
 	
 	private static final Map<Class<?>, Side> message_mapping = new LinkedHashMap<Class<?>, Side>();
 	
@@ -41,7 +43,7 @@ public class AlchemyNetworkHandler {
 	}
 
 	private static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(Class<T> clazz, Side side) {
-		networkWrapper.registerMessage(clazz, clazz, next(), side);
+		network_wrapper.registerMessage(clazz, clazz, next(), side);
 		AlchemyInitHook.push_event(clazz);
 	}
 	
@@ -53,28 +55,28 @@ public class AlchemyNetworkHandler {
 	}
 	
 	public static void registerMessage(INetworkMessage.Client<IMessage> handle) {
-		networkWrapper.registerMessage(handle, handle.getClientMessageClass(), next(), Side.CLIENT);
+		network_wrapper.registerMessage(handle, handle.getClientMessageClass(), next(), Side.CLIENT);
 	}
 	
 	public static void registerMessage(INetworkMessage.Server<IMessage> handle) {
-		networkWrapper.registerMessage(handle, handle.getServerMessageClass(), next(), Side.SERVER);
+		network_wrapper.registerMessage(handle, handle.getServerMessageClass(), next(), Side.SERVER);
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static void openGui(int id) {
-		networkWrapper.sendToServer(new MessageOpenGui(id));
+	public static void openGui(IGuiHandle handle) {
+		network_wrapper.sendToServer(new MessageOpenGui(AlchemyEventSystem.getGuiIdByGuiHandle(handle)));
 	}
 	
 	public static void spawnParticle(EnumParticleTypes particle, AxisAlignedBB aabb, World world, List<SDouble6Package> d6ps) {
 		SDouble6Package d6p[] = Tool.toArray(d6ps, SDouble6Package.class);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
-			networkWrapper.sendTo(new MessageParticle(particle.getParticleID(), d6p), player);
+			network_wrapper.sendTo(new MessageParticle(particle.getParticleID(), d6p), player);
 	}
 	
 	public static void playSound(SoundEvent sound, SoundCategory category, AxisAlignedBB aabb, World world, List<SDouble3Float2Package> d3f2ps) {
 		SDouble3Float2Package d3f2p[] = Tool.toArray(d3f2ps, SDouble3Float2Package.class);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
-			networkWrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
+			network_wrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
 	}
 	
 	public static <T extends IMessage & IMessageHandler<T, IMessage>> void init() {
