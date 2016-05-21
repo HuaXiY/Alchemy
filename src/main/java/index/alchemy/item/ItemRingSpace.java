@@ -77,7 +77,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	public void onKeyPickupPressed(KeyBinding binding) {
 		if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
 				Minecraft.getMinecraft().thePlayer.ticksExisted - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
-			AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageSpaceRingPickup());
+			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageSpaceRingPickup());
 			ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().thePlayer.ticksExisted;
 		}
 	}

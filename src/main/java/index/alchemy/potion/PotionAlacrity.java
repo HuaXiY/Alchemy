@@ -29,7 +29,7 @@ public class PotionAlacrity extends AlchemyPotion implements INetworkMessage.Ser
 				player.motionX *= vxz;
 				player.motionZ *= vxz;
 				ClientProxy.potion_alacrity_cd = 40;
-				AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageAlacrityCallback());
+				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageAlacrityCallback());
 			}
 		}
 	}

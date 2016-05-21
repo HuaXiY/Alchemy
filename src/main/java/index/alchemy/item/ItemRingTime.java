@@ -59,7 +59,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public void onKeyTimeLeapPressed(KeyBinding binding) {
 		if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
 				Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD) > USE_CD) {
-			AlchemyNetworkHandler.networkWrapper.sendToServer(new MessageTimeLeap());
+			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
 			Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
 			timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
 		}
