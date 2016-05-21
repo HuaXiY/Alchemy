@@ -46,7 +46,18 @@ public class AlchemyNetworkHandler {
 	}
 	
 	public static void registerMessage(INetworkMessage<IMessage> handle) {
-		networkWrapper.registerMessage(handle, handle.getMessageClass(), next(), handle.getMessageSide());
+		if (handle instanceof INetworkMessage.Client)
+			registerMessage((INetworkMessage.Client<IMessage>) handle);
+		if (handle instanceof INetworkMessage.Server)
+			registerMessage((INetworkMessage.Server<IMessage>) handle);
+	}
+	
+	public static void registerMessage(INetworkMessage.Client<IMessage> handle) {
+		networkWrapper.registerMessage(handle, handle.getClientMessageClass(), next(), Side.CLIENT);
+	}
+	
+	public static void registerMessage(INetworkMessage.Server<IMessage> handle) {
+		networkWrapper.registerMessage(handle, handle.getServerMessageClass(), next(), Side.SERVER);
 	}
 	
 	@SideOnly(Side.CLIENT)

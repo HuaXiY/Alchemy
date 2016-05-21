@@ -35,7 +35,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage<MessageSpaceRingPickup> {
+public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
 	public static final String KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
@@ -91,13 +91,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	}
 	
 	@Override
-	public Class<MessageSpaceRingPickup> getMessageClass() {
+	public Class<MessageSpaceRingPickup> getServerMessageClass() {
 		return MessageSpaceRingPickup.class;
-	}
-	
-	@Override
-	public Side getMessageSide() {
-		return Side.SERVER;
 	}
 	
 	@Override

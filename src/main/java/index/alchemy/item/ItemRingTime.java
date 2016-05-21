@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage<MessageTimeLeap>, ICoolDown {
+public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
 	public static final int USE_CD = 20 * 20;
 	public static final String NBT_KEY_CD = "time_leap", KEY_DESCRIPTION = "key.time_ring_leap";
@@ -74,13 +74,8 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	}
 	
 	@Override
-	public Class<MessageTimeLeap> getMessageClass() {
+	public Class<MessageTimeLeap> getServerMessageClass() {
 		return MessageTimeLeap.class;
-	}
-	
-	@Override
-	public Side getMessageSide() {
-		return Side.SERVER;
 	}
 	
 	@Override

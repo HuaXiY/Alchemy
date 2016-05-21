@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class PotionAlacrity extends AlchemyPotion implements INetworkMessage<MessageAlacrityCallback> {
+public class PotionAlacrity extends AlchemyPotion implements INetworkMessage.Server<MessageAlacrityCallback> {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -43,13 +43,8 @@ public class PotionAlacrity extends AlchemyPotion implements INetworkMessage<Mes
 	}
 	
 	@Override
-	public Class<MessageAlacrityCallback> getMessageClass() {
+	public Class<MessageAlacrityCallback> getServerMessageClass() {
 		return MessageAlacrityCallback.class;
-	}
-	
-	@Override
-	public Side getMessageSide() {
-		return Side.SERVER;
 	}
 	
 	@Override
