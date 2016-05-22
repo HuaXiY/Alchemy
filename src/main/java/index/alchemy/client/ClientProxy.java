@@ -11,8 +11,4 @@ public class ClientProxy extends CommonProxy {
 		return true;
 	}
 	
-	public static int 
-		potion_alacrity_cd = 0,
-		ring_space_pickup_last_time = 0;
-	
 }

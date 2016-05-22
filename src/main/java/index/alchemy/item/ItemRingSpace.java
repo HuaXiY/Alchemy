@@ -12,7 +12,6 @@ import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.AlchemyKeyBinding;
-import index.alchemy.client.ClientProxy;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
@@ -48,7 +47,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
-	public static final String KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
+	public static final String NBT_KEY_CD = "ring_pickup", KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
 	protected int size;
 	
@@ -141,10 +140,9 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_DESCRIPTION_PICKUP)
 	public void onKeyPickupPressed(KeyBinding binding) {
-		if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-				Minecraft.getMinecraft().thePlayer.ticksExisted - ClientProxy.ring_space_pickup_last_time > PICKUP_CD) {
+		if (isEquipmented(Minecraft.getMinecraft().thePlayer) && isCDOver()) {
 			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageSpaceRingPickup());
-			ClientProxy.ring_space_pickup_last_time = Minecraft.getMinecraft().thePlayer.ticksExisted;
+			restartCD();
 		}
 	}
 	
@@ -218,7 +216,25 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
 		return isEquipmented(Minecraft.getMinecraft().thePlayer) ? 
-				Math.max(0, PICKUP_CD - (Minecraft.getMinecraft().thePlayer.ticksExisted - ClientProxy.ring_space_pickup_last_time)) : 0;
+				Math.max(0, getMaxCD() - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean isCDOver() {
+		return getResidualCD() <= 0;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void setResidualCD(int cd) {
+		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted - (getMaxCD() - cd));
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void restartCD() {
+		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
 	}
 
 	@Override

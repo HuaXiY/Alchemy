@@ -34,7 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
 	public static final int USE_CD = 20 * 20;
-	public static final String NBT_KEY_CD = "time_leap", KEY_DESCRIPTION = "key.time_ring_leap";
+	public static final String NBT_KEY_CD = "ring_time_leap", KEY_DESCRIPTION = "key.time_ring_leap";
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
@@ -57,8 +57,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_DESCRIPTION)
 	public void onKeyTimeLeapPressed(KeyBinding binding) {
-		if (isEquipmented(Minecraft.getMinecraft().thePlayer) &&
-				Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD) > USE_CD) {
+		if (isEquipmented(Minecraft.getMinecraft().thePlayer) && isCDOver()) {
 			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
 			Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
 			timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
@@ -138,7 +137,25 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
 		return isEquipmented(Minecraft.getMinecraft().thePlayer) ? 
-				Math.max(0, USE_CD - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+				Math.max(0, getMaxCD() - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean isCDOver() {
+		return getResidualCD() <= 0;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void setResidualCD(int cd) {
+		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted - (getMaxCD() - cd));
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void restartCD() {
+		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
 	}
 
 	@Override
