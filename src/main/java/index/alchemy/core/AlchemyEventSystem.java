@@ -230,7 +230,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void renderBar(RenderGameOverlayEvent event) {
+	public void renderBar(RenderGameOverlayEvent.Pre event) {
 		if (event.getType() == ElementType.ALL)
 			HUDManager.render();
 	}

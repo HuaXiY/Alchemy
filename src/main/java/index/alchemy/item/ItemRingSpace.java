@@ -6,6 +6,7 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.annotation.KeyEvent;
+import index.alchemy.api.Alway;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
@@ -22,11 +23,20 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ContainerChest;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.AchievementList;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -42,8 +52,6 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	protected int size;
 	
-	private int gui_id;
-	
 	@Override
 	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item) {
 		if (item == null)
@@ -54,6 +62,64 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@Override
 	public String getInventoryUnlocalizedName() {
 		return getUnlocalizedName().replace("item.", "inventory.");
+	}
+	
+	@Override
+	public void onWornTick(ItemStack item, EntityLivingBase living) {
+		if (Alway.isServer() && living.ticksExisted % 20 == 0 && living instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) living;
+			if (player.getHealth() > 0.0F && !player.isSpectator())
+				for (Entity entity : player.worldObj.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().expand(4D, 3D, 4D)))
+					if (!entity.isDead && entity instanceof EntityItem)
+			        	   onCollideWithPlayer((EntityItem) entity, player);
+		}
+	}
+	
+	private void onCollideWithPlayer(EntityItem entity, EntityPlayer player) {
+		if (entity.delayBeforeCanPickup > 0)
+			return;
+        ItemStack itemstack = entity.getEntityItem();
+        int i = itemstack.stackSize;
+
+        int hook = net.minecraftforge.event.ForgeEventFactory.onItemPickup(entity, player, itemstack);
+        if (hook < 0)
+        	return;
+
+        if ((entity.getOwner() == null || entity.lifespan - entity.getAge() <= 200 ||
+        		entity.getOwner().equals(player.getName())) && (hook == 1 || i <= 0 || player.inventory.addItemStackToInventory(itemstack))) {
+            if (itemstack.getItem() == Item.getItemFromBlock(Blocks.LOG))
+            	player.addStat(AchievementList.MINE_WOOD);
+
+            if (itemstack.getItem() == Item.getItemFromBlock(Blocks.LOG2))
+            	player.addStat(AchievementList.MINE_WOOD);
+
+            if (itemstack.getItem() == Items.LEATHER)
+            	player.addStat(AchievementList.KILL_COW);
+
+            if (itemstack.getItem() == Items.DIAMOND)
+            	player.addStat(AchievementList.DIAMONDS);
+
+            if (itemstack.getItem() == Items.BLAZE_ROD)
+            	player.addStat(AchievementList.BLAZE_ROD);
+
+            if (itemstack.getItem() == Items.DIAMOND && entity.getThrower() != null) {
+                EntityPlayer entityplayer = entity.worldObj.getPlayerEntityByName(entity.getThrower());
+                if (entityplayer != null && entityplayer != player)
+                	entityplayer.addStat(AchievementList.DIAMONDS_TO_YOU);
+            }
+
+            net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerItemPickupEvent(player, entity);
+            if (!entity.isSilent())
+            	entity.worldObj.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F,
+            			((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+
+            player.onItemPickup(entity, i);
+
+            if (itemstack.stackSize <= 0)
+            	entity.setDead();
+
+            player.addStat(StatList.getObjectsPickedUpStats(itemstack.getItem()), i);
+        }
 	}
 	
 	@Override

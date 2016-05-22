@@ -150,6 +150,7 @@ public class AlchemyModLoader {
 			if (name.startsWith("index."))
 				try {
 					Class<?> clazz = Class.forName(name, false, loader);
+					logger.info(AlchemyModLoader.class.getName() + " Loading -> " + clazz);
 					if (use_dmain)
 						DMain.init(clazz);
 					AlchemyConfigLoader.init(clazz);
