@@ -47,7 +47,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
-	public static final String NBT_KEY_CD = "ring_pickup", KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
+	public static final String NBT_KEY_CD = "ring_space", KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
 	protected int size;
 	
@@ -215,8 +215,9 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		return isEquipmented(Minecraft.getMinecraft().thePlayer) ? 
-				Math.max(0, getMaxCD() - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		return isEquipmented(player) ? 
+				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : 0;
 	}
 	
 	@Override

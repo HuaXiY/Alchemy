@@ -34,7 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
 	public static final int USE_CD = 20 * 20;
-	public static final String NBT_KEY_CD = "ring_time_leap", KEY_DESCRIPTION = "key.time_ring_leap";
+	public static final String NBT_KEY_CD = "ring_time", KEY_DESCRIPTION = "key.time_ring_leap";
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
@@ -136,8 +136,9 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		return isEquipmented(Minecraft.getMinecraft().thePlayer) ? 
-				Math.max(0, getMaxCD() - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		return isEquipmented(player) ? 
+				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : 0;
 	}
 	
 	@Override

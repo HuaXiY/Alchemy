@@ -41,7 +41,7 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingHurt(LivingHurtEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
 		if (isEquipmented(living))
