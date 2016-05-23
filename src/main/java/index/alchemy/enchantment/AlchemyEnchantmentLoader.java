@@ -8,7 +8,9 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 public class AlchemyEnchantmentLoader {
 	
 	public static final Enchantment
-			siphon_life = new EnchantmentSiphonLife();
+			siphon_life = new EnchantmentSiphonLife(),
+			double_jump = new EnchantmentDoubleJump(),
+			phase_shift = new EnchantmentPhaseShift();
 	
 	public static void init() {}
 

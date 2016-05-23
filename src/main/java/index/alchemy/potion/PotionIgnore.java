@@ -32,9 +32,9 @@ public class PotionIgnore extends AlchemyPotion implements IEventHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
-		if (event.getEntityLiving() instanceof EntityLiving && event.getEntityLiving().isNonBoss() &&
-			event.getTarget() != null && event.getTarget().isPotionActive(this) &&
-			event.getEntityLiving().getCombatTracker().getBestAttacker() != event.getTarget()) {
+		if (event.getEntityLiving() instanceof EntityLiving && event.getEntityLiving().isNonBoss()
+			&& event.getTarget() != null && event.getTarget().isPotionActive(this)
+			&& event.getEntityLiving().getCombatTracker().getBestAttacker() != event.getTarget()) {
 			EntityLiving living = (EntityLiving) event.getEntityLiving();
 			Class<EntityLivingBase> type = (Class<EntityLivingBase>) 
 					(event.getEntityLiving() instanceof EntityPlayer ? EntityPlayer.class : event.getEntityLiving().getClass());

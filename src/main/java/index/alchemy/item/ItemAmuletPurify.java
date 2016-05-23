@@ -100,13 +100,13 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean isCDOver() {
-		return getResidualCD() <= 0;
+		return getResidualCD() == 0;
 	}
 	
 	@Override

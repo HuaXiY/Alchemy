@@ -14,7 +14,6 @@ public class EnchantmentSiphonLife extends AlchemyEnchantment {
 	
 	public EnchantmentSiphonLife() {
 		super("siphon_life", Rarity.VERY_RARE, EnumEnchantmentType.WEAPON, 2, EntityEquipmentSlot.MAINHAND);
-		setTreasureEnchantment();
 	}
 
 }

@@ -14,6 +14,7 @@ import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
 import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingTime.MessageTimeLeap;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -51,13 +52,16 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@Override
 	@SideOnly(Side.CLIENT)
 	public KeyBinding[] getKeyBindings() {
-		return new KeyBinding[] {new AlchemyKeyBinding(KEY_DESCRIPTION, Keyboard.KEY_V)};
+		AlchemyModLoader.checkState();
+		return new KeyBinding[] {
+				new AlchemyKeyBinding(KEY_DESCRIPTION, Keyboard.KEY_V)
+		};
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_DESCRIPTION)
 	public void onKeyTimeLeapPressed(KeyBinding binding) {
-		if (isEquipmented(Minecraft.getMinecraft().thePlayer) && isCDOver()) {
+		if (isCDOver()) {
 			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
 			Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
 			timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
@@ -138,13 +142,13 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean isCDOver() {
-		return getResidualCD() <= 0;
+		return getResidualCD() == 0;
 	}
 	
 	@Override

@@ -26,7 +26,7 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		if (living == player) {
 			double v = 1.8, vxz = 4.2;
-			if (isCDOver() && player.isPotionActive(PotionAlacrity.this) && player.motionY < 0 &&
+			if (isCDOver() && player.motionY < 0 &&
 					Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
 				player.motionY += player.motionX == 0 && player.motionZ == 0 ? v * 1.2 : v;
 				player.motionX *= vxz;
@@ -70,13 +70,13 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
 		return Minecraft.getMinecraft().thePlayer.isPotionActive(PotionAlacrity.this) ? 
-				Math.max(0, getMaxCD() - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+				Math.max(0, getMaxCD() - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean isCDOver() {
-		return getResidualCD() <= 0;
+		return getResidualCD() == 0;
 	}
 	
 	@Override

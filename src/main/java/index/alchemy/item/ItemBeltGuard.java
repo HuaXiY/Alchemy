@@ -67,13 +67,13 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, ICoo
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - Math.max(player.getLastAttackerTime(), player.getCombatTracker().lastDamageTime))) : 0;
+				Math.max(0, getMaxCD() - (player.ticksExisted - Math.max(player.getLastAttackerTime(), player.getCombatTracker().lastDamageTime))) : -1;
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean isCDOver() {
-		return getResidualCD() <= 0;
+		return getResidualCD() == 0;
 	}
 	
 	@Override

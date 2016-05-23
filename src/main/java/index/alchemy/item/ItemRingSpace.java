@@ -36,7 +36,6 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -68,7 +67,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		if (Alway.isServer() && living.ticksExisted % 20 == 0 && living instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) living;
 			if (player.getHealth() > 0.0F && !player.isSpectator())
-				for (Entity entity : player.worldObj.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().expand(4D, 3D, 4D)))
+				for (Entity entity : player.worldObj.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().expand(5D, 5D, 5D)))
 					if (!entity.isDead && entity instanceof EntityItem)
 			        	   onCollideWithPlayer((EntityItem) entity, player);
 		}
@@ -127,7 +126,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		AlchemyModLoader.checkState();
 		return new KeyBinding[] {
 				new AlchemyKeyBinding(KEY_DESCRIPTION_OPEN, Keyboard.KEY_R),
-				new AlchemyKeyBinding(KEY_DESCRIPTION_PICKUP, Keyboard.KEY_C)};
+				new AlchemyKeyBinding(KEY_DESCRIPTION_PICKUP, Keyboard.KEY_C)
+		};
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -140,7 +140,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_DESCRIPTION_PICKUP)
 	public void onKeyPickupPressed(KeyBinding binding) {
-		if (isEquipmented(Minecraft.getMinecraft().thePlayer) && isCDOver()) {
+		if (isCDOver()) {
 			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageSpaceRingPickup());
 			restartCD();
 		}
@@ -169,9 +169,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
 		if (inventory == null)
 			return;
-		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, 
-				new AxisAlignedBB(player.posX - 5D, player.posY - 5D, player.posZ - 5D,
-						player.posX + 5D, player.posY + 5D, player.posZ + 5D));
+		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
 		List<SDouble6Package> d6p = new LinkedList<SDouble6Package>(); 
 		for (EntityItem entity : list) {
 			inventory.mergeItemStack(entity.getEntityItem());
@@ -198,10 +196,6 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		return inventory == null ? null : new GuiChest(player.inventory, inventory);
 	}
 	
-	public ItemRingSpace() {
-		this("ring_space", 9 * 6);
-	}
-	
 	public ItemRingSpace(String name, int size) {
 		super(name, 0x6600CC);
 		this.size = size;
@@ -217,13 +211,13 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : 0;
+				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean isCDOver() {
-		return getResidualCD() <= 0;
+		return getResidualCD() == 0;
 	}
 	
 	@Override
@@ -247,5 +241,9 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void renderCD(int x, int y, int w, int h) {}
+	
+	public ItemRingSpace() {
+		this("ring_space", 9 * 6);
+	}
 
 }

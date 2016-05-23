@@ -23,7 +23,7 @@ public class HUDManager {
 	public static final String CATEGORY = "HUD";
 	public static final ResourceLocation CD_BG = new AlchemyResourceLocation("textures/gui/cd.png");
 	
-	public static int render_num = 5;
+	public static int render_num = 4;
 	
 	private static final List<ICoolDown> CD = new LinkedList<ICoolDown>();
 	
@@ -44,7 +44,7 @@ public class HUDManager {
 		GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
 		GlStateManager.enableAlpha();
 		
-		int i = 0;
+		int i = -1;
 		for (ICoolDown cd : CD) {
 			float cd_per = (float) cd.getResidualCD() / cd.getMaxCD();
 			if (cd_per <= 0)
@@ -73,11 +73,11 @@ public class HUDManager {
 	}
 	
 	public static int getCDXStart(int i) {
-		return Minecraft.getMinecraft().displayWidth - (CD_SIZE + INTERVAL) *  (i % render_num);
+		return Minecraft.getMinecraft().displayWidth - (CD_SIZE + INTERVAL) *  (1 +(i % render_num));
 	}
 	
 	public static int getCDYStart(int i) {
-		return Minecraft.getMinecraft().displayHeight - (CD_SIZE + INTERVAL) * (1 + (i / render_num));
+		return Minecraft.getMinecraft().displayHeight - (CD_SIZE + INTERVAL) * (1 + (i / (render_num)));
 	}
 	
 }

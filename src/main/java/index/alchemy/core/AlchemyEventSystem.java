@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.annotation.Init;
@@ -25,6 +26,7 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -190,25 +192,28 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SideOnly(Side.CLIENT)
 	public static void registerInputHandle(final IInputHandle handle) {
 		for (KeyBinding binding : handle.getKeyBindings()) {
-			ClientRegistry.registerKeyBinding(binding);
+			if (!ArrayUtils.contains(Minecraft.getMinecraft().gameSettings.keyBindings, binding))
+				ClientRegistry.registerKeyBinding(binding);
 			String description = binding.getKeyDescription();
 			for (final Method method : handle.getClass().getMethods()) {
 				KeyEvent event = method.getAnnotation(KeyEvent.class);
-				if (event != null && event.value().equals(description))
-					KEY_MAPPING.put(binding, new Entry<IInputHandle, Method>() {
-						@Override
-						public Method setValue(Method value) {
-							return null;
-						}
-						@Override
-						public IInputHandle getKey() {
-							return handle;
-						}
-						@Override
-						public Method getValue() {
-							return method;
-						}
-					});
+				if (event != null)
+					for (String value : event.value())
+						if (value.equals(description))
+							KEY_MAPPING.put(binding, new Entry<IInputHandle, Method>() {
+								@Override
+								public Method setValue(Method value) {
+									return null;
+								}
+								@Override
+								public IInputHandle getKey() {
+									return handle;
+								}
+								@Override
+								public Method getValue() {
+									return method;
+								}
+							});
 			}
 		}
 	}

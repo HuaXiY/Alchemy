@@ -109,7 +109,8 @@ public class AlchemyModLoader {
 			is_modding = false;
 		}
 		
-		use_dmain = is_modding && Boolean.getBoolean(System.getProperty("index.alchemy.use_dmain", "false"));
+		use_dmain = is_modding && Boolean.getBoolean("index.alchemy.use_dmain");
+		logger.info("Development mode state: " + use_dmain);
 		
 		List<String> class_list = new LinkedList<String>();
 		
