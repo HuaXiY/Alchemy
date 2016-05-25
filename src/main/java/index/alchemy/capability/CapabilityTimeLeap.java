@@ -30,7 +30,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 			public final double x, y, z;
 			public final float yaw, pitch;
 			public final float health, absorption;
-			public final int food, air;
+			public final int food, air, fire;
 			
 			public TimeNode(EntityPlayer player) {
 				x = player.posX;
@@ -42,6 +42,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 				absorption = player.getAbsorptionAmount();
 				food = player.getFoodStats().getFoodLevel();
 				air = player.getAir();
+				fire = player.fire;
 			}
 			
 			@SideOnly(Side.CLIENT)
@@ -49,6 +50,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 				player.setPosition(x, y, z);
 				player.rotationYaw = yaw;
 				player.rotationPitch = pitch;
+				player.fire = fire;
 				player.motionX = 0;
 				player.motionY = 0;
 				player.motionZ = 0;
@@ -59,6 +61,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 				player.setAbsorptionAmount(absorption);
 				player.getFoodStats().setFoodLevel(food);
 				player.setAir(air);
+				player.fire = fire;
 				player.motionX = 0;
 				player.motionY = 0;
 				player.motionZ = 0;

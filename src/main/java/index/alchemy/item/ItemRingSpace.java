@@ -10,6 +10,7 @@ import index.alchemy.api.Alway;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
+import index.alchemy.api.IItemInventory;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.core.AlchemyModLoader;
@@ -46,7 +47,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
-	public static final String NBT_KEY_CD = "ring_space", KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
+	public static final String NBT_KEY_CD = "cd_ring_space", KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
 	protected int size;
 	

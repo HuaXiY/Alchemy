@@ -35,7 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
 	public static final int USE_CD = 20 * 20;
-	public static final String NBT_KEY_CD = "ring_time", KEY_DESCRIPTION = "key.time_ring_leap";
+	public static final String NBT_KEY_CD = "cd_ring_time", KEY_DESCRIPTION = "key.time_ring_leap";
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {

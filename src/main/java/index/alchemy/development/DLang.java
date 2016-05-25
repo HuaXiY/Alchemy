@@ -1,9 +1,9 @@
 package index.alchemy.development;
 
 import index.alchemy.annotation.DInit;
+import index.alchemy.api.IItemInventory;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
-import index.alchemy.item.IItemInventory;
 import index.alchemy.item.ItemMagicSolvent;
 import index.alchemy.util.Tool;
 

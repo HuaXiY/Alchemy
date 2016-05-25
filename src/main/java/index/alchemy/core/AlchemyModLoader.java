@@ -26,6 +26,7 @@ import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
+import index.alchemy.world.AlchemyDimensionType;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -156,6 +157,7 @@ public class AlchemyModLoader {
 						DMain.init(clazz);
 					AlchemyConfigLoader.init(clazz);
 					AlchemyNetworkHandler.init(clazz);
+					AlchemyDimensionType.init(clazz);
 					Init init = clazz.getAnnotation(Init.class);
 					SideOnly side = clazz.getAnnotation(SideOnly.class);
 					if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))

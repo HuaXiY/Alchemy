@@ -1,6 +1,7 @@
 package index.alchemy.item;
 
 import index.alchemy.api.Alway;
+import index.alchemy.api.IBaubleEquipment;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

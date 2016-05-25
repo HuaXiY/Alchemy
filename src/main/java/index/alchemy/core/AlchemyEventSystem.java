@@ -64,8 +64,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 			ORE_GEN_BUS = new EventType[]{ EventType.ORE_GEN_BUS };
 	
 	private static final List<IPlayerTickable> 
-			SERVER_TICKABLE = new LinkedList<IPlayerTickable>(),
-			CLIENT_TICKABLE = new LinkedList<IPlayerTickable>();
+			SERVER_TICKABLE = new ArrayList<IPlayerTickable>(),
+			CLIENT_TICKABLE = new ArrayList<IPlayerTickable>();
 	
 	private static final List<IContinuedRunnable>
 			SERVER_RUNNABLE = new LinkedList<IContinuedRunnable>(),
@@ -128,6 +128,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onServerTick(ServerTickEvent event) {
+		String flag = "1";
+		if (!System.getProperty("index.alchemy.runtime.debug", "").equals(flag)) {
+			// runtime do some thing
+			{
+				
+			}
+			System.setProperty("index.alchemy.runtime.debug", flag);
+		}
 		if (!SERVER_RUNNABLE.isEmpty()) {
 			for (IContinuedRunnable runnable : SERVER_RUNNABLE)
 				if (runnable.run(event.phase))

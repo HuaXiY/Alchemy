@@ -46,7 +46,7 @@ public class HUDManager {
 		
 		int i = -1;
 		for (ICoolDown cd : CD) {
-			float cd_per = (float) cd.getResidualCD() / cd.getMaxCD();
+			float cd_per = Math.min((float) cd.getResidualCD() / cd.getMaxCD(), 1);
 			if (cd_per <= 0)
 				continue;
 			++i;
@@ -62,8 +62,7 @@ public class HUDManager {
 			int id = cd.getRenderID();
 			if (id > -1)
 				gui.drawTexturedModalRect(x, y, CD_SIZE * (id % ON_ROW), CD_SIZE * (id / ON_ROW), CD_SIZE, CD_SIZE);
-			else
-				cd.renderCD(x, y, CD_SIZE, CD_SIZE);
+			cd.renderCD(x, y, CD_SIZE, CD_SIZE);
 			
 			glDisable(GL_COLOR_ARRAY);
 			int cd_per_len = (int) ((CD_SIZE - 8) * cd_per);

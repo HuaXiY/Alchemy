@@ -1,4 +1,4 @@
-package index.alchemy.item;
+package index.alchemy.api;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

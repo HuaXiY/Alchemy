@@ -21,7 +21,7 @@ public class ModItems {
 	
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface ItemTransform {
+	private @interface ItemTransform {
 		
 		public String value() default "";
 
