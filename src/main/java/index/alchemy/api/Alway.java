@@ -39,7 +39,7 @@ public class Alway {
 	}
 	
 	public static BiomeGenBase getCurrentBiome(EntityPlayer player) {
-		return player.worldObj.getBiomeGenForCoords(new BlockPos((int) player.posX, 0, (int) player.posZ));
+		return getCurrentBiome(player.worldObj, (int) player.posX, (int) player.posZ);
 	}
 	
 	public static BiomeGenBase getCurrentBiome(World world, int x, int z) {

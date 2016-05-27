@@ -5,10 +5,11 @@ import java.util.Iterator;
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.annotation.KeyEvent;
+import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.ICoolDown;
-import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
@@ -90,45 +91,57 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@SideOnly(Side.CLIENT)
 	public void timeLeapOnClinet(final EntityPlayer player) {
 		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
-		final Iterator<TimeNode> iterator = snapshot.list.iterator();
-		snapshot.setUpdate(false);
-		player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
-		AlchemyEventSystem.addInputHook(this);
-		AlchemyEventSystem.addContinuedRunnable(new IIndexRunnable() {
-			int flag = TimeSnapshot.SIZE / 2 - 1;
-			@Override
-			public boolean run(int index, Phase phase) {
-				boolean result = false;
-				if (iterator.hasNext())
-					iterator.next().updatePlayerOnClient(player);
-				if (result = index >= flag) {
-					snapshot.setUpdate(true);
-					AlchemyEventSystem.removeInputHook(ItemRingTime.this);
+		if (snapshot.isUpdate()) {
+			snapshot.setUpdate(false);
+			AlchemyEventSystem.addInputHook(this);
+			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
+				@Override
+				public void run(Phase phase) {
+					player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
 				}
-				return result;
-			}
-		}, TimeSnapshot.SIZE / 2, Side.CLIENT);
+			}, 0, Side.SERVER);
+			final Iterator<TimeNode> iterator = snapshot.list.iterator();
+			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
+				@Override
+				public boolean run(Phase phase) {
+					if (iterator.hasNext())
+						iterator.next().updatePlayerOnClient(player);
+					if (!iterator.hasNext()) {
+						snapshot.setUpdate(true);
+						AlchemyEventSystem.removeInputHook(ItemRingTime.this);
+						return true;
+					}
+					return false;
+				}
+			}, Side.CLIENT);
+		}
 	}
 	
-	public void timeLeapOnServer(final EntityPlayer player) {
+	public void timeLeapOnServer(final EntityPlayer player) {	
 		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
-		final Iterator<TimeNode> iterator = snapshot.list.iterator();
 		if (isEquipmented(player) && snapshot.isUpdate()) {
 			snapshot.setUpdate(false);
-			player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
-			player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, TimeSnapshot.SIZE / 2, 3));
-			AlchemyEventSystem.addContinuedRunnable(new IIndexRunnable() {
-				int flag = TimeSnapshot.SIZE / 2 - 1;
+			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 				@Override
-				public boolean run(int index, Phase phase) {
+				public void run(Phase phase) {
+					player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
+					player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, TimeSnapshot.SIZE / 2, 3));
+				}
+			}, 0, Side.SERVER);
+			final Iterator<TimeNode> iterator = snapshot.list.iterator();
+			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
+				@Override
+				public boolean run(Phase phase) {
 					boolean result = false;
 					if (iterator.hasNext())
 						iterator.next().updatePlayerOnServer(player);
-					if (result = index >= flag)
+					if (!iterator.hasNext()) {
 						snapshot.setUpdate(true);
-					return result;
+						return true;
+					}
+					return false;
 				}
-			}, TimeSnapshot.SIZE / 2, Side.SERVER);
+			}, Side.SERVER);
 		}
 	}
 	

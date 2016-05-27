@@ -39,6 +39,8 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -47,14 +49,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3;
-	public static final String NBT_KEY_CD = "cd_ring_space", KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
+	public static final String NBT_KEY_CD = "cd_ring_space",
+			KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
 	protected int size;
 	
 	@Override
 	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item) {
-		if (item == null)
-			return null;
 		return new ItemInventory(player, item, size, I18n.translateToLocal(getInventoryUnlocalizedName()));
 	}
 	
@@ -65,7 +66,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer() && living.ticksExisted % 20 == 0 && living instanceof EntityPlayer) {
+		if (Alway.isServer() && living instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) living;
 			if (player.getHealth() > 0.0F && !player.isSpectator())
 				for (Entity entity : player.worldObj.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().expand(5D, 5D, 5D)))
@@ -80,7 +81,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
         ItemStack itemstack = entity.getEntityItem();
         int i = itemstack.stackSize;
 
-        int hook = net.minecraftforge.event.ForgeEventFactory.onItemPickup(entity, player, itemstack);
+        int hook = ForgeEventFactory.onItemPickup(entity, player, itemstack);
         if (hook < 0)
         	return;
 
@@ -107,7 +108,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
                 	entityplayer.addStat(AchievementList.DIAMONDS_TO_YOU);
             }
 
-            net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerItemPickupEvent(player, entity);
+            FMLCommonHandler.instance().firePlayerItemPickupEvent(player, entity);
             if (!entity.isSilent())
             	entity.worldObj.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F,
             			((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
@@ -192,16 +193,12 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(EntityPlayer player, World world, int x, int y, int z) {
 		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
 		return inventory == null ? null : new GuiChest(player.inventory, inventory);
 	}
 	
-	public ItemRingSpace(String name, int size) {
-		super(name, 0x6600CC);
-		this.size = size;
-	}
-
 	@Override
 	public int getMaxCD() {
 		return PICKUP_CD;
@@ -245,6 +242,11 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	public ItemRingSpace() {
 		this("ring_space", 9 * 6);
+	}
+	
+	public ItemRingSpace(String name, int size) {
+		super(name, 0x6600CC);
+		this.size = size;
 	}
 
 }
