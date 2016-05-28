@@ -6,11 +6,14 @@ import java.util.Map;
 
 import index.alchemy.annotation.Change;
 import index.alchemy.annotation.Init;
+import index.alchemy.block.proxy.PBlockCauldron;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntIdentityHashBiMap;
@@ -30,8 +33,8 @@ public class AlchemyBlockLoader {
 	}
 	
 	private static void replaceBlock() {
-		/*replaceBlock(Blocks.brewing_stand, BlockBrewingStandProxy.class, null,
-				(ItemBlockSpecial) Items.brewing_stand, TileEntityBrewingStandProxy.class, "Cauldron");*/
+		replaceBlock(Blocks.CAULDRON, PBlockCauldron.class, null,
+				(ItemBlockSpecial) Items.CAULDRON, TileEntityCauldron.class, "AlchemyCauldron");
 	}
 	
 	// TODO

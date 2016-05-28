@@ -1,88 +1,90 @@
 //MODID
-Alchemy=Alchemy
+Alchemy=炼金术
 
 //itemMap
-item.lapis_lazuli.name=
-item.scroll_boom.name=
-item.scroll_ice_screen.name=
-item.scroll_lightning.name=
-item.scroll_tp.name=
-item.ring_space.name=
-item.ring_time.name=
-item.ring_alive.name=
-item.ring_blessing.name=
-item.belt_guard.name=
-item.belt_tough.name=
-item.amulet_heal.name=
-item.amulet_purify.name=
+item.lapis_lazuli.name=青金石溶液
+item.scroll_boom.name=爆炸卷轴
+item.scroll_ice_screen.name=冰墙卷轴
+item.scroll_lightning.name=落雷卷轴
+item.scroll_tp.name=传送卷轴
+item.ring_space.name=空间戒指
+item.ring_time.name=时间戒指
+item.ring_alive.name=生灵戒指
+item.ring_blessing.name=祝福戒指
+item.belt_guard.name=守护腰带
+item.belt_tough.name=坚韧腰带
+item.amulet_heal.name=生命吊坠
+item.amulet_purify.name=净化吊坠
 
 //blockMap
-tile.ice_temp.name=
+tile.ice_temp.name=冰墙
 
 //potionMap
-effect.feather_fall=
-effect.alacrity=
-effect.soul_withered=
-effect.eternal=
-effect.dead_or_alive=
-effect.multiple_xp=
-effect.ignore=
-potion.effect.unluck=
-splash_potion.effect.unluck=
-lingering_potion.effect.unluck=
-tipped_arrow.effect.unluck=
-potion.effect.feather_fall=
-splash_potion.effect.feather_fall=
-lingering_potion.effect.feather_fall=
-tipped_arrow.effect.feather_fall=
-potion.effect.hunger=
-splash_potion.effect.hunger=
-lingering_potion.effect.hunger=
-tipped_arrow.effect.hunger=
-potion.effect.haste=
-splash_potion.effect.haste=
-lingering_potion.effect.haste=
-tipped_arrow.effect.haste=
-potion.effect.resistance=
-splash_potion.effect.resistance=
-lingering_potion.effect.resistance=
-tipped_arrow.effect.resistance=
-potion.effect.alacrity=
-splash_potion.effect.alacrity=
-lingering_potion.effect.alacrity=
-tipped_arrow.effect.alacrity=
-potion.effect.eternal=
-splash_potion.effect.eternal=
-lingering_potion.effect.eternal=
-tipped_arrow.effect.eternal=
-potion.effect.multiple_xp=
-splash_potion.effect.multiple_xp=
-lingering_potion.effect.multiple_xp=
-tipped_arrow.effect.multiple_xp=
-potion.effect.ignore=
-splash_potion.effect.ignore=
-lingering_potion.effect.ignore=
-tipped_arrow.effect.ignore=
-potion.effect.dead_or_alive=
-splash_potion.effect.dead_or_alive=
-lingering_potion.effect.dead_or_alive=
-tipped_arrow.effect.dead_or_alive=
+effect.feather_fall=羽落
+effect.alacrity=敏捷
+effect.soul_withered=灵魂枯萎
+effect.eternal=永恒
+effect.dead_or_alive=死或生
+effect.multiple_xp=多倍经验
+effect.ignore=忽视
+potion.effect.unluck=厄运药水
+splash_potion.effect.unluck=喷溅型 厄运药水
+lingering_potion.effect.unluck=滞留型 厄运药水
+tipped_arrow.effect.unluck=药箭
+potion.effect.feather_fall=羽落药水
+splash_potion.effect.feather_fall=喷溅型 羽落药水
+lingering_potion.effect.feather_fall=滞留型 羽落药水
+tipped_arrow.effect.feather_fall=药箭
+potion.effect.hunger=饥饿药水
+splash_potion.effect.hunger=喷溅型 饥饿药水
+lingering_potion.effect.hunger=滞留型 饥饿药水
+tipped_arrow.effect.hunger=药箭
+potion.effect.haste=急迫药水
+splash_potion.effect.haste=喷溅型 急迫药水
+lingering_potion.effect.haste=滞留型 急迫药水
+tipped_arrow.effect.haste=药箭
+potion.effect.resistance=抵抗药水
+splash_potion.effect.resistance=喷溅型 抵抗药水
+lingering_potion.effect.resistance=滞留型 抵抗药水
+tipped_arrow.effect.resistance=药箭
+potion.effect.alacrity=敏捷药水
+splash_potion.effect.alacrity=喷溅型 敏捷药水
+lingering_potion.effect.alacrity=滞留型 敏捷药水
+tipped_arrow.effect.alacrity=药箭
+potion.effect.eternal=永恒药水
+splash_potion.effect.eternal=喷溅型 永恒药水
+lingering_potion.effect.eternal=滞留型 永恒药水
+tipped_arrow.effect.eternal=药箭
+potion.effect.multiple_xp=经验药水
+splash_potion.effect.multiple_xp=喷溅型 经验药水
+lingering_potion.effect.multiple_xp=滞留型 经验药水
+tipped_arrow.effect.multiple_xp=药箭
+potion.effect.ignore=忽视药水
+splash_potion.effect.ignore=喷溅型 忽视药水
+lingering_potion.effect.ignore=滞留型 忽视药水
+tipped_arrow.effect.ignore=药箭
+potion.effect.dead_or_alive=死或生药水
+splash_potion.effect.dead_or_alive=喷溅型 死或生药水
+lingering_potion.effect.dead_or_alive=滞留型 死或生药水
+tipped_arrow.effect.dead_or_alive=药箭
 
 //enchantmentMap
-enchantment.null=
+enchantment.siphon_life=生命吸取
+enchantment.double_jump=二段跳
+enchantment.phase_shift=相位移动
 
 //keyMap
 key.space_ring_open=打开空间戒指
 key.space_ring_pickup=收进空间戒指
-key.time_ring_leap=
+key.time_ring_leap=时间跳跃
 
 //damageMap
-death.attack.soul_withred=%1$s
-death.attack.dead_magic=%1$s
-death.attack.plague=%1$s
+death.attack.soul_withred=%1$s 灵魂支离破碎
+death.attack.dead_magic=%1$s 未能通过生死的考验
+death.attack.plague=%1$s 死于瘟疫
 
 //inventoryMap
-inventory.ring_space=
+inventory.ring_space=空间戒指
 
 //miscMap
 solvent.type.null=

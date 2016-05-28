@@ -48,15 +48,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
-	public static final int PICKUP_CD = 20 * 3;
+	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
 	public static final String NBT_KEY_CD = "cd_ring_space",
 			KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
-	protected int size;
-	
 	@Override
 	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item) {
-		return new ItemInventory(player, item, size, I18n.translateToLocal(getInventoryUnlocalizedName()));
+		return new ItemInventory(player, item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
 	}
 	
 	@Override
@@ -241,12 +239,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	public void renderCD(int x, int y, int w, int h) {}
 	
 	public ItemRingSpace() {
-		this("ring_space", 9 * 6);
+		super("ring_space", 0xE451F2);
 	}
 	
-	public ItemRingSpace(String name, int size) {
-		super(name, 0x6600CC);
-		this.size = size;
-	}
-
 }

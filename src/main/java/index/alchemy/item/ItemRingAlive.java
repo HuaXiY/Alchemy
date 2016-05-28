@@ -9,18 +9,19 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ItemRingAlive extends AlchemyItemRing implements IEventHandle {
 	
-	public static final int RADIUS = 15;
+	public static final int RADIUS = 12;
 	
 	@Override
 	public EventType[] getEventType() {
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingDeath(LivingDeathEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
 		if (living.getCreatureAttribute() != EnumCreatureAttribute.UNDEAD)
@@ -30,7 +31,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IEventHandle {
 	}
 
 	public ItemRingAlive() {
-		super("ring_alive", 0xED343A);
+		super("ring_alive", 0x7E23D4);
 	}
 
 }

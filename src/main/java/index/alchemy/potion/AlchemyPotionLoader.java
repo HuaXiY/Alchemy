@@ -34,7 +34,7 @@ public class AlchemyPotionLoader extends PotionType {
 			eternal = new PotionEternal(),
 			dead_or_alive = new PotionDeadOrAlive(),
 			multiple_xp = new PotionMultipleXP(),
-			ignore = new PotionIgnore();
+			ignore = new PotionElapse();
 	
 	public static final Predicate<ItemStack> 
 			nether_wart = getItemPredicate(Items.NETHER_WART),

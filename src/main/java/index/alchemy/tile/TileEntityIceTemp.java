@@ -8,6 +8,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 
 public class TileEntityIceTemp extends TileEntity implements ITickable {
+	
 	public int time = 80;
 	
 	@Override
@@ -20,4 +21,5 @@ public class TileEntityIceTemp extends TileEntity implements ITickable {
 			worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, pos.getX(), pos.getY(), pos.getZ(), .5, .5, .5);
 		}
 	}
+	
 }

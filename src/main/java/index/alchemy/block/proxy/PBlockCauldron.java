@@ -27,7 +27,9 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity {
 	}
 	
 	public PBlockCauldron() {
-		AlchemyInitHook.init_impl(this);
+		setHardness(2.0F);
+		setUnlocalizedName("cauldron");
+		AlchemyInitHook.init(this);
 	}
 
 }

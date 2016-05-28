@@ -35,7 +35,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, ICoo
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGH)
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onLivingHurt(LivingHurtEvent event) {
 		if (isEquipmented(event.getEntityLiving()) && event.getEntityLiving().getAbsorptionAmount() > 0F)
 			event.setAmount(event.getAmount() * DECREASE);

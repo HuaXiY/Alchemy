@@ -187,7 +187,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public void renderCD(int x, int y, int w, int h) {}
 	
 	public ItemRingTime() {
-		super("ring_time", 0xFFFFFF);
+		super("ring_time", 0xFFBA31);
 	}
 
 }

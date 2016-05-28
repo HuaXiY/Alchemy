@@ -13,7 +13,7 @@ import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class PotionIgnore extends AlchemyPotion implements IEventHandle {
+public class PotionElapse extends AlchemyPotion implements IEventHandle {
 	
 	public static final Predicate<EntityLivingBase> NOT_ACTIVE = new Predicate<EntityLivingBase>() {
         public boolean apply(EntityLivingBase player) {
@@ -21,8 +21,8 @@ public class PotionIgnore extends AlchemyPotion implements IEventHandle {
         }
     };
 	
-	public PotionIgnore() {
-		super("ignore", false, 0xFFFFFF);
+	public PotionElapse() {
+		super("elapse", false, 0xFFFFFF);
 	}
 	
 	@Override

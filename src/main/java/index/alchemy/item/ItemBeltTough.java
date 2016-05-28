@@ -16,17 +16,19 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 6;
-	public static final float BALANCE_COEFFICIENT = 0.3F;
+	public static final float BALANCE_COEFFICIENT = 0.4F;
 	
 	public static final AttributeModifier KNOCKBACK_RESISTANCE =  new AttributeModifier("belt_tough_bonus", 1D, 0);
 	
 	@Override
 	public void onEquipped(ItemStack item, EntityLivingBase living) {
+		System.out.println("onEquipped");
 		living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).applyModifier(KNOCKBACK_RESISTANCE);
 	}
 
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
+		System.out.println("onUnequipped");
 		living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).removeModifier(KNOCKBACK_RESISTANCE);
 	}
 	
@@ -41,7 +43,7 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGH)
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onLivingHurt(LivingHurtEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
 		if (isEquipmented(living))

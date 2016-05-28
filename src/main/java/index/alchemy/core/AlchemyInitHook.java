@@ -52,7 +52,19 @@ public class AlchemyInitHook {
 	}
 	
 	public static void init_impl(Impl impl) {
+		
+		AlchemyModLoader.checkState();
+		
+		GameRegistry.register(impl);
+		
+		if (impl instanceof Block)
+			init(new ItemBlock((Block) impl).setRegistryName(((Block) impl).getRegistryName()));
+		
+		if (impl instanceof ITileEntity)
+			GameRegistry.registerTileEntity(((ITileEntity) impl).getTileEntityClass(), ((ITileEntity) impl).getTileEntityName());
+		
 		init(impl);
+		
 	}
 	
 	@Change
@@ -60,15 +72,6 @@ public class AlchemyInitHook {
 				   R extends Item & IResourceLocation, C> void init(Object obj) {
 		
 		AlchemyModLoader.checkState();
-		
-		if (obj instanceof Impl)
-			GameRegistry.register((Impl) obj);
-		
-		if (obj instanceof Block)
-			init(new ItemBlock((Block) obj).setRegistryName(((Block) obj).getRegistryName()));
-		
-		if (obj instanceof ITileEntity)
-			GameRegistry.registerTileEntity(((ITileEntity) obj).getTileEntityClass(), ((ITileEntity) obj).getTileEntityName());
 		
 		if (obj instanceof IOreDictionary)
 			OreDictionary.registerOre(((IOreDictionary) obj).getNameInOreDictionary(), ((IOreDictionary) obj).getItemStackInOreDictionary());

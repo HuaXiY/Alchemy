@@ -48,12 +48,22 @@ public class ModItems {
 	@Deprecated
 	@Source(BOPBlocks.class)
 	public static final  Item 
+			bop$mushroom = null,
 			bop$flower_0 = null,
 			bop$flower_1 = null;
 	
+	@ItemTransform( "bop$mushroom")
+	public static final ItemStack
+			bop$mushroom_toadstool = null,				//  毒菌
+			bop$mushroom_portobello = null,			//  双胞蘑菇
+			bop$mushroom_blue_milk_cap = null,		//  蓝牛奶伞菌
+			bop$mushroom_glowshroom = null,		//  夜光菇
+			bop$mushroom_flat_mushroom = null,	//  平菇
+			bop$mushroom_shadow_shroom = null;	//  影菇
+	
 	@ItemTransform( "bop$flower_0")
 	public static final ItemStack
-			bop$flower_clover = null,							//  苜蓿 ---- 混沌
+			bop$flower_clover = null,							//  苜蓿 ---- 坚韧
 			bop$flower_swampflower = null,				//  沼泽花 ---- 黑暗
 			bop$flower_deathbloom = null,				//  死亡花 ---- 堕化
 			bop$flower_glowflower = null,				//  闪光花 ---- 光明

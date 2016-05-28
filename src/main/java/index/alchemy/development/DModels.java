@@ -32,6 +32,8 @@ public class DModels {
 	public static void init(Item item) {
 		ResourceLocation name = item instanceof IResourceLocation ? ((IResourceLocation) item).getResourceLocation() : 
 			item.getRegistryName();
+		if (name == null)
+			return;
 		File file = new File(models_dir + "/item", name.getResourcePath() + SUFFIX);
 		if (!file.exists())
 			try {
@@ -44,6 +46,8 @@ public class DModels {
 	public static void init(Block block) {
 		ResourceLocation name = block instanceof IResourceLocation ? ((IResourceLocation) block).getResourceLocation() : 
 			block.getRegistryName();
+		if (name == null)
+			return;
 		File file = new File(models_dir + "/block", name.getResourcePath() + SUFFIX);
 		if (!file.exists())
 			try {

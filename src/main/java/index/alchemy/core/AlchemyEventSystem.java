@@ -2,12 +2,9 @@ package index.alchemy.core;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -30,6 +27,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.MinecraftForge;
@@ -58,6 +56,32 @@ public class AlchemyEventSystem implements IGuiHandler {
 		ORE_GEN_BUS
 	}
 	
+	private static class KeyBindingHandle {
+		
+		private final KeyBinding binding;
+		private final IInputHandle handle;
+		private final Method method;
+		
+		public KeyBindingHandle(KeyBinding binding, IInputHandle handle, Method method) {
+			this.binding = binding;
+			this.handle = handle;
+			this.method = method;
+		}
+		
+		public KeyBinding getBinding() {
+			return binding;
+		}
+		
+		public IInputHandle getHandle() {
+			return handle;
+		}
+		
+		public Method getMethod() {
+			return method;
+		}
+		
+	}
+	
 	public static final EventType[]
 			EVENT_BUS = new EventType[]{ EventType.EVENT_BUS },
 			TERRAIN_GEN_BUS = new EventType[]{ EventType.TERRAIN_GEN_BUS },
@@ -73,13 +97,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 			CLIENT_RUNNABLE = new LinkedList<IContinuedRunnable>(),
 			CLIENT_TEMP = new LinkedList<IContinuedRunnable>();
 	
-	private static final List<IGuiHandle> GUI_HANDLE = new ArrayList<IGuiHandle>();
+	private static final List<IGuiHandle> GUI_HANDLES = new ArrayList<IGuiHandle>();
 	
 	private static final Set<Object> HOOK_INPUT = new HashSet<Object>();
 	
 	private static boolean hookInputState = false;
 	
-	private static final Map<KeyBinding, Entry<IInputHandle, Method>> KEY_MAPPING = new HashMap<KeyBinding, Entry<IInputHandle, Method>>();
+	private static final List<KeyBindingHandle> KEY_HANDELS = new ArrayList<KeyBindingHandle>();
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		AlchemyModLoader.checkState();
@@ -165,22 +189,22 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	public static synchronized void registerGuiHandle(IGuiHandle handle) {
 		AlchemyModLoader.checkState();
-		GUI_HANDLE.add(handle);
+		GUI_HANDLES.add(handle);
 	}
 	
 	public static int getGuiIdByGuiHandle(IGuiHandle handle) {
-		return GUI_HANDLE.indexOf(handle);
+		return GUI_HANDLES.indexOf(handle);
 	}
 	
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-		return GUI_HANDLE.get(id).getServerGuiElement(player, world, x, y, z);
+		return GUI_HANDLES.get(id).getServerGuiElement(player, world, x, y, z);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-		return GUI_HANDLE.get(id).getClientGuiElement(player, world, x, y, z);
+		return GUI_HANDLES.get(id).getClientGuiElement(player, world, x, y, z);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -208,20 +232,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 				if (event != null)
 					for (String value : event.value())
 						if (value.equals(description))
-							KEY_MAPPING.put(binding, new Entry<IInputHandle, Method>() {
-								@Override
-								public Method setValue(Method value) {
-									return null;
-								}
-								@Override
-								public IInputHandle getKey() {
-									return handle;
-								}
-								@Override
-								public Method getValue() {
-									return method;
-								}
-							});
+							KEY_HANDELS.add(new KeyBindingHandle(binding, handle, method));
 			}
 		}
 	}
@@ -232,13 +243,20 @@ public class AlchemyEventSystem implements IGuiHandler {
 		if (hookInputState)
 			KeyBinding.unPressAllKeys();
 		else 
-			for (Entry<KeyBinding, Entry<IInputHandle, Method>> entry : KEY_MAPPING.entrySet())
-				if (Keyboard.isKeyDown(entry.getKey().getKeyCode()))
+			for (KeyBindingHandle handle : KEY_HANDELS)
+				if (Keyboard.isKeyDown(handle.getBinding().getKeyCode()))
 					try {
-						entry.getValue().getValue().invoke(entry.getValue().getKey(), entry.getKey());
+						handle.getMethod().invoke(handle.getHandle(), handle.getBinding());
 					} catch (Exception e) {
 						throw new AlchemyRuntimeExcption(e);
 					}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onMouseInput(MouseEvent event) {
+		if (hookInputState)
+			event.setCanceled(true);
 	}
 	
 	@SubscribeEvent

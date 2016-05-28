@@ -45,6 +45,7 @@ public class AlchemyEnchantment extends Enchantment implements IRegister {
 		super(rarity, type, slots);
 		this.max_level = max_level;
 		setTreasureEnchantment();
+		setName(name);
 		setRegistryName(name);
 		register();
 	}

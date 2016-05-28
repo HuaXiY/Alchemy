@@ -23,6 +23,8 @@ public class DBlockState {
 		if (obj instanceof Block) {
 			ResourceLocation name = obj instanceof IResourceLocation ? ((IResourceLocation) obj).getResourceLocation() : 
 				((Block) obj).getRegistryName();
+			if (name == null)
+				return;
 			File file = new File(states_dir, name.getResourcePath() + SUFFIX);
 			if (!file.exists())
 				try {

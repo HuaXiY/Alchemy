@@ -19,7 +19,7 @@ public class PotionMultipleXP extends AlchemyPotion implements IEventHandle {
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onPlayerPickupXP(PlayerPickupXpEvent event) {
 		PotionEffect effect = event.getEntityPlayer().getActivePotionEffect(AlchemyPotionLoader.multiple_xp);
 		if (effect != null)

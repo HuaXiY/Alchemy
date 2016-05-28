@@ -69,7 +69,9 @@ lingering_potion.effect.dead_or_alive=
 tipped_arrow.effect.dead_or_alive=
 
 //enchantmentMap
-enchantment.null=
+enchantment.siphon_life=
+enchantment.double_jump=
+enchantment.phase_shift=
 
 //keyMap
 key.space_ring_open=
