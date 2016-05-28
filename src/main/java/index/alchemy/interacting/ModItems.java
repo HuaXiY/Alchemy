@@ -6,8 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
-import biomesoplenty.api.block.BOPBlocks;
-import biomesoplenty.api.item.BOPItems;
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.Source;
 import index.alchemy.util.FinalFieldSetter;
@@ -30,7 +28,7 @@ public class ModItems {
 	//  Biomes O' Plenty
 
 	@Deprecated
-	@Source(BOPItems.class)
+	@Source(biomesoplenty.api.item.BOPItems.class)
 	public static final Item 
 			bop$gem = null;
 	
@@ -46,7 +44,7 @@ public class ModItems {
 			bop$gem_amber = null;								//  琥珀  ---- 时间
 	
 	@Deprecated
-	@Source(BOPBlocks.class)
+	@Source(biomesoplenty.api.block.BOPBlocks.class)
 	public static final  Item 
 			bop$mushroom = null,
 			bop$flower_0 = null,

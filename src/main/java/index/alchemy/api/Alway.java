@@ -3,11 +3,12 @@ package index.alchemy.api;
 import java.util.HashMap;
 import java.util.Map;
 
+import biomesoplenty.common.biome.overworld.BiomeGenAlps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -38,11 +39,11 @@ public class Alway {
 		return getSide().isClient();
 	}
 	
-	public static BiomeGenBase getCurrentBiome(EntityPlayer player) {
+	public static Biome getCurrentBiome(EntityPlayer player) {
 		return getCurrentBiome(player.worldObj, (int) player.posX, (int) player.posZ);
 	}
 	
-	public static BiomeGenBase getCurrentBiome(World world, int x, int z) {
+	public static Biome getCurrentBiome(World world, int x, int z) {
 		return world.getBiomeGenForCoords(new BlockPos(x, 0, z));
 	}
 	
