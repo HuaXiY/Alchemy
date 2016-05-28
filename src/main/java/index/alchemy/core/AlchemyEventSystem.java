@@ -126,6 +126,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 			int c_tick = tick;
 			@Override
 			public boolean run(Phase phase) {
+				runnable.run(phase);
 				return c_tick < 1 || phase == Phase.START && --c_tick < 1;
 			}
 		}, side);
