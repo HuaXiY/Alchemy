@@ -3,7 +3,6 @@ package index.alchemy.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import biomesoplenty.common.biome.overworld.BiomeGenAlps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -44,7 +43,7 @@ public class Alway {
 	}
 	
 	public static Biome getCurrentBiome(World world, int x, int z) {
-		return world.getBiomeGenForCoords(new BlockPos(x, 0, z));
+		return world.getBiomeForCoordsBody(new BlockPos(x, 0, z));
 	}
 	
 }

@@ -18,6 +18,6 @@ Member:
   </ul>
 <hr>
 Minecraft version: 1.9.4<br>
-Forge version: 12.17.0.1922-1.9.4<br>
-MCP version: snapshot_20160527<br>
+Forge version: 1.9.4-12.17.0.1931-1.9.4<br>
+MCP version: snapshot_20160528<br>
 Development state: informal version<br>

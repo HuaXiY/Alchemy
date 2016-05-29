@@ -71,7 +71,7 @@ public class AlchemyBlockLoader {
     					Tool.<IntIdentityHashBiMap>get(RegistryNamespaced.class, 0, registry).put(newBlock, id);
     					
     					Map map = Tool.<Map>get(RegistryNamespaced.class, 1, registry);
-    					map.remove(toReplace, registryName);
+    					map.remove(toReplace);
     					map.put(newBlock, registryName);
     					
     					if (item != null) {
