@@ -89,6 +89,8 @@ public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputH
 	@SideOnly(Side.CLIENT)
 	public int getNumber() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		if (EnchantmentHelper.getEnchantmentLevel(this, player.inventory.armorInventory[0]) <= 0)
+			return -1;
 		return PHASE_SHIFT_CD_NUM - (int) Math.ceil((double) Math.max(0,
 				getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) / PHASE_SHIFT_CD);
 	}
