@@ -19,6 +19,7 @@ import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
+import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
@@ -153,11 +154,12 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onServerTick(ServerTickEvent event) {
-		String flag = "1";
+		String flag = "4";
 		if (!System.getProperty("index.alchemy.runtime.debug", "").equals(flag)) {
 			// runtime do some thing
 			{
-				
+				System.out.println(AlchemyCapabilityLoader.time_leap);
+				System.out.println(AlchemyCapabilityLoader.bauble);
 			}
 			System.setProperty("index.alchemy.runtime.debug", flag);
 		}

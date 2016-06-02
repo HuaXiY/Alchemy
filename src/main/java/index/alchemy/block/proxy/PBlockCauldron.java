@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import index.alchemy.annotation.Change;
 import index.alchemy.api.Alway;
+import index.alchemy.api.IRegister;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.api.event.CauldronActivatedEvent;
 import index.alchemy.core.AlchemyInitHook;
@@ -32,7 +33,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
 @Change
-public class PBlockCauldron extends BlockCauldron implements ITileEntity {
+public class PBlockCauldron extends BlockCauldron implements ITileEntity, IRegister {
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
@@ -128,6 +129,11 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity {
 	public PBlockCauldron() {
 		setHardness(2.0F);
 		setUnlocalizedName("cauldron");
+		register();
+	}
+
+	@Override
+	public void register() {
 		AlchemyInitHook.init(this);
 	}
 

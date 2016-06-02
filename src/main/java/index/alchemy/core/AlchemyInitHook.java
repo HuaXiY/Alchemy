@@ -1,9 +1,8 @@
 package index.alchemy.core;
 
-import java.util.concurrent.Callable;
-
 import index.alchemy.annotation.Change;
 import index.alchemy.api.Alway;
+import index.alchemy.api.ICapability;
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
 import index.alchemy.api.ICoolDown;
@@ -16,7 +15,6 @@ import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.api.ITileEntity;
-import index.alchemy.capability.AlchemyCapability;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -28,7 +26,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
-import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -94,8 +91,8 @@ public class AlchemyInitHook {
 		if (obj instanceof IGuiHandle)
 			AlchemyEventSystem.registerGuiHandle((IGuiHandle) obj);
 		
-		if (obj instanceof AlchemyCapability)
-			CapabilityManager.INSTANCE.register((Class<C>) obj.getClass(), (IStorage<C>) obj, (Callable<C>) obj);
+		if (obj instanceof ICapability)
+			CapabilityManager.INSTANCE.register((Class<C>) obj.getClass(), (ICapability<C>) obj, (ICapability<C>) obj);
 		
 		if (Alway.isClient()) {
 			

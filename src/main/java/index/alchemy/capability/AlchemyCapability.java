@@ -1,17 +1,13 @@
 package index.alchemy.capability;
 
-import java.util.concurrent.Callable;
-
+import index.alchemy.api.ICapability;
 import index.alchemy.api.IRegister;
 import index.alchemy.core.AlchemyInitHook;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.Capability.IStorage;
 
-public abstract class AlchemyCapability<T> implements IStorage<T>, Callable<T>, IRegister {
-	
-	public abstract Class<T> getDataClass();
+public abstract class AlchemyCapability<T> implements ICapability<T>, IRegister {
 	
 	@Override
 	public T call() throws Exception {
@@ -26,13 +22,13 @@ public abstract class AlchemyCapability<T> implements IStorage<T>, Callable<T>, 
 	@Override
 	public void readNBT(Capability<T> capability, T instance, EnumFacing side, NBTBase nbt) { }
 
+	public AlchemyCapability() {
+		register();
+	}
+	
 	@Override
 	public void register() {
 		AlchemyInitHook.init(this);
-	}
-	
-	public AlchemyCapability() {
-		register();
 	}
 
 }

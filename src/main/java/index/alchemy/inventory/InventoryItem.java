@@ -1,4 +1,4 @@
-package index.alchemy.item;
+package index.alchemy.inventory;
 
 import java.util.RandomAccess;
 
@@ -6,18 +6,15 @@ import com.google.common.base.Objects;
 
 import index.alchemy.util.NBTHelper;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class ItemInventory implements IInventory, RandomAccess {
+public class InventoryItem extends AlchemyInventory implements RandomAccess {
 	
-	protected static final String CONTENTS = "contents";
+	protected static final String CONTENTS = "item_contents";
 	
 	protected final ItemStack content;
 	protected EntityPlayer player;
@@ -26,9 +23,7 @@ public class ItemInventory implements IInventory, RandomAccess {
 	protected String name; 
 	protected int size;
 	
-	protected boolean flag;
-	
-	protected ItemInventory(EntityPlayer player, ItemStack content, int size, String name) {
+	public InventoryItem(EntityPlayer player, ItemStack content, int size, String name) {
 		this.player = player;
 		this.content = content;
 		this.size = size;
@@ -72,14 +67,6 @@ public class ItemInventory implements IInventory, RandomAccess {
 		}
 	}
 	
-	protected void updateFlag() {
-		flag = true;
-	}
-	
-	protected boolean shouldUpdate() {
-		return flag;
-	}
-	
 	public boolean nonUsing() {
 		return player == null;
 	}
@@ -101,16 +88,6 @@ public class ItemInventory implements IInventory, RandomAccess {
 	}
 
 	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
-
-	@Override
-	public ITextComponent getDisplayName() {
-		return new TextComponentString(getName());
-	}
-
-	@Override
 	public int getSizeInventory() {
 		return size;
 	}
@@ -122,19 +99,19 @@ public class ItemInventory implements IInventory, RandomAccess {
 
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		updateFlag();
+		markDirty();
 		return ItemStackHelper.getAndSplit(contents, index, count);
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
-		updateFlag();
+		markDirty();
 		return ItemStackHelper.getAndRemove(contents, index);
 	}
 
 	@Override
 	public void setInventorySlotContents(int index, ItemStack item) {
-		updateFlag();
+		markDirty();
 		contents[index] = item;
 	}
 
@@ -144,21 +121,8 @@ public class ItemInventory implements IInventory, RandomAccess {
 	}
 
 	@Override
-	public void markDirty() {}
-
-	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
 		return this.player == player;
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-		if (shouldUpdate())
-			updateNBT();
-		player = null;
 	}
 
 	@Override
@@ -167,23 +131,10 @@ public class ItemInventory implements IInventory, RandomAccess {
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
-		updateFlag();
+		markDirty();
 		for (int i = 0; i < contents.length; i++)
 			contents[i] = null;
 	}
-
+	
 }

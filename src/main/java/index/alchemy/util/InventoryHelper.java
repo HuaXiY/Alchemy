@@ -47,19 +47,19 @@ public class InventoryHelper  {
 				spawnItemStack(world, x, y, z, item);
 	}
 
-	public static void spawnItemStack(World world, double x, double y, double z, ItemStack stack) {
+	public static void spawnItemStack(World world, double x, double y, double z, ItemStack item) {
 		float mx = RANDOM.nextFloat() * 0.8F + 0.1F;
 		float my = RANDOM.nextFloat() * 0.8F + 0.1F;
 		float mz = RANDOM.nextFloat() * 0.8F + 0.1F;
 
-		while (stack.stackSize > 0) {
-			int i = Math.min(RANDOM.nextInt(21) + 10, stack.stackSize);
+		while (item.stackSize > 0) {
+			int i = Math.min(RANDOM.nextInt(21) + 10, item.stackSize);
 
-			stack.stackSize -= i;
-			EntityItem entityitem = new EntityItem(world, x + mx, y + my, z + mz, new ItemStack(stack.getItem(), i, stack.getMetadata()));
+			item.stackSize -= i;
+			EntityItem entityitem = new EntityItem(world, x + mx, y + my, z + mz, new ItemStack(item.getItem(), i, item.getMetadata()));
 
-			if (stack.hasTagCompound())
-				entityitem.getEntityItem().setTagCompound((NBTTagCompound) stack.getTagCompound().copy());
+			if (item.hasTagCompound())
+				entityitem.getEntityItem().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
 
 			float f = 0.05F;
 			entityitem.motionX = RANDOM.nextGaussian() * f;
@@ -67,6 +67,25 @@ public class InventoryHelper  {
 			entityitem.motionZ = RANDOM.nextGaussian() * f;
 			world.spawnEntityInWorld(entityitem);
 		}
+	}
+	
+	public static EntityItem getEntityItem(Entity entity, ItemStack item) {
+		return getEntityItem(entity.worldObj, entity.posX, entity.posY, entity.posZ, item);
+	}
+	
+	public static EntityItem getEntityItem(World world, double x, double y, double z, ItemStack item) {
+		float mx = RANDOM.nextFloat() * 0.8F + 0.1F;
+		float my = RANDOM.nextFloat() * 0.8F + 0.1F;
+		float mz = RANDOM.nextFloat() * 0.8F + 0.1F;
+		
+		EntityItem entityitem = new EntityItem(world, x + mx, y + my, z + mz, item);
+		
+		float f = 0.05F;
+		entityitem.motionX = RANDOM.nextGaussian() * f;
+		entityitem.motionY = RANDOM.nextGaussian() * f + 0.2D;
+		entityitem.motionZ = RANDOM.nextGaussian() * f;
+		
+		return entityitem;
 	}
 	
 	public static void addItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {

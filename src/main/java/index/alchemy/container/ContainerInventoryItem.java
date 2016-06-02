@@ -1,18 +1,18 @@
 package index.alchemy.container;
 
-import index.alchemy.item.ItemInventory;
+import index.alchemy.inventory.InventoryItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerItemInventory extends Container {
+public class ContainerInventoryItem extends Container {
 	
-	private ItemInventory inventory;
+	private InventoryItem inventory;
 	private int row;
 
-	public ContainerItemInventory(InventoryPlayer player, ItemInventory inventory) {
+	public ContainerInventoryItem(InventoryPlayer player, InventoryItem inventory) {
 		this.inventory = inventory;
 		row = inventory.getSizeInventory() / 9;
 		int offset = (row - 4) * 18;

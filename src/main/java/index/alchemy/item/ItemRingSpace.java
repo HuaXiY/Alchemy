@@ -14,6 +14,7 @@ import index.alchemy.api.IItemInventory;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.inventory.InventoryItem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -53,8 +54,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 			KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
 	@Override
-	public ItemInventory getItemInventory(EntityPlayer player, ItemStack item) {
-		return new ItemInventory(player, item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
+	public InventoryItem getItemInventory(EntityPlayer player, ItemStack item) {
+		return new InventoryItem(player, item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
 	}
 	
 	@Override
@@ -166,7 +167,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	}
 	
 	public void pickup(EntityPlayer player) {
-		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
+		InventoryItem inventory = getItemInventory(player, getFormPlayer(player));
 		if (inventory == null)
 			return;
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
@@ -186,14 +187,14 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	@Override
 	public Object getServerGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
+		InventoryItem inventory = getItemInventory(player, getFormPlayer(player));
 		return inventory == null ? null : new ContainerChest(player.inventory, inventory, player);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		ItemInventory inventory = getItemInventory(player, getFormPlayer(player));
+		InventoryItem inventory = getItemInventory(player, getFormPlayer(player));
 		return inventory == null ? null : new GuiChest(player.inventory, inventory);
 	}
 	
