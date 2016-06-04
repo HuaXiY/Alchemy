@@ -156,8 +156,9 @@ public class AlchemyModLoader {
 					if (use_dmain)
 						DMain.init(clazz);
 					AlchemyConfigLoader.init(clazz);
-					AlchemyNetworkHandler.init(clazz);
+					AlchemyEventSystem.init(clazz);
 					AlchemyDimensionType.init(clazz);
+					AlchemyNetworkHandler.init(clazz);
 					Init init = clazz.getAnnotation(Init.class);
 					SideOnly side = clazz.getAnnotation(SideOnly.class);
 					if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))

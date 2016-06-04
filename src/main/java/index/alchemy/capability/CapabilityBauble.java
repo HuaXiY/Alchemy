@@ -7,15 +7,19 @@ import index.alchemy.api.Alway;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
+import index.alchemy.client.gui.GuiInventoryBauble;
+import index.alchemy.container.ContainerInventoryBauble;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.inventory.InventoryBauble;
+import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.InventoryHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -47,7 +51,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	
 	@SubscribeEvent
 	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent.Entity event) {
-		if (event.getEntity() instanceof EntityLivingBase) {
+		if (event.getEntity() instanceof EntityPlayer || event.getEntity() instanceof EntityZombie) {
 			event.addCapability(RESOURCE, new InventoryBauble((EntityLivingBase) event.getEntity()));
 		}
 	}
@@ -55,6 +59,8 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event) {
 		IInventory inventory = event.getEntityLiving().getCapability(AlchemyCapabilityLoader.bauble, null);
+		if (inventory == null)
+			return;
 		for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 			ItemStack item = inventory.getStackInSlot(i);
 			if (item != null && item.getItem() instanceof IBauble)
@@ -67,6 +73,8 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 		EntityLivingBase living = event.getEntityLiving();
 		if (Alway.isServer() && !(living instanceof EntityPlayer)) {
 			IInventory inventory = living.getCapability(AlchemyCapabilityLoader.bauble, null);
+			if (inventory == null)
+				return;
 			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 				ItemStack item = inventory.getStackInSlot(i);
 				if (item != null)
@@ -80,6 +88,8 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 		EntityPlayer player = event.getEntityPlayer();
 		if (Alway.isServer() && !player.worldObj.getGameRules().getBoolean("keepInventory")) {
 			IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
+			if (inventory == null)
+				return;
 			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 				ItemStack item = inventory.getStackInSlot(i);
 				if (item != null)
@@ -99,19 +109,19 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_INVENTORY)
 	public void onInventory(KeyBinding binding) {
-		
+		KeyBinding.setKeyBindState(binding.getKeyCode(), false);
+		AlchemyNetworkHandler.openGui(this);
 	}
 
 	@Override
 	public Object getServerGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ContainerInventoryBauble(player.inventory, !world.isRemote, player);
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		// TODO Auto-generated method stub
-		return null;
+		return new GuiInventoryBauble(new ContainerInventoryBauble(player.inventory, !world.isRemote, player));
 	}
 
 }

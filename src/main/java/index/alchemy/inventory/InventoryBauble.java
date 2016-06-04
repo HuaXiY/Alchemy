@@ -35,6 +35,8 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	protected void init(EntityLivingBase living) {
 		NBTTagCompound nbt = living.getEntityData();
 		if (nbt != null) {
+			if (living instanceof EntityPlayer)
+			System.out.println(nbt.getTagList(CONTENTS, NBT.TAG_COMPOUND));
 			NBTTagList list = nbt.getTagList(CONTENTS, NBT.TAG_COMPOUND);
 			if (!list.hasNoTags())
 				contents = NBTHelper.getItemStacksFormNBTList(list);

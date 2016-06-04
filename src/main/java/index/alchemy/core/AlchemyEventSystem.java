@@ -12,6 +12,7 @@ import org.lwjgl.input.Keyboard;
 
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.KeyEvent;
+import index.alchemy.annotation.Texture;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
@@ -27,10 +28,12 @@ import index.alchemy.development.DMain;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -49,7 +52,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.CONSTRUCTED)
 public class AlchemyEventSystem implements IGuiHandler {
 	
-	public static final AlchemyEventSystem INSTANCE = new AlchemyEventSystem();
+	private static AlchemyEventSystem instance;
+	
+	public static AlchemyEventSystem getInstance() {
+		return instance;
+	}
 	
 	public static enum EventType {
 		EVENT_BUS,
@@ -103,6 +110,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 	private static final Set<Object> HOOK_INPUT = new HashSet<Object>();
 	
 	private static boolean hookInputState = false;
+	
+	private static final Set<String> TEXTURE_SET = new HashSet<String>();
 	
 	private static final List<KeyBindingHandle> KEY_HANDELS = new ArrayList<KeyBindingHandle>();
 	
@@ -269,6 +278,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 			HUDManager.render();
 	}
 	
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onTextureStitch_Pre(TextureStitchEvent.Pre event) {
+		for (String res : TEXTURE_SET)
+			event.getMap().registerSprite(new ResourceLocation(res));
+	}
+	
 	public static void registerEventHandle(IEventHandle handle) {
 		AlchemyModLoader.checkState();
 		for (EventType type : handle.getEventType()) {
@@ -281,7 +297,20 @@ public class AlchemyEventSystem implements IGuiHandler {
 		}
 	}
 	
-	public static void init() {}
+	public static void init() {
+		instance = new AlchemyEventSystem();
+	}
+	
+	public static void init(Class<?> clazz) {
+		AlchemyModLoader.checkState();
+		Texture texture = clazz.getAnnotation(Texture.class);
+		if (texture != null)
+			if (texture.value() != null)
+				for (String res : texture.value())
+					TEXTURE_SET.add(res);
+			else
+				throw new AlchemyRuntimeExcption(new RuntimeException(new NullPointerException(clazz + " -> @Texture.value()")));
+	}
 	
 	public AlchemyEventSystem() {
 		MinecraftForge.EVENT_BUS.register(this);
