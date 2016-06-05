@@ -19,6 +19,8 @@ public class AlchemyPotion extends Potion implements IRegister {
 	
 	public static final ResourceLocation RESOURCE_LOCATION = new AlchemyResourceLocation("potion");
 	
+	public static final int NOT_FLASHING_TIME = 20 * 12;
+	
 	private static int current_id = -1;
 	
 	private boolean ready;

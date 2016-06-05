@@ -13,6 +13,7 @@ import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.alchemy.item.ItemAmuletPurify.MessagePurifyCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6Package;
+import index.alchemy.potion.AlchemyPotion;
 import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -32,7 +33,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IEventHandle, INetworkMessage.Client<MessagePurifyCallback> {
 	
-	public static final int INTERVAL = 20 * 30;
+	public static final int INTERVAL = 20 * 20, MAX_AIR = 300;
 	public static final String NBT_KEY_CD = "amulet_purify";
 	
 	@Override
@@ -55,8 +56,10 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 						AlchemyNetworkHandler.network_wrapper.sendTo(new MessagePurifyCallback(), (EntityPlayerMP) living);
 				}
 			}
-			if (living.ticksExisted % INTERVAL == 0 && living.isInWater())
-				living.addPotionEffect(new PotionEffect(MobEffects.WATER_BREATHING, INTERVAL));
+			if (living.isInWater()) {
+				living.addPotionEffect(new PotionEffect(MobEffects.WATER_BREATHING, AlchemyPotion.NOT_FLASHING_TIME));
+				living.setAir(MAX_AIR);
+			}
 		}
 	}
 	

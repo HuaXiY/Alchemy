@@ -31,21 +31,14 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	@Override
 	public void onEquipped(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer()) {
-			System.out.println("oE: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+		if (Alway.isServer())
 			living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).applyModifier(KNOCKBACK_RESISTANCE);
-			System.out.println("oE: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
-		}
-		System.out.println("oE: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
 	}
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer()) {
-			System.out.println("oU: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+		if (Alway.isServer())
 			living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).removeModifier(KNOCKBACK_RESISTANCE);
-			System.out.println("oU: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
-		}
 	}
 	
 	@Override

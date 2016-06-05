@@ -1,7 +1,6 @@
 package index.alchemy.block;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import index.alchemy.annotation.Change;
@@ -22,6 +21,7 @@ import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.registry.FMLControlledNamespacedRegistry;
 import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
 
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyBlockLoader {
@@ -38,7 +38,7 @@ public class AlchemyBlockLoader {
 	}
 	
 	// TODO
-	// !!!!> Only in the version 1.9 working <!!!!
+	// !!!!> Only in the version 1.9.4 working <!!!!
 	// This is replace block in the Minecraft.
 	// Not guaranteed to work in another version, Field name and
 	// position will change with the version.
@@ -65,27 +65,22 @@ public class AlchemyBlockLoader {
     					AlchemyModLoader.logger.info("    Replacing block - " + id + " / " + registryName);
     					
     					Block newBlock = blockClass.newInstance();
+    					Tool.set(Impl.class, 2, newBlock, resource == null ? registryName : resource);
+    					
     					FMLControlledNamespacedRegistry<Block> registry = GameData.getBlockRegistry();
-    					registry.putObject(registryName, newBlock);
-    					
     					Tool.<IntIdentityHashBiMap>get(RegistryNamespaced.class, 0, registry).put(newBlock, id);
-    					
     					Map map = Tool.<Map>get(RegistryNamespaced.class, 1, registry);
     					map.remove(toReplace);
     					map.put(newBlock, registryName);
     					
-    					if (item != null) {
-    						Field ItemBlockSpecial = Tool.setAccessible(item.getClass().getDeclaredFields()[0]);
-        					modifiersField.setInt(ItemBlockSpecial, modifiersField.getInt(ItemBlockSpecial) & ~Modifier.FINAL);
-        					ItemBlockSpecial.set(item, newBlock);
-    					}
+    					if (item != null)
+    						Tool.set(ItemBlockSpecial.class, 0, item, newBlock);
     					
     					if (tile != null && tileEntityClass != null) {
 	    					Tool.<Map>get(TileEntity.class, 1).put(tile, tileEntityClass);
 	    					Tool.<Map>get(TileEntity.class, 2).put(tileEntityClass, tile);
     					}
     					
-    					newBlock.setRegistryName(resource == null ? registryName : resource);
     					FinalFieldSetter.getInstance().setStatic(field, newBlock);
     				}
         		}

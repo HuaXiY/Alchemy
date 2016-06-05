@@ -3,9 +3,11 @@ package index.alchemy.network;
 import java.util.Iterator;
 
 import index.alchemy.annotation.Message;
-import index.alchemy.item.AlchemyItemBauble;
+import index.alchemy.capability.AlchemyCapabilityLoader;
+import index.alchemy.inventory.InventoryBauble;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -19,9 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpdate, IMessage> {
 	
 	public static enum Type {
-		PLAYER_ENTITY_DATA,
-		PLAYER_INVENTORY,
-		PLAYER_BAUBLE
+		ENTITY_DATA,
+		ENTITY_BAUBLE_DATA
 	}
 	
 	public Type type;
@@ -29,10 +30,6 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 	public NBTTagCompound data;
 	
 	public MessageNBTUpdate() {}
-	
-	public MessageNBTUpdate(Type type, NBTTagCompound data) {
-		this(type, -1, data);
-	}
 	
 	public MessageNBTUpdate(Type type, int id, NBTTagCompound data) {
 		this.type = type;
@@ -43,17 +40,16 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(MessageNBTUpdate message, MessageContext ctx) {
-		switch (message.type) {
-			case PLAYER_ENTITY_DATA:
-				updateNBT(Minecraft.getMinecraft().thePlayer.getEntityData(), message.data);
-				break;
-			case PLAYER_INVENTORY:
-				setNBT(Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(message.id), message.data);
-				break;
-			case PLAYER_BAUBLE:
-				setNBT(AlchemyItemBauble.getBauble(Minecraft.getMinecraft().thePlayer, message.id), message.data);
-				break;
-		}
+		Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.id);
+		if (entity != null)
+			switch (message.type) {
+				case ENTITY_BAUBLE_DATA:
+					InventoryBauble inventory = entity.getCapability(AlchemyCapabilityLoader.bauble, null);
+					inventory.readFromNBT(message.data);
+				case ENTITY_DATA:
+					updateNBT(entity.getEntityData(), message.data);
+					break;
+			}
 		return null;
 	}
 	

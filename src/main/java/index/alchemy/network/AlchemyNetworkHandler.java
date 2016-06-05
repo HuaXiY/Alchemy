@@ -16,6 +16,7 @@ import index.alchemy.core.Constants;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -77,6 +78,10 @@ public class AlchemyNetworkHandler {
 		Double3Float2Package d3f2p[] = Tool.toArray(d3f2ps, Double3Float2Package.class);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
 			network_wrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
+	}
+	
+	public static void updateEntityNBT(MessageNBTUpdate.Type type, int id, NBTTagCompound data, EntityPlayerMP player) {
+		network_wrapper.sendTo(new MessageNBTUpdate(type, id, data), player);
 	}
 	
 	public static <T extends IMessage & IMessageHandler<T, IMessage>> void init() {

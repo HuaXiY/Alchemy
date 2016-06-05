@@ -21,14 +21,12 @@ import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
-import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -66,6 +64,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 		ORE_GEN_BUS
 	}
 	
+	@SideOnly(Side.CLIENT)
 	private static class KeyBindingHandle {
 		
 		private final KeyBinding binding;
@@ -129,6 +128,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerTick(PlayerTickEvent event) {
+		String flag = "6";
+		if (Alway.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+			// runtime do some thing
+			{
+				System.out.println(event.player.getName() + " - " + event.player.getEntityData());
+			}
+			System.setProperty("index.alchemy.runtime.debug.player", flag);
+		}
 		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)
 			tickable.onTick(event.player, event.phase);
 	}
@@ -138,8 +145,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 			int c_tick = tick;
 			@Override
 			public boolean run(Phase phase) {
-				runnable.run(phase);
-				return c_tick < 1 || phase == Phase.START && --c_tick < 1;
+				if (c_tick < 1 || phase == Phase.START && --c_tick < 1) {
+					runnable.run(phase);
+					return true;
+				}
+				return false;
 			}
 		}, side);
 	}
@@ -169,6 +179,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
+				
 			}
 			System.setProperty("index.alchemy.runtime.debug.server", flag);
 		}
@@ -183,11 +194,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onClientTick(ClientTickEvent event) {
-		String flag = "6";
+		String flag = "9";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
-				System.out.println(Minecraft.getMinecraft().thePlayer.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+				//System.out.println(Minecraft.getMinecraft().thePlayer.getEntityData());
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);
 		}

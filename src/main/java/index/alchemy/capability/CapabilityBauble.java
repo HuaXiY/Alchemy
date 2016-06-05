@@ -21,16 +21,20 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -40,6 +44,16 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	
 	public static final ResourceLocation RESOURCE = new AlchemyResourceLocation("bauble");
 	public static final String KEY_INVENTORY = "key.inventory";
+	
+	@Override
+	public NBTBase writeNBT(Capability<InventoryBauble> capability, InventoryBauble instance, EnumFacing side) {
+		return instance.saveToNBT(new NBTTagCompound());
+	}
+
+	@Override
+	public void readNBT(Capability<InventoryBauble> capability, InventoryBauble instance, EnumFacing side, NBTBase nbt) {
+		instance.readFromNBT((NBTTagCompound) nbt);
+	}
 	
 	@Override
 	public Class<InventoryBauble> getDataClass() {
@@ -78,16 +92,11 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 			if (inventory == null)
 				return;
 			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
-				ItemStack item = inventory.getStackInSlot(i);
+				ItemStack item = inventory.removeStackFromSlot(i);
 				if (item != null)
 					event.getDrops().add(InventoryHelper.getEntityItem(living, item));
 			}
 		}
-	}
-	
-	@SubscribeEvent
-	public void onPlayer_Clone(PlayerEvent.Clone event) {
-		event.getOriginal().getCapability(AlchemyCapabilityLoader.bauble, null).copy(event.getEntityPlayer());
 	}
 	
 	@SubscribeEvent
@@ -98,17 +107,29 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 			if (inventory == null)
 				return;
 			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
-				ItemStack item = inventory.getStackInSlot(i);
+				ItemStack item = inventory.removeStackFromSlot(i);
 				if (item != null)
 					event.getDrops().add(InventoryHelper.getEntityItem(player, item));
 			}
 		}
 	}
+	
+	@SubscribeEvent
+	public void onPlayer_Clone(PlayerEvent.Clone event) {
+		event.getOriginal().getCapability(AlchemyCapabilityLoader.bauble, null).copy(event.getEntityPlayer());
+	}
+	
+	@SubscribeEvent
+	public void onPlayer_StartTracking(PlayerEvent.StartTracking event) {
+		InventoryBauble inventory = event.getTarget().getCapability(AlchemyCapabilityLoader.bauble, null);
+		if (inventory != null)
+			inventory.updatePlayer((EntityPlayerMP) event.getEntityPlayer());
+	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public KeyBinding[] getKeyBindings() {
-		AlchemyModLoader.checkState();FMLCommonHandler.instance().bus();
+		AlchemyModLoader.checkState();
 		return new KeyBinding[] {
 				Minecraft.getMinecraft().gameSettings.keyBindInventory
 		};
@@ -117,8 +138,10 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_INVENTORY)
 	public void onKeyInventory(KeyBinding binding) {
-		binding.unpressKey();
-		AlchemyNetworkHandler.openGui(this);
+		if (!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
+			binding.unpressKey();
+			AlchemyNetworkHandler.openGui(this);
+		}
 	}
 
 	@Override
