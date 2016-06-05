@@ -19,11 +19,11 @@ public class MessageSound implements IMessage, IMessageHandler<MessageSound, IMe
 	
 	public int len;
 	public String id, category;
-	public SDouble3Float2Package d3f2p[];
+	public Double3Float2Package d3f2p[];
 	
 	public MessageSound() {}
 	
-	public MessageSound(String id, String category, SDouble3Float2Package... d3f2p) {
+	public MessageSound(String id, String category, Double3Float2Package... d3f2p) {
 		this.id = id;
 		this.category = category;
 		this.d3f2p = d3f2p;
@@ -32,7 +32,7 @@ public class MessageSound implements IMessage, IMessageHandler<MessageSound, IMe
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(MessageSound message, MessageContext ctx) {
-		SDouble3Float2Package d3f2p[] = message.d3f2p;
+		Double3Float2Package d3f2p[] = message.d3f2p;
 		SoundEvent sound = SoundEvent.REGISTRY.getObject(new ResourceLocation(message.id));
 		SoundCategory category = SoundCategory.getByName(message.category);
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
@@ -46,9 +46,9 @@ public class MessageSound implements IMessage, IMessageHandler<MessageSound, IMe
 		id = ByteBufUtils.readUTF8String(buf);
 		category = ByteBufUtils.readUTF8String(buf);
 		len = buf.readInt();
-		d3f2p = new SDouble3Float2Package[len];
+		d3f2p = new Double3Float2Package[len];
 		for (int i = 0; i < len; i++) {
-			d3f2p[i] = new SDouble3Float2Package(buf.readDouble(), buf.readDouble(), buf.readDouble(),
+			d3f2p[i] = new Double3Float2Package(buf.readDouble(), buf.readDouble(), buf.readDouble(),
 					buf.readFloat(), buf.readFloat());
 		}
 	}

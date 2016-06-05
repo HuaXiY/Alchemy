@@ -32,7 +32,7 @@ public class Premise {
 	}
 	
 	public static void onMiss(String modid) {
-		if (AlchemyModLoader.proxy.isClient()) {
+		if (AlchemyModLoader.getProxy().isClient()) {
 			SplashProgress.finish();
 			Display.destroy();
 			JDialog dialog = new JDialog();

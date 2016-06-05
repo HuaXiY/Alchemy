@@ -15,11 +15,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class MessageParticle implements IMessage, IMessageHandler<MessageParticle, IMessage> {
 	
 	public int id, len;
-	public SDouble6Package d6p[];
+	public Double6Package d6p[];
 	
 	public MessageParticle() {}
 	
-	public MessageParticle(int id, SDouble6Package... d6p) {
+	public MessageParticle(int id, Double6Package... d6p) {
 		this.id = id;
 		len = d6p.length;
 		this.d6p = d6p;
@@ -28,7 +28,7 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(MessageParticle message, MessageContext ctx) {
-		SDouble6Package d6p[] = message.d6p;
+		Double6Package d6p[] = message.d6p;
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		EnumParticleTypes type = EnumParticleTypes.getParticleFromId(message.id);
 		for (int i = 0; i < d6p.length; i++)
@@ -40,9 +40,9 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 	public void fromBytes(ByteBuf buf) {
 		id = buf.readInt();
 		len = buf.readInt();
-		d6p = new SDouble6Package[len];
+		d6p = new Double6Package[len];
 		for (int i = 0; i < len; i++) {
-			d6p[i] = new SDouble6Package(buf.readDouble(), buf.readDouble(), buf.readDouble(),
+			d6p[i] = new Double6Package(buf.readDouble(), buf.readDouble(), buf.readDouble(),
 					buf.readDouble(), buf.readDouble(), buf.readDouble());
 		}
 	}

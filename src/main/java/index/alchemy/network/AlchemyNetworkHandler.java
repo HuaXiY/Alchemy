@@ -67,14 +67,14 @@ public class AlchemyNetworkHandler {
 		network_wrapper.sendToServer(new MessageOpenGui(AlchemyEventSystem.getGuiIdByGuiHandle(handle)));
 	}
 	
-	public static void spawnParticle(EnumParticleTypes particle, AxisAlignedBB aabb, World world, List<SDouble6Package> d6ps) {
-		SDouble6Package d6p[] = Tool.toArray(d6ps, SDouble6Package.class);
+	public static void spawnParticle(EnumParticleTypes particle, AxisAlignedBB aabb, World world, List<Double6Package> d6ps) {
+		Double6Package d6p[] = Tool.toArray(d6ps, Double6Package.class);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
 			network_wrapper.sendTo(new MessageParticle(particle.getParticleID(), d6p), player);
 	}
 	
-	public static void playSound(SoundEvent sound, SoundCategory category, AxisAlignedBB aabb, World world, List<SDouble3Float2Package> d3f2ps) {
-		SDouble3Float2Package d3f2p[] = Tool.toArray(d3f2ps, SDouble3Float2Package.class);
+	public static void playSound(SoundEvent sound, SoundCategory category, AxisAlignedBB aabb, World world, List<Double3Float2Package> d3f2ps) {
+		Double3Float2Package d3f2p[] = Tool.toArray(d3f2ps, Double3Float2Package.class);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
 			network_wrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
 	}

@@ -5,6 +5,7 @@ import java.util.RandomAccess;
 import baubles.api.IBauble;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.util.NBTHelper;
+import index.alchemy.util.Tool;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ItemStackHelper;
@@ -27,20 +28,31 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	
 	public InventoryBauble(EntityLivingBase living) {
 		this.living = living;
-		init(living);
-		if (contents == null)
-			contents = new ItemStack[SIZE];
+		readNbt(living.getEntityData());
 	}
 	
-	protected void init(EntityLivingBase living) {
-		NBTTagCompound nbt = living.getEntityData();
-		if (nbt != null) {
-			if (living instanceof EntityPlayer)
-			System.out.println(nbt.getTagList(CONTENTS, NBT.TAG_COMPOUND));
-			NBTTagList list = nbt.getTagList(CONTENTS, NBT.TAG_COMPOUND);
-			if (!list.hasNoTags())
-				contents = NBTHelper.getItemStacksFormNBTList(list);
-		}
+	public InventoryBauble readNbt(NBTTagCompound nbt) {
+		NBTTagList list = nbt.getTagList(CONTENTS, NBT.TAG_COMPOUND);
+		if (!list.hasNoTags())
+			contents = NBTHelper.getItemStacksFormNBTList(list);
+		else
+			contents = new ItemStack[SIZE];
+		return this;
+	}
+	
+	public NBTTagCompound saveNbt(NBTTagCompound nbt) {
+		nbt.setTag(CONTENTS, NBTHelper.getNBTListFormItemStacks(contents));
+		return nbt;
+	}
+	
+	@Override
+	public void markDirty() {
+		updateNBT();
+	}
+	
+	public void copy(EntityLivingBase living) {
+		living.getEntityData().setTag(CONTENTS, NBTHelper.getNBTListFormItemStacks(contents));
+		living.getCapability(AlchemyCapabilityLoader.bauble, null).readNbt(living.getEntityData());
 	}
 	
 	public EntityLivingBase getLiving() {

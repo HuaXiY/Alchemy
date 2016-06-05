@@ -14,7 +14,7 @@ public class AlchemyRuntimeExcption extends RuntimeException {
 	public AlchemyRuntimeExcption(Exception e) {
 		super(e);
 		
-		if (AlchemyModLoader.proxy.isClient()) {
+		if (AlchemyModLoader.getProxy().isClient()) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);

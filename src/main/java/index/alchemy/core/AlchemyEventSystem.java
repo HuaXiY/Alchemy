@@ -13,6 +13,7 @@ import org.lwjgl.input.Keyboard;
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.KeyEvent;
 import index.alchemy.annotation.Texture;
+import index.alchemy.api.Alway;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
@@ -27,6 +28,7 @@ import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import index.alchemy.development.DMain;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -164,13 +166,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onServerTick(ServerTickEvent event) {
 		String flag = "4";
-		if (!System.getProperty("index.alchemy.runtime.debug", "").equals(flag)) {
+		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
-				System.out.println(AlchemyCapabilityLoader.time_leap);
-				System.out.println(AlchemyCapabilityLoader.bauble);
 			}
-			System.setProperty("index.alchemy.runtime.debug", flag);
+			System.setProperty("index.alchemy.runtime.debug.server", flag);
 		}
 		if (!SERVER_RUNNABLE.isEmpty()) {
 			for (IContinuedRunnable runnable : SERVER_RUNNABLE)
@@ -183,6 +183,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onClientTick(ClientTickEvent event) {
+		String flag = "6";
+		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
+			// runtime do some thing
+			{
+				System.out.println(Minecraft.getMinecraft().thePlayer.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+			}
+			System.setProperty("index.alchemy.runtime.debug.client", flag);
+		}
 		if (!CLIENT_RUNNABLE.isEmpty()) {
 			for (IContinuedRunnable runnable : CLIENT_RUNNABLE)
 				if (runnable.run(event.phase))
@@ -303,13 +311,15 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
-		Texture texture = clazz.getAnnotation(Texture.class);
-		if (texture != null)
-			if (texture.value() != null)
-				for (String res : texture.value())
-					TEXTURE_SET.add(res);
-			else
-				throw new AlchemyRuntimeExcption(new RuntimeException(new NullPointerException(clazz + " -> @Texture.value()")));
+		if (Alway.isClient()) {
+			Texture texture = clazz.getAnnotation(Texture.class);
+			if (texture != null)
+				if (texture.value() != null)
+					for (String res : texture.value())
+						TEXTURE_SET.add(res);
+				else
+					throw new AlchemyRuntimeExcption(new RuntimeException(new NullPointerException(clazz + " -> @Texture.value()")));
+		}
 	}
 	
 	public AlchemyEventSystem() {

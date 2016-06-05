@@ -29,6 +29,8 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -84,6 +86,11 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	}
 	
 	@SubscribeEvent
+	public void onPlayer_Clone(PlayerEvent.Clone event) {
+		event.getOriginal().getCapability(AlchemyCapabilityLoader.bauble, null).copy(event.getEntityPlayer());
+	}
+	
+	@SubscribeEvent
 	public void onPlayerDrops(PlayerDropsEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
 		if (Alway.isServer() && !player.worldObj.getGameRules().getBoolean("keepInventory")) {
@@ -99,8 +106,9 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public KeyBinding[] getKeyBindings() {
-		AlchemyModLoader.checkState();
+		AlchemyModLoader.checkState();FMLCommonHandler.instance().bus();
 		return new KeyBinding[] {
 				Minecraft.getMinecraft().gameSettings.keyBindInventory
 		};
@@ -108,8 +116,8 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_INVENTORY)
-	public void onInventory(KeyBinding binding) {
-		KeyBinding.setKeyBindState(binding.getKeyCode(), false);
+	public void onKeyInventory(KeyBinding binding) {
+		binding.unpressKey();
 		AlchemyNetworkHandler.openGui(this);
 	}
 

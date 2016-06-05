@@ -1,7 +1,5 @@
 package index.alchemy.item;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 import index.alchemy.api.Alway;
@@ -12,14 +10,13 @@ import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 
 public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
@@ -28,24 +25,27 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	public static final AttributeModifier KNOCKBACK_RESISTANCE =  
 			new AttributeModifier(UUID.fromString("1434a694-1beb-4825-854b-72303432eed3"), "belt_tough_bonus", 1D, 0);
+	static {
+		((RangedAttribute) SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setShouldWatch(true);
+	}
 	
 	@Override
 	public void onEquipped(ItemStack item, EntityLivingBase living) {
-		System.out.println(living);
-		System.out.println("onE");
-		for (AttributeModifier modifier : living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getModifiers())
-			System.out.println(modifier);
-		living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).applyModifier(KNOCKBACK_RESISTANCE);
+		if (Alway.isServer()) {
+			System.out.println("oE: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+			living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).applyModifier(KNOCKBACK_RESISTANCE);
+			System.out.println("oE: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+		}
+		System.out.println("oE: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
 	}
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
-		System.out.println("onU");
-		for (AttributeModifier modifier : living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getModifiers())
-			System.out.println(modifier);
-		living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).removeModifier(KNOCKBACK_RESISTANCE);
-		for (AttributeModifier modifier : living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getModifiers())
-			System.out.println(modifier);
+		if (Alway.isServer()) {
+			System.out.println("oU: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+			living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).removeModifier(KNOCKBACK_RESISTANCE);
+			System.out.println("oU: " + living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getAttributeValue());
+		}
 	}
 	
 	@Override

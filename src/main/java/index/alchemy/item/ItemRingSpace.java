@@ -18,7 +18,7 @@ import index.alchemy.inventory.InventoryItem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.SDouble6Package;
+import index.alchemy.network.Double6Package;
 import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -171,11 +171,11 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		if (inventory == null)
 			return;
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
-		List<SDouble6Package> d6p = new LinkedList<SDouble6Package>(); 
+		List<Double6Package> d6p = new LinkedList<Double6Package>(); 
 		for (EntityItem entity : list) {
 			inventory.mergeItemStack(entity.getEntityItem());
 			if (entity.getEntityItem().stackSize < 1) {
-				d6p.add(new SDouble6Package(entity.posX, entity.posY, entity.posZ, 0, 0, 0));
+				d6p.add(new Double6Package(entity.posX, entity.posY, entity.posZ, 0, 0, 0));
 				entity.setDead();
 			}
 		}

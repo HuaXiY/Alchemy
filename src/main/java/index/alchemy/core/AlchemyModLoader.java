@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.LWJGLException;
 
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.InitInstance;
@@ -34,7 +33,9 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -56,7 +57,11 @@ public class AlchemyModLoader {
 	}
 	
 	@SidedProxy(clientSide = Constants.MOD_PACKAGE + ".client.ClientProxy", serverSide = Constants.MOD_PACKAGE + ".core.CommonProxy")
-	public static CommonProxy proxy;
+	private static CommonProxy proxy;
+	
+	public static CommonProxy getProxy() {
+		return proxy;
+	}
 	
 	public AlchemyModLoader() {
 		if (instance != null)
@@ -202,19 +207,27 @@ public class AlchemyModLoader {
 	}
 	
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) throws LWJGLException {
+	public void onFMLConstruction(FMLConstructionEvent event) {
 		init(ModState.CONSTRUCTED);
+	}
+	
+	@EventHandler
+	public void onFMLPreInitialization(FMLPreInitializationEvent event) {
 		init(ModState.PREINITIALIZED);
 	}
 	
 	@EventHandler
-	public void init(FMLInitializationEvent event) {
+	public void onFMLInitialization(FMLInitializationEvent event) {
 		init(ModState.INITIALIZED);
 	}
 	
 	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
+	public void onFMLPostInitialization(FMLPostInitializationEvent event) {
 		init(ModState.POSTINITIALIZED);
+	}
+	
+	@EventHandler
+	public void onFMLLoadComplete(FMLLoadCompleteEvent event) {
 		init(ModState.AVAILABLE);
 	}
 	
