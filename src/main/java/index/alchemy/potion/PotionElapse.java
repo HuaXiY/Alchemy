@@ -17,7 +17,7 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 	
 	public static final Predicate<EntityLivingBase> NOT_ACTIVE = new Predicate<EntityLivingBase>() {
         public boolean apply(EntityLivingBase player) {
-            return !player.isPotionActive(AlchemyPotionLoader.ignore);
+            return !player.isPotionActive(AlchemyPotionLoader.elapse);
         }
     };
 	
@@ -39,7 +39,7 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 			Class<EntityLivingBase> type = (Class<EntityLivingBase>) 
 					(event.getEntityLiving() instanceof EntityPlayer ? EntityPlayer.class : event.getEntityLiving().getClass());
 			living.attackTarget = EntityAIFindEntityNearestHelper.<EntityLivingBase>findNearest(
-					(EntityLiving) event.getEntityLiving(), type, NOT_ACTIVE);
+					(EntityLiving) living.attackTarget, type, NOT_ACTIVE);
 		}
 	}
 

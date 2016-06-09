@@ -25,7 +25,7 @@ public class AlchemyCapabilityLoader {
 			try {
 				clazz.newInstance();
 			} catch (Exception e) {
-				throw new AlchemyRuntimeExcption(e);
+				AlchemyRuntimeExcption.onExcption(e);
 			}
 	}
 	

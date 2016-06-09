@@ -93,7 +93,8 @@ public class ModItems {
 			Source source = field.getAnnotation(Source.class);
 			if (source != null && source.value() != null) {
 				Object obj = source.value().getField(field.getName().replaceAll(".*\\$", "")).get(null);
-				FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
+				if (FinalFieldSetter.hasInstance())
+					FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
 			}
 		}
 		

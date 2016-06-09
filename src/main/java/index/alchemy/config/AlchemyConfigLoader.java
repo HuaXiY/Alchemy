@@ -65,7 +65,7 @@ public class AlchemyConfigLoader {
 				for (Field f : config_list) {
 					Config c = f.getAnnotation(Config.class);
 					if (c.category().equals(config.category()) && f.getName().equals(field.getName()))
-						throw new AlchemyRuntimeExcption(new RuntimeException(
+						AlchemyRuntimeExcption.onExcption(new RuntimeException(
 								"@Config duplicate: " + field.getDeclaringClass().getName() + field.getName() + "<=>" + f.getDeclaringClass().getName() + f.getName()));
 				}
 				config_list.add(Tool.setAccessible(field));

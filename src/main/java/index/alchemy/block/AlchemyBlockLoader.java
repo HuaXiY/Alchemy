@@ -80,8 +80,8 @@ public class AlchemyBlockLoader {
 	    					Tool.<Map>get(TileEntity.class, 1).put(tile, tileEntityClass);
 	    					Tool.<Map>get(TileEntity.class, 2).put(tileEntityClass, tile);
     					}
-    					
-    					FinalFieldSetter.getInstance().setStatic(field, newBlock);
+    					if (FinalFieldSetter.hasInstance())
+    						FinalFieldSetter.getInstance().setStatic(field, newBlock);
     				}
         		}
         	}

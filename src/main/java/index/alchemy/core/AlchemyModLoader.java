@@ -51,9 +51,9 @@ public class AlchemyModLoader {
 	private static AlchemyModLoader instance;
 	
 	public static Object instance() {
-		if (instance != null)
-			return instance;
-		throw new AlchemyRuntimeExcption(new NullPointerException("index.alchemy.core.AlchemyModLoader.instance"));
+		if (instance == null)
+			AlchemyRuntimeExcption.onExcption(new NullPointerException("index.alchemy.core.AlchemyModLoader.instance"));
+		return instance;
 	}
 	
 	@SidedProxy(clientSide = Constants.MOD_PACKAGE + ".client.ClientProxy", serverSide = Constants.MOD_PACKAGE + ".core.CommonProxy")
@@ -65,7 +65,7 @@ public class AlchemyModLoader {
 	
 	public AlchemyModLoader() {
 		if (instance != null)
-			throw new AlchemyRuntimeExcption(new RuntimeException("Before this has been instantiate"));
+			AlchemyRuntimeExcption.onExcption(new RuntimeException("Before this has been instantiate"));
 	}
 	
 	public static final String mc_dir; 
@@ -97,7 +97,7 @@ public class AlchemyModLoader {
 	
 	public static void checkState() {
 		if (getState().ordinal() >= ModState.AVAILABLE.ordinal())
-			throw new AlchemyRuntimeExcption(new RuntimeException("Abnormal state: " + getState().name()));
+			AlchemyRuntimeExcption.onExcption(new RuntimeException("Abnormal state: " + getState().name()));
 	}
 	
 	static {
@@ -142,7 +142,7 @@ public class AlchemyModLoader {
 						class_list.add(name.replace(".class", "").replace("/", "."));
 				}
 			} catch (IOException e) {
-				throw new AlchemyRuntimeExcption(e);
+				AlchemyRuntimeExcption.onExcption(e);
 			} finally {
 				if (jar != null)
 					try {
@@ -202,7 +202,7 @@ public class AlchemyModLoader {
 		} catch (Exception e) {
 			logger.error("Failed !");
 			init(ModState.ERRORED);
-			throw new AlchemyRuntimeExcption(e);
+			AlchemyRuntimeExcption.onExcption(e);
 		}
 	}
 	

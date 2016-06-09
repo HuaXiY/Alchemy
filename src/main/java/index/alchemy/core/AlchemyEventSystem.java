@@ -10,6 +10,8 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
 
+import biomesoplenty.api.particle.BOPParticleTypes;
+import biomesoplenty.core.BiomesOPlenty;
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.KeyEvent;
 import index.alchemy.annotation.Texture;
@@ -21,6 +23,7 @@ import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
+import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
@@ -128,18 +131,24 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "6";
+		String flag = "7";
 		if (Alway.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
-				System.out.println(event.player.getName() + " - " + event.player.getEntityData());
+				EntityPlayer player = event.player;
+				float groundYOffset = 0.015625F;
+				double offsetX = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
+				double offsetZ = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
+				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
+			
+				Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX + offsetX, ((int)player.posY) + 2, player.posZ + offsetZ));
 			}
-			System.setProperty("index.alchemy.runtime.debug.player", flag);
+			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)
 			tickable.onTick(event.player, event.phase);
 	}
-	
+		
 	public static void addDelayedRunnable(final IPhaseRunnable runnable, final int tick, Side side) {
 		addContinuedRunnable(new IContinuedRunnable() {
 			int c_tick = tick;
@@ -279,7 +288,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 					try {
 						handle.getMethod().invoke(handle.getHandle(), handle.getBinding());
 					} catch (Exception e) {
-						throw new AlchemyRuntimeExcption(e);
+						AlchemyRuntimeExcption.onExcption(e);
 					}
 	}
 	
@@ -297,7 +306,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 			HUDManager.render();
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent()
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch_Pre(TextureStitchEvent.Pre event) {
 		for (String res : TEXTURE_SET)
@@ -329,7 +338,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 					for (String res : texture.value())
 						TEXTURE_SET.add(res);
 				else
-					throw new AlchemyRuntimeExcption(new RuntimeException(new NullPointerException(clazz + " -> @Texture.value()")));
+					AlchemyRuntimeExcption.onExcption(new RuntimeException(new NullPointerException(clazz + " -> @Texture.value()")));
 		}
 	}
 	

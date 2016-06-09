@@ -3,6 +3,8 @@ package index.alchemy.util;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import javax.annotation.Nullable;
+
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
 
 public final class FinalFieldSetter {
@@ -10,11 +12,13 @@ public final class FinalFieldSetter {
     private static final FinalFieldSetter INSTANCE;
 
     static {
+    	FinalFieldSetter temp = null;
         try {
-            INSTANCE = new FinalFieldSetter();
+            temp = new FinalFieldSetter();
         } catch (ReflectiveOperationException e) {
-            throw new AlchemyRuntimeExcption(e);
+            AlchemyRuntimeExcption.onExcption(e);
         }
+        INSTANCE = temp;
     }
 
     private final Object unsafeObj;
@@ -44,8 +48,13 @@ public final class FinalFieldSetter {
         staticFieldBaseMethod = unsafeClass.getMethod("staticFieldBase", Field.class);
     }
 
+    @Nullable
     public static FinalFieldSetter getInstance() {
         return INSTANCE;
+    }
+    
+    public static boolean hasInstance() {
+    	return getInstance() != null;
     }
 
     public void set(final Object o, final Field field, final Object value) throws Exception {

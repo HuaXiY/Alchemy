@@ -3,16 +3,8 @@ package index.alchemy.interacting;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
-import org.lwjgl.opengl.Display;
-
 import index.alchemy.annotation.Init;
-import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
-import net.minecraftforge.fml.client.SplashProgress;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import index.alchemy.core.debug.AlchemyRuntimeExcption;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
@@ -32,17 +24,7 @@ public class Premise {
 	}
 	
 	public static void onMiss(String modid) {
-		if (AlchemyModLoader.getProxy().isClient()) {
-			SplashProgress.finish();
-			Display.destroy();
-			JDialog dialog = new JDialog();
-			dialog.setAlwaysOnTop(true);
-			JOptionPane.showMessageDialog(dialog, "Could not find a prerequisite mod: " + modid,
-					"Minecraft-" + Constants.MOD_ID, JOptionPane.ERROR_MESSAGE);
-		}
-		AlchemyModLoader.logger.error("Could not find a prerequisite mod: " + modid);
-		System.setProperty("fml.debugExit", "true");
-		FMLCommonHandler.instance().exitJava(-0xC001, false);
+		AlchemyRuntimeExcption.onExcption(new RuntimeException("Could not find a prerequisite mod: " + modid));
 	}
 
 }

@@ -3,27 +3,39 @@ package index.alchemy.core.debug;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
+import index.alchemy.annotation.Config;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
+import index.alchemy.util.Tool;
+import net.minecraftforge.fml.client.SplashProgress;
 
 public class AlchemyRuntimeExcption extends RuntimeException {
+	
+	@Config(category = "runtime", comment = "Serious exceptions are ignored in the game.")
+	private static boolean ignore_serious_exceptions = false;
 
-	public AlchemyRuntimeExcption(Exception e) {
-		super(e);
+	private AlchemyRuntimeExcption(Throwable t) {
+		super(t);
+	}
+	
+	public static void onExcption(Throwable t) {
+		AlchemyModLoader.logger.error(t);
+		
+		if (ignore_serious_exceptions)
+			return;
+		
+		AlchemyRuntimeExcption e = new AlchemyRuntimeExcption(t);
+		
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
 		
 		if (AlchemyModLoader.getProxy().isClient()) {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String exceptionText = sw.toString();
-			JDialog dialog = new JDialog();
-			dialog.setAlwaysOnTop(true);
-			JOptionPane.showMessageDialog(dialog, exceptionText,
-					"Minecraft-" + Constants.MOD_ID, JOptionPane.ERROR_MESSAGE);
+			Tool.set(SplashProgress.class, 4, e);
+			SplashProgress.finish();
+			
+	        // TODO
 		}
+		
 	}
 	
 }

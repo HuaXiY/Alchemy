@@ -113,7 +113,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
             			((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
 
             player.onItemPickup(entity, i);
-
+            
             if (itemstack.stackSize <= 0)
             	entity.setDead();
 

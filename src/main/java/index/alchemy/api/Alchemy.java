@@ -18,11 +18,14 @@ public class Alchemy {
 	public static void registerAlchemyRecipe(IAlchemyRecipe recipe) {
 		AlchemyModLoader.checkState();
 		if (recipe.getAlchemyName() == null)
-			throw new AlchemyRuntimeExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, name is null"));
+			AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, name is null"));
 		for (ItemStack item : recipe.getMaterial())
 			if (item == null)
-				throw new AlchemyRuntimeExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, recipe has null, " + recipe.getAlchemyName()));
-		ALCHEMY_LIST.add(recipe);
+				AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, recipe has null, " + recipe.getAlchemyName()));
+		if (!ALCHEMY_LIST.contains(recipe))
+			ALCHEMY_LIST.add(recipe);
+		else
+			AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, recipe was added before this, " + recipe.getAlchemyName()));
 	}
 	
 	public static void removeAlchemyRecipe(IAlchemyRecipe recipe) {
@@ -51,7 +54,7 @@ public class Alchemy {
 				while (r.hasNext()) {
 					ItemStack ri = r.next(), li = l.next();
 					if (li == null)
-						throw new AlchemyRuntimeExcption(new RuntimeException("index.alchemy.api.Alchemy.findResult, input has null"));
+						AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.findResult, input has null"));
 					if (!ItemStack.areItemStacksEqual(ri, li))
 						continue list;
 				}

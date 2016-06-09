@@ -40,7 +40,7 @@ public class PotionPlague extends AlchemyPotion implements IEventHandle {
 			spawn_living = new EntityZombie(living.worldObj);
 			((EntityZombie) spawn_living).setChild(living.isChild());
 			if (living instanceof EntityVillager)
-				((EntityZombie) spawn_living).setVillagerType(RANDOM.nextInt(5));
+				((EntityZombie) spawn_living).setVillagerType(((EntityVillager) living).getProfessionForge());
 		} else if (living instanceof EntityPig) {
 			spawn_living = new EntityPigZombie(living.worldObj);
 		}

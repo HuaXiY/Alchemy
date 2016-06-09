@@ -3,13 +3,16 @@ package index.alchemy.network;
 import java.util.Iterator;
 
 import index.alchemy.annotation.Message;
+import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.capability.AlchemyCapabilityLoader;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.inventory.InventoryBauble;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -39,17 +42,22 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public IMessage onMessage(MessageNBTUpdate message, MessageContext ctx) {
-		Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.id);
-		if (entity != null)
-			switch (message.type) {
-				case ENTITY_BAUBLE_DATA:
-					InventoryBauble inventory = entity.getCapability(AlchemyCapabilityLoader.bauble, null);
-					inventory.readFromNBT(message.data);
-				case ENTITY_DATA:
-					updateNBT(entity.getEntityData(), message.data);
-					break;
+	public IMessage onMessage(final MessageNBTUpdate message, MessageContext ctx) {
+		AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
+			@Override
+			public void run(Phase phase) {
+				Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.id);
+				if (entity != null)
+					switch (message.type) {
+						case ENTITY_BAUBLE_DATA:
+							InventoryBauble inventory = entity.getCapability(AlchemyCapabilityLoader.bauble, null);
+							inventory.readFromNBT(message.data);
+						case ENTITY_DATA:
+							updateNBT(entity.getEntityData(), message.data);
+							break;
+					}
 			}
+		}, 1, Side.CLIENT);
 		return null;
 	}
 	

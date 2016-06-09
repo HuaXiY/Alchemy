@@ -96,7 +96,7 @@ public class AlchemyNetworkHandler {
 			if (message.value() != null)
 				message_mapping.put(clazz, message.value());
 			else
-				throw new AlchemyRuntimeExcption(new RuntimeException(new NullPointerException(clazz + " -> @Message.value()")));
+				AlchemyRuntimeExcption.onExcption(new RuntimeException(new NullPointerException(clazz + " -> @Message.value()")));
 	}
 	
 }
