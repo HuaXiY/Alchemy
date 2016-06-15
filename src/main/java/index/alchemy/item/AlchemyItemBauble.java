@@ -1,7 +1,10 @@
 package index.alchemy.item;
 
+import baubles.api.BaubleType;
+import baubles.api.IBauble;
 import index.alchemy.api.Alway;
 import index.alchemy.api.IBaubleEquipment;
+import index.alchemy.capability.AlchemyCapabilityLoader;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -10,9 +13,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
-import baubles.api.BaubleType;
-import baubles.api.IBauble;
-import baubles.common.lib.PlayerHandler;
 
 public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment {
 
@@ -25,13 +25,13 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public boolean canEquip(ItemStack item, EntityLivingBase player) {
-			return ((IInventory) PlayerHandler.getPlayerBaubles((EntityPlayer) player)).getStackInSlot(0) == null;
+			return player.getCapability(AlchemyCapabilityLoader.bauble, null).getStackInSlot(0) == null;
 		}
 		
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
 			if (Alway.isServer() && canEquip(item, player)) {
-				IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				if (inventory.getStackInSlot(0) == null) {
 					inventory.setInventorySlotContents(0, item.copy());
 					item.stackSize--;
@@ -56,7 +56,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public boolean canEquip(ItemStack item, EntityLivingBase player) {
-			IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+			IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 			return isOnly() ?
 				inventory.getStackInSlot(2) == null && (inventory.getStackInSlot(1) == null || inventory.getStackInSlot(1).getItem() != this) ||
 				inventory.getStackInSlot(1) == null && (inventory.getStackInSlot(2) == null || inventory.getStackInSlot(2).getItem() != this) : 
@@ -66,7 +66,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
 			if (Alway.isServer() && canEquip(item, player)) {
-				IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				for (int i = 1; i < 3; i++)
 					if (inventory.getStackInSlot(i) == null) {
 						inventory.setInventorySlotContents(i, item.copy());
@@ -96,13 +96,13 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public boolean canEquip(ItemStack item, EntityLivingBase player) {
-			return ((IInventory) PlayerHandler.getPlayerBaubles((EntityPlayer) player)).getStackInSlot(3) == null;
+			return player.getCapability(AlchemyCapabilityLoader.bauble, null).getStackInSlot(3) == null;
 		}
 		
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
 			if (Alway.isServer() && canEquip(item, player)) {
-				IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				if (inventory.getStackInSlot(3) == null) {
 					inventory.setInventorySlotContents(3, item.copy());
 					item.stackSize--;
@@ -151,7 +151,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	
 	@Override
 	public ItemStack getFormPlayer(EntityPlayer player) {
-		IInventory inventory = PlayerHandler.getPlayerBaubles(player);
+		IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 		for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 			ItemStack item = inventory.getStackInSlot(i);
 			if (item != null && item.getItem() == this)
@@ -166,14 +166,14 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	}
 	
 	public static ItemStack setBauble(EntityPlayer player, int index, ItemStack item) {
-		IInventory inventory = PlayerHandler.getPlayerBaubles((EntityPlayer) player);
+		IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 		ItemStack result = inventory.getStackInSlot(index);
 		inventory.setInventorySlotContents(index, item);
 		return result;
 	}
 	
 	public static ItemStack getBauble(EntityPlayer player, int index) {
-		return ((IInventory) PlayerHandler.getPlayerBaubles((EntityPlayer) player)).getStackInSlot(index);
+		return player.getCapability(AlchemyCapabilityLoader.bauble, null).getStackInSlot(index);
 	}
 
 }

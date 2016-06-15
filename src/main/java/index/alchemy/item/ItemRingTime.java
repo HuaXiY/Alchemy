@@ -99,7 +99,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 				public void run(Phase phase) {
 					player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
 				}
-			}, 0, Side.SERVER);
+			}, 0);
 			final Iterator<TimeNode> iterator = snapshot.list.iterator();
 			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
 				@Override
@@ -113,7 +113,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 					}
 					return false;
 				}
-			}, Side.CLIENT);
+			});
 		}
 	}
 	
@@ -127,7 +127,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 					player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
 					player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, TimeSnapshot.SIZE / 2, 3));
 				}
-			}, 0, Side.SERVER);
+			}, 0);
 			final Iterator<TimeNode> iterator = snapshot.list.iterator();
 			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
 				@Override
@@ -141,7 +141,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 					}
 					return false;
 				}
-			}, Side.SERVER);
+			});
 		}
 	}
 	

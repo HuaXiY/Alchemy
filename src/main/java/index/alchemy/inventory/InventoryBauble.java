@@ -10,6 +10,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.MessageNBTUpdate;
 import index.alchemy.util.NBTHelper;
+import index.alchemy.util.Tool;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -24,7 +25,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class InventoryBauble extends AlchemyInventory implements ICapabilityProvider, INBTSerializable, RandomAccess {
@@ -44,7 +44,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 		NBTTagList list = nbt.getTagList(CONTENTS, NBT.TAG_COMPOUND);
 		if (!list.hasNoTags())
 			contents = NBTHelper.getItemStacksFormNBTList(list);
-		update();
+		update(true);
 	}
 	
 	public NBTTagCompound saveToNBT(NBTTagCompound nbt) {
@@ -55,8 +55,16 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	@Override
 	public void markDirty() {}
 	
-	public void update() {
-		if (Alway.isServer())
+	public boolean hasBauble() {
+		int flag = 0;
+		for (ItemStack item : contents)
+			if (item != null)
+				flag++;
+		return flag > 0;
+	}
+	
+	public void update(boolean init) {
+		if (Alway.isServer() && (!init || hasBauble()))
 			updateTracker();
 	}
 	
@@ -70,7 +78,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 				public void run(Phase phase) {
 					updatePlayer((EntityPlayerMP) living, data);					
 				}
-			}, 1, Side.SERVER);
+			}, 1);
 	}
 	
 	public void updatePlayer(EntityPlayerMP player) {
@@ -78,6 +86,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	}
 	
 	public void updatePlayer(EntityPlayerMP player, NBTTagCompound data) {
+		System.out.println("updatePlayer");
 		AlchemyNetworkHandler.updateEntityNBT(MessageNBTUpdate.Type.ENTITY_BAUBLE_DATA, living.getEntityId(), data, player);
 	}
 	
@@ -104,16 +113,20 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
 		ItemStack item = ItemStackHelper.getAndSplit(contents, index, count);
-		change(item, null);
-		update();
+		if (item != null) {
+			change(item, null);
+			update(false);
+		}
 		return item;
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		ItemStack item = ItemStackHelper.getAndRemove(contents, index);
-		change(item, null);
-		update();
+		if (item != null) {
+			change(item, null);
+			update(false);
+		}
 		return item;
 	}
 
@@ -121,8 +134,10 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	public void setInventorySlotContents(int index, ItemStack item) {
 		ItemStack old = contents[index];
 		contents[index] = item;
-		change(old, item);
-		update();
+		if (old != item) {
+			change(old, item);
+			update(false);
+		}
 	}
 
 	@Override
@@ -146,7 +161,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 			change(contents[i], null);
 			contents[i] = null;
 		}
-		update();
+		update(false);
 	}
 	
 	public void change(ItemStack old, ItemStack _new) {

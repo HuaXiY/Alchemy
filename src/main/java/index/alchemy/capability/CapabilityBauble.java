@@ -122,7 +122,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent
 	public void onPlayer_StartTracking(PlayerEvent.StartTracking event) {
 		InventoryBauble inventory = event.getTarget().getCapability(AlchemyCapabilityLoader.bauble, null);
-		if (inventory != null)
+		if (inventory != null && inventory.hasBauble())
 			inventory.updatePlayer((EntityPlayerMP) event.getEntityPlayer());
 	}
 

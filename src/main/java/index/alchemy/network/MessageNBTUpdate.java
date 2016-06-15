@@ -57,7 +57,7 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 							break;
 					}
 			}
-		}, 1, Side.CLIENT);
+		}, 1);
 		return null;
 	}
 	

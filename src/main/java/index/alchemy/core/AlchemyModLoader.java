@@ -3,6 +3,9 @@ package index.alchemy.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -17,8 +20,11 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.base.Joiner;
+
 import index.alchemy.annotation.Init;
 import index.alchemy.annotation.InitInstance;
+import index.alchemy.annotation.Test;
 import index.alchemy.api.Alway;
 import index.alchemy.config.AlchemyConfigLoader;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
@@ -26,6 +32,7 @@ import index.alchemy.development.DMain;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
 import index.alchemy.world.AlchemyDimensionType;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -95,9 +102,26 @@ public class AlchemyModLoader {
 		return state;
 	}
 	
+	public static boolean isAvailable() {
+		return getState().ordinal() >= ModState.AVAILABLE.ordinal();
+	}
+	
 	public static void checkState() {
-		if (getState().ordinal() >= ModState.AVAILABLE.ordinal())
+		if (isAvailable())
 			AlchemyRuntimeExcption.onExcption(new RuntimeException("Abnormal state: " + getState().name()));
+	}
+	
+	public static void restart() {
+		RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+		String cp = bean.getClassPath();
+		List<String> args = bean.getInputArguments();
+		String main = System.getProperty("sun.java.command");
+		try {
+			Process process = Runtime.getRuntime().exec("java " + Joiner.on(' ').join(args) + " -cp " + cp + " " + main);
+			FMLCommonHandler.instance().exitJava(0xC001, false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	static {
@@ -188,7 +212,14 @@ public class AlchemyModLoader {
 		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
 		for (Class clazz : init_map.get(state)) {
 			bar.step(clazz.getSimpleName());
-			init(clazz);
+			if (clazz.getAnnotation(Test.class) != null)
+				try {
+					AlchemyInitHook.init(clazz.newInstance());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			else
+				init(clazz);
 		}
 		ProgressManager.pop(bar);
 		logger.info("************************************   " + state_str + "  END    ************************************");
@@ -197,7 +228,9 @@ public class AlchemyModLoader {
 	public static void init(Class<?> clazz) {
 		try {
 			logger.info("Starting init class: " + clazz.getName());
-			clazz.getMethod("init").invoke(null);
+			Method method = clazz.getMethod("init");
+			if (method != null)
+				method.invoke(null);
 			logger.info("Successful !");
 		} catch (Exception e) {
 			logger.error("Failed !");

@@ -24,16 +24,17 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
@@ -65,12 +66,25 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer() && living instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) living;
-			if (player.getHealth() > 0.0F && !player.isSpectator())
-				for (Entity entity : player.worldObj.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().expand(5D, 5D, 5D)))
-					if (!entity.isDead && entity instanceof EntityItem)
-			        	   onCollideWithPlayer((EntityItem) entity, player);
+		if (Alway.isServer()) {
+			if (living instanceof EntityPlayer) {
+				EntityPlayer player = (EntityPlayer) living;
+				if (player.getHealth() > 0.0F && !player.isSpectator())
+					for (EntityItem entity : player.worldObj.getEntitiesWithinAABB(EntityItem.class, player.getEntityBoundingBox().expand(5D, 5D, 5D)))
+						if (!entity.isDead)
+				        	   onCollideWithPlayer((EntityItem) entity, player);
+			}
+		} else if (living == Minecraft.getMinecraft().thePlayer) {
+			for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(living, 32)))
+				if (oliving != Minecraft.getMinecraft().thePlayer) {
+					oliving.setGlowing(true);
+					oliving.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 2));
+				}
+			for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(living, 108))) {
+				PotionEffect effect = oliving.getActivePotionEffect(MobEffects.GLOWING);
+				if (effect == null || effect.getDuration() == 0)
+					oliving.setGlowing(false);
+			}
 		}
 	}
 	

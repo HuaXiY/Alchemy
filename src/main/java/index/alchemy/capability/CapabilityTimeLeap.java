@@ -62,6 +62,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 				player.setAbsorptionAmount(absorption);
 				player.getFoodStats().setFoodLevel(food);
 				player.setAir(air);
+				player.setPosition(x, y, z);
 				player.fire = fire;
 				player.motionX = 0;
 				player.motionY = 0;

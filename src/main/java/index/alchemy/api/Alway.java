@@ -5,8 +5,11 @@ import java.util.Map;
 
 import index.alchemy.core.Constants;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -50,6 +53,16 @@ public class Alway {
 	
 	public static Biome getCurrentBiome(World world, int x, int z) {
 		return world.getBiomeForCoordsBody(new BlockPos(x, 0, z));
+	}
+	
+	public static ILocationProvider generateLocationProvider(final Entity entity, final double offsetY) {
+		return new ILocationProvider() {
+			@Override
+			public Vec3d getLocation() {
+				AxisAlignedBB aabb = entity.getEntityBoundingBox();
+				return entity.getPositionVector().addVector((aabb.maxX - aabb.minX) / 2, offsetY, (aabb.maxZ - aabb.minZ) / 2);
+			}
+		};
 	}
 	
 }

@@ -53,5 +53,5 @@ public class AlchemyColorLoader {
 		registerItemColor();
 		registerBlockColor();
 	}
-
+	
 }
