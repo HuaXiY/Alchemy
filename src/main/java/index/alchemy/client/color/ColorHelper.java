@@ -48,6 +48,9 @@ public class ColorHelper {
 				
 				return new Color((int) fr, (int) fg, (int) fb, (int) fa);
 			}
+			
+			@Override
+			public void remove() { }
 		};
 	}
 	
@@ -106,6 +109,9 @@ public class ColorHelper {
 				int rgb = Color.HSBtoRGB(fh, fs, fb);
 				return new Color(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, (int) fa);
 			}
+			
+			@Override
+			public void remove() { }
 		};
 	}
 	
