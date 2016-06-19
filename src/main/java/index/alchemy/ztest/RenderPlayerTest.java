@@ -23,9 +23,9 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import static index.alchemy.util.MathHelper.*;
+import org.lwjgl.opengl.GL11;
 
-@Test
+//@Test
 @Init(state = ModState.POSTINITIALIZED)
 public class RenderPlayerTest implements IEventHandle {
 	
@@ -58,7 +58,7 @@ public class RenderPlayerTest implements IEventHandle {
 
 	            vertexbuffer.begin(7, DefaultVertexFormats.BLOCK);
 	            BlockPos blockpos = new BlockPos(entity.posX, entity.posY, entity.posZ);
-	            GlStateManager.translate(-x - .5 * mod(x), -y, -z - .5 * mod(z));
+	            //GlStateManager.translate(-x - .5 * mod(x), -y, -z - .5 * mod(z));
 	            BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 	            blockrendererdispatcher.getBlockModelRenderer().renderModel(world, blockrendererdispatcher.getModelForState(iblockstate),
 	            		iblockstate, blockpos, vertexbuffer,  false, 0);

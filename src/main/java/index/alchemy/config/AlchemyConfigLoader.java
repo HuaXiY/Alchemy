@@ -23,6 +23,9 @@ public class AlchemyConfigLoader {
 	
 	public static final List<Field> config_list = new LinkedList<Field>();
 	
+	@Config(category = "config", comment = "DO NOT MODIFY.")
+	private static int version = 1;
+	
 	private static Configuration configuration;
 		
 	public static void init() {

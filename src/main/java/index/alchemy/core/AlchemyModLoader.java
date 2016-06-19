@@ -76,7 +76,7 @@ public class AlchemyModLoader {
 	}
 	
 	public static final String mc_dir; 
-	public static final boolean is_modding, use_dmain;
+	public static final boolean is_modding, enable_test, enable_dmain;
 	public static final Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>() {
 		@Override
 		public List<Class<?>> get(Object key) {
@@ -139,8 +139,11 @@ public class AlchemyModLoader {
 			is_modding = false;
 		}
 		
-		use_dmain = is_modding && Boolean.getBoolean("index.alchemy.use_dmain");
-		logger.info("Development mode state: " + use_dmain);
+		enable_test = Boolean.getBoolean("index.alchemy.enable_test");
+		logger.info("Test mode state: " + enable_test);
+		
+		enable_dmain = is_modding && Boolean.getBoolean("index.alchemy.enable_dmain");
+		logger.info("Development mode state: " + enable_dmain);
 		
 		List<String> class_list = new LinkedList<String>();
 		
@@ -182,7 +185,7 @@ public class AlchemyModLoader {
 				try {
 					Class<?> clazz = Class.forName(name, false, loader);
 					logger.info(AlchemyModLoader.class.getName() + " Loading -> " + clazz);
-					if (use_dmain)
+					if (enable_dmain)
 						DMain.init(clazz);
 					AlchemyConfigLoader.init(clazz);
 					AlchemyEventSystem.init(clazz);
@@ -212,11 +215,11 @@ public class AlchemyModLoader {
 		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
 		for (Class clazz : init_map.get(state)) {
 			bar.step(clazz.getSimpleName());
-			if (clazz.getAnnotation(Test.class) != null)
+			if (clazz.getAnnotation(Test.class) != null && enable_test)
 				try {
 					AlchemyInitHook.init(clazz.newInstance());
 				} catch (Exception e) {
-					e.printStackTrace();
+					AlchemyRuntimeExcption.onExcption(e);
 				}
 			else
 				init(clazz);
@@ -228,7 +231,10 @@ public class AlchemyModLoader {
 	public static void init(Class<?> clazz) {
 		try {
 			logger.info("Starting init class: " + clazz.getName());
-			Method method = clazz.getMethod("init");
+			Method method = null;
+			try {
+				method = clazz.getMethod("init");
+			} catch (NoSuchMethodException e) {}
 			if (method != null)
 				method.invoke(null);
 			logger.info("Successful !");

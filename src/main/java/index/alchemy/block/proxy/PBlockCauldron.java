@@ -59,13 +59,13 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IRegis
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem,
 			EnumFacing side, float hitX, float hitY, float hitZ) {
-		int i = ((Integer)state.getValue(LEVEL)).intValue();
-		
-		CauldronActivatedEvent event;
-		if (MinecraftForge.EVENT_BUS.post(event = new CauldronActivatedEvent(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)))
-			return event.getResult() == Result.DEFAULT;
-
 		if (Alway.isServer()) {
+			int i = ((Integer)state.getValue(LEVEL)).intValue();
+			
+			CauldronActivatedEvent event;
+			if (MinecraftForge.EVENT_BUS.post(event = new CauldronActivatedEvent(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)))
+				return event.getResult() == Result.DEFAULT;
+			
 			if (heldItem == null) {
 				LinkedList<ItemStack> list = getTileEntityCauldron(world, pos).getContainer();
 				if (list.size() > 0)
@@ -80,13 +80,13 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IRegis
 					}
 				} else if (item == Items.WATER_BUCKET) {
 					if (i < 3) {
-						InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, new ItemStack(Items.BUCKET));
+						InventoryHelper.addNonCreativeModeItemStackOrSetToHand(player, hand, heldItem, new ItemStack(Items.BUCKET));
 					    player.addStat(StatList.CAULDRON_FILLED);
 					    setWaterLevel(world, pos, state, 3);
 					}
 				} else if (item == Items.POTIONITEM) {
 					if (i < 3 && PotionUtils.getPotionFromItem(heldItem) == PotionTypes.WATER) {
-						InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, new ItemStack(Items.GLASS_BOTTLE));
+						InventoryHelper.addNonCreativeModeItemStackOrSetToHand(player, hand, heldItem, new ItemStack(Items.GLASS_BOTTLE));
 					    player.addStat(StatList.CAULDRON_FILLED);
 					    setWaterLevel(world, pos, state, i + 1);
 					}

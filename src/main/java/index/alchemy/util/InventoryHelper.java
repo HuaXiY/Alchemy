@@ -95,4 +95,12 @@ public class InventoryHelper  {
 			player.dropItem(item, false);
 	}
 	
+	public static void addNonCreativeModeItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {
+		if (!player.capabilities.isCreativeMode)
+			if (--heldItem.stackSize == 0)
+				player.setHeldItem(hand, item);
+			else if (item != null && !player.inventory.addItemStackToInventory(item))
+				player.dropItem(item, false);
+	}
+	
 }

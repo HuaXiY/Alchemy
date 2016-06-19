@@ -13,6 +13,7 @@ import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IItemInventory;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.AlchemyKeyBinding;
+import index.alchemy.config.AlchemyConfig;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.inventory.InventoryItem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
@@ -75,7 +76,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 				        	   onCollideWithPlayer((EntityItem) entity, player);
 			}
 		} else if (living == Minecraft.getMinecraft().thePlayer) {
-			for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(living, 32)))
+			for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(living, 16)))
 				if (oliving != Minecraft.getMinecraft().thePlayer) {
 					oliving.setGlowing(true);
 					oliving.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 2));
@@ -195,7 +196,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		}
 		if (list.size() > 0) {
 			inventory.updateNBT();
-			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player, 64D), player.worldObj, d6p);
+			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player, AlchemyConfig.getParticleRange()), player.worldObj, d6p);
 		}
 	}
 	

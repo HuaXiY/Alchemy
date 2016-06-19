@@ -10,7 +10,6 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.MessageNBTUpdate;
 import index.alchemy.util.NBTHelper;
-import index.alchemy.util.Tool;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -86,7 +85,6 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	}
 	
 	public void updatePlayer(EntityPlayerMP player, NBTTagCompound data) {
-		System.out.println("updatePlayer");
 		AlchemyNetworkHandler.updateEntityNBT(MessageNBTUpdate.Type.ENTITY_BAUBLE_DATA, living.getEntityId(), data, player);
 	}
 	

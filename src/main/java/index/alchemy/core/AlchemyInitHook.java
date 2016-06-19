@@ -55,7 +55,7 @@ public class AlchemyInitHook {
 		GameRegistry.register(impl);
 		
 		if (impl instanceof Block)
-			init(new ItemBlock((Block) impl).setRegistryName(((Block) impl).getRegistryName()));
+			init_impl(new ItemBlock((Block) impl).setRegistryName(((Block) impl).getRegistryName()));
 		
 		if (impl instanceof ITileEntity)
 			GameRegistry.registerTileEntity(((ITileEntity) impl).getTileEntityClass(), ((ITileEntity) impl).getTileEntityName());

@@ -12,7 +12,7 @@ import net.minecraftforge.common.DimensionManager;
 
 public class AlchemyDimensionType {
 	
-	@Config(category = "World", comment = "Alchemy mod DimensionType id start")
+	@Config(category = "world", comment = "Alchemy mod DimensionType id start.")
 	private static int alchemy_dimension_type_id = 30;
 	private static int next_id = -1;
 	

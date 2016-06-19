@@ -1,7 +1,7 @@
 package index.alchemy.api;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -19,9 +19,6 @@ public class Alchemy {
 		AlchemyModLoader.checkState();
 		if (recipe.getAlchemyName() == null)
 			AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, name is null"));
-		for (ItemStack item : recipe.getMaterial())
-			if (item == null)
-				AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, recipe has null, " + recipe.getAlchemyName()));
 		if (!ALCHEMY_LIST.contains(recipe))
 			ALCHEMY_LIST.add(recipe);
 		else
@@ -45,23 +42,28 @@ public class Alchemy {
 		return null;
 	}
 	
+	/*
+	 * if (return != null) materials -> residues material
+	 */
 	@Nullable
-	public static ItemStack findResult(List<ItemStack> list) {
-		list: for (int i = 0, len = ALCHEMY_LIST.size(); i < len; i++) {
-			IAlchemyRecipe recipe = ALCHEMY_LIST.get(i);
-			if (recipe.getMaterial().size() == list.size()) {
-				Iterator<ItemStack> r = recipe.getMaterial().iterator(), l = list.iterator();
-				while (r.hasNext()) {
-					ItemStack ri = r.next(), li = l.next();
-					if (li == null)
-						AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.findResult, input has null"));
-					if (!ItemStack.areItemStacksEqual(ri, li))
-						continue list;
-				}
-				return recipe.getResult().copy();
+	public static ItemStack findResult(List<ItemStack> materials) {
+		List<ItemStack> copy = null;
+		boolean change = true;
+		alchemy: for (IAlchemyRecipe recipe : ALCHEMY_LIST) {
+			if (change) {
+				copy = new LinkedList<ItemStack>(materials);
+				change = false;
 			}
+			for (IMaterialConsumer consumer : recipe.getAlchemyMaterial())
+				if (consumer.treatmentMaterial(copy))
+					change = true;
+				else
+					continue alchemy;
+			materials.clear();
+			materials.addAll(copy);
+			return recipe.getAlchemyResult();
 		}
 		return null;
 	}
-
+	
 }

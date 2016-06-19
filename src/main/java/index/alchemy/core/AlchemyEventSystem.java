@@ -26,7 +26,6 @@ import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
-import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeExcption;
@@ -225,7 +224,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SubscribeEvent
 	public void onInitHook(InitHookEvent event) {
 		AlchemyModLoader.logger.info("    init: <" + event.init.getClass().getName() + "> " + event.init);
-		if (AlchemyModLoader.use_dmain)
+		if (AlchemyModLoader.enable_dmain)
 			DMain.init(event.init);
 	}
 	

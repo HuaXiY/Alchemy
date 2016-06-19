@@ -2,11 +2,10 @@ package index.alchemy.client.fx;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.World;
 
-public class AlchemyFX extends Particle {
+public abstract class AlchemyFX extends Particle {
 	
 	protected int brightness = -1;
 	
