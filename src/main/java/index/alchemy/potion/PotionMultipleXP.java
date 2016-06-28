@@ -10,10 +10,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class PotionMultipleXP extends AlchemyPotion implements IEventHandle {
 	
-	public PotionMultipleXP() {
-		super("multiple_xp", false, 0x00FF7F);
-	}
-	
 	@Override
 	public EventType[] getEventType() {
 		return AlchemyEventSystem.EVENT_BUS;
@@ -24,6 +20,10 @@ public class PotionMultipleXP extends AlchemyPotion implements IEventHandle {
 		PotionEffect effect = event.getEntityPlayer().getActivePotionEffect(AlchemyPotionLoader.multiple_xp);
 		if (effect != null)
 			event.getOrb().xpValue *= effect.getAmplifier() + 1;
+	}
+	
+	public PotionMultipleXP() {
+		super("multiple_xp", false, 0x00FF7F);
 	}
 
 }

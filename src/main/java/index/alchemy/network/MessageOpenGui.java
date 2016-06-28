@@ -1,6 +1,6 @@
 package index.alchemy.network;
 
-import index.alchemy.annotation.Message;
+import index.alchemy.api.annotation.Message;
 import index.alchemy.core.AlchemyModLoader;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;

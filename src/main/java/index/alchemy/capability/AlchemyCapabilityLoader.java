@@ -1,9 +1,9 @@
 package index.alchemy.capability;
 
-import index.alchemy.annotation.Init;
+import index.alchemy.api.annotation.Init;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.inventory.InventoryBauble;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -20,15 +20,15 @@ public class AlchemyCapabilityLoader {
 	@CapabilityInject(CapabilityBauble.class)
 	public static final Capability<InventoryBauble> bauble = null;
 	
-	static {
+	public static void init() {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		for (Class<?> clazz : AlchemyModLoader.instance_map.get(TYPE))
 			try {
 				clazz.newInstance();
 			} catch (Exception e) {
-				AlchemyRuntimeExcption.onExcption(e);
+				AlchemyRuntimeException.onException(e);
 			}
 	}
-	
-	public static void init() {}
 
 }

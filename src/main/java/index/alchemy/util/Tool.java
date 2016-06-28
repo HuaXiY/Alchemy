@@ -15,10 +15,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 
 public class Tool {
 	
@@ -45,10 +49,35 @@ public class Tool {
 				try {
 					setAccessible(fato[index]).set(to, setAccessible(fsrc).get(src));
 				} catch (Exception e) {
-					e.printStackTrace();
+					AlchemyRuntimeException.onException(e);
 				}
 		}
 		return to;
+	}
+	
+	public static final void setType(Class<?> clazz, Object obj) {
+		Field field = null;
+		try {
+			field = clazz.getDeclaredField("type");
+		} catch (Exception e) {
+			AlchemyModLoader.logger.warn("Can't find Field(type) in: " + clazz.getName());
+		}
+		if (field != null)
+			try {
+				FinalFieldSetter.getInstance().setStatic(field, obj);
+			} catch (Exception e) {
+				AlchemyRuntimeException.onException(e);
+			}
+	}
+	
+	public static final void checkInvokePermissions(int deep, Class<?> clazz) {
+		StackTraceElement ea[];
+		for (StackTraceElement element : ea = new Throwable().getStackTrace())
+			if (clazz.getName().equals(element.getClassName()))
+				return;
+		AlchemyRuntimeException.onException(new IllegalAccessException(
+				ea[deep].getClassName() + " can't invoke " +
+				ea[deep - 1].getClassName() + "#" + ea[deep - 1].getMethodName()));
 	}
 	
 	public static final <T> T[] toArray(List<T> list, Class<T> type) {
@@ -69,7 +98,31 @@ public class Tool {
 				return true;
 		return isSubclass(supers, clazz);
 	}
+	
+	public static final int getSafe(int[] array, int i, int def) {
+		return i < 0 || i > array.length - 1 ? def : array[i];
+	}
+	
+	public static final <T> T getSafe(T[] array, int i, T def) {
+		return i < 0 || i > array.length - 1 ? def : array[i];
+	}
+	
+	public static final <T> T getSafe(List<T> list, int i) {
+		return i < 0 || i > list.size() - 1 ? null : list.get(i);
+	}
+	
+	public static final void checkNull(Object... args) {
+		for (Object obj : args)
+			if (obj == null)
+				AlchemyRuntimeException.onException(new NullPointerException());
+	}
+	
+	public static final void checkArrayLength(Object array, int length) {
+		if (Array.getLength(array) < length)
+			AlchemyRuntimeException.onException(new ArrayIndexOutOfBoundsException(length));
+	}
 
+	@Nullable
 	public static final PrintWriter getPrintWriter(String path) {
 		File file = new File(path);
 		if (!file.exists())
@@ -81,25 +134,25 @@ public class Tool {
 		try {
 			return new PrintWriter(path, "utf-8");
 		} catch (Exception e) {
-			e.printStackTrace();
+			AlchemyRuntimeException.onException(e);
 			return null;
 		}
 	}
 
+	@Nullable
 	public static final PrintWriter getPrintWriter(String path, boolean append) {
 		File file = new File(path);
 		if (!file.exists())
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				System.err.println(file);
 				e.printStackTrace();
 			}
 		try {
 			return new PrintWriter(new OutputStreamWriter(new FileOutputStream(
 					path, append), "utf-8"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			AlchemyRuntimeException.onException(e);
 			return null;
 		}
 	}
@@ -194,7 +247,7 @@ public class Tool {
 		try {
 			return (T) setAccessible(cls.getDeclaredFields()[index]).get(obj);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AlchemyRuntimeException.onException(e);
 			return null;
 		}
 	}
@@ -207,10 +260,11 @@ public class Tool {
 		try {
 			setAccessible(cls.getDeclaredFields()[index]).set(src, to);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AlchemyRuntimeException.onException(e);
 		}
 	}
 	
+	@Nullable
 	public static final Method searchMethod(Class<?> clazz, Class<?>... args) {
 		method_forEach:
 		for (Method method : clazz.getDeclaredMethods()) {
@@ -220,10 +274,19 @@ public class Tool {
 					if (ca[i] != args[i])
 						continue method_forEach;
 				}
-				return method;
+				return setAccessible(method);
 			}
 		}
-		throw new RuntimeException("Can't search Method: " + args + ", in: " + clazz);
+		AlchemyRuntimeException.onException(new RuntimeException("Can't search Method: " + args + ", in: " + clazz));
+		return null;
+	}
+	
+	public static final List<Method> searchMethod(Class<?> clazz, String name) {
+		List<Method> result = new LinkedList<Method>();
+		for (Method method : clazz.getDeclaredMethods())
+			if (method.getName().equals(name))
+				result.add(setAccessible(method));
+		return result;
 	}
 	
 	public static final String _toUp(String str) {

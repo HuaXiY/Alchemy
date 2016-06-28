@@ -2,7 +2,7 @@ package index.alchemy.client.gui;
 
 import java.io.IOException;
 
-import index.alchemy.annotation.Proxy;
+import index.alchemy.api.annotation.Proxy;
 import index.alchemy.container.ContainerInventoryBauble;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;

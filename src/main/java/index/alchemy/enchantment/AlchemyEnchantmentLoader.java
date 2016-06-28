@@ -1,6 +1,6 @@
 package index.alchemy.enchantment;
 
-import index.alchemy.annotation.Init;
+import index.alchemy.api.annotation.Init;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
@@ -12,6 +12,4 @@ public class AlchemyEnchantmentLoader {
 			double_jump = new EnchantmentDoubleJump(),
 			phase_shift = new EnchantmentPhaseShift();
 	
-	public static void init() {}
-
 }

@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -22,16 +23,14 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Joiner;
 
-import index.alchemy.annotation.Init;
-import index.alchemy.annotation.InitInstance;
-import index.alchemy.annotation.Test;
 import index.alchemy.api.Alway;
-import index.alchemy.config.AlchemyConfigLoader;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.InitInstance;
+import index.alchemy.api.annotation.Loading;
+import index.alchemy.api.annotation.Test;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
-import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
-import index.alchemy.world.AlchemyDimensionType;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.Mod;
@@ -52,6 +51,8 @@ public class AlchemyModLoader {
 	
 	public static final Logger logger = LogManager.getLogger(Constants.MOD_ID);
 	
+	public static final Random random = new Random();
+	
 	@Nullable
 	@Deprecated
 	@Instance(Constants.MOD_ID)
@@ -59,8 +60,13 @@ public class AlchemyModLoader {
 	
 	public static Object instance() {
 		if (instance == null)
-			AlchemyRuntimeExcption.onExcption(new NullPointerException("index.alchemy.core.AlchemyModLoader.instance"));
+			AlchemyRuntimeException.onException(new NullPointerException("index.alchemy.core.AlchemyModLoader.instance"));
 		return instance;
+	}
+	
+	public AlchemyModLoader() {
+		if (instance != null)
+			AlchemyRuntimeException.onException(new RuntimeException("Before this has been instantiate"));
 	}
 	
 	@SidedProxy(clientSide = Constants.MOD_PACKAGE + ".client.ClientProxy", serverSide = Constants.MOD_PACKAGE + ".core.CommonProxy")
@@ -68,11 +74,6 @@ public class AlchemyModLoader {
 	
 	public static CommonProxy getProxy() {
 		return proxy;
-	}
-	
-	public AlchemyModLoader() {
-		if (instance != null)
-			AlchemyRuntimeExcption.onExcption(new RuntimeException("Before this has been instantiate"));
 	}
 	
 	public static final String mc_dir; 
@@ -95,6 +96,7 @@ public class AlchemyModLoader {
 			return result;
 		}
 	};
+	public static final List<Method> loading_list = new LinkedList<Method>();
 	
 	private static ModState state = ModState.UNLOADED;
 	
@@ -108,7 +110,16 @@ public class AlchemyModLoader {
 	
 	public static void checkState() {
 		if (isAvailable())
-			AlchemyRuntimeExcption.onExcption(new RuntimeException("Abnormal state: " + getState().name()));
+			AlchemyRuntimeException.onException(new RuntimeException("Abnormal state: " + getState().name()));
+	}
+	
+	public static void checkState(ModState state) {
+		if (getState() != state)
+			AlchemyRuntimeException.onException(new RuntimeException("Abnormal state: " + getState().name()));
+	}
+	
+	public static void checkInvokePermissions() {
+		Tool.checkInvokePermissions(3, AlchemyModLoader.class);
 	}
 	
 	public static void restart() {
@@ -120,7 +131,7 @@ public class AlchemyModLoader {
 			Process process = Runtime.getRuntime().exec("java " + Joiner.on(' ').join(args) + " -cp " + cp + " " + main);
 			FMLCommonHandler.instance().exitJava(0xC001, false);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AlchemyRuntimeException.onException(e);
 		}
 	}
 	
@@ -149,7 +160,9 @@ public class AlchemyModLoader {
 		
 		try {
 			mod_path = URLDecoder.decode(mod_path, "utf-8");
-		} catch (UnsupportedEncodingException e) { e.printStackTrace(); }
+		} catch (UnsupportedEncodingException e) {
+			AlchemyRuntimeException.onException(e);
+		}
 		
 		if (is_modding) {
 			List<String> temp = new LinkedList<String>();
@@ -169,7 +182,7 @@ public class AlchemyModLoader {
 						class_list.add(name.replace(".class", "").replace("/", "."));
 				}
 			} catch (IOException e) {
-				AlchemyRuntimeExcption.onExcption(e);
+				AlchemyRuntimeException.onException(e);
 			} finally {
 				if (jar != null)
 					try {
@@ -181,24 +194,41 @@ public class AlchemyModLoader {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		
 		for (String name : class_list) {
-			if (name.startsWith("index."))
-				try {
-					Class<?> clazz = Class.forName(name, false, loader);
-					logger.info(AlchemyModLoader.class.getName() + " Loading -> " + clazz);
-					if (enable_dmain)
-						DMain.init(clazz);
-					AlchemyConfigLoader.init(clazz);
-					AlchemyEventSystem.init(clazz);
-					AlchemyDimensionType.init(clazz);
-					AlchemyNetworkHandler.init(clazz);
-					Init init = clazz.getAnnotation(Init.class);
-					SideOnly side = clazz.getAnnotation(SideOnly.class);
-					if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))
-						init_map.get(init.state()).add(clazz);
-					InitInstance instance = clazz.getAnnotation(InitInstance.class);
-					if (instance != null)
+			try {
+				Class<?> clazz = Class.forName(name, false, loader);
+				Loading loading = clazz.getAnnotation(Loading.class);
+				if (loading != null) {
+					loading_list.add(clazz.getMethod("init", Class.class));
+					logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
+				}
+			} catch (ClassNotFoundException e) {} 
+			catch (Exception e) {
+				AlchemyRuntimeException.onException(e);
+			}
+		}
+		
+		for (String name : class_list) {
+			try {
+				Class<?> clazz = Class.forName(name, false, loader);
+				logger.info(AlchemyModLoader.class.getName() + " Loading -> " + clazz);
+				if (enable_dmain)
+					DMain.init(clazz);
+				for (Method method : loading_list)
+					method.invoke(null, clazz);
+				Init init = clazz.getAnnotation(Init.class);
+				SideOnly side = clazz.getAnnotation(SideOnly.class);
+				if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))
+					init_map.get(init.state()).add(clazz);
+				InitInstance instance = clazz.getAnnotation(InitInstance.class);
+				if (instance != null)
+					if (instance.value() != null)
 						instance_map.get(instance.value()).add(clazz);
-				} catch (ClassNotFoundException e) {}
+					else
+						AlchemyRuntimeException.onException(new RuntimeException(new NullPointerException(clazz + " -> @InitInstance.value()")));
+			} catch (ClassNotFoundException e) {}
+			catch (Exception e) {
+				AlchemyRuntimeException.onException(e);
+			}
 		}
 		
 	}
@@ -219,7 +249,7 @@ public class AlchemyModLoader {
 				try {
 					AlchemyInitHook.init(clazz.newInstance());
 				} catch (Exception e) {
-					AlchemyRuntimeExcption.onExcption(e);
+					AlchemyRuntimeException.onException(e);
 				}
 			else
 				init(clazz);
@@ -237,11 +267,13 @@ public class AlchemyModLoader {
 			} catch (NoSuchMethodException e) {}
 			if (method != null)
 				method.invoke(null);
+			else
+				Class.forName(clazz.getName());
 			logger.info("Successful !");
 		} catch (Exception e) {
 			logger.error("Failed !");
 			init(ModState.ERRORED);
-			AlchemyRuntimeExcption.onExcption(e);
+			AlchemyRuntimeException.onException(e);
 		}
 	}
 	

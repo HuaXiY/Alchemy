@@ -1,4 +1,4 @@
-package index.alchemy.annotation;
+package index.alchemy.api.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Config {
 	
-	public String category() default "";
+	public String category();
 	
 	public String comment() default "";
 	

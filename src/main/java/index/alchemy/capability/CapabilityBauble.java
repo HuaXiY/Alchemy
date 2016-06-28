@@ -1,12 +1,12 @@
 package index.alchemy.capability;
 
 import baubles.api.IBauble;
-import index.alchemy.annotation.InitInstance;
-import index.alchemy.annotation.KeyEvent;
 import index.alchemy.api.Alway;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
+import index.alchemy.api.annotation.InitInstance;
+import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.client.gui.GuiInventoryBauble;
 import index.alchemy.container.ContainerInventoryBauble;
 import index.alchemy.core.AlchemyEventSystem;

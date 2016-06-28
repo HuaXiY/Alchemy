@@ -7,7 +7,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -18,11 +18,13 @@ public class Alchemy {
 	public static void registerAlchemyRecipe(IAlchemyRecipe recipe) {
 		AlchemyModLoader.checkState();
 		if (recipe.getAlchemyName() == null)
-			AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, name is null"));
+			AlchemyRuntimeException.onException(new RuntimeException(
+					"index.alchemy.api.Alchemy.registerAlchemyRecipe, name is null"));
 		if (!ALCHEMY_LIST.contains(recipe))
 			ALCHEMY_LIST.add(recipe);
 		else
-			AlchemyRuntimeExcption.onExcption(new RuntimeException("index.alchemy.api.Alchemy.registerAlchemyRecipe, recipe was added before this, " + recipe.getAlchemyName()));
+			AlchemyRuntimeException.onException(new RuntimeException(
+					"index.alchemy.api.Alchemy.registerAlchemyRecipe, recipe was added before this, " + recipe.getAlchemyName()));
 	}
 	
 	public static void removeAlchemyRecipe(IAlchemyRecipe recipe) {

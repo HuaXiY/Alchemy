@@ -23,17 +23,17 @@ public class AlchemyPotion extends Potion implements IRegister {
 	
 	private static int current_id = -1;
 	
-	private boolean ready;
+	private boolean instant;
 	private int id;
 	
 	@Override
 	public boolean isReady(int tick, int level) {
-		return ready;
+		return true;
 	}
 	
 	@Override
 	public boolean isInstant() {
-		return ready;
+		return instant;
 	}
 	
 	@Override
@@ -52,9 +52,11 @@ public class AlchemyPotion extends Potion implements IRegister {
 		this(name, isbad, color, false);
 	}
 	
-	public AlchemyPotion(String name, boolean isbad, int color, boolean ready) {
+	public AlchemyPotion(String name, boolean isbad, int color, boolean instant) {
 		super(isbad, color);
-		this.ready = ready;
+		this.instant = instant;
+		if (!isbad)
+			setBeneficial();
 		id = ++current_id;
 		setPotionName("effect." + name);
 		setRegistryName("potion_" + name);

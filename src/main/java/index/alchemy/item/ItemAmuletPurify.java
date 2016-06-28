@@ -13,7 +13,7 @@ import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.alchemy.item.ItemAmuletPurify.MessagePurifyCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.Double6Package;
+import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.potion.AlchemyPotion;
 import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
@@ -32,6 +32,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static java.lang.Math.*;
+
 public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IEventHandle, INetworkMessage.Client<MessagePurifyCallback> {
 	
 	public static final int INTERVAL = 20 * 20, MAX_AIR = 300;
@@ -48,10 +50,12 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 						flag = true;
 					}
 				if (flag) {
-					List<Double6Package> d6p = new LinkedList<Double6Package>();
+					List<Double6IntArrayPackage> d6iap = new LinkedList<Double6IntArrayPackage>();
 					for (int i = 0; i < 9; i++)
-						d6p.add(new Double6Package(living.posX - 1 + living.rand.nextDouble() * 2, living.posY + 1, living.posZ - 1 + living.rand.nextDouble() * 2, 0D, 0D, 0D));
-					AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.WATER_SPLASH, AABBHelper.getAABBFromEntity(living, AlchemyConfig.getParticleRange()), living.worldObj, d6p);
+						d6iap.add(new Double6IntArrayPackage(living.posX - 1 + living.rand.nextDouble() * 2, living.posY + 1,
+								living.posZ - 1 + living.rand.nextDouble() * 2, 0D, 0D, 0D));
+					AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.WATER_SPLASH, AABBHelper.getAABBFromEntity(living,
+							AlchemyConfig.getParticleRange()), living.worldObj, d6iap);
 					living.getEntityData().setInteger(NBT_KEY_CD, living.ticksExisted);
 					if (living instanceof EntityPlayerMP)
 						AlchemyNetworkHandler.network_wrapper.sendTo(new MessagePurifyCallback(), (EntityPlayerMP) living);
@@ -104,7 +108,7 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
+				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
@@ -116,13 +120,15 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted - (getMaxCD() - cd));
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 
 	@Override

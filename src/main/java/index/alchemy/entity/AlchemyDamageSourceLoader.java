@@ -1,6 +1,6 @@
 package index.alchemy.entity;
 
-import index.alchemy.annotation.Init;
+import index.alchemy.api.annotation.Init;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
@@ -11,7 +11,5 @@ public class AlchemyDamageSourceLoader {
 			soul_withred = new AlchemyDamageSource("soul_withred").setMagicDamage().setDamageBypassesArmor(),
 			dead_magic = new AlchemyDamageSource("dead_magic").setMagicDamage().setDamageBypassesArmor(),
 			plague = new AlchemyDamageSource("plague").setMagicDamage().setDamageBypassesArmor();
-	
-	public static void init() {}
 	
 }

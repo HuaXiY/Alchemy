@@ -4,12 +4,13 @@ import java.util.Iterator;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.annotation.KeyEvent;
+import index.alchemy.api.Alway;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.IPhaseRunnable;
+import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
@@ -24,18 +25,24 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+
+import static java.lang.Math.*;
 
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
-	public static final int USE_CD = 20 * 20;
+	public static final int USE_CD = 20 * 20, REPAIR_INTERVAL = 20 * 10;
 	public static final String NBT_KEY_CD = "cd_ring_time", KEY_DESCRIPTION = "key.time_ring_leap";
 	
 	@Override
@@ -48,6 +55,14 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
 		if (living instanceof EntityPlayer)
 			living.getCapability(AlchemyCapabilityLoader.time_leap, null).updateTimeNode((EntityPlayer) living);
+		if (living.ticksExisted % REPAIR_INTERVAL == 0) {
+			IItemHandler handler = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.NORTH);
+			for (int i = 0, len = handler.getSlots(); i < len; i++) {
+				ItemStack old = handler.getStackInSlot(i);
+				if (old != null && old.isItemDamaged() && Enchantments.MENDING.canApply(item))
+					old.setItemDamage(old.getItemDamage() - 1);
+			}
+		}
 	}
 
 	@Override
@@ -97,20 +112,24 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 				@Override
 				public void run(Phase phase) {
-					player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
+					if (Alway.isPlaying())
+						player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
 				}
 			}, 0);
 			final Iterator<TimeNode> iterator = snapshot.list.iterator();
 			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
 				@Override
 				public boolean run(Phase phase) {
-					if (iterator.hasNext())
-						iterator.next().updatePlayerOnClient(player);
-					if (!iterator.hasNext()) {
-						snapshot.setUpdate(true);
-						AlchemyEventSystem.removeInputHook(ItemRingTime.this);
+					if (Alway.isPlaying()) {
+						if (iterator.hasNext())
+							iterator.next().updatePlayerOnClient(player);
+						if (!iterator.hasNext()) {
+							snapshot.setUpdate(true);
+							AlchemyEventSystem.removeInputHook(ItemRingTime.this);
+							return true;
+						}
+					} else 
 						return true;
-					}
 					return false;
 				}
 			});
@@ -155,7 +174,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
+				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
@@ -167,13 +186,15 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted - (getMaxCD() - cd));
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 
 	@Override

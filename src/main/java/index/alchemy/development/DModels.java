@@ -3,8 +3,8 @@ package index.alchemy.development;
 import java.io.File;
 import java.io.IOException;
 
-import index.alchemy.annotation.DInit;
 import index.alchemy.api.IResourceLocation;
+import index.alchemy.api.annotation.DInit;
 import index.alchemy.core.Constants;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;

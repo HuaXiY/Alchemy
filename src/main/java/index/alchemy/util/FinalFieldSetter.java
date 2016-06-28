@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 
 public final class FinalFieldSetter {
 
@@ -16,7 +16,7 @@ public final class FinalFieldSetter {
         try {
             temp = new FinalFieldSetter();
         } catch (ReflectiveOperationException e) {
-            AlchemyRuntimeExcption.onExcption(e);
+            AlchemyRuntimeException.onException(e);
         }
         INSTANCE = temp;
     }
@@ -58,7 +58,6 @@ public final class FinalFieldSetter {
     }
 
     public void set(final Object o, final Field field, final Object value) throws Exception {
-
         final Object fieldBase = o;
         final long fieldOffset = (Long) objectFieldOffsetMethod.invoke(unsafeObj, field);
 
@@ -66,7 +65,6 @@ public final class FinalFieldSetter {
     }
 
     public void setStatic(final Field field, final Object value) throws Exception {
-
         final Object fieldBase = staticFieldBaseMethod.invoke(unsafeObj, field);
         final long fieldOffset = (Long) staticFieldOffsetMethod.invoke(unsafeObj, field);
 

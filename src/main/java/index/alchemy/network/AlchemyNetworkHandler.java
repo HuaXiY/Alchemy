@@ -5,15 +5,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import index.alchemy.annotation.Init;
-import index.alchemy.annotation.Message;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Loading;
+import index.alchemy.api.annotation.Message;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,6 +31,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Loading
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
 	
@@ -68,10 +70,10 @@ public class AlchemyNetworkHandler {
 		network_wrapper.sendToServer(new MessageOpenGui(AlchemyEventSystem.getGuiIdByGuiHandle(handle)));
 	}
 	
-	public static void spawnParticle(EnumParticleTypes particle, AxisAlignedBB aabb, World world, List<Double6Package> d6ps) {
-		Double6Package d6p[] = Tool.toArray(d6ps, Double6Package.class);
+	public static void spawnParticle(EnumParticleTypes particle, AxisAlignedBB aabb, World world, List<Double6IntArrayPackage> d6iaps) {
+		Double6IntArrayPackage d6iap[] = Tool.toArray(d6iaps, Double6IntArrayPackage.class);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
-			network_wrapper.sendTo(new MessageParticle(particle.getParticleID(), d6p), player);
+			network_wrapper.sendTo(new MessageParticle(particle.getParticleID(), d6iap), player);
 	}
 	
 	public static void playSound(SoundEvent sound, SoundCategory category, AxisAlignedBB aabb, World world, List<Double3Float2Package> d3f2ps) {
@@ -85,6 +87,8 @@ public class AlchemyNetworkHandler {
 	}
 	
 	public static <T extends IMessage & IMessageHandler<T, IMessage>> void init() {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		for (Entry<Class<?>, Side> entry : message_mapping.entrySet())
 			registerMessage((Class<T>) entry.getKey(), entry.getValue());
 	}
@@ -96,7 +100,7 @@ public class AlchemyNetworkHandler {
 			if (message.value() != null)
 				message_mapping.put(clazz, message.value());
 			else
-				AlchemyRuntimeExcption.onExcption(new RuntimeException(new NullPointerException(clazz + " -> @Message.value()")));
+				AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @Message.value()"));
 	}
 	
 }

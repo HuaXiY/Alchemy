@@ -1,8 +1,8 @@
 package index.alchemy.ztest;
 
-import index.alchemy.annotation.Init;
-import index.alchemy.annotation.Test;
 import index.alchemy.api.IEventHandle;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Test;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.util.Tool;

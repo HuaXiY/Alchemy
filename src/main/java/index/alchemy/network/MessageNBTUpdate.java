@@ -2,8 +2,8 @@ package index.alchemy.network;
 
 import java.util.Iterator;
 
-import index.alchemy.annotation.Message;
 import index.alchemy.api.IPhaseRunnable;
+import index.alchemy.api.annotation.Message;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.inventory.InventoryBauble;
@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -46,7 +47,10 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 		AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 			@Override
 			public void run(Phase phase) {
-				Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(message.id);
+				World world = Minecraft.getMinecraft().theWorld;
+				if (world == null)
+					return;
+				Entity entity = world.getEntityByID(message.id);
 				if (entity != null)
 					switch (message.type) {
 						case ENTITY_BAUBLE_DATA:

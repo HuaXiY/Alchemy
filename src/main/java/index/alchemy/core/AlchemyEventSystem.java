@@ -1,6 +1,7 @@
 package index.alchemy.core;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,10 +15,6 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.annotation.Init;
-import index.alchemy.annotation.KeyEvent;
-import index.alchemy.annotation.Render;
-import index.alchemy.annotation.Texture;
 import index.alchemy.api.Alway;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
@@ -26,9 +23,15 @@ import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.KeyEvent;
+import index.alchemy.api.annotation.Loading;
+import index.alchemy.api.annotation.Render;
+import index.alchemy.api.annotation.Texture;
+import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
-import index.alchemy.core.debug.AlchemyRuntimeExcption;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
@@ -57,6 +60,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Loading
 @Init(state = ModState.CONSTRUCTED)
 public class AlchemyEventSystem implements IGuiHandler {
 	
@@ -147,8 +151,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 				double offsetZ = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
 			
-				//Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
-				//		+ offsetX, ((int)player.posY) + 2, player.posZ + offsetZ));
+				Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
+						+ offsetX, ((int)player.posY) + 2, player.posZ + offsetZ));
 			}
 			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
@@ -264,16 +268,30 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SideOnly(Side.CLIENT)
 	public static void registerInputHandle(final IInputHandle handle) {
+		Class<?> clazz = handle.getClass();
 		for (KeyBinding binding : handle.getKeyBindings()) {
 			if (!ArrayUtils.contains(Minecraft.getMinecraft().gameSettings.keyBindings, binding))
 				ClientRegistry.registerKeyBinding(binding);
 			String description = binding.getKeyDescription();
-			for (final Method method : handle.getClass().getMethods()) {
+			for (Method method : clazz.getMethods()) {
 				KeyEvent event = method.getAnnotation(KeyEvent.class);
 				if (event != null)
-					for (String value : event.value())
-						if (value.equals(description))
-							KEY_HANDELS.add(new KeyBindingHandle(binding, handle, method));
+					if (event.value() != null)
+						if (!Modifier.isStatic(method.getModifiers()))
+							if (method.getParameterTypes().length == 1 && method.getParameterTypes()[0] == KeyBinding.class) {
+								for (String value : event.value())
+									if (value.equals(description))
+										KEY_HANDELS.add(new KeyBindingHandle(binding, handle, method));
+							}
+							else
+								AlchemyRuntimeException.onException(new IllegalArgumentException(
+												clazz + "#" + method.getName() + "() -> args != " + KeyBinding.class.getName()));
+						else
+							AlchemyRuntimeException.onException(new IllegalAccessException(
+											clazz + "#" + method.getName() + "() -> is static"));
+					else
+						AlchemyRuntimeException.onException(new NullPointerException(
+										clazz + "#" + method.getName() + "() -> @KeyEvent.value()"));
 			}
 		}
 	}
@@ -289,7 +307,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 					try {
 						handle.getMethod().invoke(handle.getHandle(), handle.getBinding());
 					} catch (Exception e) {
-						AlchemyRuntimeExcption.onExcption(e);
+						AlchemyRuntimeException.onException(e);
 					}
 	}
 	
@@ -327,6 +345,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	public static void init() {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		instance = new AlchemyEventSystem();
 	}
 	
@@ -339,7 +359,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 					for (String res : texture.value())
 						TEXTURE_SET.add(res);
 				else
-					AlchemyRuntimeExcption.onExcption(new RuntimeException(new NullPointerException(clazz + " -> @Texture.value()")));
+					AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @Texture.value()"));
 			Render render = clazz.getAnnotation(Render.class);
 			if (render != null)
 				if (render.value() != null) {
@@ -347,16 +367,17 @@ public class AlchemyEventSystem implements IGuiHandler {
 						try {
 							ClientRegistry.bindTileEntitySpecialRenderer((Class) render.value(), (TileEntitySpecialRenderer) clazz.newInstance());
 						} catch (Exception e) {
-							AlchemyRuntimeExcption.onExcption(new RuntimeException(e));
+							AlchemyRuntimeException.onException(e);
 						}
 					else
-						AlchemyRuntimeExcption.onExcption(new RuntimeException("Can't bind Render: " + render.value().getName() + " -> " + clazz.getName()));
+						AlchemyRuntimeException.onException(new RuntimeException(
+								"Can't bind Render: " + render.value().getName() + " -> " + clazz.getName()));
 				} else
-					AlchemyRuntimeExcption.onExcption(new RuntimeException(new NullPointerException(clazz + " -> @Render.value()")));
+					AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @Render.value()"));
 		}
 	}
 	
-	public AlchemyEventSystem() {
+	private AlchemyEventSystem() {
 		MinecraftForge.EVENT_BUS.register(this);
 		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyModLoader.instance(), this);
 	}

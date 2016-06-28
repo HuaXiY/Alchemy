@@ -18,6 +18,7 @@ item.amulet_purify.name=净化吊坠
 
 //blockMap
 tile.ice_temp.name=冰墙
+tile.cauldron.name=
 
 //potionMap
 effect.feather_fall=羽落
@@ -27,6 +28,13 @@ effect.eternal=永恒
 effect.dead_or_alive=死或生
 effect.multiple_xp=多倍经验
 effect.elapse=
+effect.plague=
+effect.danger_sense=
+effect.witchcraft=
+potion.effect.luck=
+splash_potion.effect.luck=
+lingering_potion.effect.luck=
+tipped_arrow.effect.luck=
 potion.effect.unluck=厄运药水
 splash_potion.effect.unluck=喷溅型 厄运药水
 lingering_potion.effect.unluck=滞留型 厄运药水
@@ -35,6 +43,10 @@ potion.effect.feather_fall=羽落药水
 splash_potion.effect.feather_fall=喷溅型 羽落药水
 lingering_potion.effect.feather_fall=滞留型 羽落药水
 tipped_arrow.effect.feather_fall=药箭
+potion.effect.levitation=
+splash_potion.effect.levitation=
+lingering_potion.effect.levitation=
+tipped_arrow.effect.levitation=
 potion.effect.hunger=饥饿药水
 splash_potion.effect.hunger=喷溅型 饥饿药水
 lingering_potion.effect.hunger=滞留型 饥饿药水
@@ -67,6 +79,10 @@ potion.effect.dead_or_alive=死或生药水
 splash_potion.effect.dead_or_alive=喷溅型 死或生药水
 lingering_potion.effect.dead_or_alive=滞留型 死或生药水
 tipped_arrow.effect.dead_or_alive=药箭
+potion.effect.witchcraft=
+splash_potion.effect.witchcraft=
+lingering_potion.effect.witchcraft=
+tipped_arrow.effect.witchcraft=
 
 //enchantmentMap
 enchantment.siphon_life=生命吸取

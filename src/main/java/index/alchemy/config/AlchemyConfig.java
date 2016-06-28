@@ -1,6 +1,6 @@
 package index.alchemy.config;
 
-import index.alchemy.annotation.Config;
+import index.alchemy.api.annotation.Config;
 
 public class AlchemyConfig {
 	

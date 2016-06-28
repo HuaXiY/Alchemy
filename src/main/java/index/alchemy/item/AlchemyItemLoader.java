@@ -1,6 +1,6 @@
 package index.alchemy.item;
 
-import index.alchemy.annotation.Init;
+import index.alchemy.api.annotation.Init;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
@@ -25,7 +25,5 @@ public class AlchemyItemLoader {
 			belt_tough = new ItemBeltTough(),
 			amulet_heal = new ItemAmuletHeal(),
 			amulet_purify = new ItemAmuletPurify();
-	
-	public static void init() {}
 	
 }

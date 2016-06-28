@@ -18,6 +18,7 @@ item.amulet_purify.name=
 
 //blockMap
 tile.ice_temp.name=
+tile.cauldron.name=
 
 //potionMap
 effect.feather_fall=
@@ -27,6 +28,13 @@ effect.eternal=
 effect.dead_or_alive=
 effect.multiple_xp=
 effect.elapse=
+effect.plague=
+effect.danger_sense=
+effect.witchcraft=
+potion.effect.luck=
+splash_potion.effect.luck=
+lingering_potion.effect.luck=
+tipped_arrow.effect.luck=
 potion.effect.unluck=
 splash_potion.effect.unluck=
 lingering_potion.effect.unluck=
@@ -35,6 +43,10 @@ potion.effect.feather_fall=
 splash_potion.effect.feather_fall=
 lingering_potion.effect.feather_fall=
 tipped_arrow.effect.feather_fall=
+potion.effect.levitation=
+splash_potion.effect.levitation=
+lingering_potion.effect.levitation=
+tipped_arrow.effect.levitation=
 potion.effect.hunger=
 splash_potion.effect.hunger=
 lingering_potion.effect.hunger=
@@ -67,6 +79,10 @@ potion.effect.dead_or_alive=
 splash_potion.effect.dead_or_alive=
 lingering_potion.effect.dead_or_alive=
 tipped_arrow.effect.dead_or_alive=
+potion.effect.witchcraft=
+splash_potion.effect.witchcraft=
+lingering_potion.effect.witchcraft=
+tipped_arrow.effect.witchcraft=
 
 //enchantmentMap
 enchantment.siphon_life=

@@ -6,8 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
-import index.alchemy.annotation.Init;
-import index.alchemy.annotation.Source;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Source;
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.FinalFieldSetter;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -88,6 +89,8 @@ public class ModItems {
 			bop$flower_rose = null;								//  玫瑰 ---- 爱情
 	
 	public static void init() throws Exception {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		String last = null;
 		for (Field field : ModItems.class.getFields()) {
 			Source source = field.getAnnotation(Source.class);
@@ -112,11 +115,11 @@ public class ModItems {
 			}
 		}
 		
-		/*for (Field field : ModItems.class.getFields()) {
+		for (Field field : ModItems.class.getFields()) {
 			Object obj = field.get(null);
-			System.out.println(field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
+			AlchemyModLoader.logger.info("	init: <" + field.getType().getName() + "> " + field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
 				obj instanceof ItemStack ? ((ItemStack) obj).getDisplayName() : ""));
-		}*/
+		}
 	}
 	
 }

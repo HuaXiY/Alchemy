@@ -53,7 +53,8 @@ public class PotionPlague extends AlchemyPotion implements IEventHandle {
 			IItemHandler item = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), 
 					spawn_item = spawn_living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 			for (int i = 0, len = item.getSlots(); i < len; i++)
-				spawn_item.insertItem(i, item.getStackInSlot(i).copy(), true);
+				if (item.getStackInSlot(i) != null)
+					spawn_item.insertItem(i, item.getStackInSlot(i).copy(), true);
 			spawn_living.copyLocationAndAnglesFrom(living);
 			living.worldObj.spawnEntityInWorld(spawn_living);
 		}

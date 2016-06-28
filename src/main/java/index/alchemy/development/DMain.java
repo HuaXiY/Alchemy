@@ -3,13 +3,13 @@ package index.alchemy.development;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import index.alchemy.annotation.DInit;
-import index.alchemy.annotation.Init;
+import index.alchemy.api.annotation.DInit;
+import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.util.Tool;
@@ -25,7 +25,7 @@ public class DMain {
 			resources = AlchemyModLoader.mc_dir + "/src/main/resources/assets/" + Constants.MOD_ID,
 			PROPERTIES = "build.properties", DEV_VERSION_KEY_NAME = "dev_version";
 	
-	public static final List<Method> init_obj = new LinkedList<Method>(), init = new LinkedList<Method>();
+	public static final List<Method> init_obj = new ArrayList<Method>(), init = new ArrayList<Method>();
 	
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
@@ -45,6 +45,7 @@ public class DMain {
 	}
 	
 	public static void init(Object obj) {
+		AlchemyModLoader.checkState();
 		for (Method method : init_obj)
 			try {
 				method.invoke(null, obj);
@@ -55,6 +56,8 @@ public class DMain {
 	}
 	
 	public static void init() throws IOException {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState(ModState.AVAILABLE);
 		for (Method method : init)
 			try {
 				AlchemyModLoader.logger.info("	init: <" + method.getDeclaringClass() + "> " + method);
@@ -63,11 +66,10 @@ public class DMain {
 				AlchemyModLoader.logger.warn("Catch a Exception in init method with class(" + method.getDeclaringClass().getName() + ")");
 				e.printStackTrace();
 			}
-		
 		updateVersion();
 	}
 	
-	public static void updateVersion() throws IOException {
+	private static void updateVersion() throws IOException {
 		Map<String, String> mapping = Tool.getMapping(Tool.readSafe(new File(AlchemyModLoader.mc_dir, PROPERTIES)));
 		mapping.put(DEV_VERSION_KEY_NAME, String.valueOf(Integer.valueOf(Tool.isNullOr(mapping.get(DEV_VERSION_KEY_NAME), "0")) + 1));
 		StringBuilder builder = new StringBuilder();

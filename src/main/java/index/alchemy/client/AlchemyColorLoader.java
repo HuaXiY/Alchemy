@@ -3,9 +3,9 @@ package index.alchemy.client;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.annotation.Init;
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
+import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import net.minecraft.block.Block;
@@ -50,6 +50,8 @@ public class AlchemyColorLoader {
 	}
 	
 	public static void init() {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		registerItemColor();
 		registerBlockColor();
 	}

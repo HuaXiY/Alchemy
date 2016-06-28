@@ -1,8 +1,11 @@
 package index.alchemy.client.render;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glScalef;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import index.alchemy.api.ICoolDown;
@@ -25,7 +28,7 @@ public class HUDManager {
 	
 	public static int render_num = 4;
 	
-	private static final List<ICoolDown> CD = new LinkedList<ICoolDown>();
+	private static final List<ICoolDown> CD = new ArrayList<ICoolDown>();
 	
 	public static void registerCoolDown(ICoolDown cd) {
 		AlchemyModLoader.checkState();

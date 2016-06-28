@@ -1,10 +1,18 @@
 package index.alchemy.tile;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import index.alchemy.animation.StdCycle;
 import index.alchemy.api.Alway;
+import index.alchemy.api.IFXUpdate;
+import index.alchemy.api.annotation.FX;
+import index.alchemy.client.color.ColorHelper;
+import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
+import index.alchemy.client.fx.update.FXMotionUpdate;
+import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.Entity;
@@ -20,7 +28,25 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 
+@FX.UpdateProvider
 public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
+	
+	public static final String FX_KEY_GATHER = "cauldron_gather";
+	
+	@FX.UpdateMethod(FX_KEY_GATHER)
+	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
+		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
+		int i = 0, 
+			max_age = Tool.getSafe(args, i++, 0),
+			scale = Tool.getSafe(args, i++, 1);
+		result.add(new FXMotionUpdate(
+				new StdCycle().setLoop(true).setRotation(true).setMax(0.5F),
+				new StdCycle().setMax(0.3F),
+				new StdCycle().setLoop(true).setRotation(true).setMax(0.5F)));
+		result.add(new FXARGBIteratorUpdate(ColorHelper.ahsbStep(Color.RED, new Color(0x66, 0xCC, 0XFF, 0x22), max_age, true, true, false)));
+		result.add(new FXScaleUpdate(new StdCycle().setMax(scale / 100F)));
+		return result;
+	}
 	
 	public static enum State {
 		NULL,
@@ -45,10 +71,10 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	private Fluid fluid;
 	/*  alchemy: 
-	 *  	Magic Solvent volume -> alchemy & 4
-	 *  	Glow Stone volume -> alchemy >> 4 & 4
-	 *  	Red Stone volume -> alchemy >> 8 & 4
-	 *  	Dragon's Breath volume -> alchemy >> 12 & 4
+	 *  	Magic Solvent volume	 -> alchemy & 4
+	 *  	Glow Stone volume		 -> alchemy >> 4 & 4
+	 *  	Red Stone volume 		 -> alchemy >> 8 & 4
+	 *  	Dragon's Breath volume	 -> alchemy >> 12 & 4
 	 */
 	private int alchemy;
 	

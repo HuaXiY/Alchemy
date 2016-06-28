@@ -1,12 +1,12 @@
 package index.alchemy.potion;
 
-import index.alchemy.annotation.Change;
-import index.alchemy.annotation.Init;
-import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.interacting.ModItems;
-
 import com.google.common.base.Predicate;
 
+import index.alchemy.api.annotation.Change;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.interacting.ModItems;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.PotionTypes;
@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 // This is register ItemPotion in the Minecraft.
 // Not guaranteed to work in another version, Field name and
 // position will change with the version.
+@Change("1.9.4")
 @Init(state = ModState.INITIALIZED)
 public class AlchemyPotionLoader extends PotionType {
 	
@@ -34,7 +35,10 @@ public class AlchemyPotionLoader extends PotionType {
 			eternal = new PotionEternal(),
 			dead_or_alive = new PotionDeadOrAlive(),
 			multiple_xp = new PotionMultipleXP(),
-			elapse = new PotionElapse();
+			elapse = new PotionElapse(),
+			plague = new PotionPlague(),
+			danger_sense = new PotionDangerSense(),
+			witchcraft = new PotionWitchcraft();
 	
 	public static final Predicate<ItemStack> 
 			nether_wart = getItemPredicate(Items.NETHER_WART),
@@ -64,7 +68,7 @@ public class AlchemyPotionLoader extends PotionType {
 		};
 	}
 	
-	@Change
+	@Change("1.9.4")
 	public static void registerItemPotion(PotionType input, boolean levelII, boolean long_time, int time,
 			String name, Predicate<ItemStack> item, Potion... output) {
 		PotionEffect[] effects = new PotionEffect[output.length];
@@ -109,7 +113,7 @@ public class AlchemyPotionLoader extends PotionType {
 		
 	}
 	
-	@Change
+	@Change("1.9.4")
 	public static void registerItemPotionAndPutrid(PotionType input, boolean levelII, boolean long_time, int time,
 			String name1, String name2, Predicate<ItemStack> item1, Predicate<ItemStack> item2, Potion[] output1, Potion[] output2) {
 		PotionEffect[] effects1 = new PotionEffect[output1.length], effects2 = new PotionEffect[output2.length];
@@ -203,6 +207,8 @@ public class AlchemyPotionLoader extends PotionType {
     }
 	
 	public static void init() {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "luck", "unluck",
 				getItemPredicate(ModItems.bop$flower_miners_delight), null, new Potion[]{MobEffects.LUCK}, new Potion[]{MobEffects.UNLUCK});
 		
@@ -232,6 +238,9 @@ public class AlchemyPotionLoader extends PotionType {
 
 		registerItemPotion(PotionTypes.AWKWARD, false, false, 1, "dead_or_alive", 
 				getItemPredicate(Items.DIAMOND), dead_or_alive);
+		
+		registerItemPotion(PotionTypes.AWKWARD, false, false, 20 * 8, "witchcraft", 
+				getItemPredicate(Items.DIAMOND), witchcraft);
 		
 	}
 }

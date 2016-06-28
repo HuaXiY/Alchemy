@@ -1,11 +1,13 @@
 package index.alchemy.client.render.tile;
 
-import index.alchemy.annotation.Render;
+import index.alchemy.api.Alway;
+import index.alchemy.api.annotation.Render;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.RenderHelper;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -16,19 +18,19 @@ import static org.lwjgl.opengl.GL11.*;
 public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEntityCauldron> {
 	
 	@Override
-	public void renderTileEntityAt(TileEntityCauldron te, double tx, double ty, double tz, float tick, int destroyStage) {
+	public void renderTileEntityAt(TileEntityCauldron te, double tx, double ty, double tz, float partialTicks, int destroyStage) {
 		final float v = 1F / 4F;
 		int i = 1, size = 	te.getContainer().size();
 		
 		if (size < 1)
 			return;
 		
-		double ticks = getWorld().getWorldTime();
+		long tick = Alway.getClientWorldTime();
 		float offsetPerPetal = 360 / size;
 
 		for(ItemStack item : te.getContainer()) {
 			float offset = offsetPerPetal * i;
-			float deg = (int) (ticks / 0.5F % 360F + offset);
+			float deg = (int) (tick / 0.5F % 360F + offset);
 			
 			glPushMatrix();
 			glTranslatef((float) tx + .5F, (float) ty + .8F, (float) tz + .25F);
@@ -44,6 +46,11 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 			i++;
 		}
 		
+		onWorkingTick(te, tick);
+	}
+	
+	public void onWorkingTick(TileEntityCauldron te, long tick) {
+		World world = te.getWorld();
 	}
 
 }

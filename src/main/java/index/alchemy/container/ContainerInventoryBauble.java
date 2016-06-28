@@ -2,8 +2,8 @@ package index.alchemy.container;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-import index.alchemy.annotation.Proxy;
-import index.alchemy.annotation.Texture;
+import index.alchemy.api.annotation.Proxy;
+import index.alchemy.api.annotation.Texture;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.inventory.InventoryBauble;
 import net.minecraft.entity.EntityLiving;

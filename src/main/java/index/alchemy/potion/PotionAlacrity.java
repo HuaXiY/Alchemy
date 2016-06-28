@@ -2,6 +2,7 @@ package index.alchemy.potion;
 
 import org.lwjgl.input.Keyboard;
 
+import index.alchemy.api.Alway;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -15,24 +16,27 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static java.lang.Math.*;
+
 public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetworkMessage.Server<MessageAlacrityCallback> {
 	
-	public static final int JUMP_AIR_CD = 20 * 2;
+	public static final int JUMP_AIR_CD = 20;
+	public static final double JUMP_V = 1.8, JUMP_V_Y = 1.2, JUMP_V_XZ = 4.2;
 	public static final String NBT_KEY_CD = "potion_alacrity";
 	
 	@Override
-	@SideOnly(Side.CLIENT)
 	public void performEffect(EntityLivingBase living, int level) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		if (living == player) {
-			double v = 1.8, vxz = 4.2;
-			if (isCDOver() && player.motionY < 0 &&
-					Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
-				player.motionY += player.motionX == 0 && player.motionZ == 0 ? v * 1.2 : v;
-				player.motionX *= vxz;
-				player.motionZ *= vxz;
-				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageAlacrityCallback());
-				restartCD();
+		if (Alway.isClient()) {
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			if (living == player) {
+				if (isCDOver() && player.motionY < 0 &&
+						Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
+					player.motionY += player.motionX == 0 && player.motionZ == 0 ? JUMP_V * JUMP_V_Y : JUMP_V;
+					player.motionX *= JUMP_V_XZ;
+					player.motionZ *= JUMP_V_XZ;
+					AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageAlacrityCallback());
+					restartCD();
+				}
 			}
 		}
 	}
@@ -57,8 +61,12 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	}
 	
 	public void callback(EntityPlayer player) {
-		if (player.isPotionActive(this))
+		if (player.isPotionActive(this)) {
+			player.motionY += player.motionX == 0 && player.motionZ == 0 ? JUMP_V * JUMP_V_Y : JUMP_V;
+			player.motionX *= JUMP_V_XZ;
+			player.motionZ *= JUMP_V_XZ;
 			player.fallDistance = 0;
+		}
 	}
 	
 	@Override
@@ -69,8 +77,9 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		return Minecraft.getMinecraft().thePlayer.isPotionActive(PotionAlacrity.this) ? 
-				Math.max(0, getMaxCD() - (Minecraft.getMinecraft().thePlayer.ticksExisted - Minecraft.getMinecraft().thePlayer.getEntityData().getInteger(NBT_KEY_CD))) : -1;
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		return player.isPotionActive(PotionAlacrity.this) ? 
+				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
@@ -82,13 +91,15 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted - (getMaxCD() - cd));
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 
 	@Override

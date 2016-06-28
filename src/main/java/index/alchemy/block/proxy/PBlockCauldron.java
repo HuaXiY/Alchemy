@@ -4,10 +4,10 @@ import java.util.LinkedList;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.annotation.Change;
 import index.alchemy.api.Alway;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.ITileEntity;
+import index.alchemy.api.annotation.Change;
 import index.alchemy.api.event.CauldronActivatedEvent;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.tile.TileEntityCauldron;
@@ -32,7 +32,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
-@Change
+@Change("1.9.4")
 public class PBlockCauldron extends BlockCauldron implements ITileEntity, IRegister {
 
 	@Override

@@ -5,6 +5,11 @@ import net.minecraft.entity.EntityLivingBase;
 public class PotionFeatherFall extends AlchemyPotion {
 	
 	@Override
+	public boolean isReady(int tick, int level) {
+		return true;
+	}
+	
+	@Override
 	public void performEffect(EntityLivingBase living, int level) {
 		if (!living.onGround && living.motionY < 0) {
 			living.motionY *= 0.75;
@@ -13,7 +18,7 @@ public class PotionFeatherFall extends AlchemyPotion {
 	}
 	
 	public PotionFeatherFall() {
-		super("feather_fall", false, 0xFFFFFF, true);
+		super("feather_fall", false, 0xFFFFFF);
 	}
 
 }

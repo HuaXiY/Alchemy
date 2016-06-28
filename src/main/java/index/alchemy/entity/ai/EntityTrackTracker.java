@@ -1,10 +1,10 @@
 package index.alchemy.entity.ai;
 
-import index.alchemy.annotation.Init;
-import index.alchemy.annotation.Test;
 import index.alchemy.api.Alway;
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IPlayerTickable;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Test;
 import index.alchemy.util.AABBHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;

@@ -6,8 +6,7 @@ import net.minecraft.entity.EntityLivingBase;
 public class PotionSoulWithered extends AlchemyPotion {
 	
 	@Override
-	public boolean isReady(int tick, int level)
-    {
+	public boolean isReady(int tick, int level) {
         return tick % 20 == 0 || tick > 0;
     }
 	

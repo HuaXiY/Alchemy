@@ -1,6 +1,5 @@
 package index.alchemy.core;
 
-import index.alchemy.annotation.Change;
 import index.alchemy.api.Alway;
 import index.alchemy.api.ICapability;
 import index.alchemy.api.IColorBlock;
@@ -15,6 +14,7 @@ import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.api.ITileEntity;
+import index.alchemy.api.annotation.Change;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -64,7 +64,7 @@ public class AlchemyInitHook {
 		
 	}
 	
-	@Change
+	@Change("1.9.4")
 	public static <I extends Item & IColorItem, B extends Block & IColorBlock,
 				   R extends Item & IResourceLocation, C> void init(Object obj) {
 		

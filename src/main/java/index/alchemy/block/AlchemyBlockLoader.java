@@ -3,8 +3,8 @@ package index.alchemy.block;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import index.alchemy.annotation.Change;
-import index.alchemy.annotation.Init;
+import index.alchemy.api.annotation.Change;
+import index.alchemy.api.annotation.Init;
 import index.alchemy.block.proxy.PBlockCauldron;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.tile.TileEntityCauldron;
@@ -29,6 +29,8 @@ public class AlchemyBlockLoader {
 	public static final Block ice_temp = new BlockIceTemp();
 	
 	public static void init() {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		replaceBlock();
 	}
 	
@@ -42,15 +44,15 @@ public class AlchemyBlockLoader {
 	// This is replace block in the Minecraft.
 	// Not guaranteed to work in another version, Field name and
 	// position will change with the version.
-	@Change
 	@Deprecated
+	@Change("1.9.4")
 	public static boolean replaceBlock(Block toReplace, Class<? extends Block> blockClass, ItemBlockSpecial item) {
 		return replaceBlock(toReplace, blockClass, null, item, null, null);
 	}
 	
 	// TODO
-	@Change
 	@Deprecated
+	@Change("1.9.4")
 	public static boolean replaceBlock(Block toReplace, Class<? extends Block> blockClass, ResourceLocation resource,
 			ItemBlockSpecial item, Class<?> tileEntityClass, String tile){
 		Field modifiersField = null;

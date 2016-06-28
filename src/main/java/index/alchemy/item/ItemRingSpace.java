@@ -5,13 +5,13 @@ import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.annotation.KeyEvent;
 import index.alchemy.api.Alway;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IItemInventory;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.config.AlchemyConfig;
 import index.alchemy.core.AlchemyModLoader;
@@ -19,7 +19,7 @@ import index.alchemy.inventory.InventoryItem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.Double6Package;
+import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -30,12 +30,10 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
@@ -48,6 +46,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import static java.lang.Math.*;
 
 public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
@@ -74,17 +74,6 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 					for (EntityItem entity : player.worldObj.getEntitiesWithinAABB(EntityItem.class, player.getEntityBoundingBox().expand(5D, 5D, 5D)))
 						if (!entity.isDead)
 				        	   onCollideWithPlayer((EntityItem) entity, player);
-			}
-		} else if (living == Minecraft.getMinecraft().thePlayer) {
-			for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(living, 16)))
-				if (oliving != Minecraft.getMinecraft().thePlayer) {
-					oliving.setGlowing(true);
-					oliving.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 2));
-				}
-			for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(living, 108))) {
-				PotionEffect effect = oliving.getActivePotionEffect(MobEffects.GLOWING);
-				if (effect == null || effect.getDuration() == 0)
-					oliving.setGlowing(false);
 			}
 		}
 	}
@@ -186,17 +175,18 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 		if (inventory == null)
 			return;
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
-		List<Double6Package> d6p = new LinkedList<Double6Package>(); 
+		List<Double6IntArrayPackage> d6iap = new LinkedList<Double6IntArrayPackage>(); 
 		for (EntityItem entity : list) {
 			inventory.mergeItemStack(entity.getEntityItem());
 			if (entity.getEntityItem().stackSize < 1) {
-				d6p.add(new Double6Package(entity.posX, entity.posY, entity.posZ, 0, 0, 0));
+				d6iap.add(new Double6IntArrayPackage(entity.posX, entity.posY, entity.posZ, 0, 0, 0));
 				entity.setDead();
 			}
 		}
 		if (list.size() > 0) {
 			inventory.updateNBT();
-			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player, AlchemyConfig.getParticleRange()), player.worldObj, d6p);
+			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player,
+					AlchemyConfig.getParticleRange()), player.worldObj, d6iap);
 		}
 	}
 	
@@ -223,7 +213,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
+				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
 	
 	@Override
@@ -235,13 +225,15 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted - (getMaxCD() - cd));
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 
 	@Override

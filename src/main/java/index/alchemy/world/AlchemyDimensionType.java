@@ -2,14 +2,16 @@ package index.alchemy.world;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.annotation.Config;
-import index.alchemy.annotation.Dimension;
+import index.alchemy.api.annotation.Config;
+import index.alchemy.api.annotation.Dimension;
+import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
-import net.minecraftforge.common.DimensionManager;
 
+@Loading
 public class AlchemyDimensionType {
 	
 	@Config(category = "world", comment = "Alchemy mod DimensionType id start.")
@@ -23,13 +25,22 @@ public class AlchemyDimensionType {
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
 		Dimension dimension = clazz.getAnnotation(Dimension.class);
-		if (dimension != null && Tool.isSubclass(WorldProvider.class, clazz))
-			registerDimensionType(dimension.name(), dimension.suffix(), (Class<? extends WorldProvider>) clazz, dimension.load());
+		if (dimension != null) {
+			if (dimension.name() != null) {
+				if (Tool.isSubclass(WorldProvider.class, clazz))
+					Tool.setType(clazz, registerDimensionType(dimension.name(), dimension.suffix(),
+							(Class<? extends WorldProvider>) clazz, dimension.load()));
+				else
+					AlchemyRuntimeException.onException(new RuntimeException(
+							"Class<" + clazz.getName() + "> forgot to extends the Class<" + WorldProvider.class.getName() + "> ?"));
+			} else
+				AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @Dimension.name()"));
+		}
 	}
 	
-	public static void registerDimensionType(String name, String suffix, Class<? extends WorldProvider> provider, boolean load) {
+	public static DimensionType registerDimensionType(String name, String suffix, Class<? extends WorldProvider> provider, boolean load) {
 		AlchemyModLoader.checkState();
-		DimensionManager.registerDimension(DimensionManager.getNextFreeDimId(), DimensionType.register(name, suffix, nextId(), provider, load));
+		return DimensionType.register(name, suffix, nextId(), provider, load);
 	}
 	
 	@Nullable

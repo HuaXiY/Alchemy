@@ -5,9 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Predicate;
+
 import index.alchemy.core.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -25,6 +29,13 @@ public class Alway {
 	
 	public static final int SEA_LEVEL = 62;
 	
+	public static final Predicate<EntityLivingBase> IS_MONSTER = new Predicate<EntityLivingBase>() {
+		@Override
+		public boolean apply(EntityLivingBase input) {
+			return input instanceof IMob;
+		}
+	};
+	
 	public static final Map<Thread, Side> SIDE_MAPPING = new HashMap<Thread, Side>();
 	
 	public static boolean isAlchemyModLoaded() {
@@ -34,6 +45,20 @@ public class Alway {
 	@SideOnly(Side.CLIENT)
 	public static boolean isPlaying() {
 		return Minecraft.getMinecraft().thePlayer != null;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static long getClientWorldTime() {
+		return Minecraft.getMinecraft().theWorld.getWorldTime();
+	}
+	
+	public static boolean runOnClient() {
+		try {
+			Class.forName("net.minecraft.client.Minecraft");
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	public static Side getSide() {

@@ -17,6 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static java.lang.Math.*;
+
 public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, ICoolDown {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 3, RECOVERY_CD = 20 * 6, MAX_ABSORPTION = 20;
@@ -27,7 +29,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, ICoo
 		if (Alway.isServer() && living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION
 				&& living.ticksExisted - living.getLastAttackerTime() > RECOVERY_CD
 				&& living.ticksExisted - living.getCombatTracker().lastDamageTime > RECOVERY_CD)
-			living.setAbsorptionAmount(Math.min(living.getAbsorptionAmount() + 1, MAX_ABSORPTION));
+			living.setAbsorptionAmount(min(living.getAbsorptionAmount() + 1, MAX_ABSORPTION));
 	}
 	
 	@Override
@@ -67,7 +69,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, ICoo
 	public int getResidualCD() {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		return isEquipmented(player) ? 
-				Math.max(0, getMaxCD() - (player.ticksExisted - Math.max(player.getLastAttackerTime(), player.getCombatTracker().lastDamageTime))) : -1;
+				max(0, getMaxCD() - (player.ticksExisted - max(player.getLastAttackerTime(), player.getCombatTracker().lastDamageTime))) : -1;
 	}
 	
 	@Override
