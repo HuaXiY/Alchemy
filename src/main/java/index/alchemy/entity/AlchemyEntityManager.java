@@ -1,5 +1,6 @@
 package index.alchemy.entity;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import index.alchemy.util.Tool;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -25,7 +26,6 @@ public class AlchemyEntityManager {
 		try {
 			return list.get(AlchemyModLoader.random.nextInt(list.size())).getConstructor(World.class).newInstance(world);
 		} catch (Exception e) {
-			AlchemyModLoader.logger.warn(e);
 			e.printStackTrace();
 			return new EntityPig(world);
 		}
@@ -35,7 +35,6 @@ public class AlchemyEntityManager {
 		try {
 			return list.get(id).getConstructor(World.class).newInstance(world);
 		} catch (Exception e) {
-			AlchemyModLoader.logger.warn(e);
 			e.printStackTrace();
 			return new EntityPig(world);
 		}
@@ -43,8 +42,9 @@ public class AlchemyEntityManager {
 	
 	public static void init() {
 		for (Class<? extends Entity> clazz : EntityList.CLASS_TO_NAME.keySet())
-			if (Tool.isSubclass(EntityLivingBase.class, clazz))
-				(Tool.isInstance(IMob.class, clazz) ? MONSTER_LIST : FRIENDLY_LIVING_LIST).add((Class<? extends EntityLivingBase>) clazz);
+			if (Tool.isSubclass(EntityLivingBase.class, clazz) && !Modifier.isAbstract(clazz.getModifiers()))
+				(Tool.isSubclass(EntityAnimal.class, clazz) ? FRIENDLY_LIVING_LIST : MONSTER_LIST)
+					.add((Class<? extends EntityLivingBase>) clazz);
 	}
 	
 }

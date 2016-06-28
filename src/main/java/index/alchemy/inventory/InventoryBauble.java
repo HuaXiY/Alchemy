@@ -69,15 +69,15 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	
 	public void updateTracker() {
 		final NBTTagCompound data = saveToNBT(new NBTTagCompound());
-		for (EntityPlayer player : ((WorldServer) living.worldObj).getEntityTracker().getTrackingPlayers(living))
-			updatePlayer((EntityPlayerMP) player, data);
-		if (living instanceof EntityPlayerMP)
-			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
-				@Override
-				public void run(Phase phase) {
-					updatePlayer((EntityPlayerMP) living, data);					
-				}
-			}, 1);
+		AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
+			@Override
+			public void run(Phase phase) {
+				for (EntityPlayer player : ((WorldServer) living.worldObj).getEntityTracker().getTrackingPlayers(living))
+					updatePlayer((EntityPlayerMP) player, data);
+				if (living instanceof EntityPlayerMP)
+					updatePlayer((EntityPlayerMP) living, data);
+			}
+		}, 1);
 	}
 	
 	public void updatePlayer(EntityPlayerMP player) {

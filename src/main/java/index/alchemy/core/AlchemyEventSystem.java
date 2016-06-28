@@ -205,7 +205,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
-				
 			}
 			System.setProperty("index.alchemy.runtime.debug.server", flag);
 		}
@@ -257,6 +256,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 		if (HOOK_INPUT.isEmpty())
 			hookInputState = true;
 		HOOK_INPUT.add(obj);
+		KeyBinding.unPressAllKeys();
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -264,6 +264,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 		HOOK_INPUT.remove(obj);
 		if (HOOK_INPUT.isEmpty())
 			hookInputState = false;
+		KeyBinding.updateKeyBindState();
 	}
 	
 	@SideOnly(Side.CLIENT)
