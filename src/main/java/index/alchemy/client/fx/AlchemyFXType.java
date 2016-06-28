@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.sun.istack.internal.Nullable;
+import javax.annotation.Nullable;
 
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.FX;
