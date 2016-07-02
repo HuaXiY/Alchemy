@@ -41,7 +41,7 @@ public class AlchemyBlockLoader {
 	
 	// TODO
 	// !!!!> Only in the version 1.9.4 working <!!!!
-	// This is replace block in the Minecraft.
+	// This method is used to replace the block in the Minecraft.
 	// Not guaranteed to work in another version, Field name and
 	// position will change with the version.
 	@Deprecated

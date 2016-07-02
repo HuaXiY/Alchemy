@@ -6,8 +6,6 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lwjgl.opengl.Display;
-
 import index.alchemy.api.Alway;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.Change;
@@ -18,14 +16,7 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.Constants;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiErrorScreen;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.client.GuiJava8Error;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.WrongMinecraftVersionException;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
 public class AlchemyRuntimeException extends RuntimeException {
@@ -65,7 +56,6 @@ public class AlchemyRuntimeException extends RuntimeException {
 			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 				@Override
 				public void run(Phase phase) {
-					System.out.println("*****************************************************************");
 					Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyError(e, error));
 				}
 			}, 0);

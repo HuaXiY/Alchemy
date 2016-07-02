@@ -55,7 +55,8 @@ public class EntityTrackTracker {
 		@Override
 		public void onTick(EntityPlayer player, Phase phase) {
 			if (phase == Phase.START)
-				for (EntityArrow throwable : player.worldObj.getEntitiesWithinAABB(EntityArrow.class, AABBHelper.getAABBFromEntity(player, 2).addCoord(0, 1, 0))) {
+				for (EntityArrow throwable : player.worldObj.getEntitiesWithinAABB(EntityArrow.class, 
+						AABBHelper.getAABBFromEntity(player, 2).addCoord(0, 1, 0))) {
 					if (throwable.shootingEntity != null && throwable.shootingEntity != player) {
 						throwable.motionX = 0;
 						throwable.motionY = 0;

@@ -6,6 +6,8 @@ import static java.lang.Math.max;
 import java.awt.Color;
 import java.util.Iterator;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 public class ColorHelper {
 	
 	public static Iterator<Color> argbStep(final Color start, final Color end, final int steps, final boolean keepA) {
@@ -120,6 +122,10 @@ public class ColorHelper {
 		for (int i = 0; i < size; i++)
 			result[i] = iterator.next();
 		return result;
+	}
+	
+	public static void setColor(Color color) {
+		GlStateManager.color(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, color.getAlpha() / 255F);
 	}
 
 }

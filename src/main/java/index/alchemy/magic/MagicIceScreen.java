@@ -2,13 +2,17 @@ package index.alchemy.magic;
 
 import index.alchemy.api.Alway;
 import index.alchemy.api.Elemix;
-import index.alchemy.api.IEntityLivingAction;
 import index.alchemy.block.AlchemyBlockLoader;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class MagicIceScreen extends AlchemyMagic {
+	
+	@Override
+	public boolean hasStrength() {
+		return false;
+	}
 
 	@Override
 	public void apply(EntityLivingBase src, EntityLivingBase living, float amplify) {

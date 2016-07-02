@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import index.alchemy.api.Alway;
 import index.alchemy.api.IContinuedRunnable;
@@ -30,11 +31,14 @@ import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.render.HUDManager;
+import index.alchemy.client.render.RenderHelper;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
 import index.alchemy.util.Tool;
+import mapi.java.runtime.ActivityTreeViewSample;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
@@ -149,12 +153,17 @@ public class AlchemyEventSystem implements IGuiHandler {
 				float groundYOffset = 0.015625F;
 				double offsetX = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
 				double offsetZ = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
+				
+				//AlchemyRuntimeException.onException(new RuntimeException());
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
-			
-				Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
-						+ offsetX, ((int)player.posY) + 2, player.posZ + offsetZ));
+				//GL11.glPushMatrix();
+				//GL11.glTranslated(player.posX, player.posY, player.posZ);
+				//RenderHelper.Draw2D.drawRound(3, 0, 360, 1, 0xFF66CCFF, false);
+				//GL11.glPopMatrix();
+				//Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
+				//		+ offsetX, ((int)player.posY) + 2, player.posZ + offsetZ));
 			}
-			//System.setProperty("index.alchemy.runtime.debug.player", flag);
+			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)
 			tickable.onTick(event.player, event.phase);

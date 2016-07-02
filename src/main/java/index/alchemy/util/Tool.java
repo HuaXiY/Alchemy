@@ -14,12 +14,15 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -83,6 +86,37 @@ public class Tool {
 	public static final <T> T[] toArray(List<T> list, Class<T> type) {
 		return list.toArray((T[]) Array.newInstance(type, list.size()));
 	}
+	
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPING = new HashMap<Class<?>, Class<?>>();
+	static {
+		PRIMITIVE_MAPPING.put(byte.class, Byte.class);
+		PRIMITIVE_MAPPING.put(short.class, Short.class);
+		PRIMITIVE_MAPPING.put(int.class, Integer.class);
+		PRIMITIVE_MAPPING.put(long.class, Long.class);
+		PRIMITIVE_MAPPING.put(float.class, Float.class);
+		PRIMITIVE_MAPPING.put(double.class, Double.class);
+		PRIMITIVE_MAPPING.put(boolean.class, Boolean.class);
+		PRIMITIVE_MAPPING.put(char.class, Character.class);
+	}
+	
+	private static final Class<?>[] SIMPLE = new Class[]{ Character.class, String.class, Boolean.class,
+			Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class };
+	
+	public static final Class<?> getPrimitiveMapping(Class<?> clazz) {
+		return PRIMITIVE_MAPPING.get(clazz);
+	}
+	
+	public static final boolean isPacking(Class<?> clazz){
+		return ArrayUtils.contains(SIMPLE, clazz);
+	}
+	
+	public static final boolean isSimple(Class<?> clazz){
+		return clazz.isPrimitive() || isPacking(clazz);
+	}
+	
+	public static final boolean isBasics(Class<?> clazz){
+		return isSimple(clazz) || clazz == String.class;
+	}
 
 	public static final boolean isSubclass(Class<?> supers, Class<?> clazz) {
 		do
@@ -94,7 +128,7 @@ public class Tool {
 	
 	public static final boolean isInstance(Class<?> supers, Class<?> clazz) {
 		for (Class<?> i : clazz.getInterfaces())
-			if (i == supers)
+			if (i == supers || getPrimitiveMapping(supers) == clazz)
 				return true;
 		return isSubclass(supers, clazz);
 	}
@@ -281,6 +315,21 @@ public class Tool {
 		return null;
 	}
 	
+	@Nullable
+	public static final Method searchMethod(Class<?> clazz, String name, Object... args) {
+		method_forEach:
+		for (Method method : clazz.getDeclaredMethods()) {
+			Class<?> now_args[] = method.getParameterTypes();
+			if (method.getName().equals(name) && now_args.length == args.length) {
+				for (int i = 0; i < args.length; i++)
+					if (!isInstance(now_args[i], args[i].getClass()))
+						continue method_forEach;
+				return setAccessible(method);
+			}
+		}
+		return null;
+	}
+	
 	public static final List<Method> searchMethod(Class<?> clazz, String name) {
 		List<Method> result = new LinkedList<Method>();
 		for (Method method : clazz.getDeclaredMethods())
@@ -311,6 +360,30 @@ public class Tool {
 				result.put(sa[0], sa[1]);
 		}
 		return result;
+	}
+	
+	@Nullable
+	public static final <T> T $(Object... args) {
+		checkArrayLength(args, 2);
+		Object object = args[0].getClass() == Class.class ? null : args[0];
+		String name = (String) args[1];
+		Class<?> clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
+		args = ArrayUtils.subarray(args, 2, args.length);
+		do {
+			Method method = searchMethod(clazz, name, args);
+			try {
+				if (method != null)
+					return (T) method.invoke(object, args);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} while((clazz = clazz.getSuperclass()) != null);
+		StringBuilder builder = new StringBuilder();
+		for (Object arg : args)
+			builder.append(arg).append(", ");
+		builder.setLength(Math.max(builder.length(), builder.length() - 2));
+		AlchemyRuntimeException.onException(new RuntimeException("Can't invoke: " + builder.toString()));
+		return null;
 	}
 	
 }

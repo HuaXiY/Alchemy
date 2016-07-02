@@ -5,6 +5,8 @@ import static index.alchemy.client.color.ColorHelper.ahsbStep;
 import java.awt.Color;
 import java.util.Iterator;
 
+import org.lwjgl.opengl.GL11;
+
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.client.fx.update.FXUpdateHelper;
@@ -54,7 +56,7 @@ public class FXWisp extends AlchemyFX {
 	@Override
 	public void renderParticle(final VertexBuffer renderer, final Entity entity, final float tick, final float rotationX,
 			final float rotationZ, final float rotationYZ, final float rotationXY, final float rotationXZ) {
-        super.renderParticle(renderer, entity, tick, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+		super.renderParticle(renderer, entity, tick, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
 	
 	@SideOnly(Side.CLIENT)

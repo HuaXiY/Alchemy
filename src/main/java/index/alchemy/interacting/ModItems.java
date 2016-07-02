@@ -30,7 +30,7 @@ public class ModItems {
 
 	@Deprecated
 	@Source(biomesoplenty.api.item.BOPItems.class)
-	public static final Item 
+	public static final Item
 			bop$gem = null;
 	
 	@ItemTransform("bop$gem")
@@ -46,7 +46,7 @@ public class ModItems {
 	
 	@Deprecated
 	@Source(biomesoplenty.api.block.BOPBlocks.class)
-	public static final  Item 
+	public static final Item
 			bop$mushroom = null,
 			bop$flower_0 = null,
 			bop$flower_1 = null;
@@ -117,7 +117,7 @@ public class ModItems {
 		
 		for (Field field : ModItems.class.getFields()) {
 			Object obj = field.get(null);
-			AlchemyModLoader.logger.info("	init: <" + field.getType().getName() + "> " + field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
+			AlchemyModLoader.logger.info("    init: <" + field.getType().getName() + "> " + field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
 				obj instanceof ItemStack ? ((ItemStack) obj).getDisplayName() : ""));
 		}
 	}

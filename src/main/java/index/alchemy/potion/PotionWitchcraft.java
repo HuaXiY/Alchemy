@@ -2,6 +2,7 @@ package index.alchemy.potion;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.client.render.RenderHelper;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.AlchemyEntityManager;
@@ -75,18 +76,18 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 		if (id != 0) {
 			event.setCanceled(true);
 			last = AlchemyEntityManager.getEntityById(AlchemyEntityManager.FRIENDLY_LIVING_LIST, id, minecraft.theWorld);
-			float partialTicks = minecraft.getRenderPartialTicks();
-			double lx = living.lastTickPosX + (living.posX - living.lastTickPosX) * partialTicks;
-			double ly = living.lastTickPosY + (living.posY - living.lastTickPosY) * partialTicks;
-			double lz = living.lastTickPosZ + (living.posZ - living.lastTickPosZ) * partialTicks;
-			double px = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
-			double py = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
-			double pz = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
-			float f = living.prevRotationYaw + (living.rotationYaw - living.prevRotationYaw) * partialTicks;
+			float partialTick = minecraft.getRenderPartialTicks();
+			double lx = living.lastTickPosX + (living.posX - living.lastTickPosX) * partialTick;
+			double ly = living.lastTickPosY + (living.posY - living.lastTickPosY) * partialTick;
+			double lz = living.lastTickPosZ + (living.posZ - living.lastTickPosZ) * partialTick;
+			double px = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTick;
+			double py = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTick;
+			double pz = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTick;
+			float f = living.prevRotationYaw + (living.rotationYaw - living.prevRotationYaw) * partialTick;
 			glPushMatrix();
 			glTranslated(lx - px, ly - py, lz - pz);
 			glRotatef(-f % 360, 0, 1, 0);
-			minecraft.getRenderManager().doRenderEntity(last, 0, 0, 0, 0, minecraft.getRenderPartialTicks(), false);
+			RenderHelper.renderEntity(last, partialTick);
 			glPopMatrix();
 		}
 	}
