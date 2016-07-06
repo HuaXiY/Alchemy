@@ -4,6 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 public abstract class AlchemyInventory implements IInventory {
 	
@@ -16,6 +18,10 @@ public abstract class AlchemyInventory implements IInventory {
 	@Override
 	public void markDirty() {
 		flag = true;
+	}
+	
+	public IItemHandler getItemHandler() {
+		return new InvWrapper(this);
 	}
 	
 	@Override
@@ -57,5 +63,5 @@ public abstract class AlchemyInventory implements IInventory {
 	public int getFieldCount() {
 		return 0;
 	}
-
+	
 }

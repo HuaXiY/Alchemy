@@ -47,15 +47,29 @@ public class RenderHelper {
 		ColorHelper.setColor(color);
 	}
 	
+	public static void enable(int... args) {
+		for (int arg : args)
+			glEnable(arg);
+	}
+	
+	public static void disable(int... args) {
+		for (int arg : args)
+			glDisable(arg);
+	}
+	
 	public static class Draw2D {
 		
-		public static void drawTriangle(double l, double h, boolean fill) {
+		public static void drawTriangle(double la, double lb, double ha, double hb, boolean fill) {
 			glBegin(fill ? GL_TRIANGLE_FAN : GL_LINE_STRIP);
-			glVertex3d(-l, 0, 0);
-			glVertex3d(l, 0, 0);
-			glVertex3d(0, 0, h);
-			glVertex3d(-l, 0, 0);
+			glVertex3d(-la, 0, hb);
+			glVertex3d(lb, 0, hb);
+			glVertex3d(0, 0, ha);
+			glVertex3d(-la, 0, hb);
 			glEnd();
+		}
+		
+		public static void drawCircle(double r, double delta_angle, boolean fill) {
+			drawRound(r, 0, 360, delta_angle, fill);
 		}
 		
 		public static void drawRound(double r, double start_angle, double end_angle, double delta_angle, boolean fill) {
@@ -88,6 +102,18 @@ public class RenderHelper {
 		
 		public static void rotateZ() {
 			glRotatef(180, 0, 0, 1);
+		}
+		
+		public static void rotateX(float rot) {
+			glRotatef(rot, 1, 0, 0);
+		}
+		
+		public static void rotateY(float rot) {
+			glRotatef(rot, 0, 1, 0);
+		}
+		
+		public static void rotateZ(float rot) {
+			glRotatef(rot, 0, 0, 1);
 		}
 		
 		public static void translate(Entity entity) {

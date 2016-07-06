@@ -30,7 +30,8 @@ public class AlchemyTileEntity extends TileEntity {
 	
 	public void updateTracker() {
 		SPacketUpdateTileEntity packet = getUpdatePacket();
-		for (EntityPlayerMP player : worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, AABBHelper.getAABBFromBlockPos(pos, AlchemyConfig.getTileEntityUpdateRange())))
+		for (EntityPlayerMP player : worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, 
+				AABBHelper.getAABBFromBlockPos(pos, AlchemyConfig.getTileEntityUpdateRange())))
 			updatePlayer(player, packet);
 	}
 	

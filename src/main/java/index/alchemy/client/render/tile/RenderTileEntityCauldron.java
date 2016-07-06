@@ -2,6 +2,7 @@ package index.alchemy.client.render.tile;
 
 import index.alchemy.api.Alway;
 import index.alchemy.api.annotation.Render;
+import index.alchemy.client.render.MagicMatrix;
 import index.alchemy.client.render.RenderHelper;
 import index.alchemy.tile.TileEntityCauldron;
 import net.minecraft.block.Block;
@@ -46,6 +47,7 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		glRotatef(-tick % 72 * 5, 0, 1, 0);*/
 		
 		RenderHelper.setColor(new Color(0x66, 0xCC, 0xFF, 0x77));
+		MagicMatrix.renderHexagram();
 		
 		// Render Cube
 		glDisable(GL_TEXTURE_2D);

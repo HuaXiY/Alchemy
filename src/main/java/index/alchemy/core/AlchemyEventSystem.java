@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import index.alchemy.api.Alway;
 import index.alchemy.api.IContinuedRunnable;
@@ -29,26 +28,27 @@ import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
-import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.render.HUDManager;
-import index.alchemy.client.render.RenderHelper;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
+import index.alchemy.magic.MagicTeleportDirectional;
 import index.alchemy.util.Tool;
-import mapi.java.runtime.ActivityTreeViewSample;
+import net.minecraft.block.BlockObsidian;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -63,6 +63,7 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.server.FMLServerHandler;
 
 @Loading
 @Init(state = ModState.CONSTRUCTED)
@@ -145,14 +146,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "7";
+		String flag = "37";
 		if (Alway.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
-				EntityPlayer player = event.player;
-				float groundYOffset = 0.015625F;
-				double offsetX = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
-				double offsetZ = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
+				//EntityPlayer player = event.player;
+				//float groundYOffset = 0.015625F;
+				//double offsetX = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
+				//double offsetZ = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
 				
 				//AlchemyRuntimeException.onException(new RuntimeException());
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
@@ -163,6 +164,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 				//Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
 				//		+ offsetX, ((int)player.posY) + 2, player.posZ + offsetZ));
 			}
+			//System.setProperty("index.alchemy.runtime.debug.player", flag);
+		}
+		if (Alway.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
+			//System.out.println(DimensionManager.getWorld(10).getDefaultTeleporter()); 
+			//event.player.changeDimension(0);
+			//System.out.println(DimensionManager.getWorld(1).getDefaultTeleporter().placeInExistingPortal(event.player, event.player.rotationYaw));
+			//new MagicTeleportDirectional(1).apply(null, event.player, 1);
 			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)

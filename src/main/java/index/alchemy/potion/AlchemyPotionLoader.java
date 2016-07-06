@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 
 // TODO
 // !!!!> Only in the version 1.9.4 working <!!!!
-// This is register ItemPotion in the Minecraft.
+// This class is used to register the potion in the Minecraft.
 // Not guaranteed to work in another version, Field name and
 // position will change with the version.
 @Change("1.9.4")

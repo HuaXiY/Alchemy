@@ -5,8 +5,6 @@ import static index.alchemy.client.color.ColorHelper.ahsbStep;
 import java.awt.Color;
 import java.util.Iterator;
 
-import org.lwjgl.opengl.GL11;
-
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.client.fx.update.FXUpdateHelper;

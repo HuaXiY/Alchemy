@@ -41,7 +41,7 @@ public class ContainerInventoryBauble extends ContainerPlayer {
 		
 		@Override
 		public boolean isItemValid(ItemStack item) {
-			return item!=null && item.getItem() !=null &&
+			return item != null && item.getItem() != null &&
 					item.getItem() instanceof IBauble && 
 				   ((IBauble) item.getItem()).getBaubleType(item)== type &&
 				   ((IBauble) item.getItem()).canEquip(item, baubles.getLiving());
@@ -49,7 +49,7 @@ public class ContainerInventoryBauble extends ContainerPlayer {
 
 		@Override
 		public boolean canTakeStack(EntityPlayer player) {
-			return this.getStack()!=null &&
+			return getStack() != null &&
 				   ((IBauble) getStack().getItem()).canUnequip(getStack(), player);
 		}
 
@@ -104,7 +104,8 @@ public class ContainerInventoryBauble extends ContainerPlayer {
 			}  else if (index >= 5 && index < 9) { // equipment
 				if (!mergeItemStack(slot_item, 9, 45, false))
 					return null;
-			} else if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && !inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) {
+			} else if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR &&
+					!inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) {
 				int i = 8 - entityequipmentslot.getIndex();
 				if (!mergeItemStack(slot_item, i, i + 1, false))
 					return null;

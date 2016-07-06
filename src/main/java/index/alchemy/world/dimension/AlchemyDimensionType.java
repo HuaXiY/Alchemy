@@ -1,15 +1,18 @@
-package index.alchemy.world;
+package index.alchemy.world.dimension;
 
 import javax.annotation.Nullable;
 
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Dimension;
+import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.LoaderState.ModState;
 
 @Loading
 public class AlchemyDimensionType {
@@ -24,6 +27,7 @@ public class AlchemyDimensionType {
 	
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
+		AlchemyModLoader.checkInvokePermissions();
 		Dimension dimension = clazz.getAnnotation(Dimension.class);
 		if (dimension != null) {
 			if (dimension.name() != null) {
@@ -45,9 +49,11 @@ public class AlchemyDimensionType {
 	
 	@Nullable
 	public static DimensionType findDimensionType(Class<?> provider) {
-		for (DimensionType type : DimensionType.values())
-			if (type.getDeclaringClass() == provider)
-				return type;
+		do 
+			for (DimensionType type : DimensionType.values())
+				if (type.getDeclaringClass() == provider)
+					return type;
+		while ((provider = provider.getSuperclass()) != null);
 		return null;
 	}
 	

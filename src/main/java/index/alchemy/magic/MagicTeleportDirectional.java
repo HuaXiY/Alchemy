@@ -26,7 +26,8 @@ public class MagicTeleportDirectional extends AlchemyMagic {
 		if (Alway.isServer()) {
 			if (dim != -1) {
 				WorldServer world = DimensionManager.getWorld(dim);
-				world.getDefaultTeleporter().placeInExistingPortal(living, living.rotationYaw);
+				if (world != null)
+					world.getDefaultTeleporter().placeInExistingPortal(living, living.rotationYaw);
 			}
 			living.setPositionAndUpdate(x, y, z);
 		}

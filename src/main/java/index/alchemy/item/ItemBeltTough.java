@@ -62,9 +62,6 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onPlayerDrops(PlayerDropsEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
-		System.out.println("onD");
-		for (AttributeModifier modifier : player.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getModifiers())
-			System.out.println(modifier);
 		if (!isEquipmented(player))
 			onUnequipped(null, player);
 	}
