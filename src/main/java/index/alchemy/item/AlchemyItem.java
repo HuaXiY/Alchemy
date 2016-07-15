@@ -4,7 +4,7 @@ import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,7 +15,7 @@ import net.minecraft.util.text.TextFormatting;
 
 public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 	
-	public static final CreativeTabs CREATIVE_TABS = new CreativeTabs(Constants.MOD_ID) {
+	public static final CreativeTabs CREATIVE_TABS = new CreativeTabs(AlchemyConstants.MOD_ID) {
 		@Override
 		public Item getTabIconItem() {
 			return AlchemyItemLoader.solvent_lapis_lazuli;

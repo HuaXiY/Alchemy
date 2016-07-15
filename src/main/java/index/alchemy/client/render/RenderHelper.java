@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import java.awt.Color;
 
 import static org.lwjgl.opengl.GL11.*;
-import static java.lang.Math.*;
+import static net.minecraft.util.math.MathHelper.*;
 
 public class RenderHelper {
 	
@@ -59,32 +59,32 @@ public class RenderHelper {
 	
 	public static class Draw2D {
 		
-		public static void drawTriangle(double la, double lb, double ha, double hb, boolean fill) {
+		public static void drawTriangle(float la, float lb, float ha, float hb, boolean fill) {
 			glBegin(fill ? GL_TRIANGLE_FAN : GL_LINE_STRIP);
-			glVertex3d(-la, 0, hb);
-			glVertex3d(lb, 0, hb);
-			glVertex3d(0, 0, ha);
-			glVertex3d(-la, 0, hb);
+			glVertex3f(-la, 0, hb);
+			glVertex3f(lb, 0, hb);
+			glVertex3f(0, 0, ha);
+			glVertex3f(-la, 0, hb);
 			glEnd();
 		}
 		
-		public static void drawCircle(double r, double delta_angle, boolean fill) {
+		public static void drawCircle(float r, float delta_angle, boolean fill) {
 			drawRound(r, 0, 360, delta_angle, fill);
 		}
 		
-		public static void drawRound(double r, double start_angle, double end_angle, double delta_angle, boolean fill) {
+		public static void drawRound(float r, float start_angle, float end_angle, float delta_angle, boolean fill) {
 			glBegin(fill ? GL_TRIANGLE_FAN : GL_LINE_STRIP);
-			for (double i = start_angle; i < end_angle; i += delta_angle)
-				glVertex3d(r * cos(i), 0 ,r * sin(i));
+			for (float i = start_angle; i < end_angle; i += delta_angle)
+				glVertex3f(r * cos(i), 0 ,r * sin(i));
 			glEnd();
 		}
 		
-		public static void drawRectangle(double x, double z) {
+		public static void drawRectangle(float x, float z) {
 			glBegin(GL_QUADS);
-			glVertex3d(x, 0, z);
-			glVertex3d(-x, 0, z);
-			glVertex3d(-x, 0, -z);
-			glVertex3d(x, 0, -z);
+			glVertex3f(x, 0, z);
+			glVertex3f(-x, 0, z);
+			glVertex3f(-x, 0, -z);
+			glVertex3f(x, 0, -z);
 			glEnd();
 		}
 		
@@ -117,7 +117,7 @@ public class RenderHelper {
 		}
 		
 		public static void translate(Entity entity) {
-			glTranslated(entity.posX, entity.posY, entity.posZ);
+			glTranslatef((float) entity.posX, (float) entity.posY, (float) entity.posZ);
 		}
 		
 		public static void translate(BlockPos pos) {
@@ -128,90 +128,90 @@ public class RenderHelper {
 			glTranslatef(pos.getX() + .5F, pos.getY() + .5F, pos.getZ() + .5F);
 		}
 		
-		public static void drawRectangle(double x, double y, double z, EnumFacing facing) {
+		public static void drawRectangle(float x, float y, float z, EnumFacing facing) {
 			glBegin(GL_QUADS);
 			switch (facing) {
 				case UP:
-					glVertex3d(x, y, z);
-					glVertex3d(-x, y, z);
-					glVertex3d(-x, y, -z);
-					glVertex3d(x, y, -z);
+					glVertex3f(x, y, z);
+					glVertex3f(-x, y, z);
+					glVertex3f(-x, y, -z);
+					glVertex3f(x, y, -z);
 					break;
 				case DOWN:
-					glVertex3d(x, -y, z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(-x, -y, -z);
-					glVertex3d(x, -y, -z);
+					glVertex3f(x, -y, z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(-x, -y, -z);
+					glVertex3f(x, -y, -z);
 					break;
 				case NORTH:
-					glVertex3d(x, y, z);
-					glVertex3d(-x, y, z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(x, -y, z);
+					glVertex3f(x, y, z);
+					glVertex3f(-x, y, z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(x, -y, z);
 					break;
 				case SOUTH:
-					glVertex3d(x, y, z);
-					glVertex3d(-x, y, z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(x, -y, z);
+					glVertex3f(x, y, z);
+					glVertex3f(-x, y, z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(x, -y, z);
 					break;
 				case WEST:
-					glVertex3d(x, y, z);
-					glVertex3d(x, -y, z);
-					glVertex3d(x, -y, -z);
-					glVertex3d(x, y, -z);
+					glVertex3f(x, y, z);
+					glVertex3f(x, -y, z);
+					glVertex3f(x, -y, -z);
+					glVertex3f(x, y, -z);
 					break;
 				case EAST:
-					glVertex3d(-x, y, z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(-x, -y, -z);
-					glVertex3d(-x, y, -z);
+					glVertex3f(-x, y, z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(-x, -y, -z);
+					glVertex3f(-x, y, -z);
 					break;
 			}
 			glEnd();
 			glBegin(GL_QUADS);
 			switch (facing) {
 				case UP:
-					glVertex3d(x, y, -z);
-					glVertex3d(-x, y, -z);
-					glVertex3d(-x, y, z);
-					glVertex3d(x, y, z);
+					glVertex3f(x, y, -z);
+					glVertex3f(-x, y, -z);
+					glVertex3f(-x, y, z);
+					glVertex3f(x, y, z);
 					break;
 				case DOWN:
-					glVertex3d(x, -y, -z);
-					glVertex3d(-x, -y, -z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(x, -y, z);
+					glVertex3f(x, -y, -z);
+					glVertex3f(-x, -y, -z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(x, -y, z);
 					break;
 				case NORTH:
-					glVertex3d(x, -y, z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(-x, y, z);
-					glVertex3d(x, y, z);
+					glVertex3f(x, -y, z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(-x, y, z);
+					glVertex3f(x, y, z);
 					break;
 				case SOUTH:
-					glVertex3d(x, -y, z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(-x, y, z);
-					glVertex3d(x, y, z);
+					glVertex3f(x, -y, z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(-x, y, z);
+					glVertex3f(x, y, z);
 					break;
 				case WEST:
-					glVertex3d(x, y, -z);
-					glVertex3d(x, -y, -z);
-					glVertex3d(x, -y, z);
-					glVertex3d(x, y, z);
+					glVertex3f(x, y, -z);
+					glVertex3f(x, -y, -z);
+					glVertex3f(x, -y, z);
+					glVertex3f(x, y, z);
 					break;
 				case EAST:
-					glVertex3d(-x, y, -z);
-					glVertex3d(-x, -y, -z);
-					glVertex3d(-x, -y, z);
-					glVertex3d(-x, y, z);
+					glVertex3f(-x, y, -z);
+					glVertex3f(-x, -y, -z);
+					glVertex3f(-x, -y, z);
+					glVertex3f(-x, y, z);
 					break;
 			}
 			glEnd();
 		}
 		
-		public static void drawCube(double x, double y, double z) {
+		public static void drawCube(float x, float y, float z) {
 			for (EnumFacing facing : EnumFacing.VALUES)
 				drawRectangle(x, y, z, facing);
 		}

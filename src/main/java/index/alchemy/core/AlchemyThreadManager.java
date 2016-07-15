@@ -6,7 +6,19 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import index.alchemy.core.debug.AlchemyRuntimeException;
+
 public final class AlchemyThreadManager {
+	
+	public static class OtherThreadThrowable extends Throwable {
+		
+		public final Thread thread = Thread.currentThread();
+
+		public OtherThreadThrowable(Throwable e) {
+			super(e);
+		}
+		
+	}
 	
 	public AlchemyThreadManager() {
 		this(1, 1, 10, 50);
@@ -64,7 +76,7 @@ public final class AlchemyThreadManager {
 					} catch (Throwable e) {
 						System.err.println("[ThreadManager]Catch a Throwable in runtime loop: ");
 						System.err.println("**********************************************************");
-						e.printStackTrace();
+						AlchemyRuntimeException.onException(new OtherThreadThrowable(e));
 						System.err.println("**********************************************************");
 					}
 					lock.lock();
@@ -80,9 +92,7 @@ public final class AlchemyThreadManager {
 								Thread.sleep(1000);
 						} else
 							Thread.sleep(10);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					} catch (Exception e) {}
 			}
 			deleltThread(Threads.this);
 		}
@@ -99,8 +109,7 @@ public final class AlchemyThreadManager {
 
 	public void addThread() {
 		if (size > max && ++warning > 100) {
-			System.err.println("Warning: ThreadManager can't meet the list needs.("
-							+ ++num + ")");
+			System.err.println("Warning: ThreadManager can't meet the list needs.(" + ++num + ")");
 			return;
 		}
 		lock.lock();

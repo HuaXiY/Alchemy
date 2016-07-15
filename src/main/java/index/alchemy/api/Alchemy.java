@@ -18,7 +18,7 @@ public class Alchemy {
 	public static void registerAlchemyRecipe(IAlchemyRecipe recipe) {
 		AlchemyModLoader.checkState();
 		if (recipe.getAlchemyName() == null)
-			AlchemyRuntimeException.onException(new RuntimeException(
+			AlchemyRuntimeException.onException(new NullPointerException(
 					"index.alchemy.api.Alchemy.registerAlchemyRecipe, name is null"));
 		if (!ALCHEMY_LIST.contains(recipe))
 			ALCHEMY_LIST.add(recipe);
@@ -45,6 +45,9 @@ public class Alchemy {
 	}
 	
 	/*
+	 * Use A COPY(List<ItemStack> materials) to invoke this method
+	 * This method may change the content of the collection
+	 * 
 	 * if (return != null) materials -> residues material
 	 */
 	@Nullable

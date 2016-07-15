@@ -7,6 +7,7 @@ import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.block.proxy.PBlockCauldron;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
@@ -88,7 +89,7 @@ public class AlchemyBlockLoader {
         		}
         	}
     	}catch(Exception e){
-    		e.printStackTrace();
+    		AlchemyRuntimeException.onException(e);
     		return false;
     	}
     	return true;

@@ -56,7 +56,7 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 
 	@Override
 	public String getNameInOreDictionary() {
-		return Tool._toUp(getRegistryName().getResourcePath());
+		return Tool._ToUpper(getRegistryName().getResourcePath());
 	}
 	
 	@Override

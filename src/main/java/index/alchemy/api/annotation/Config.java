@@ -5,9 +5,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD)
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Config {
+	
+	public static @interface Handle {
+		
+		public static enum Type {
+			MAKE,
+			SAVE
+		}
+		
+		public String name();
+		
+		public Type type();
+		
+	}
+	
+	public String handle() default "";
 	
 	public String category();
 	

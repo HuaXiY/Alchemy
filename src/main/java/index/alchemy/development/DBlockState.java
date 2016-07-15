@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.api.annotation.DInit;
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -15,7 +15,7 @@ public class DBlockState {
 	
 	public static final String SUFFIX = ".json";
 	
-	private static final String states_dir = DMain.resources + "/blockstates", default_json = Tool.readSafe(new File(states_dir, Constants.MC_VERSION + SUFFIX));
+	private static final String states_dir = DMain.resources + "/blockstates", default_json = Tool.readSafe(new File(states_dir, AlchemyConstants.MC_VERSION + SUFFIX));
 	
 	public static void init() {}
 	

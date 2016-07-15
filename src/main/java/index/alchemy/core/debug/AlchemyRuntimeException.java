@@ -13,7 +13,7 @@ import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiErrorScreen;
@@ -71,9 +71,9 @@ public class AlchemyRuntimeException extends RuntimeException {
 			unsafe(unsafe.value());
 		}
 		Change change = method.getAnnotation(Change.class);
-		if (change != null && !change.value().equals(Constants.MC_VERSION)) {
+		if (change != null && !change.value().equals(AlchemyConstants.MC_VERSION)) {
 			change(clazz.getName() + "#" + method.getName() + "()");
-			change(change.value() + "<=>" + Constants.MC_VERSION);
+			change(change.value() + "<=>" + AlchemyConstants.MC_VERSION);
 		}
 		return unsafe != null || change != null;
 	}

@@ -16,6 +16,9 @@ import static java.lang.Math.*;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.awt.Color;
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 
 @SideOnly(Side.CLIENT)
 @Render(TileEntityCauldron.class)
@@ -24,13 +27,27 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 	@Override
 	public void renderTileEntityAt(TileEntityCauldron te, double tx, double ty, double tz, float partialTicks, int destroyStage) {
 		final float v = 1F / 4F;
-		int index = 1, size = 	te.getContainer().size();
+		int index = 1, size = te.getContainer().size();
 		
 		if (size < 1)
 			return;
 		
 		long tick = Alway.getClientWorldTime();
 		float offsetPerPetal = 360 / size;
+		
+		glDisable(GL_LIGHTING);
+		
+	    glBegin(GL_LINE_LOOP);
+	    float aa=(float) cos(54.0/360.0*2*PI);
+	    float bb=(float) (aa*tan(36.0/360.0*2*PI));
+	    float cc=(float) (sin(54.0/360.0*2*PI)-bb);
+
+	    for(int i=0;i<360;i+=72)
+	    {
+	        glVertex3f((float) (cos(i/360.0*2.0*PI)-0.5), 0F, (float) (sin(i/360.0*2.0*PI)+0.5));
+	        glVertex3f((float) (cc*cos((i+36)/360.0*2.0*PI)-0.5), 0F, (float) (cc*sin((i+36)/360.0*2.0*PI)+0.5));
+	    }
+	    glEnd();
 		
 		/*glRotatef(tick % 72 * 5, 0, 1, 0);
 		glDisable(GL_TEXTURE_2D);
@@ -45,6 +62,23 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		glEnable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
 		glRotatef(-tick % 72 * 5, 0, 1, 0);*/
+		float points[][] = {
+			    { -4F, -4F, 0F }, { -2F, 4F, 0F },
+			    { 2F, -4F, 0F }, { 4F, 4F, 0F }
+		};
+		FloatBuffer buffer = BufferUtils.createFloatBuffer(12);
+		buffer.clear();
+		for (float potion[] : points)
+			buffer.put(potion);
+		buffer.rewind();
+		
+		glMap1f(GL_MAP1_VERTEX_3, 0, 1, 3, 4, buffer);
+		glEnable(GL_MAP1_VERTEX_3);
+		glBegin(GL_LINE_STRIP);
+	    for (int i = 0; i < 31; i++)
+	        glEvalCoord1f(i / 30F);
+	    glEnd();
+	    glDisable(GL_MAP1_VERTEX_3);
 		
 		RenderHelper.setColor(new Color(0x66, 0xCC, 0xFF, 0x77));
 		MagicMatrix.renderHexagram();
@@ -62,7 +96,7 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 			glRotatef(deg, 0, 1, 0);
 			glTranslatef(0, 0, -r);
 			
-			RenderHelper.Draw3D.drawCube(0.05, 0.1, 0.05);
+			RenderHelper.Draw3D.drawCube(0.05F, 0.1F, 0.05F);
 			
 			glPopMatrix();
 		}

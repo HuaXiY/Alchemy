@@ -96,8 +96,7 @@ public class ModItems {
 			Source source = field.getAnnotation(Source.class);
 			if (source != null && source.value() != null) {
 				Object obj = source.value().getField(field.getName().replaceAll(".*\\$", "")).get(null);
-				if (FinalFieldSetter.hasInstance())
-					FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
+				FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
 			}
 		}
 		
@@ -117,7 +116,8 @@ public class ModItems {
 		
 		for (Field field : ModItems.class.getFields()) {
 			Object obj = field.get(null);
-			AlchemyModLoader.logger.info("    init: <" + field.getType().getName() + "> " + field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
+			AlchemyModLoader.logger.info("    init: <" + field.getType().getName() + "> " +
+					field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
 				obj instanceof ItemStack ? ((ItemStack) obj).getDisplayName() : ""));
 		}
 	}

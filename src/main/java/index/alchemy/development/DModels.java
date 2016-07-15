@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.api.annotation.DInit;
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -17,8 +17,8 @@ public class DModels {
 	public static final String SUFFIX = ".json";
 		
 	private static final String models_dir = DMain.resources + "/models",
-			default_item_json = Tool.readSafe(new File(models_dir + "/item", Constants.MC_VERSION + SUFFIX)),
-			default_block_json = Tool.readSafe(new File(models_dir + "/block", Constants.MC_VERSION + SUFFIX));
+			default_item_json = Tool.readSafe(new File(models_dir + "/item", AlchemyConstants.MC_VERSION + SUFFIX)),
+			default_block_json = Tool.readSafe(new File(models_dir + "/block", AlchemyConstants.MC_VERSION + SUFFIX));
 	
 	public static void init() {}
 	

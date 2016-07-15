@@ -23,19 +23,15 @@ public class AlchemyEntityManager {
 			MONSTER_LIST = new ArrayList<Class<? extends EntityLivingBase>>();
 	
 	public static EntityLivingBase getRandomEntity(List<Class<? extends EntityLivingBase>> list, World world) {
-		try {
-			return list.get(AlchemyModLoader.random.nextInt(list.size())).getConstructor(World.class).newInstance(world);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new EntityPig(world);
-		}
+		return getEntityById(list, AlchemyModLoader.random.nextInt(list.size()), world);
 	}
 	
 	public static EntityLivingBase getEntityById(List<Class<? extends EntityLivingBase>> list, int id, World world) {
+		Class<? extends EntityLivingBase> clazz = list.get(id);
 		try {
 			return list.get(id).getConstructor(World.class).newInstance(world);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AlchemyModLoader.logger.warn("Cannot be instantiated: " + clazz.getName(), e);
 			return new EntityPig(world);
 		}
 	}

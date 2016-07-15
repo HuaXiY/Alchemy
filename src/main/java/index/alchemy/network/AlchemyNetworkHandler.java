@@ -13,7 +13,7 @@ import index.alchemy.api.annotation.Message;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -35,7 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
 	
-	public static final SimpleNetworkWrapper network_wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MOD_ID);
+	public static final SimpleNetworkWrapper network_wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(AlchemyConstants.MOD_ID);
 	
 	private static final Map<Class<?>, Side> message_mapping = new LinkedHashMap<Class<?>, Side>();
 	

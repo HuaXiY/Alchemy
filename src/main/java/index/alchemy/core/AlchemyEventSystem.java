@@ -32,23 +32,19 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
-import index.alchemy.magic.MagicTeleportDirectional;
+import index.alchemy.potion.AlchemyPotionLoader;
 import index.alchemy.util.Tool;
-import net.minecraft.block.BlockObsidian;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -63,7 +59,6 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.fml.server.FMLServerHandler;
 
 @Loading
 @Init(state = ModState.CONSTRUCTED)
@@ -114,33 +109,33 @@ public class AlchemyEventSystem implements IGuiHandler {
 			ORE_GEN_BUS = new EventType[]{ EventType.ORE_GEN_BUS };
 	
 	private static final List<IPlayerTickable> 
-			SERVER_TICKABLE = new ArrayList<IPlayerTickable>(),
-			CLIENT_TICKABLE = new ArrayList<IPlayerTickable>();
+			server_tickable = new ArrayList<IPlayerTickable>(),
+			client_tickable = new ArrayList<IPlayerTickable>();
 	
 	private static final Map<Side, List<IContinuedRunnable>> 
-			RUNNABLE_MAPPING = new HashMap<Side, List<IContinuedRunnable>>();
+			runnable_mapping = new HashMap<Side, List<IContinuedRunnable>>();
 	static {
 		for (Side side : Side.values())
-			RUNNABLE_MAPPING.put(side, Collections.synchronizedList(new LinkedList<IContinuedRunnable>()));
+			runnable_mapping.put(side, Collections.synchronizedList(new LinkedList<IContinuedRunnable>()));
 	}
 	
-	private static final List<IGuiHandle> GUI_HANDLES = new ArrayList<IGuiHandle>();
+	private static final List<IGuiHandle> gui_handle = new ArrayList<IGuiHandle>();
 	
-	private static final Set<Object> HOOK_INPUT = new HashSet<Object>();
+	private static final Set<Object> hook_input = new HashSet<Object>();
 	
 	private static boolean hookInputState = false;
 	
-	private static final Set<String> TEXTURE_SET = new HashSet<String>();
+	private static final Set<String> texture_set = new HashSet<String>();
 	
-	private static final List<KeyBindingHandle> KEY_HANDELS = new ArrayList<KeyBindingHandle>();
+	private static final List<KeyBindingHandle> key_handle = new ArrayList<KeyBindingHandle>();
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		AlchemyModLoader.checkState();
 		if (tickable.getSide() != null)
-			(tickable.getSide() == Side.SERVER ? SERVER_TICKABLE : CLIENT_TICKABLE).add(tickable);
+			(tickable.getSide() == Side.SERVER ? server_tickable : client_tickable).add(tickable);
 		else {
-			SERVER_TICKABLE.add(tickable);
-			CLIENT_TICKABLE.add(tickable);
+			server_tickable.add(tickable);
+			client_tickable.add(tickable);
 		}
 	}
 	
@@ -174,7 +169,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 			//new MagicTeleportDirectional(1).apply(null, event.player, 1);
 			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
-		for (IPlayerTickable tickable : event.side.isServer() ? SERVER_TICKABLE : CLIENT_TICKABLE)
+		for (IPlayerTickable tickable : event.side.isServer() ? server_tickable : client_tickable)
 			tickable.onTick(event.player, event.phase);
 	}
 		
@@ -204,11 +199,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	public static void addContinuedRunnable(IContinuedRunnable runnable) {
-		RUNNABLE_MAPPING.get(Alway.getSide()).add(runnable);
+		runnable_mapping.get(Alway.getSide()).add(runnable);
 	}
 	
 	public static void onRunnableTick(Side side, Phase phase) {
-		List<IContinuedRunnable> list = RUNNABLE_MAPPING.get(side);
+		List<IContinuedRunnable> list = runnable_mapping.get(side);
 		synchronized (list) {
 			Iterator<IContinuedRunnable> iterator = list.iterator();
 			while (iterator.hasNext())
@@ -231,6 +226,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onClientTick(ClientTickEvent event) {
+		if (Minecraft.getMinecraft().thePlayer != null)
+			AlchemyPotionLoader.danger_sense.performEffect(Minecraft.getMinecraft().thePlayer, 1);
 		String flag = "9";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
@@ -251,36 +248,36 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	public static synchronized void registerGuiHandle(IGuiHandle handle) {
 		AlchemyModLoader.checkState();
-		GUI_HANDLES.add(handle);
+		gui_handle.add(handle);
 	}
 	
 	public static int getGuiIdByGuiHandle(IGuiHandle handle) {
-		return GUI_HANDLES.indexOf(handle);
+		return gui_handle.indexOf(handle);
 	}
 	
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-		return GUI_HANDLES.get(id).getServerGuiElement(player, world, x, y, z);
+		return gui_handle.get(id).getServerGuiElement(player, world, x, y, z);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-		return GUI_HANDLES.get(id).getClientGuiElement(player, world, x, y, z);
+		return gui_handle.get(id).getClientGuiElement(player, world, x, y, z);
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public static void addInputHook(Object obj) {
-		if (HOOK_INPUT.isEmpty())
+		if (hook_input.isEmpty())
 			hookInputState = true;
-		HOOK_INPUT.add(obj);
+		hook_input.add(obj);
 		KeyBinding.unPressAllKeys();
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public static void removeInputHook(Object obj) {
-		HOOK_INPUT.remove(obj);
-		if (HOOK_INPUT.isEmpty())
+		hook_input.remove(obj);
+		if (hook_input.isEmpty())
 			hookInputState = false;
 		KeyBinding.updateKeyBindState();
 	}
@@ -300,7 +297,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 							if (method.getParameterTypes().length == 1 && method.getParameterTypes()[0] == KeyBinding.class) {
 								for (String value : event.value())
 									if (value.equals(description))
-										KEY_HANDELS.add(new KeyBindingHandle(binding, handle, method));
+										key_handle.add(new KeyBindingHandle(binding, handle, method));
 							}
 							else
 								AlchemyRuntimeException.onException(new IllegalArgumentException(
@@ -321,7 +318,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 		if (hookInputState)
 			KeyBinding.unPressAllKeys();
 		else 
-			for (KeyBindingHandle handle : KEY_HANDELS)
+			for (KeyBindingHandle handle : key_handle)
 				if (Keyboard.isKeyDown(handle.getBinding().getKeyCode()))
 					try {
 						handle.getMethod().invoke(handle.getHandle(), handle.getBinding());
@@ -347,7 +344,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SubscribeEvent()
 	@SideOnly(Side.CLIENT)
 	public void onTextureStitch_Pre(TextureStitchEvent.Pre event) {
-		for (String res : TEXTURE_SET)
+		for (String res : texture_set)
 			event.getMap().registerSprite(new ResourceLocation(res));
 	}
 	
@@ -376,7 +373,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 			if (texture != null)
 				if (texture.value() != null)
 					for (String res : texture.value())
-						TEXTURE_SET.add(res);
+						texture_set.add(res);
 				else
 					AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @Texture.value()"));
 			Render render = clazz.getAnnotation(Render.class);
@@ -384,7 +381,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 				if (render.value() != null) {
 					if (Tool.isSubclass(TileEntity.class, render.value()) && Tool.isSubclass(TileEntitySpecialRenderer.class, clazz))
 						try {
-							ClientRegistry.bindTileEntitySpecialRenderer((Class) render.value(), (TileEntitySpecialRenderer) clazz.newInstance());
+							ClientRegistry.bindTileEntitySpecialRenderer(render.value(),
+									(TileEntitySpecialRenderer) clazz.newInstance());
 						} catch (Exception e) {
 							AlchemyRuntimeException.onException(e);
 						}

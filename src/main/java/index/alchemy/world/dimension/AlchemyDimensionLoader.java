@@ -10,13 +10,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 public class AlchemyDimensionLoader {
 	
 	public static void init() {
-		System.out.println(DimensionType.values().length);
-		for (DimensionType type : DimensionType.values())
-			System.out.println(type.getName() + " - " + type.getId());
-		System.out.println("---");
-		System.out.println(DimensionTheForgottenTimeCourtyard.type.getId());
 		DimensionManager.registerDimension(10, DimensionTheForgottenTimeCourtyard.type);
-		//DimensionManager.createProviderFor(10);
 	}
 
 }

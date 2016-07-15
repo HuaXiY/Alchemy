@@ -2,12 +2,13 @@ package index.alchemy.api;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Predicate;
 
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,6 +21,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.IFuelHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -39,7 +41,7 @@ public class Alway {
 	public static final Map<Thread, Side> SIDE_MAPPING = new HashMap<Thread, Side>();
 	
 	public static boolean isAlchemyModLoaded() {
-		return Loader.isModLoaded(Constants.MOD_ID);
+		return Loader.isModLoaded(AlchemyConstants.MOD_ID);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -82,6 +84,22 @@ public class Alway {
 	
 	public static Biome getCurrentBiome(World world, int x, int z) {
 		return world.getBiomeForCoordsBody(new BlockPos(x, 0, z));
+	}
+	
+	public static IFuelHandler getFuelHandler(final ItemStack item, final int time) {
+		return new IFuelHandler() {
+			@Override
+			public int getBurnTime(ItemStack fuel) {
+				return ItemStack.areItemsEqual(fuel, item) ? time : 0;
+			}
+		};
+	}
+	
+	public static List<IFuelHandler> getFuelHandlers(String material_str, int time) {
+		List<IFuelHandler> result = new LinkedList<IFuelHandler>();
+		for (ItemStack material : OreDictionary.getOres(material_str))
+			result.add(getFuelHandler(material, time));
+		return result;
 	}
 	
 	public static ILocationProvider generateLocationProvider(final Entity entity, final double offsetY) {

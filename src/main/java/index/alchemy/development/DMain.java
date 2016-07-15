@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class DMain {
 	
 	public static final String
-			resources = AlchemyModLoader.mc_dir + "/src/main/resources/assets/" + Constants.MOD_ID,
+			resources = AlchemyModLoader.mc_dir + "/src/main/resources/assets/" + AlchemyConstants.MOD_ID,
 			PROPERTIES = "build.properties", DEV_VERSION_KEY_NAME = "dev_version";
 	
 	public static final List<Method> init_obj = new ArrayList<Method>(), init = new ArrayList<Method>();

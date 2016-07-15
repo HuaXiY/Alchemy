@@ -35,6 +35,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -72,7 +73,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 		}
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingUpdate(LivingUpdateEvent event) {
 		IInventory inventory = event.getEntityLiving().getCapability(AlchemyCapabilityLoader.bauble, null);
 		if (inventory == null)
@@ -84,7 +85,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 		}
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingDrops(LivingDropsEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
 		if (Alway.isServer() && !(living instanceof EntityPlayer)) {
@@ -99,7 +100,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 		}
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onPlayerDrops(PlayerDropsEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
 		if (Alway.isServer() && !player.worldObj.getGameRules().getBoolean("keepInventory")) {

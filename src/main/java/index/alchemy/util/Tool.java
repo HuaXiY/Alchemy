@@ -9,21 +9,26 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 
@@ -39,9 +44,39 @@ public class Tool {
 		return t;
 	}
 	
+	public static final String get(String str, String key) {
+		Matcher matcher = Pattern.compile(key).matcher(str);
+		if (matcher.find())
+			return matcher.group(1);
+		return "";
+	}
+	
+	public static final String decode(String str) {
+		try {
+			return URLDecoder.decode(str, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return str;
+		}
+	}
+	
+	public static final void init(Class<?> clazz) {
+		Object instance = instance(clazz);
+		if (instance != null)
+			AlchemyInitHook.init(instance);
+	}
+	
+	@Nullable
+	public static final <T> T instance(Class<T> clazz) {
+		try {
+			return (T) setAccessible(clazz.getDeclaredConstructor()).newInstance();
+		} catch (Exception e) {
+			AlchemyRuntimeException.onException(e);
+		}
+		return null;
+	}
+	
 	public static final <Src, To> To proxy(Src src, To to, int i) {
-		Field fasrc[] = src.getClass().getDeclaredFields(), fato[] = to
-				.getClass().getDeclaredFields();
+		Field fasrc[] = src.getClass().getDeclaredFields(), fato[] = to.getClass().getDeclaredFields();
 		int index = -1;
 		for (Field fsrc : fasrc) {
 			if (++index == i)
@@ -168,7 +203,7 @@ public class Tool {
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				e.printStackTrace();
+				AlchemyRuntimeException.onException(e);
 			}
 		try {
 			return new PrintWriter(path, "utf-8");
@@ -185,7 +220,7 @@ public class Tool {
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
-				e.printStackTrace();
+				AlchemyRuntimeException.onException(e);
 			}
 		try {
 			return new PrintWriter(new OutputStreamWriter(new FileOutputStream(
@@ -224,7 +259,7 @@ public class Tool {
 				if (reader != null)
 					reader.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				AlchemyRuntimeException.onException(e);
 			}
 		}
 	}
@@ -250,7 +285,7 @@ public class Tool {
 			pfp.print(str);
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			AlchemyRuntimeException.onException(e);
 			return false;
 		} finally {
 			if (pfp != null)
@@ -343,11 +378,29 @@ public class Tool {
 		return result;
 	}
 	
-	public static final String _toUp(String str) {
-		int i;
-		while ((i = str.indexOf('_')) != -1 && str.length() > i + 2)
-			str = str.substring(0, i) + str.substring(i + 1, i + 2).toUpperCase() + str.substring(i + 2);
-		return str;
+	public static final String _ToUpper(String str) {
+		boolean upper = false;
+		StringBuilder builder = new StringBuilder();
+		for (char c : str.toCharArray())
+			if (c == '_')
+				upper = true;
+			else if (upper) {
+				builder.append(Character.toUpperCase(c));
+				upper = false;
+			} else
+				builder.append(c);
+		return builder.toString();
+	}
+	
+	public static final String upperTo_(String str) {
+		boolean lower = false;
+		StringBuilder builder = new StringBuilder();
+		for (char c : str.toCharArray())
+			if (Character.isLowerCase(c)) {
+				builder.append('_').append(Character.toLowerCase(c));
+			} else
+				builder.append(c);
+		return builder.toString();
 	}
 	
 	public static final String getString(char c, int len) {
@@ -367,8 +420,10 @@ public class Tool {
 		return result;
 	}
 	
+	public static final Void VOID = instance(Void.class);
+	
 	@Nullable
-	public static final <T> T $(Object... args) {
+	public static final Object $(Object... args) throws Exception {
 		checkArrayLength(args, 2);
 		Object object = args[0].getClass() == Class.class ? null : args[0];
 		String name = (String) args[1];
@@ -376,12 +431,8 @@ public class Tool {
 		args = ArrayUtils.subarray(args, 2, args.length);
 		do {
 			Method method = searchMethod(clazz, name, args);
-			try {
-				if (method != null)
-					return (T) method.invoke(object, args);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			if (method != null)
+				return isNullOr(method.invoke(object, args), VOID);
 		} while((clazz = clazz.getSuperclass()) != null);
 		StringBuilder builder = new StringBuilder();
 		for (Object arg : args)

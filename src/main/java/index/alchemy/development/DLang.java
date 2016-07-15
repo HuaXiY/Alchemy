@@ -3,7 +3,7 @@ package index.alchemy.development;
 import index.alchemy.api.IItemInventory;
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.Constants;
+import index.alchemy.core.AlchemyConstants;
 import index.alchemy.item.ItemMagicSolvent;
 import index.alchemy.util.Tool;
 
@@ -53,9 +53,9 @@ public class DLang {
 		}
 		
 		try {
-			mcSet.addAll(getMap(new File(lang_dir, Constants.MC_VERSION + SUFFIX)).keySet());
+			mcSet.addAll(getMap(new File(lang_dir, AlchemyConstants.MC_VERSION + SUFFIX)).keySet());
 		} catch (IOException e) {
-			AlchemyModLoader.logger.warn("Can't load: " + Constants.MC_VERSION + SUFFIX);
+			AlchemyModLoader.logger.warn("Can't load: " + AlchemyConstants.MC_VERSION + SUFFIX);
 		}
 	}
 	
@@ -82,8 +82,8 @@ public class DLang {
 		File file = new File(lang_dir, name);
 		try {
 			Map<String, String> map = getMap(file);
-			StringBuilder builder = new StringBuilder("//MODID\n" + Constants.MOD_ID + "=" +
-					Tool.isNullOr(map.get(Constants.MOD_ID), Constants.MOD_ID) + "\n");
+			StringBuilder builder = new StringBuilder("//MODID\n" + AlchemyConstants.MOD_ID + "=" +
+					Tool.isNullOr(map.get(AlchemyConstants.MOD_ID), AlchemyConstants.MOD_ID) + "\n");
 			for (Field field : DLang.class.getDeclaredFields())
 				if (Tool.setAccessible(field).getType() == Map.class && !field.getName().startsWith("_")) {
 					builder.append("\n//" + field.getName() + "\n");

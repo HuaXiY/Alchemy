@@ -48,6 +48,7 @@ public class AlchemyInitHook {
 		MinecraftForge.EVENT_BUS.post(new InitHookEvent(obj));
 	}
 	
+	@Change("1.9.4")
 	public static void init_impl(Impl impl) {
 		
 		AlchemyModLoader.checkState();
