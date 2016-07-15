@@ -1,20 +1,17 @@
 package index.alchemy.core;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
@@ -27,7 +24,6 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.Display;
 
 import com.google.common.base.Joiner;
 import com.google.gson.Gson;
@@ -40,7 +36,6 @@ import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result.Build;
 import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result.Build.Artifact;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
@@ -319,11 +314,6 @@ public class AlchemyUpdateManager {
 			logger.warn("AlchemyUpdateManager.update() -> IOException", e);
 		}
 		IOUtils.closeQuietly(httpclient);
-	}
-	
-	public static void main(String[] args) throws Exception {
-		auto_update = true;
-		invoke(MOD_ID);
 	}
 
 }

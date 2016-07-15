@@ -4,15 +4,12 @@ import javax.annotation.Nullable;
 
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Dimension;
-import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.LoaderState.ModState;
 
 @Loading
 public class AlchemyDimensionType {
