@@ -32,7 +32,6 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
-import index.alchemy.potion.AlchemyPotionLoader;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -224,10 +223,9 @@ public class AlchemyEventSystem implements IGuiHandler {
 		onRunnableTick(event.side, event.phase);
 	}
 	
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onClientTick(ClientTickEvent event) {
-		if (Minecraft.getMinecraft().thePlayer != null)
-			AlchemyPotionLoader.danger_sense.performEffect(Minecraft.getMinecraft().thePlayer, 1);
 		String flag = "9";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing

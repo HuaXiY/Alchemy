@@ -5,10 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Config {
 	
+	@Target(ElementType.METHOD)
+	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface Handle {
 		
 		public static enum Type {

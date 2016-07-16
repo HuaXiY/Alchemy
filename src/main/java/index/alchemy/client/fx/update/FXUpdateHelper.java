@@ -53,6 +53,7 @@ public class FXUpdateHelper {
 	
 	public static int[] getIntArrayByArgs(String name, int... args) {
 		int result[] = new int[args.length + 1];
+		result[0] = getIdByName(name);
 		System.arraycopy(args, 0, result, 1, args.length);
 		return result;
 	}

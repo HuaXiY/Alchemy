@@ -118,6 +118,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(MessageWitchcraftUpdate message, MessageContext ctx) {
 		World world = Minecraft.getMinecraft().theWorld;
 		if (world != null) {

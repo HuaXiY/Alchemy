@@ -27,7 +27,6 @@ import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Test;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.development.DMain;
 import index.alchemy.util.Tool;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -43,6 +42,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static index.alchemy.core.AlchemyConstants.*;
@@ -209,18 +209,28 @@ public class AlchemyModLoader {
 				}
 			}
 			
+			for (String name : new LinkedList<String>(class_list))
+				if (name.matches(".*\\$[0-9]+"))
+					class_list.remove(name);
+				
+			
+			Side side = Alway.getSide();
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			
 			for (String name : class_list) {
 				try {
 					Class<?> clazz = Class.forName(name, false, loader);
+					SideOnly only = clazz.getAnnotation(SideOnly.class);
+					if (only != null && only.value() != side)
+						continue;
 					Loading loading = clazz.getAnnotation(Loading.class);
 					if (loading != null) {
 						loading_list.add(clazz.getMethod("init", Class.class));
 						logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
 					}
-				} catch (ClassNotFoundException e) {} 
-				catch (Exception e) {
+				} catch (ClassNotFoundException e) {
+					continue;
+				} catch (Exception e) {
 					AlchemyRuntimeException.onException(e);
 				}
 			}
@@ -229,13 +239,13 @@ public class AlchemyModLoader {
 				try {
 					Class<?> clazz = Class.forName(name, false, loader);
 					logger.info(AlchemyModLoader.class.getName() + " Loading -> " + clazz);
-					if (enable_dmain)
-						DMain.init(clazz);
+					SideOnly only = clazz.getAnnotation(SideOnly.class);
+					if (only != null && only.value() != side)
+						continue;
 					for (Method method : loading_list)
 						method.invoke(null, clazz);
 					Init init = clazz.getAnnotation(Init.class);
-					SideOnly side = clazz.getAnnotation(SideOnly.class);
-					if (init != null && init.enable() && (side == null || Alway.getSide() == side.value()))
+					if (init != null && init.enable())
 						init_map.get(init.state()).add(clazz);
 					InitInstance instance = clazz.getAnnotation(InitInstance.class);
 					if (instance != null)
@@ -243,8 +253,9 @@ public class AlchemyModLoader {
 							instance_map.get(instance.value()).add(clazz);
 						else
 							AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @InitInstance.value()"));
-				} catch (ClassNotFoundException e) {}
-				catch (Exception e) {
+				} catch (ClassNotFoundException e) {
+					continue;
+				} catch (Exception e) {
 					AlchemyRuntimeException.onException(e);
 				}
 			}

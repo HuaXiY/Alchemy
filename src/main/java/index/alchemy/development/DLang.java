@@ -25,8 +25,11 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionType;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @DInit
+@SideOnly(Side.CLIENT)
 public class DLang {
 	
 	public static final String SUFFIX = ".lang";

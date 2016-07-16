@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Loading
 @SideOnly(Side.CLIENT)
 @Init(state = ModState.AVAILABLE)
 public class DMain {
@@ -28,6 +30,8 @@ public class DMain {
 	public static final List<Method> init_obj = new ArrayList<Method>(), init = new ArrayList<Method>();
 	
 	public static void init(Class<?> clazz) {
+		if (!AlchemyModLoader.enable_dmain)
+			return;
 		AlchemyModLoader.checkState();
 		DInit dInit = clazz.getAnnotation(DInit.class);
 		if (dInit != null) {

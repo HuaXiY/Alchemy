@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.Mod.Instance;
 		modid = Baubles.MODID, 
 		name = Baubles.MODNAME, 
 		version = Baubles.VERSION, 
-		dependencies="required-after:Forge@[12.17.0,);")
+		dependencies="required-after:Forge@[12.17.0,);"
+)
 public class Baubles {
 	
 	public static final String MODID = "Baubles";

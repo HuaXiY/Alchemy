@@ -17,15 +17,20 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Texture({
-	"alchemy:particle/wisp"
-})
-@FX(name = "wisp", factory = FXWisp.Factory.class, ignoreRange = false)
+@SideOnly(Side.CLIENT)
 public class FXWisp extends AlchemyFX {
 	
-	private static final String TEXTURE_NAME[] = FXWisp.class.getAnnotation(Texture.class).value();
+	@Texture({
+		"alchemy:particle/wisp"
+	})
+	@FX(name = "wisp", ignoreRange = false)
+	public static class Info {
+		
+		public static final EnumParticleTypes type = null;
+		
+	}
 	
-	public static final EnumParticleTypes type = null;
+	private static final String TEXTURE_NAME[] = FXWisp.class.getAnnotation(Texture.class).value();
 	
 	private Iterator<Color> iterator = ahsbStep(new Color(0x7766CCFF), Color.RED, 2000 / 20, true, true, true);
 	private boolean render;
@@ -59,10 +64,12 @@ public class FXWisp extends AlchemyFX {
 	
 	@SideOnly(Side.CLIENT)
 	public static class Factory implements IParticleFactory {
+		
 		@Override
 		public Particle getEntityFX(int id, World world, double x, double y, double z, double vx, double vy, double vz, int... args) {
                 return new FXWisp(world, x, y, z).addFXUpdate(FXUpdateHelper.getResultByArgs(args));
 		}
+		
 	}
 
 }

@@ -3,6 +3,8 @@ package index.alchemy.client.fx.update;
 import index.alchemy.animation.ICycle;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.client.fx.AlchemyFX;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class FXMotionUpdate implements IFXUpdate {
 	
@@ -15,6 +17,7 @@ public class FXMotionUpdate implements IFXUpdate {
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void updateFX(AlchemyFX fx, long tick) {
 		fx.setMotionX(xCycle.next());
 		fx.setMotionY(yCycle.next());

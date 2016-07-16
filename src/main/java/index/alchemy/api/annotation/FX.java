@@ -11,8 +11,6 @@ public @interface FX {
 	
 	public String name();
 	
-	public Class factory();
-	
 	public boolean ignoreRange() default false;
 	
 	@Target(ElementType.TYPE)

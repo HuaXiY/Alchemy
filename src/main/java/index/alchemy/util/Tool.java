@@ -59,6 +59,15 @@ public class Tool {
 		}
 	}
 	
+	@Nullable
+	public static final Class forName(String name, boolean init) {
+		try {
+			return Class.forName(name);
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+	}
+	
 	public static final void init(Class<?> clazz) {
 		Object instance = instance(clazz);
 		if (instance != null)

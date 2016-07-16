@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 
 //TODO
 //!!!!> Only in the version 1.10 working <!!!!
-//This is register EnumParticleTypes in the Minecraft.
+//This class is used to register the EnumParticleTypes in the Minecraft.
 //Not guaranteed to work in another version, Field name and
 //position will change with the version.
 @Loading
@@ -58,12 +58,9 @@ public class AlchemyFXType {
 		FX fx = clazz.getAnnotation(FX.class);
 		if (fx != null)
 			if (fx.name() != null)
-				if (fx.factory() != null)
 					FX_MAPPING.put(fx, clazz);
 				else
 					AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @FX.name()"));
-			else
-				AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @FX.factory()"));
 	}
 	
 	public static void init() {
@@ -73,7 +70,8 @@ public class AlchemyFXType {
 			FX fx = entry.getKey();
 			Class<?> clazz = entry.getValue();
 			AlchemyModLoader.logger.info("	init: <" + clazz.getName() + "> " + fx);
-			Tool.setType(clazz, registerParticleTypes(fx.name(), fx.factory(), fx.ignoreRange()));
+			Tool.setType(clazz, registerParticleTypes(fx.name(), 
+					Tool.forName(clazz.getName().replace("Info", "Factory"), false), fx.ignoreRange()));
 		}
 	}
 

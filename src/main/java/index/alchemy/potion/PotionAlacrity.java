@@ -2,7 +2,6 @@ package index.alchemy.potion;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.api.Alway;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -25,18 +24,17 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	public static final String NBT_KEY_CD = "potion_alacrity";
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void performEffect(EntityLivingBase living, int level) {
-		if (Alway.isClient()) {
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-			if (living == player) {
-				if (isCDOver() && player.motionY < 0 &&
-						Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
-					player.motionY += player.motionX == 0 && player.motionZ == 0 ? JUMP_V * JUMP_V_Y : JUMP_V;
-					player.motionX *= JUMP_V_XZ;
-					player.motionZ *= JUMP_V_XZ;
-					AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageAlacrityCallback());
-					restartCD();
-				}
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		if (living == player) {
+			if (isCDOver() && player.motionY < 0 &&
+					Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
+				player.motionY += player.motionX == 0 && player.motionZ == 0 ? JUMP_V * JUMP_V_Y : JUMP_V;
+				player.motionX *= JUMP_V_XZ;
+				player.motionZ *= JUMP_V_XZ;
+				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageAlacrityCallback());
+				restartCD();
 			}
 		}
 	}

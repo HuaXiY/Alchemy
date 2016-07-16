@@ -9,8 +9,11 @@ import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @DInit
+@SideOnly(Side.CLIENT)
 public class DBlockState {
 	
 	public static final String SUFFIX = ".json";

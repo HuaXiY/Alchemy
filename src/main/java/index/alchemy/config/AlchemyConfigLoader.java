@@ -118,7 +118,7 @@ public class AlchemyConfigLoader {
 							clazz + "#" + field.getName() + " -> is non static"));
 		}
 		for (Method method : clazz.getDeclaredMethods()) {
-			Config.Handle handle =  method.getAnnotation(Config.Handle.class);
+			Config.Handle handle = method.getAnnotation(Config.Handle.class);
 			if (handle != null)
 				if (Modifier.isStatic(method.getModifiers()))
 					if (method.getParameterTypes().length == 1)

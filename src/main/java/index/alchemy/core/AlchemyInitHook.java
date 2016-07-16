@@ -18,6 +18,7 @@ import index.alchemy.api.annotation.Change;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -51,6 +52,7 @@ public class AlchemyInitHook {
 	@Change("1.9.4")
 	public static void init_impl(Impl impl) {
 		
+		Tool.checkNull(impl);
 		AlchemyModLoader.checkState();
 		
 		GameRegistry.register(impl);
@@ -69,6 +71,7 @@ public class AlchemyInitHook {
 	public static <I extends Item & IColorItem, B extends Block & IColorBlock,
 				   R extends Item & IResourceLocation, C> void init(Object obj) {
 		
+		Tool.checkNull(obj);
 		AlchemyModLoader.checkState();
 		
 		if (obj instanceof IOreDictionary)

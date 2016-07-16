@@ -66,18 +66,22 @@ public class AlchemyUpdateManager {
 			byte buffer[] = new byte[4096];
 			long count = 0;
 			int len = 0;
+			float last = 0;
 			while ((len = input.read(buffer)) != -1) {
 				output.write(buffer, 0, len);
 				count += len;
+				float progress = count / (float) size * 100;
+				String display =  String.format("%.1f", progress) + "%";
 				if (client) {
-					float progress = count / (float) size * 100;
-					String display =  String.format("%.1f", progress) + "%";
 					display = "Updating: " + Tool.getString(' ', 5 - display.length()) + display;
 					for (int i = 0; i < len; i++)
 						bar.step(display);
 					try {
 						Thread.sleep(10);
 					} catch (InterruptedException e) {}
+				} else if (progress > last) {
+					logger.info(display);
+					last = progress;
 				}
 			}
 			
@@ -138,18 +142,17 @@ public class AlchemyUpdateManager {
 		
 		public static final String tree_api = makeTreeApi(Result.class);
 		
-		@Config(handle = NAME, comment = CATEGORY_UPDATE, category = "Custom Jenkins CI URL.")
-		private static JenkinsCI custom;
+		@Config(handle = NAME, category = CATEGORY_UPDATE, comment = "Custom Jenkins CI URL.")
+		private static JenkinsCI custom = MICKEY;
 		
 		public static JenkinsCI getCustom() {
 			return custom;
 		}
 		
-		@Nullable
 		@Config.Handle(name = NAME, type = Type.MAKE)
 		public static JenkinsCI makeJenkinsCI(String url) {
 			if (url.isEmpty())
-				return null;
+				return MICKEY;
 			String scheme, host;
 			int index = url.indexOf(SEPARATOT);
 			if (index == -1) {
@@ -164,7 +167,9 @@ public class AlchemyUpdateManager {
 		
 		@Config.Handle(name = NAME, type = Type.SAVE)
 		public static String saveJenkinsCI(JenkinsCI ci) {
-			return ci == null ? "" : ci.scheme + SEPARATOT + ci.host;
+			if (ci == null)
+				ci = MICKEY;
+			return ci.scheme + SEPARATOT + ci.host;
 		}
 		
 		public final String scheme, host;

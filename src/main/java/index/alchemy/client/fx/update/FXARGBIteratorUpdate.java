@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.client.fx.AlchemyFX;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class FXARGBIteratorUpdate implements IFXUpdate {
 	
@@ -15,6 +17,7 @@ public class FXARGBIteratorUpdate implements IFXUpdate {
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void updateFX(AlchemyFX fx, long tick) {
 		if (iterator.hasNext()) {
 			Color color = iterator.next();
