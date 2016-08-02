@@ -23,7 +23,7 @@ public class AlchemyCapabilityLoader {
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
-		for (Class<?> clazz : AlchemyModLoader.instance_map.get(TYPE))
+		for (Class<?> clazz : AlchemyModLoader.getInstance(TYPE))
 			try {
 				clazz.newInstance();
 			} catch (Exception e) {

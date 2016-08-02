@@ -9,10 +9,11 @@ import java.util.Map;
 import com.google.common.base.Predicate;
 
 import index.alchemy.core.AlchemyConstants;
+import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -31,10 +32,12 @@ public class Alway {
 	
 	public static final int SEA_LEVEL = 62;
 	
+	private static final boolean client = Tool.forName("net.minecraft.client.Minecraft", false) != null;
+	
 	public static final Predicate<EntityLivingBase> IS_MONSTER = new Predicate<EntityLivingBase>() {
 		@Override
 		public boolean apply(EntityLivingBase input) {
-			return input instanceof IMob;
+			return input instanceof EntityAnimal;
 		}
 	};
 	
@@ -54,13 +57,9 @@ public class Alway {
 		return Minecraft.getMinecraft().theWorld.getWorldTime();
 	}
 	
+	
 	public static boolean runOnClient() {
-		try {
-			Class.forName("net.minecraft.client.Minecraft");
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
+		return client;
 	}
 	
 	public static Side getSide() {
@@ -107,7 +106,8 @@ public class Alway {
 			@Override
 			public Vec3d getLocation() {
 				AxisAlignedBB aabb = entity.getEntityBoundingBox();
-				return entity.getPositionVector().addVector((aabb.maxX - aabb.minX) / 2, offsetY * (aabb.maxY - aabb.minY) / 2, (aabb.maxZ - aabb.minZ) / 2);
+				return entity.getPositionVector()
+						.addVector((aabb.maxX - aabb.minX) / 2, offsetY * (aabb.maxY - aabb.minY) / 2, (aabb.maxZ - aabb.minZ) / 2);
 			}
 		};
 	}

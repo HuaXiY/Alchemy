@@ -59,7 +59,7 @@ public class Alchemy {
 				copy = new LinkedList<ItemStack>(materials);
 				change = false;
 			}
-			for (IMaterialConsumer consumer : recipe.getAlchemyMaterial())
+			for (IMaterialConsumer consumer : recipe.getAlchemyMaterials())
 				if (consumer.treatmentMaterial(copy))
 					change = true;
 				else

@@ -15,7 +15,7 @@ public class AlchemyBlock extends Block implements IResourceLocation, IRegister 
 	
 	@Override
 	public ResourceLocation getResourceLocation() {
-		return icon_name == null ? getRegistryName(): icon_name;
+		return icon_name == null ? getRegistryName() : icon_name;
 	}
 	
 	public AlchemyBlock(String name, Material material) {

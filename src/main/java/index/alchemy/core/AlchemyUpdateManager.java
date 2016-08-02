@@ -13,6 +13,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Joiner;
 import com.google.gson.Gson;
+import com.sun.corba.se.impl.util.Version;
 
 import index.alchemy.api.Alway;
 import index.alchemy.api.annotation.Config;
@@ -60,35 +62,41 @@ public class AlchemyUpdateManager {
 			if (client) {
 				bar = ProgressManager.push("AlchemyUpdateManager", (int) size);
 			}
-			
 			InputStream input = response.getEntity().getContent();
 			FileOutputStream output = new FileOutputStream(target);
-			byte buffer[] = new byte[4096];
-			long count = 0;
-			int len = 0;
-			float last = 0;
-			while ((len = input.read(buffer)) != -1) {
-				output.write(buffer, 0, len);
-				count += len;
-				float progress = count / (float) size * 100;
-				String display =  String.format("%.1f", progress) + "%";
-				if (client) {
-					display = "Updating: " + Tool.getString(' ', 5 - display.length()) + display;
-					for (int i = 0; i < len; i++)
-						bar.step(display);
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {}
-				} else if (progress > last) {
-					logger.info(display);
-					last = progress;
-				}
-			}
 			
-			if (client) {
-				ProgressManager.pop(bar);
+			try {
+				
+				byte buffer[] = new byte[4096];
+				long count = 0;
+				int len = 0;
+				float last = 0;
+				while ((len = input.read(buffer)) != -1) {
+					output.write(buffer, 0, len);
+					count += len;
+					float progress = count / (float) size * 100;
+					String display =  String.format("%.1f", progress) + "%";
+					if (client) {
+						display = "Updating: " + Tool.getString(' ', 5 - display.length()) + display;
+						for (int i = 0; i < len; i++)
+							bar.step(display);
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {}
+					} else if (progress > last) {
+						logger.info(display);
+						last = progress;
+					}
+				}
+				logger.info("Update success !");
+			} catch (Exception e) {
+				logger.warn("Update failed !", e);
+			} finally {
+				if (client) {
+					ProgressManager.pop(bar);
+				}
+				IOUtils.closeQuietly(output);
 			}
-			IOUtils.closeQuietly(output);
 			return target;
 		}
 		
@@ -97,6 +105,53 @@ public class AlchemyUpdateManager {
 	private static final String CATEGORY_UPDATE = "update";
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyUpdateManager.class.getSimpleName());
+	
+	public static class VersionInfo {
+		
+		public final String url, relativePath, versionType, jarType, mcVersion, suffix;
+		public final int[] version;
+		
+		public final boolean isDLC;
+		public final String dlcName;
+		
+		private VersionInfo(String relativePath, String url) throws Exception {
+			this.url = url;
+			this.relativePath = relativePath;
+			String name = Tool.get(relativePath, ".*/(.*?)\\.");
+			suffix = Tool.get(relativePath, ".*\\.(.*)");
+			String nodes[] = name.split("-");
+			int next = 0;
+			if (!nodes[next++].equals(MOD_NAME))
+				throw new RuntimeException("name != " + MOD_NAME);
+			versionType = nodes[next++];
+			isDLC = nodes[next++].equals("dlc");
+			dlcName = isDLC ? nodes[next++] : "";
+			mcVersion = nodes[next++];
+			version = Tool.stringToIntArray(nodes[next++]);
+			jarType = nodes[next++];
+		}
+		
+		@Nullable
+		public static VersionInfo formBuild(Build build, @Nullable String dlcName, String versionType, String jarType) {
+			VersionInfo info = null;
+			for (Artifact artifact : build.artifacts) {
+				try {
+					info = new VersionInfo(artifact.relativePath, build.url);
+					if (info.dlcName.equals(dlcName) && info.versionType.equals(versionType) && info.jarType.equals(jarType))
+						return info;
+				} catch (Exception e) {
+					// Ignore
+				}
+			}
+			return null;
+		}
+		
+		@Override
+		public String toString() {
+			return ReflectionToStringBuilder.toString(this);
+		}
+		
+	}
 	
 	public static enum JenkinsCI {
 		
@@ -179,6 +234,11 @@ public class AlchemyUpdateManager {
 			this.host = host;
 		}
 		
+		@Override
+		public String toString() {
+			return saveJenkinsCI(this);
+		}
+		
 		private static String makeTreeApi(Class<?> clazz) {
 			List<String> list = new LinkedList<String>();
 			for (Field field : clazz.getFields())
@@ -211,7 +271,7 @@ public class AlchemyUpdateManager {
 				return new URIBuilder()
 						.setScheme(scheme)
 						.setHost(host)
-						.setPath("/job/" + MOD_ID + "/api/json")
+						.setPath("/job/" + job + "/api/json")
 						.setParameter("tree", tree_api)
 						.build();
 			} catch (URISyntaxException e) {
@@ -240,85 +300,131 @@ public class AlchemyUpdateManager {
 		@Nullable
 		public Result getVersionInfoResult(String job) throws Exception {
 			String json = getVersionInfoJson(job);
-			if (json != null) {
+			if (json != null)
 				return new Gson().fromJson(json, Result.class);
-			}
 			return null;
 		}
 		
 	}
 	
-	@Config(category = "update", comment = "Automatic update Alchemy mod when the game starts")
+	@Config(category = "update", comment = "Automatic update Alchemy mod when the game starts.")
 	private static boolean auto_update = false;
 	
 	@Nullable
-	public static Build getLatestVersionInfo(String job) {
+	public static VersionInfo getLatestVersionInfo(String job, @Nullable String dlcName, String jarType) {
 		for (JenkinsCI ci : JenkinsCI.values())
 			try {
 				Result result = ci.getVersionInfoResult(job);
 				for (Build build : result.builds)
 					if (build.result.equals(JenkinsCI.SUCCESS))
-						return build;
+						return VersionInfo.formBuild(build, dlcName, MC_VERSION, jarType);
 			} catch (Exception e) {
-				logger.warn("Failed to get version information from " + ci.host, e);
+				logger.warn("Failed to get version information from: " + ci.host, e);
 				continue;
 			}
 		return null;
 	}
 	
-	public static void invoke(String job) {
+	public static void invoke(String job, String now_version, @Nullable String dlcName, File file) {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
+		
 		if (AlchemyModLoader.is_modding || !auto_update)
 			return;
-		Build build = getLatestVersionInfo(job);
-		if (build == null) {
-			logger.warn("AlchemyUpdateManager.invoke() -> build is null");
+		
+		VersionInfo info = getLatestVersionInfo(job, dlcName, JenkinsCI.UNIVERSAL);
+		if (info == null) {
+			logger.warn("AlchemyUpdateManager.invoke() -> info is null");
 			return;
 		}
-		String version = null;
+		
+		/*String latest_version = null;
 		int index = -1;
 		for (Artifact artifact : build.artifacts) {
 			index++;
 			if (artifact.relativePath.contains(JenkinsCI.UNIVERSAL)) {
-				version = Tool.get(artifact.relativePath, MC_VERSION + "-(.*\\..*?)-" + JenkinsCI.UNIVERSAL);
-				break;
+				latest_version = Tool.get(artifact.relativePath, MC_VERSION + "-.*\\.*(.*?)-" + JenkinsCI.UNIVERSAL);
+				try {
+					Integer.valueOf(latest_version);
+					break;
+				} catch (NumberFormatException e) {
+					logger.warn("AlchemyUpdateManager.invoke() unknown relativePath: " + artifact.relativePath);
+				}
 			}
-		}
-		if (version == null) {
-			logger.warn("AlchemyUpdateManager.invoke() -> version is null");
-			return;
-		}
-		if (DEV_VERSION.equals("?") || version.equals("?")) {
-			logger.warn("AlchemyUpdateManager.invoke() -> DEV_VERSION || version unknown");
-			return;
-		}
-		try {
-			if (Integer.valueOf(DEV_VERSION) < Integer.valueOf(version))
-				update(build, index);
+		}*/
+		
+		/*try {
+			if (now_version == null || Integer.valueOf(now_version) < Integer.valueOf(latest_version))
+				update(info);
 		} catch (NumberFormatException e) {
-			logger.warn("AlchemyUpdateManager.invoke() -> DEV_VERSION: " + DEV_VERSION + ", version: " + version, e);
-		}
+			logger.warn("AlchemyUpdateManager.invoke() -> now_version: " + now_version + ", latest_version: " + latest_version, e);
+		}*/
+		int now[] = Tool.stringToIntArray(now_version);
+		if (now.length > info.version.length)
+			return;
+		if (now[now.length - 1] < info.version[now.length - 1])
+			update(info, file);
 	}
 	
-	private static void update(Build build, int index) {
-		logger.info("Start update ...");
+	@Nullable
+	public static File update(VersionInfo info, File file) {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
+		
+		File result = null;
+		logger.info("Starting update ...");
+		URI uri;
+		try {
+			uri = new URI(info.url + "artifact/" + info.relativePath);
+		} catch (URISyntaxException e) {
+			logger.warn("AlchemyUpdateManager.update() -> uri: " + info.url + "artifact/" + info.relativePath, e);
+			return null;
+		}
+		
+		CloseableHttpClient httpclient = HttpClients.custom().setRedirectStrategy(new LaxRedirectStrategy()).build();
+		try {
+			 result = httpclient.execute(new HttpGet(uri), new FileDownloadResponseHandler(
+					new File(file.getPath(), Tool.get(info.relativePath, ".*/(.*)"))));
+		} catch (IOException e) {
+			logger.warn("AlchemyUpdateManager.update() -> download failed", e);
+		} finally {
+			IOUtils.closeQuietly(httpclient);
+		}
+		
+		if (info.isDLC) {
+			file.delete();
+		} else {
+			file.deleteOnExit();
+			AlchemyModLoader.restart();
+		}
+		
+		return result;
+	}
+		/*
+		logger.info("Starting update ...");
 		URI uri;
 		try {
 			uri = new URI(build.url + "artifact/" + build.artifacts[index].relativePath);
 		} catch (URISyntaxException e) {
-			logger.warn("AlchemyUpdateManager.update() -> URISyntaxException", e);
+			logger.warn("AlchemyUpdateManager.update() -> uri: " + build.url + "artifact/" + build.artifacts[index].relativePath, e);
 			return;
 		}
-		HttpGet httpGet = new HttpGet(uri);
+		
 		CloseableHttpClient httpclient = HttpClients.custom().setRedirectStrategy(new LaxRedirectStrategy()).build();
 		try {
-			File downloaded = httpclient.execute(httpGet, new FileDownloadResponseHandler(
-					new File(AlchemyModLoader.mc_dir + "/mods", Tool.get(build.artifacts[index].relativePath, ".*/(.*?\\.jar)"))));
-			AlchemyModLoader.deleteOnExit();
-			AlchemyModLoader.restart();
+			if (isDLC) {
+				
+			} else {
+				File downloaded = httpclient.execute(new HttpGet(uri), new FileDownloadResponseHandler(*/
+						//new File(AlchemyModLoader.mc_dir + "/mods", Tool.get(build.artifacts[index].relativePath, ".*/(.*?\\.jar)"))));
+				/*AlchemyModLoader.deleteOnExit();
+				AlchemyModLoader.restart();
+			}
 		} catch (IOException e) {
-			logger.warn("AlchemyUpdateManager.update() -> IOException", e);
+			logger.warn("AlchemyUpdateManager.update() -> download failed", e);
+		} finally {
+			IOUtils.closeQuietly(httpclient);
 		}
-		IOUtils.closeQuietly(httpclient);
-	}
+	}*/
 
 }

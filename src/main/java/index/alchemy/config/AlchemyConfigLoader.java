@@ -22,7 +22,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
 @Loading
-@Init(state = ModState.UNLOADED)
+@Init(state = ModState.LOADED)
 public class AlchemyConfigLoader {
 	
 	public static final String SUFFIX = ".cfg";

@@ -140,7 +140,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "37";
+		String flag = "42";
 		if (Alway.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -148,8 +148,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 				//float groundYOffset = 0.015625F;
 				//double offsetX = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
 				//double offsetZ = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
-				
-				//AlchemyRuntimeException.onException(new RuntimeException());
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
 				//GL11.glPushMatrix();
 				//GL11.glTranslated(player.posX, player.posY, player.posZ);
@@ -379,8 +377,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 				if (render.value() != null) {
 					if (Tool.isSubclass(TileEntity.class, render.value()) && Tool.isSubclass(TileEntitySpecialRenderer.class, clazz))
 						try {
-							ClientRegistry.bindTileEntitySpecialRenderer(render.value(),
-									(TileEntitySpecialRenderer) clazz.newInstance());
+							ClientRegistry.bindTileEntitySpecialRenderer(render.value(), (TileEntitySpecialRenderer) clazz.newInstance());
 						} catch (Exception e) {
 							AlchemyRuntimeException.onException(e);
 						}
@@ -394,7 +391,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	private AlchemyEventSystem() {
 		MinecraftForge.EVENT_BUS.register(this);
-		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyModLoader.instance(), this);
+		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyConstants.MOD_ID, this);
 	}
 
 }

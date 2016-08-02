@@ -15,6 +15,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,6 +31,7 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -59,6 +63,18 @@ public class Tool {
 		}
 	}
 	
+	public static final void addURLToClassLoader(ClassLoader loader, URL url) throws Exception {
+		if (loader instanceof URLClassLoader)
+			$(loader, "addURL", url);
+	}
+	
+	public static final String getDescriptor(Class<?> clazz) {
+		if (clazz.isPrimitive())
+			return clazz.getName() + ";";
+		else
+			return "L" + clazz.getName().replace('.', '/') + ";";
+	}
+	
 	@Nullable
 	public static final Class forName(String name, boolean init) {
 		try {
@@ -84,6 +100,7 @@ public class Tool {
 		return null;
 	}
 	
+	@Unsafe
 	public static final <Src, To> To proxy(Src src, To to, int i) {
 		Field fasrc[] = src.getClass().getDeclaredFields(), fato[] = to.getClass().getDeclaredFields();
 		int index = -1;
@@ -314,6 +331,18 @@ public class Tool {
 				list.add(f.getPath());
 	}
 	
+	public static final void getAllURL(File f, List<URL> list) throws MalformedURLException {
+		if (f.exists())
+			if (f.isDirectory()) {
+				File fa[] = f.listFiles();
+				if (fa == null)
+					return;
+				for (File ft : fa)
+					getAllURL(ft, list);
+			} else
+				list.add(f.toURI().toURL());
+	}
+	
 	public static final <T> T isNullOr(T t, T or) {
 		return t == null ? or : t;
 	}
@@ -322,10 +351,12 @@ public class Tool {
 		return str == null || str.isEmpty() ? or : str;
 	}
 	
+	@Unsafe
 	public static final <T> T get(Class cls, int index) {
 		return get(cls, index, null);
 	}
 	
+	@Unsafe
 	public static final <T> T get(Class cls, int index, Object obj) {
 		try {
 			return (T) setAccessible(cls.getDeclaredFields()[index]).get(obj);
@@ -335,10 +366,12 @@ public class Tool {
 		}
 	}
 	
+	@Unsafe
 	public static final void set(Class cls, int index, Object to) {
 		set(cls, index, null, to);
 	}
 	
+	@Unsafe
 	public static final void set(Class cls, int index, Object src, Object to) {
 		try {
 			setAccessible(cls.getDeclaredFields()[index]).set(src, to);
@@ -360,7 +393,6 @@ public class Tool {
 				return setAccessible(method);
 			}
 		}
-		AlchemyRuntimeException.onException(new RuntimeException("Can't search Method: " + args + ", in: " + clazz));
 		return null;
 	}
 	
@@ -410,6 +442,14 @@ public class Tool {
 			} else
 				builder.append(c);
 		return builder.toString();
+	}
+	
+	public static final int[] stringToIntArray(String str) throws NumberFormatException {
+		String sa[] = str.split(".");
+		int [] result = new int[sa.length];
+		for (int i = 0; i < result.length; i++)
+			result[i] = Integer.valueOf(sa[i]);
+		return result;
 	}
 	
 	public static final String getString(char c, int len) {

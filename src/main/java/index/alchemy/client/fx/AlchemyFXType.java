@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
+import index.alchemy.api.Alway;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Init;
@@ -35,22 +36,19 @@ public class AlchemyFXType {
     private static final Map<FX, Class<?>> FX_MAPPING = new HashMap<FX, Class<?>>();
 	
 	@Nullable
-	public static EnumParticleTypes registerParticleTypes(String name, Class factory, boolean ignoreRange) {
+	public static EnumParticleTypes registerParticleTypes(String name, Class factory, boolean ignoreRange) throws Exception {
 		AlchemyModLoader.checkState();
-		if (Tool.isInstance(IParticleFactory.class, factory)) {
-			int id = EnumParticleTypes.values().length;
-			try {
-				EnumParticleTypes type = EnumHelper.addEnum(EnumParticleTypes.class, name,
-						new Class[] { String.class, int.class, boolean.class }, name, id, ignoreRange);
+		int id = EnumParticleTypes.values().length;
+		if (Alway.runOnClient())
+			if (Tool.isInstance(IParticleFactory.class, factory))
 				Minecraft.getMinecraft().effectRenderer.registerParticle(id, (IParticleFactory) factory.newInstance());
-				PARTICLES.put(type.getParticleID(), type);
-	            BY_NAME.put(type.getParticleName(), type);
-			} catch (Exception e) {
-				AlchemyRuntimeException.onException(e);
-			}
-		} else 
-			AlchemyRuntimeException.onException(new RuntimeException(
-					"Class<" + factory.getName() + "> forgot to implement the Interface<" + IParticleFactory.class.getName() + "> ?"));
+			else 
+				AlchemyRuntimeException.onException(new RuntimeException(
+						"Class<" + factory.getName() + "> forgot to implement the Interface<" + IParticleFactory.class.getName() + "> ?"));
+		EnumParticleTypes type = EnumHelper.addEnum(EnumParticleTypes.class, name,
+				new Class[] { String.class, int.class, boolean.class }, name, id, ignoreRange);
+		PARTICLES.put(type.getParticleID(), type);
+        BY_NAME.put(type.getParticleName(), type);
 		return null;
 	}
 	
@@ -70,8 +68,12 @@ public class AlchemyFXType {
 			FX fx = entry.getKey();
 			Class<?> clazz = entry.getValue();
 			AlchemyModLoader.logger.info("	init: <" + clazz.getName() + "> " + fx);
-			Tool.setType(clazz, registerParticleTypes(fx.name(), 
-					Tool.forName(clazz.getName().replace("Info", "Factory"), false), fx.ignoreRange()));
+			try {
+				Tool.setType(clazz, registerParticleTypes(fx.name(), 
+						Tool.forName(clazz.getName().replace("Info", "Factory"), false), fx.ignoreRange()));
+			} catch (Exception e) {
+				AlchemyRuntimeException.onException(e);
+			}
 		}
 	}
 

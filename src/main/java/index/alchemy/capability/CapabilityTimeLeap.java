@@ -9,7 +9,6 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.core.AlchemyResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
@@ -107,14 +106,6 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 		}
 		
 	}
-	
-	@Override
-	public NBTBase writeNBT(Capability<TimeSnapshot> capability, TimeSnapshot instance, EnumFacing side) {
-		return null;
-	}
-
-	@Override
-	public void readNBT(Capability<TimeSnapshot> capability, TimeSnapshot instance, EnumFacing side, NBTBase nbt) { }
 	
 	@Override
 	public Class<TimeSnapshot> getDataClass() {

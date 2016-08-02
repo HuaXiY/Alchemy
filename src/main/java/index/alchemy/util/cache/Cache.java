@@ -1,11 +1,11 @@
-package index.alchemy.util;
+package index.alchemy.util.cache;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class Cache<K, V> {
+import index.alchemy.api.ICache;
+
+public abstract class Cache<K, V> implements ICache<K, V> {
 	
-	protected Map<K, V> cache = new HashMap<K, V>();
 	private int max;
 	
 	public Cache() {
@@ -25,17 +25,20 @@ public class Cache<K, V> {
 		return this;
 	}
 	
+	public abstract Map<K, V> getCacheMap();
+	
 	public V get(K key) {
-		return cache.get(key);
+		return getCacheMap().get(key);
 	}
 	
 	public V add(K key, V val) {
+		Map<K, V> cache = getCacheMap();
 		if (max > 0 && cache.size() > max) cache.clear();
 		return cache.put(key, val);
 	}
 	
 	public V del(K key) {
-		return cache.remove(key);
+		return getCacheMap().remove(key);
 	}
 	
 }

@@ -11,6 +11,6 @@ public interface IAlchemyRecipe {
 	
 	public ItemStack getAlchemyResult();
 	
-	public List<IMaterialConsumer> getAlchemyMaterial();
+	public List<IMaterialConsumer> getAlchemyMaterials();
 
 }

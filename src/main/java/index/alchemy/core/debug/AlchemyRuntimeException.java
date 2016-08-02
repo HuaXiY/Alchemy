@@ -16,6 +16,7 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
@@ -29,6 +30,9 @@ public class AlchemyRuntimeException extends RuntimeException {
 	}
 	
 	public static void onException(Throwable t) {
+		if (t instanceof AlchemyRuntimeException)
+			return;
+		
 		final AlchemyRuntimeException e = new AlchemyRuntimeException(t);
 		
 		StringWriter sw = new StringWriter();
@@ -56,7 +60,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 				@Override
 				public void run(Phase phase) {
-					Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyError(e, error));
+					Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyRuntimeError(e, error));
 				}
 			}, 0);
 		} else
@@ -86,12 +90,12 @@ public class AlchemyRuntimeException extends RuntimeException {
 		AlchemyModLoader.logger.error("AlchemyRuntimeException: change >>> " + msg);
 	}
 	
-	public static class GuiAlchemyError extends GuiErrorScreen {
+	public static class GuiAlchemyRuntimeError extends GuiErrorScreen {
 		
 	    private Exception e;
 	    private String error, msgs[];
 	    
-	    public GuiAlchemyError(Exception e, String error) {
+	    public GuiAlchemyRuntimeError(Exception e, String error) {
 	        super(null, null);
 	        this.e = e;
 	        this.error = error;
@@ -105,6 +109,8 @@ public class AlchemyRuntimeException extends RuntimeException {
 	    public void initGui() {
 	        super.initGui();
 	        buttonList.clear();
+	        buttonList.add(new GuiButton(0, width / 2 - 200, height - 20, "复制"));
+	        buttonList.add(new GuiButton(0, width / 2, height - 20, "上传"));
 	    }
 
 	    @Override
@@ -145,6 +151,8 @@ public class AlchemyRuntimeException extends RuntimeException {
 	        }
 	        if (flag)
 	        	drawString(fontRendererObj, "...", 30, offset, 0xFFFFFF);
+	        for (int i = 0; i < buttonList.size(); i++)
+	        	buttonList.get(i).drawButton(this.mc, mouseX, mouseY);
 	    }
 	}
 	

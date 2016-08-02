@@ -10,6 +10,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,6 +29,10 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	@SideOnly(Side.CLIENT)
 	public void performEffect(EntityLivingBase living, int level) {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		int i = 0;
+		for (ItemStack item : player.inventoryContainer.inventoryItemStacks)
+			if (item != null && item.getItem() == Items.DIAMOND)
+				i += item.stackSize;
 		if (living == player) {
 			if (isCDOver() && player.motionY < 0 &&
 					Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {

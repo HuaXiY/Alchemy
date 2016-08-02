@@ -14,7 +14,9 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
+apply plugin: 'java'
 
+compileJava.options.encoding = 'UTF-8'
 
 /*
 // for people who want stable - not yet functional for MC 1.8.8 - we require the forgegradle 2.1 snapshot
@@ -34,7 +36,7 @@ configFile.withReader {
 
 version = config.mod_version
 group= "com.github.mickeyxiami.alchemy" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Alchemy"
+archivesBaseName = "Alchemy-${config.show_version}"
 
 version = "${config.minecraft_version}-${config.mod_version}.${config.dev_version}"
 config.build_number = config.dev_version
@@ -50,21 +52,100 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = project.config.mappings_version
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    def buildnum = (config.build_number!="") ? '.' + config.build_number : ""
-    replace '@MOD_VERSION@', config.mod_version + buildnum
-    replaceIn 'Constants.java'
+    def buildnum = (config.build_number != "") ? config.build_number : "?"
+    replace '@MOD_VERSION@', config.mod_version + '.' + buildnum
+    replace '@DEV_VERSION@', buildnum
+    replaceIn 'AlchemyConstants.java'
     
 }
 
-task sourcesJar(type: Jar, dependsOn: sourceJar) {
-    from 'build/sources/main/java/'
+task sourcesJar(type: Jar) {
+    from 'src/main/java/'
     classifier = 'sources'
     
     from 'LICENSE'
 }
 
+task dlc {
+    dirList('dlcs').each { File f ->
+        def name = f.name
+        println "Found DLC -> ${name}"
+        
+        task "sourcesDLC-${name}"(type: Jar, dependsOn: sourcesJar) {
+            baseName = "${archivesBaseName}-dlc-${name}"
+            version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
+            from "dlcs/${name}/src/main/java"
+            from 'dlcs/LICENSE.txt'
+            classifier = 'sources'
+        }
+        artifacts.add('archives', tasks["sourcesDLC-${name}"])
+        
+        task "compileDLC-${name}"(type: JavaCompile) {
+            source = fileTree(dir: "dlcs/${name}/src/main/java", include: '**/*.java')
+            destinationDir = file("build/classes/${name}")
+            sourceCompatibility = '1.6'
+            targetCompatibility = '1.6'
+            dependencyCacheDir = file("build/classes/${name}")
+            classpath = tasks['compileJava'].classpath + files('build/classes/main')
+        }
+        
+        task "jarDLC-${name}"(type: Jar, dependsOn: "compileDLC-${name}") {
+            baseName = "${archivesBaseName}-dlc-${name}"
+            version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
+            from "build/classes/${name}"
+            from "dlcs/${name}/src/main/resources"
+            from 'dlcs/README.txt'
+            classifier = 'deobf'
+        }
+        artifacts.add('archives', tasks["jarDLC-${name}"])
+        
+        task "reobfDLC-${name}"(dependsOn: "jarDLC-${name}") << {
+            def inputName = "${archivesBaseName}-dlc-${name}-${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}-deobf.jar"
+            reobfDLC(inputName)
+		}
+		tasks["jarDLC-${name}"].finalizedBy tasks["reobfDLC-${name}"]
+    }
+}
+
+void reobfDLC(String inputName) {
+	def mcpVersion = project.config.mappings_version.substring('snapshot_'.length())
+			def outputName = inputName.replace('deobf', 'universal')
+			def mapping = new net.md_5.specialsource.JarMapping()
+			def srgFile = file(System.getProperty('user.home') + "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/srgs/mcp-srg.srg")
+			def inputFile = file("build/libs/${inputName}")
+			def outputFile = file("build/libs/${outputName}")
+			def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
+			def inputJar = net.md_5.specialsource.Jar.init(inputFile)
+			def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
+			def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
+			inheritanceProviders.add(jarProvider)
+			mapping.loadMappings(srgFile)
+			mapping.setFallbackInheritanceProvider(inheritanceProviders)
+   			remapper.remapJar(inputJar, outputFile)
+}
+
+File[] fileList(String dir) {
+    file(dir).listFiles({ file -> file.isFile() && !file.getName().equals('bin') } as FileFilter).sort()
+}
+
+File[] dirList(String dir) {
+    file(dir).listFiles({ file -> file.isDirectory() && !file.getName().equals('bin') } as FileFilter).sort()
+}
+
+task rename << {
+	fileList('build/libs').each { File f ->
+	    def name = f.name
+		if (name.contains('-dlc-') && name.contains('-universal'))
+		    f.renameTo(file(f.parent + '/' + name.replace('.jar', '.dlc')))
+		else if (name.contains('-sources'))
+		    f.renameTo(file(f.parent + '/' + name.replace('.jar', '.zip')))
+	}
+}
+
+build.finalizedBy rename
+
 def commonManifest = {
-    attributes 'FMLAT': 'alchemy_at.cfg'
+    attributes 'FMLAT' : 'alchemy_at.cfg'
 }
 
 jar {
@@ -73,7 +154,7 @@ jar {
 }
 
 artifacts {
-    archives sourceJar
+    archives sourcesJar
 }
 
 dependencies {

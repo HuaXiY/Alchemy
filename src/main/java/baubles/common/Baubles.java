@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 )
 public class Baubles {
 	
-	public static final String MODID = "Baubles";
+	public static final String MODID = "baubles";
 	public static final String MODNAME = "Baubles";
 	public static final String VERSION = "2.2.1.0";
 
