@@ -17,7 +17,7 @@ Member:
     <li><a href="https://github.com/ci010">@CI010</a></li>
   </ul>
 <hr>
-Minecraft version: 1.9.4<br>
-Forge version: 1.9.4-12.17.0.1931-1.9.4<br>
-MCP version: snapshot_20160528<br>
+Minecraft version: 1.10.2<br>
+Forge version: 1.10.2-12.18.1.2011<br>
+MCP version: snapshot_20160712<br>
 Development state: informal version<br>
