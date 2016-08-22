@@ -1,7 +1,7 @@
 package index.alchemy.capability;
 
 import baubles.api.IBauble;
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
@@ -88,7 +88,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingDrops(LivingDropsEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
-		if (Alway.isServer() && !(living instanceof EntityPlayer)) {
+		if (Always.isServer() && !(living instanceof EntityPlayer)) {
 			IInventory inventory = living.getCapability(AlchemyCapabilityLoader.bauble, null);
 			if (inventory == null)
 				return;
@@ -103,7 +103,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onPlayerDrops(PlayerDropsEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
-		if (Alway.isServer() && !player.worldObj.getGameRules().getBoolean("keepInventory")) {
+		if (Always.isServer() && !player.worldObj.getGameRules().getBoolean("keepInventory")) {
 			IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 			if (inventory == null)
 				return;

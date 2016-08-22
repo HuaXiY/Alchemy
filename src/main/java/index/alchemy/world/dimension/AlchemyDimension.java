@@ -10,7 +10,6 @@ public abstract class AlchemyDimension extends WorldProvider {
 	
 	@Override
 	public DimensionType getDimensionType() {
-		System.out.println(DimensionTheForgottenTimeCourtyard.class + " - " + getClass());
 		return AlchemyDimensionType.findDimensionType(getClass());
 	}
 	

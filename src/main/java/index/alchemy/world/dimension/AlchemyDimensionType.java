@@ -16,6 +16,7 @@ public class AlchemyDimensionType {
 	
 	@Config(category = "world", comment = "Alchemy mod DimensionType id start.")
 	private static int alchemy_dimension_type_id = 30;
+	
 	private static int next_id = -1;
 	
 	private static synchronized int nextId() {
@@ -25,6 +26,7 @@ public class AlchemyDimensionType {
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
 		AlchemyModLoader.checkInvokePermissions();
+		
 		Dimension dimension = clazz.getAnnotation(Dimension.class);
 		if (dimension != null) {
 			if (dimension.name() != null) {
@@ -46,11 +48,9 @@ public class AlchemyDimensionType {
 	
 	@Nullable
 	public static DimensionType findDimensionType(Class<?> provider) {
-		do 
-			for (DimensionType type : DimensionType.values())
-				if (type.getDeclaringClass() == provider)
-					return type;
-		while ((provider = provider.getSuperclass()) != null);
+		for (DimensionType type : DimensionType.values())
+			if (Tool.isSubclass(type.clazz, provider))
+				return type;
 		return null;
 	}
 	

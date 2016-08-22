@@ -30,7 +30,8 @@ import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 import com.sun.corba.se.impl.util.Version;
 
-import index.alchemy.api.Alway;
+import biomesoplenty.api.item.BOPItems;
+import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Config.Handle.Type;
 import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result;
@@ -56,7 +57,7 @@ public class AlchemyUpdateManager {
 
 		@Override
 		public File handleResponse(HttpResponse response) throws IOException {
-			boolean client = Alway.runOnClient();
+			boolean client = Always.runOnClient();
 			int size = Integer.valueOf(response.getFirstHeader("content-length").getValue());
 			ProgressBar bar = null;
 			if (client) {
@@ -66,7 +67,6 @@ public class AlchemyUpdateManager {
 			FileOutputStream output = new FileOutputStream(target);
 			
 			try {
-				
 				byte buffer[] = new byte[4096];
 				long count = 0;
 				int len = 0;
@@ -388,7 +388,7 @@ public class AlchemyUpdateManager {
 		} catch (IOException e) {
 			logger.warn("AlchemyUpdateManager.update() -> download failed", e);
 		} finally {
-			IOUtils.closeQuietly(httpclient);
+			IOUtils.closeQuietly(httpclient);new BOPItems();
 		}
 		
 		if (info.isDLC) {

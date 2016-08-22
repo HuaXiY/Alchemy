@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
@@ -59,7 +59,7 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IRegis
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem,
 			EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (Alway.isServer()) {
+		if (Always.isServer()) {
 			int i = ((Integer)state.getValue(LEVEL)).intValue();
 			
 			CauldronActivatedEvent event;

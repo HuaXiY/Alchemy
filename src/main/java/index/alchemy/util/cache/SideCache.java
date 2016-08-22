@@ -3,7 +3,7 @@ package index.alchemy.util.cache;
 import java.util.HashMap;
 import java.util.Map;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class SideCache<K, V> extends Cache<K, V> {
@@ -17,7 +17,7 @@ public class SideCache<K, V> extends Cache<K, V> {
 
 	@Override
 	public Map<K, V> getCacheMap() {
-		return mapping.get(Alway.getSide());
+		return mapping.get(Always.getSide());
 	}
 
 }

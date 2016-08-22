@@ -63,7 +63,7 @@ task sourcesJar(type: Jar) {
     from 'src/main/java/'
     classifier = 'sources'
     
-    from 'LICENSE'
+    from 'LICENSE.txt'
 }
 
 task dlc {
@@ -109,19 +109,62 @@ task dlc {
 
 void reobfDLC(String inputName) {
 	def mcpVersion = project.config.mappings_version.substring('snapshot_'.length())
-			def outputName = inputName.replace('deobf', 'universal')
-			def mapping = new net.md_5.specialsource.JarMapping()
-			def srgFile = file(System.getProperty('user.home') + "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/srgs/mcp-srg.srg")
-			def inputFile = file("build/libs/${inputName}")
-			def outputFile = file("build/libs/${outputName}")
-			def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
-			def inputJar = net.md_5.specialsource.Jar.init(inputFile)
-			def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
-			def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
-			inheritanceProviders.add(jarProvider)
-			mapping.loadMappings(srgFile)
-			mapping.setFallbackInheritanceProvider(inheritanceProviders)
-   			remapper.remapJar(inputJar, outputFile)
+	def outputName = inputName.replace('deobf', 'universal')
+	def mapping = new net.md_5.specialsource.JarMapping()
+	def srgFile = file(System.getProperty('user.home') + "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/srgs/mcp-srg.srg")
+	def inputFile = file("build/libs/${inputName}")
+	def outputFile = file("build/libs/${outputName}")
+	def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
+	def inputJar = net.md_5.specialsource.Jar.init(inputFile)
+	def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
+	def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
+	inheritanceProviders.add(jarProvider)
+	mapping.loadMappings(srgFile)
+	mapping.setFallbackInheritanceProvider(inheritanceProviders)
+   	remapper.remapJar(inputJar, outputFile)
+}
+
+void reobfCSL(String inputName) {
+	def mcpVersion = project.config.mappings_version.substring('snapshot_'.length()) // custom
+	def outputName = inputName.replace('.jar', '-deobf.jar')
+	def mapping = new net.md_5.specialsource.JarMapping()
+	def srgFile = file(System.getProperty('user.home') + "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/srgs/notch-mcp.srg")
+	def inputFile = file("${inputName}")
+	def outputFile = file("${outputName}")
+	def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
+	def inputJar = net.md_5.specialsource.Jar.init(inputFile)
+	def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
+	def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
+	inheritanceProviders.add(jarProvider)
+	mapping.loadMappings(srgFile)
+	mapping.setFallbackInheritanceProvider(inheritanceProviders)
+   	remapper.remapJar(inputJar, outputFile)
+	
+	inputJar.jarFiles.each {
+		it.close()
+	}
+	inputJar.jarForResource.each {
+		it.value.close()
+	}
+	
+	def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${outputName}"))
+	def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${outputName}".replace(".jar", "-fixed.jar")))
+	for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
+		if (entry.name.startsWith("net/minecraft")) {
+			println entry.name.replace('/', '.')
+			entry = new java.util.zip.ZipEntry(entry.name.replace('/', '.'))
+		}
+		zos.putNextEntry(entry)
+		org.apache.commons.io.IOUtils.copy(zis, zos)
+	}
+	zis.close()
+	zos.finish()
+	inputFile.delete()
+	outputFile.delete()
+}
+
+task csl << {
+	reobfCSL('mods/CustomSkinLoader_1.10-14.3.jar');
 }
 
 File[] fileList(String dir) {
@@ -135,7 +178,7 @@ File[] dirList(String dir) {
 task rename << {
 	fileList('build/libs').each { File f ->
 	    def name = f.name
-		if (name.contains('-dlc-') && name.contains('-universal'))
+		if (name.contains('-dlc') && name.contains('-universal'))
 		    f.renameTo(file(f.parent + '/' + name.replace('.jar', '.dlc')))
 		else if (name.contains('-sources'))
 		    f.renameTo(file(f.parent + '/' + name.replace('.jar', '.zip')))
@@ -151,6 +194,8 @@ def commonManifest = {
 jar {
     manifest commonManifest
     classifier = 'universal'
+	
+	from 'README.txt'
 }
 
 artifacts {

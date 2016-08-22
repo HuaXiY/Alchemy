@@ -23,7 +23,11 @@ public class LocalTexture implements ITextureObject {
 
 	@Override
 	public void loadTexture(IResourceManager resourceManager) throws IOException {
-		id = TextureLoader.loadTexture(file);
+		try {
+			id = TextureLoader.loadTexture(file);
+		} catch (IOException e) {
+			id = -1;
+		}
 	}
 
 	@Override

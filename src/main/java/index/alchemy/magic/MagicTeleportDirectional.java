@@ -1,10 +1,8 @@
 package index.alchemy.magic;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
@@ -23,7 +21,7 @@ public class MagicTeleportDirectional extends AlchemyMagic {
 
 	@Override
 	public void apply(EntityLivingBase src, EntityLivingBase living, float amplify) {
-		if (Alway.isServer()) {
+		if (Always.isServer()) {
 			if (dim != -1) {
 				WorldServer world = DimensionManager.getWorld(dim);
 				if (world != null)

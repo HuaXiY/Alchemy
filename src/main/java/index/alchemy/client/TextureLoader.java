@@ -51,11 +51,7 @@ public class TextureLoader {
 		return ImageIO.read(file);
 	}
 	
-	public static int loadTexture(File file) {
-		try {
-			return loadTexture(loadImage(file));
-		} catch (IOException e) {
-			return -1;
-		}
+	public static int loadTexture(File file) throws IOException {
+		return loadTexture(loadImage(file));
 	}
 }

@@ -1,0 +1,7 @@
+{
+    "parent": "builtin/generated",
+    "textures": {
+		"layer0": "alchemy:items/ore_overlay",
+        "layer1": "alchemy:items/ore_icon"
+    }
+}

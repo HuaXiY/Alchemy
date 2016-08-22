@@ -23,8 +23,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean advanced)
-    {
+    public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean advanced) {
 		tooltip.add(Type.get(item.getTagCompound()).getTextWithoutFormattingCodes());
     }
 	
@@ -49,6 +48,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 	}
 	
 	public static enum Type {
+		
 		NULL(TextFormatting.WHITE),
 		UNSTABLE(TextFormatting.GRAY),
 		POWERFUL(TextFormatting.BLUE),
@@ -105,11 +105,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 			return NULL;
 		}
 		
-		public static void init() {}
-		
 	}
-	
-	static { Type.init(); }
 	
 	public ItemMagicSolvent(String name, int color, Item material) {
 		this(name, color, material, 0);

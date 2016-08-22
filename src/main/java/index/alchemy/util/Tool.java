@@ -476,7 +476,15 @@ public class Tool {
 		checkArrayLength(args, 2);
 		Object object = args[0].getClass() == Class.class ? null : args[0];
 		String name = (String) args[1];
-		Class<?> clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
+		Class<?> clazz = null;
+		if (args[0].getClass() == String.class) {
+			String str = (String) args[0];
+			if (str.startsWith("L"))
+				clazz = Tool.forName(str.substring(1), false);
+			if (clazz == null)
+				clazz = String.class;
+		} else
+			clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
 		args = ArrayUtils.subarray(args, 2, args.length);
 		do {
 			Method method = searchMethod(clazz, name, args);
@@ -487,8 +495,7 @@ public class Tool {
 		for (Object arg : args)
 			builder.append(arg).append(", ");
 		builder.setLength(Math.max(builder.length(), builder.length() - 2));
-		AlchemyRuntimeException.onException(new RuntimeException("Can't invoke: " + builder.toString()));
-		return null;
+		throw new RuntimeException("Can't invoke: " + builder.toString());
 	}
 	
 }

@@ -8,10 +8,4 @@ public class DimensionTheForgottenTimeCourtyard extends AlchemyDimension {
 	
 	public static final DimensionType type = null;
 	
-	@Override
-	public DimensionType getDimensionType() {
-		return type;
-	}
-
-
 }

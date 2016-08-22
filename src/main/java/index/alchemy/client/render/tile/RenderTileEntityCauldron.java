@@ -1,6 +1,6 @@
 package index.alchemy.client.render.tile;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.client.render.MagicMatrix;
 import index.alchemy.client.render.RenderHelper;
@@ -32,7 +32,7 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		if (size < 1)
 			return;
 		
-		long tick = Alway.getClientWorldTime();
+		long tick = Always.getClientWorldTime();
 		float offsetPerPetal = 360 / size;
 		
 		glDisable(GL_LIGHTING);

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IFXUpdate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
@@ -77,7 +77,7 @@ public abstract class AlchemyFX extends Particle {
 
 	@Override
 	public void onUpdate() {
-		long tick = Alway.getClientWorldTime();
+		long tick = Always.getClientWorldTime();
 		for (IFXUpdate update : update_list)
 			update.updateFX(this, tick);
 		super.onUpdate();

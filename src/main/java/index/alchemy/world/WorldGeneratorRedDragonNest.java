@@ -1,6 +1,6 @@
 package index.alchemy.world;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.core.AlchemyModLoader;
 
 import java.util.Random;
@@ -24,8 +24,8 @@ public class WorldGeneratorRedDragonNest extends AlchemyWorldGenerator {
 			IChunkGenerator generator, IChunkProvider provider) {
 		x *= 16;
 		z *= 16;
-		AlchemyModLoader.logger.info(Alway.getCurrentBiome(world, x, z));
-		if (!start && Alway.getCurrentBiome(world, x, z) == ocean && should(world, x, z, need) && random.nextInt() > 900) {
+		AlchemyModLoader.logger.info(Always.getCurrentBiome(world, x, z));
+		if (!start && Always.getCurrentBiome(world, x, z) == ocean && should(world, x, z, need) && random.nextInt() > 900) {
 			
 		}
 		
@@ -38,7 +38,7 @@ public class WorldGeneratorRedDragonNest extends AlchemyWorldGenerator {
 	private boolean should(World world, int x, int z, StructureBoundingBox box) {
 		for (int i = 0, xlen = box.getXSize(); i < xlen; i++) {
 			for (int k = 0, zlen = box.getZSize(); k < zlen; k++) {
-				if (world.getBlockState(new BlockPos(x + i, Alway.SEA_LEVEL, z + k)).getBlock() != Blocks.WATER) 
+				if (world.getBlockState(new BlockPos(x + i, Always.SEA_LEVEL, z + k)).getBlock() != Blocks.WATER) 
 					return false;
 			}
 		}

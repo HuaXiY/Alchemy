@@ -1,6 +1,6 @@
 package index.alchemy.interacting;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Init;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class Characteristic {
 	
 	public static void init() {
-		GameRegistry.registerFuelHandler(Alway.getFuelHandler(new ItemStack(Items.BLAZE_POWDER), 20 * 30));
+		GameRegistry.registerFuelHandler(Always.getFuelHandler(new ItemStack(Items.BLAZE_POWDER), 20 * 30));
 	}
 
 }

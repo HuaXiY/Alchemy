@@ -1,6 +1,6 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "alchemy:blocks/ice_temp"
+        "layer0": "alchemy:items/${name}"
     }
 }

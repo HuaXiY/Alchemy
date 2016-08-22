@@ -1,6 +1,6 @@
 {
     "parent": "builtin/generated",
     "textures": {
-        "layer0": "alchemy:items/amulet"
+        "layer0": "alchemy:items/ore_silver"
     }
 }

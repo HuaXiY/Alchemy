@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Init;
@@ -39,7 +39,7 @@ public class AlchemyFXType {
 	public static EnumParticleTypes registerParticleTypes(String name, Class factory, boolean ignoreRange) throws Exception {
 		AlchemyModLoader.checkState();
 		int id = EnumParticleTypes.values().length;
-		if (Alway.runOnClient())
+		if (Always.runOnClient())
 			if (Tool.isInstance(IParticleFactory.class, factory))
 				Minecraft.getMinecraft().effectRenderer.registerParticle(id, (IParticleFactory) factory.newInstance());
 			else 

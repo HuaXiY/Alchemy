@@ -1,0 +1,7 @@
+{
+    "parent": "alchemy:block/ore_color",
+    "textures": {
+		"overlay": "alchemy:blocks/ore_overlay",
+        "side": "alchemy:blocks/ore_icon"
+    }
+}

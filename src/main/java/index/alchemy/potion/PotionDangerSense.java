@@ -1,6 +1,6 @@
 package index.alchemy.potion;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.util.AABBHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,16 +13,16 @@ public class PotionDangerSense extends AlchemyPotion {
 	
 	@Override
 	public void performEffect(EntityLivingBase living, int level) {
-		if (Alway.isClient())
+		if (Always.isClient())
 			if (living == Minecraft.getMinecraft().thePlayer) {
 				for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
-						AABBHelper.getAABBFromEntity(living, RANGE), Alway.IS_MONSTER))
+						AABBHelper.getAABBFromEntity(living, RANGE), Always.IS_MONSTER))
 					if (oliving != Minecraft.getMinecraft().thePlayer) {
 						oliving.setGlowing(true);
 						oliving.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 2));
 					}
 				for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
-						AABBHelper.getAABBFromEntity(living, OUT_OF_RANGE), Alway.IS_MONSTER)) {
+						AABBHelper.getAABBFromEntity(living, OUT_OF_RANGE), Always.IS_MONSTER)) {
 					PotionEffect effect = oliving.getActivePotionEffect(MobEffects.GLOWING);
 					if (effect == null || effect.getDuration() == 0)
 						oliving.setGlowing(false);

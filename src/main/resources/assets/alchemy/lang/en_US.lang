@@ -18,7 +18,7 @@ item.amulet_purify.name=
 
 //blockMap
 tile.ice_temp.name=
-tile.cauldron.name=
+tile.ore_silver.name=
 
 //potionMap
 effect.feather_fall=
@@ -31,10 +31,6 @@ effect.elapse=
 effect.plague=
 effect.danger_sense=
 effect.witchcraft=
-potion.effect.luck=
-splash_potion.effect.luck=
-lingering_potion.effect.luck=
-tipped_arrow.effect.luck=
 potion.effect.unluck=
 splash_potion.effect.unluck=
 lingering_potion.effect.unluck=
@@ -43,10 +39,6 @@ potion.effect.feather_fall=
 splash_potion.effect.feather_fall=
 lingering_potion.effect.feather_fall=
 tipped_arrow.effect.feather_fall=
-potion.effect.levitation=
-splash_potion.effect.levitation=
-lingering_potion.effect.levitation=
-tipped_arrow.effect.levitation=
 potion.effect.hunger=
 splash_potion.effect.hunger=
 lingering_potion.effect.hunger=
@@ -103,9 +95,3 @@ death.attack.plague=%1$s
 inventory.ring_space=
 
 //miscMap
-solvent.type.null=
-solvent.type.unstable=
-solvent.type.powerful=
-solvent.type.benign=
-solvent.type.wonderful=
-solvent.type.dangerous=

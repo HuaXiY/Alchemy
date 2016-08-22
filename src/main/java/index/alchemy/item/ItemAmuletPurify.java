@@ -3,7 +3,7 @@ package index.alchemy.item;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
@@ -41,7 +41,7 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer()) {
+		if (Always.isServer()) {
 			if (living.ticksExisted - living.getEntityData().getInteger(NBT_KEY_CD) > INTERVAL) {
 				boolean flag = false;
 				for (PotionEffect effect : living.getActivePotionEffects())

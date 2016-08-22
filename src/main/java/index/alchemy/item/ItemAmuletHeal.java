@@ -1,6 +1,6 @@
 package index.alchemy.item;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
@@ -20,7 +20,7 @@ public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle {
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer() && living.fire > 0) {
+		if (Always.isServer() && living.fire > 0) {
 			living.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, AlchemyPotion.NOT_FLASHING_TIME));
 			living.fire = 0;
 		}
@@ -33,7 +33,7 @@ public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle {
 	
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onLivingHeal(LivingHealEvent event) {
-		if (Alway.isServer() && isEquipmented(event.getEntityLiving()))
+		if (Always.isServer() && isEquipmented(event.getEntityLiving()))
 			event.setAmount(event.getAmount() * (1 + AMPLIFY));
 	}
 

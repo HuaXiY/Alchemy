@@ -1,6 +1,6 @@
 package index.alchemy.item;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.Elemix;
 import index.alchemy.block.AlchemyBlockLoader;
 import net.minecraft.entity.EntityLivingBase;
@@ -18,7 +18,7 @@ public class ItemScrollIceScreen extends ItemScroll {
 	public void useScroll(ItemStack item, World world, EntityPlayer player, int type) {
 		EntityLivingBase living = player;
 		int posX = (int) living.posX, posY = (int) living.posY, posZ = (int) living.posZ;
-		if (Alway.isServer()) {
+		if (Always.isServer()) {
 			for (int x = -1; x < 2; x++) 
 				for (int y = -1; y < 3; y++) 
 					for (int z = -1; z < 2; z++) {

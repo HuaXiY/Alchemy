@@ -1,6 +1,6 @@
 package index.alchemy.entity.ai;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.api.annotation.Init;
@@ -28,7 +28,7 @@ public class EntityTrackTracker {
 	
 	public void update(Entity tracker, double offsetY) {
 		Vec3d src = location.getLocation();
-		Vec3d tra = Alway.generateLocationProvider(tracker, offsetY).getLocation();
+		Vec3d tra = Always.generateLocationProvider(tracker, offsetY).getLocation();
 		
 		double dx = src.xCoord - tra.xCoord;
 		double dy = src.yCoord - tra.yCoord;
@@ -61,7 +61,7 @@ public class EntityTrackTracker {
 						throwable.motionX = 0;
 						throwable.motionY = 0;
 						throwable.motionZ = 0;
-						new EntityTrackTracker(Alway.generateLocationProvider(throwable.shootingEntity, 1), 5).update(throwable, 1);
+						new EntityTrackTracker(Always.generateLocationProvider(throwable.shootingEntity, 2), 5).update(throwable, 1);
 					}
 				}
 		}

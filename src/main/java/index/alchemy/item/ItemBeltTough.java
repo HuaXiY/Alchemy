@@ -2,7 +2,7 @@ package index.alchemy.item;
 
 import java.util.UUID;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
@@ -31,19 +31,19 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	@Override
 	public void onEquipped(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer())
+		if (Always.isServer())
 			living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).applyModifier(KNOCKBACK_RESISTANCE);
 	}
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer())
+		if (Always.isServer())
 			living.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).removeModifier(KNOCKBACK_RESISTANCE);
 	}
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer() && living.ticksExisted % RECOVERY_INTERVAL == 0)
+		if (Always.isServer() && living.ticksExisted % RECOVERY_INTERVAL == 0)
 			living.heal(1F);
 	}
 	

@@ -1,6 +1,6 @@
 package index.alchemy.item;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
@@ -26,7 +26,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, ICoo
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer() && living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION
+		if (Always.isServer() && living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION
 				&& living.ticksExisted - living.getLastAttackerTime() > RECOVERY_CD
 				&& living.ticksExisted - living.getCombatTracker().lastDamageTime > RECOVERY_CD)
 			living.setAbsorptionAmount(min(living.getAbsorptionAmount() + 1, MAX_ABSORPTION));

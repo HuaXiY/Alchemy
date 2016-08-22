@@ -2,7 +2,7 @@ package index.alchemy.item;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IBaubleEquipment;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,7 +30,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
-			if (Alway.isServer() && canEquip(item, player)) {
+			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				if (inventory.getStackInSlot(0) == null) {
 					inventory.setInventorySlotContents(0, item.copy());
@@ -65,7 +65,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
-			if (Alway.isServer() && canEquip(item, player)) {
+			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				for (int i = 1; i < 3; i++)
 					if (inventory.getStackInSlot(i) == null) {
@@ -101,7 +101,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
-			if (Alway.isServer() && canEquip(item, player)) {
+			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				if (inventory.getStackInSlot(3) == null) {
 					inventory.setInventorySlotContents(3, item.copy());

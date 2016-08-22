@@ -3,7 +3,7 @@ package index.alchemy.inventory;
 import java.util.RandomAccess;
 
 import baubles.api.IBauble;
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
@@ -63,7 +63,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilityProv
 	}
 	
 	public void update(boolean init) {
-		if (Alway.isServer() && (!init || hasBauble()))
+		if (Always.isServer() && (!init || hasBauble()))
 			updateTracker();
 	}
 	

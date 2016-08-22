@@ -1,5 +1,7 @@
 package index.alchemy.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -14,8 +16,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
@@ -28,12 +31,16 @@ import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
+import index.alchemy.client.LocalTexture;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreenDemo;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
@@ -140,10 +147,12 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "42";
-		if (Alway.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+		String flag = "47";
+		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
+				System.out.println(Minecraft.getMinecraft().thePlayer.getSkinType());
+				System.out.println(Tool.get(RenderManager.class, 2, Minecraft.getMinecraft().getRenderManager()));
 				//EntityPlayer player = event.player;
 				//float groundYOffset = 0.015625F;
 				//double offsetX = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
@@ -158,7 +167,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 			}
 			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
-		if (Alway.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
 			//System.out.println(DimensionManager.getWorld(10).getDefaultTeleporter()); 
 			//event.player.changeDimension(0);
@@ -196,7 +205,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	public static void addContinuedRunnable(IContinuedRunnable runnable) {
-		runnable_mapping.get(Alway.getSide()).add(runnable);
+		runnable_mapping.get(Always.getSide()).add(runnable);
 	}
 	
 	public static void onRunnableTick(Side side, Phase phase) {
@@ -364,7 +373,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
-		if (Alway.isClient()) {
+		if (Always.isClient()) {
 			Texture texture = clazz.getAnnotation(Texture.class);
 			if (texture != null)
 				if (texture.value() != null)

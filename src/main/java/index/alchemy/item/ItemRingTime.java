@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IInputHandle;
@@ -112,7 +112,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 				@Override
 				public void run(Phase phase) {
-					if (Alway.isPlaying())
+					if (Always.isPlaying())
 						player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
 				}
 			}, 0);
@@ -120,7 +120,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
 				@Override
 				public boolean run(Phase phase) {
-					if (Alway.isPlaying()) {
+					if (Always.isPlaying()) {
 						if (iterator.hasNext())
 							iterator.next().updatePlayerOnClient(player);
 						if (!iterator.hasNext()) {

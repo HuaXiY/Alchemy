@@ -2,7 +2,7 @@ package index.alchemy.item;
 
 import java.util.List;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -69,7 +69,7 @@ public abstract class ItemScroll extends AlchemyItem {
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
 		if (player.capabilities.isCreativeMode) {
-			if (!sync || Alway.isServer()) 
+			if (!sync || Always.isServer()) 
 				useScroll(item, world, player, getType(item));
 		} else if(instant) {
 			onUsingTick(item, player, 1);
@@ -103,7 +103,7 @@ public abstract class ItemScroll extends AlchemyItem {
 		if (!canUseItemStack(living, item))
 			return;
 		item.setItemDamage(0);
-		if (time <= 1 && (!sync || Alway.isServer())) 
+		if (time <= 1 && (!sync || Always.isServer())) 
 			useScroll(item, world, (EntityPlayer) living, getType(item));
 	}
 	

@@ -27,7 +27,9 @@ import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyBlockLoader {
 	
-	public static final Block ice_temp = new BlockIceTemp();
+	public static final Block 
+			ice_temp = new BlockIceTemp(),
+			silver_ore = new BlockOre("ore_silver", null, 0xFFFFFF);
 	
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();

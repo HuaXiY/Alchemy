@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
@@ -67,7 +67,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Alway.isServer()) {
+		if (Always.isServer()) {
 			if (living instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) living;
 				if (player.getHealth() > 0.0F && !player.isSpectator())

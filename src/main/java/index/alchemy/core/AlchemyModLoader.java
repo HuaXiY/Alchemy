@@ -23,7 +23,7 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
 import baubles.common.Baubles;
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.api.annotation.Loading;
@@ -207,7 +207,7 @@ public class AlchemyModLoader {
 		
 		AlchemyDLCLoader.setup();
 		
-		Side side = Alway.getSide();
+		Side side = Always.getSide();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		
 		for (String name : class_list) {

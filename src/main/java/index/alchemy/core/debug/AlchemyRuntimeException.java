@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.Config;
@@ -56,7 +56,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 				continue;
 			}
 		
-		if (Alway.runOnClient()) {
+		if (Always.runOnClient()) {
 			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 				@Override
 				public void run(Phase phase) {

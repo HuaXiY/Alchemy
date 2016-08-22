@@ -1,6 +1,6 @@
 package index.alchemy.core;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.ICapability;
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
@@ -98,7 +98,7 @@ public class AlchemyInitHook {
 		if (obj instanceof ICapability)
 			CapabilityManager.INSTANCE.register((Class<C>) obj.getClass(), (ICapability<C>) obj, (ICapability<C>) obj);
 		
-		if (Alway.isClient()) {
+		if (Always.isClient()) {
 			
 			if (obj instanceof Item) {
 				

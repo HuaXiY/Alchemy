@@ -21,9 +21,11 @@ import org.objectweb.asm.tree.ClassNode;
 
 import index.alchemy.api.annotation.DLC;
 import index.alchemy.api.annotation.Loading;
+import index.alchemy.api.event.AlchemyLoadDLCEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.client.gui.GuiErrorScreen;
+import net.minecraftforge.common.MinecraftForge;
 import sun.reflect.annotation.AnnotationParser;
 
 @Loading
@@ -84,11 +86,16 @@ public class AlchemyDLCLoader {
 		try {
 			if ((dlc = checkFileIsDLC(file)) != null) {
 				file = update(dlc, file);
+				if (MinecraftForge.EVENT_BUS.post(new AlchemyLoadDLCEvent.Pre(dlc, file))) {
+					AlchemyModLoader.logger.info("Skip loading DLC: " + file.getPath());
+					return;
+				}
 				URL url = file.toURI().toURL();
 				Tool.addURLToClassLoader(Thread.currentThread().getContextClassLoader(), url);
 				List<String> classes = AlchemyModLoader.findClassFromURL(url);
 				AlchemyModLoader.addClass(classes);
 				file_mapping.put(dlc.name(), file);
+				MinecraftForge.EVENT_BUS.post(new AlchemyLoadDLCEvent.Post(dlc, file));
 				AlchemyModLoader.logger.info("Successfully loaded DLC: " + file.getPath());
 			} else
 				AlchemyModLoader.logger.warn("DLC: " + file.getPath() + ", is not a standard Alchemy DLC");

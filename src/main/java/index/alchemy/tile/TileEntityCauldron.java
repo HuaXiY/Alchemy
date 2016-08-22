@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import index.alchemy.animation.StdCycle;
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.client.color.ColorHelper;
@@ -112,7 +112,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 
 	@Override
 	public void update() {
-		if (Alway.isServer())
+		if (Always.isServer())
 			if (fluid == FluidRegistry.LAVA) {
 				List<Entity> entitys = worldObj.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos).addCoord(0, 1, 0));
 				for (Entity entity : entitys) {

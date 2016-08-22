@@ -49,7 +49,8 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 		return new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int index) {
-				return index == 0 ? color : -1;
+				System.out.println(index);
+				return index == 0 ? -1 : -1;
 			}
 		};
 	}
@@ -70,7 +71,7 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 	
 	public BlockOre(String name, Item drop, int drop_num, int min_xp, int max_xp, int color, boolean drop_fortune) {
 		super(name, Material.ROCK, "ore");
-		this.drop = drop;
+		this.drop = drop == null ? Item.getItemFromBlock(this) : drop;
 		this.drop_num = drop_num;
 		this.min_xp = min_xp;
 		this.max_xp = max_xp;

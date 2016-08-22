@@ -23,8 +23,8 @@ public class CauldronActivatedEvent extends BlockEvent {
 	public final EnumFacing side;
 	public final float hitX, hitY, hitZ;
 
-	public CauldronActivatedEvent(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem,
-			EnumFacing side, float hitX, float hitY, float hitZ) {
+	public CauldronActivatedEvent(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
+			@Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		super(world, pos, state);
 		this.player = player;
 		this.hand = hand;

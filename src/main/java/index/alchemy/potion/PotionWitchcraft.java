@@ -14,6 +14,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
@@ -47,6 +48,8 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 			EntityLiving living = (EntityLiving) base;
 			living.tasks.tickCount = 1;
 			living.targetTasks.tickCount = 1;
+			if (living instanceof EntityCreeper)
+				((EntityCreeper) living).setCreeperState(-1);
 		}
 	}
 	

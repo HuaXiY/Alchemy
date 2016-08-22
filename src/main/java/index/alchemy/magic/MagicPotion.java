@@ -1,7 +1,5 @@
 package index.alchemy.magic;
 
-import index.alchemy.api.Alway;
-import index.alchemy.entity.ai.EntityTrackTracker;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.PotionEffect;
 
@@ -15,7 +13,7 @@ public class MagicPotion extends AlchemyMagic {
 
 	@Override
 	public void apply(EntityLivingBase src, EntityLivingBase living, float amplify) {
-		//living.addPotionEffect(effect.);
+		living.addPotionEffect(new PotionEffect(effect));
 	}
 
 }

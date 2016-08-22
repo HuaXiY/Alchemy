@@ -1,6 +1,6 @@
 package index.alchemy.magic;
 
-import index.alchemy.api.Alway;
+import index.alchemy.api.Always;
 import net.minecraft.entity.EntityLivingBase;
 
 public class MagicBurning extends AlchemyMagic {
@@ -11,7 +11,7 @@ public class MagicBurning extends AlchemyMagic {
 	
 	@Override
 	public void apply(EntityLivingBase src, EntityLivingBase living, float amplify) {
-		if (Alway.isServer())
+		if (Always.isServer())
 			living.fire = (int) (strength * amplify);
 	}
 

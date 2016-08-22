@@ -1,7 +1,6 @@
 package index.alchemy.magic;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.math.BlockPos;
 
 public class MagicTeleportRandom extends AlchemyMagic {
 	
