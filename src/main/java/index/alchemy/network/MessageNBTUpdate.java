@@ -55,7 +55,8 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 					switch (message.type) {
 						case ENTITY_BAUBLE_DATA:
 							InventoryBauble inventory = entity.getCapability(AlchemyCapabilityLoader.bauble, null);
-							inventory.readFromNBT(message.data);
+							if (inventory != null)
+								inventory.readFromNBT(message.data);
 						case ENTITY_DATA:
 							updateNBT(entity.getEntityData(), message.data);
 							break;

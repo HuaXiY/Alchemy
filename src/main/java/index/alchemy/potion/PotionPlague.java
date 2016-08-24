@@ -1,5 +1,6 @@
 	package index.alchemy.potion;
 
+import index.alchemy.api.Always;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
@@ -35,28 +36,30 @@ public class PotionPlague extends AlchemyPotion implements IEventHandle {
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingDeath(LivingDeathEvent event) {
-		EntityLivingBase living = event.getEntityLiving(), spawn_living = null;
-		if (living instanceof EntityPlayer || living instanceof EntityVillager) {
-			spawn_living = new EntityZombie(living.worldObj);
-			((EntityZombie) spawn_living).setChild(living.isChild());
-			if (living instanceof EntityVillager)
-				((EntityZombie) spawn_living).setVillagerType(((EntityVillager) living).getProfessionForge());
-		} else if (living instanceof EntityPig) {
-			spawn_living = new EntityPigZombie(living.worldObj);
-		}
-		
-		if (spawn_living != null) {
-			if (spawn_living.hasCustomName()) {
-				spawn_living.setCustomNameTag(living.getCustomNameTag());
-				spawn_living.setAlwaysRenderNameTag(living.getAlwaysRenderNameTag());
-            }
-			IItemHandler item = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), 
-					spawn_item = spawn_living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			for (int i = 0, len = item.getSlots(); i < len; i++)
-				if (item.getStackInSlot(i) != null)
-					spawn_item.insertItem(i, item.getStackInSlot(i).copy(), true);
-			spawn_living.copyLocationAndAnglesFrom(living);
-			living.worldObj.spawnEntityInWorld(spawn_living);
+		if (Always.isServer() && event.getEntityLiving().isPotionActive(this)) {
+			EntityLivingBase living = event.getEntityLiving(), spawn_living = null;
+			if (living instanceof EntityPlayer || living instanceof EntityVillager) {
+				spawn_living = new EntityZombie(living.worldObj);
+				((EntityZombie) spawn_living).setChild(living.isChild());
+				if (living instanceof EntityVillager)
+					((EntityZombie) spawn_living).setVillagerType(((EntityVillager) living).getProfessionForge());
+			} else if (living instanceof EntityPig) {
+				spawn_living = new EntityPigZombie(living.worldObj);
+			}
+			
+			if (spawn_living != null) {
+				if (spawn_living.hasCustomName()) {
+					spawn_living.setCustomNameTag(living.getCustomNameTag());
+					spawn_living.setAlwaysRenderNameTag(living.getAlwaysRenderNameTag());
+	            }
+				IItemHandler item = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null), 
+						spawn_item = spawn_living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+				for (int i = 0, len = item.getSlots(); i < len; i++)
+					if (item.getStackInSlot(i) != null)
+						spawn_item.insertItem(i, item.getStackInSlot(i).copy(), true);
+				spawn_living.copyLocationAndAnglesFrom(living);
+				living.worldObj.spawnEntityInWorld(spawn_living);
+			}
 		}
 	}
 	

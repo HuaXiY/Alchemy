@@ -3,6 +3,8 @@ package index.alchemy.item;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.api.Always;
@@ -55,9 +57,10 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	public static final String NBT_KEY_CD = "cd_ring_space",
 			KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
+	@Nullable
 	@Override
 	public InventoryItem getItemInventory(EntityPlayer player, ItemStack item) {
-		return new InventoryItem(player, item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
+		return item == null ? null : new InventoryItem(player, item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
 	}
 	
 	@Override
@@ -171,7 +174,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	}
 	
 	public void pickup(EntityPlayer player) {
-		InventoryItem inventory = getItemInventory(player, getFormPlayer(player));
+		InventoryItem inventory = getItemInventory(player, getFormLiving(player));
 		if (inventory == null)
 			return;
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
@@ -192,14 +195,14 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	@Override
 	public Object getServerGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		InventoryItem inventory = getItemInventory(player, getFormPlayer(player));
+		InventoryItem inventory = getItemInventory(player, getFormLiving(player));
 		return inventory == null ? null : new ContainerChest(player.inventory, inventory, player);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		InventoryItem inventory = getItemInventory(player, getFormPlayer(player));
+		InventoryItem inventory = getItemInventory(player, getFormLiving(player));
 		return inventory == null ? null : new GuiChest(player.inventory, inventory);
 	}
 	

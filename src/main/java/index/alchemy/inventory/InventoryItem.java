@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants.NBT;
 
+@Deprecated // Will rewrite logic & implements -> ICapabilityProvider in next version.
 public class InventoryItem extends AlchemyInventory implements RandomAccess {
 	
 	protected static final String CONTENTS = "item_contents";

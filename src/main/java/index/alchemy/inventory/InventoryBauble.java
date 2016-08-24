@@ -21,12 +21,11 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.common.util.INBTSerializable;
 
-public class InventoryBauble extends AlchemyInventory implements ICapabilityProvider, INBTSerializable, RandomAccess {
+public class InventoryBauble extends AlchemyInventory implements ICapabilitySerializable, RandomAccess {
 	
 	protected static final String CONTENTS = "bauble_contents";
 	

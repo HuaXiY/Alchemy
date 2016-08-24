@@ -1,12 +1,15 @@
 package index.alchemy.api;
 
-import net.minecraft.entity.player.EntityPlayer;
+import javax.annotation.Nullable;
+
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 
 public interface IBaubleEquipment {
 	
-	public boolean isEquipmented(EntityPlayer player);
+	public boolean isEquipmented(EntityLivingBase living);
 	
-	public ItemStack getFormPlayer(EntityPlayer player);
+	@Nullable
+	public ItemStack getFormLiving(EntityLivingBase living);
 
 }

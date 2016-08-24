@@ -1,10 +1,13 @@
 package index.alchemy.item;
 
+import javax.annotation.Nullable;
+
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import index.alchemy.api.Always;
 import index.alchemy.api.IBaubleEquipment;
 import index.alchemy.capability.AlchemyCapabilityLoader;
+import index.alchemy.inventory.InventoryBauble;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -144,19 +147,16 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		return living instanceof EntityPlayer && isEquipmented((EntityPlayer) living);
 	}
 	
+	@Nullable
 	@Override
-	public boolean isEquipmented(EntityPlayer player) {
-		return getFormPlayer(player) != null;
-	}
-	
-	@Override
-	public ItemStack getFormPlayer(EntityPlayer player) {
-		IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-		for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
-			ItemStack item = inventory.getStackInSlot(i);
-			if (item != null && item.getItem() == this)
-				return item;
-		}
+	public ItemStack getFormLiving(EntityLivingBase living) {
+		InventoryBauble inventory = living.getCapability(AlchemyCapabilityLoader.bauble, null);
+		if (inventory != null)
+			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
+				ItemStack item = inventory.getStackInSlot(i);
+				if (item != null && item.getItem() == this)
+					return item;
+			}
 		return null;
 	}
 	

@@ -27,7 +27,7 @@ public class ItemRingBlessing extends AlchemyItemRing implements IEventHandle {
 		Entity source = event.getSource().getSourceOfDamage();
 		if (source != null && source instanceof EntityPlayer &&
 				event.getSource().getDamageType().equals(DAMAGETYPE) && isEquipmented((EntityPlayer) source))
-			event.setAmount(Math.max(event.getEntityLiving().getMaxHealth() * HURT_PERCENTAGE, HURT_MIN_VALUE));
+			event.setAmount(event.getAmount() + Math.max(event.getEntityLiving().getMaxHealth() * HURT_PERCENTAGE, HURT_MIN_VALUE));
 	}
 
 	public ItemRingBlessing() {
