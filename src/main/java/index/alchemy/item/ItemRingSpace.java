@@ -3,20 +3,20 @@ package index.alchemy.item;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
-import index.alchemy.api.IItemInventory;
+import index.alchemy.api.IInventoryProvider.IItemInventoryProvider;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.annotation.KeyEvent;
+import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.config.AlchemyConfig;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryItem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
@@ -51,16 +51,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
 
-public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, IInputHandle, IGuiHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
+public class ItemRingSpace extends AlchemyItemRing implements IItemInventoryProvider, IInputHandle, IGuiHandle, ICoolDown,
+	INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
 	public static final String NBT_KEY_CD = "cd_ring_space",
 			KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
-	@Nullable
 	@Override
-	public InventoryItem getItemInventory(EntityPlayer player, ItemStack item) {
-		return item == null ? null : new InventoryItem(player, item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
+	public InventoryItem initInventory(ItemStack item) {
+		return new InventoryItem(item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
+	}
+	
+	@Override
+	public InventoryItem getInventory(ItemStack item) {
+		return item == null ? null : (InventoryItem) item.getCapability(AlchemyCapabilityLoader.inventory, null);
 	}
 	
 	@Override
@@ -174,7 +179,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	}
 	
 	public void pickup(EntityPlayer player) {
-		InventoryItem inventory = getItemInventory(player, getFormLiving(player));
+		AlchemyInventory inventory = getInventory(getFormLiving(player));
 		if (inventory == null)
 			return;
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
@@ -187,7 +192,6 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 			}
 		}
 		if (list.size() > 0) {
-			inventory.updateNBT();
 			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player,
 					AlchemyConfig.getParticleRange()), player.worldObj, d6iap);
 		}
@@ -195,14 +199,14 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventory, II
 	
 	@Override
 	public Object getServerGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		InventoryItem inventory = getItemInventory(player, getFormLiving(player));
+		InventoryItem inventory = getInventory(getFormLiving(player));
 		return inventory == null ? null : new ContainerChest(player.inventory, inventory, player);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(EntityPlayer player, World world, int x, int y, int z) {
-		InventoryItem inventory = getItemInventory(player, getFormLiving(player));
+		InventoryItem inventory = getInventory(getFormLiving(player));
 		return inventory == null ? null : new GuiChest(player.inventory, inventory);
 	}
 	

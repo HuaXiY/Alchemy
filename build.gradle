@@ -111,7 +111,8 @@ void reobfDLC(String inputName) {
 	def mcpVersion = project.config.mappings_version.substring('snapshot_'.length())
 	def outputName = inputName.replace('deobf', 'universal')
 	def mapping = new net.md_5.specialsource.JarMapping()
-	def srgFile = file(System.getProperty('user.home') + "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/srgs/mcp-srg.srg")
+	def srgFile = file(System.getProperty('user.home') +
+		"/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/mcp-srg.srg")
 	def inputFile = file("build/libs/${inputName}")
 	def outputFile = file("build/libs/${outputName}")
 	def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
@@ -128,7 +129,8 @@ void reobfCSL(String inputName) {
 	def mcpVersion = project.config.mappings_version.substring('snapshot_'.length()) // custom
 	def outputName = inputName.replace('.jar', '-deobf.jar')
 	def mapping = new net.md_5.specialsource.JarMapping()
-	def srgFile = file(System.getProperty('user.home') + "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/srgs/notch-mcp.srg")
+	def srgFile = file(System.getProperty('user.home') +
+		"/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/notch-mcp.srg")
 	def inputFile = file("${inputName}")
 	def outputFile = file("${outputName}")
 	def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)

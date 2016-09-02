@@ -144,7 +144,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	}
 	
 	public boolean isEquipmented(EntityLivingBase living) {
-		return living instanceof EntityPlayer && isEquipmented((EntityPlayer) living);
+		return getFormLiving(living) != null;
 	}
 	
 	@Nullable
@@ -172,8 +172,10 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		return result;
 	}
 	
-	public static ItemStack getBauble(EntityPlayer player, int index) {
-		return player.getCapability(AlchemyCapabilityLoader.bauble, null).getStackInSlot(index);
+	@Nullable
+	public static ItemStack getBauble(EntityLivingBase living, int index) {
+		InventoryBauble inventory = living.getCapability(AlchemyCapabilityLoader.bauble, null);
+		return inventory == null ? null : inventory.getStackInSlot(index);
 	}
 
 }

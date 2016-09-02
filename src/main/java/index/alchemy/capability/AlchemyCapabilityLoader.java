@@ -4,6 +4,7 @@ import index.alchemy.api.annotation.Init;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryBauble;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -19,6 +20,9 @@ public class AlchemyCapabilityLoader {
 	
 	@CapabilityInject(CapabilityBauble.class)
 	public static final Capability<InventoryBauble> bauble = null;
+	
+	@CapabilityInject(CapabilityInventory.class)
+	public static final Capability<AlchemyInventory> inventory = null;
 	
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();

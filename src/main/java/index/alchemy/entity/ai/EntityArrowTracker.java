@@ -9,10 +9,10 @@ public class EntityArrowTracker {
 	
 	public static void track(EntityArrow arrow, Entity target) {
 		double dx = target.posX - arrow.posX;
-        double dy = target.getEntityBoundingBox().minY + target.height / 3 - arrow.posY;
-        double dz = target.posZ - arrow.posZ;
-        double dr = sqrt_double(dx * dx + dz * dz);
-        arrow.setThrowableHeading(dx, dy + dr * 0.3, dz, 2, 2);
+		double dy = target.getEntityBoundingBox().minY + target.height / 3 - arrow.posY;
+		double dz = target.posZ - arrow.posZ;
+		double dr = sqrt_double(dx * dx + dz * dz);
+		arrow.setThrowableHeading(dx, dy + dr * 0.2, dz, 1.6F, 2);
 	}
 
 }

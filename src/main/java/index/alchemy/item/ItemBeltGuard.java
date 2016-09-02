@@ -4,6 +4,7 @@ import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.config.AlchemyConfig;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.ai.EntityArrowTracker;
@@ -11,6 +12,8 @@ import index.alchemy.entity.ai.EntityHelper;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import index.alchemy.item.ItemBeltGuard.MessageGuardCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.network.Double3Float2Package;
+import index.alchemy.util.AABBHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -18,7 +21,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -32,9 +37,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INetworkMessage.Client<MessageGuardCallback>, ICoolDown {
 	
-	public static final int RECOVERY_INTERVAL = 20 * 3, RECOVERY_CD = 20 * 6, MAX_ABSORPTION = 20;
+	public static final int RECOVERY_INTERVAL = 20 * 3, RECOVERY_CD = 20 * 8, MAX_ABSORPTION = 20;
 	public static final float DECREASE = 0.8F;
 	
 	public boolean isCDOver(EntityLivingBase living) {
@@ -45,8 +53,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
 		if (Always.isServer()) {
-			if (living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION
-					&& isCDOver(living))
+			if (living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION && isCDOver(living))
 				living.setAbsorptionAmount(min(living.getAbsorptionAmount() + 1, MAX_ABSORPTION));
 		} else if (living == Minecraft.getMinecraft().thePlayer && living.lastDamage != -1) {
 			living.lastDamage = -1;
@@ -64,16 +71,24 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 		if (Always.isServer() && event.getSource().getSourceOfDamage() instanceof EntityArrow
 				&& isEquipmented(event.getEntityLiving()) && isCDOver(event.getEntityLiving())) {
 			event.setCanceled(true);
+			EntityLivingBase living = event.getEntityLiving();
 			EntityArrow arrow = (EntityArrow) event.getSource().getSourceOfDamage();
 			if (arrow.shootingEntity != null && arrow.shootingEntity != event.getEntityLiving()) {
 				EntityArrow reflect = EntityHelper.respawnArrow(arrow);
 				EntityArrowTracker.track(reflect, arrow.shootingEntity);
-				reflect.setDamage(10);
-				reflect.shootingEntity = event.getEntityLiving();
-				event.getEntityLiving().setLastAttacker(arrow.shootingEntity);
-				if (event.getEntityLiving() instanceof EntityPlayerMP)
+				reflect.setDamage(16);
+				reflect.shootingEntity = living;
+				arrow.worldObj.spawnEntityInWorld(reflect);
+				living.setLastAttacker(arrow.shootingEntity);
+				Double3Float2Package d3f2p = new Double3Float2Package(living.posX, living.posY, living.posZ, 1F,
+						1F / (living.rand.nextFloat() * 0.4F + 0.8F));
+				List<Double3Float2Package> d3f2ps = new LinkedList<Double3Float2Package>();
+				d3f2ps.add(d3f2p);
+				AlchemyNetworkHandler.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, SoundCategory.PLAYERS,
+						AABBHelper.getAABBFromEntity(living, AlchemyConfig.getSoundRange()), living.worldObj, d3f2ps);
+				if (living instanceof EntityPlayerMP)
 					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(arrow.shootingEntity.getEntityId()),
-							(EntityPlayerMP) event.getEntityLiving());
+							(EntityPlayerMP) living);
 			}
 		}
 	}
@@ -116,9 +131,13 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		if (message.lastAttackerId != -1) {
 			World world = Minecraft.getMinecraft().theWorld;
-			Entity lastAttacker;
-			if ((lastAttacker = world.getEntityByID(message.lastAttackerId)) != null)
-				player.setLastAttacker(lastAttacker);
+			if (world != null) {
+				Entity lastAttacker;
+				if ((lastAttacker = world.getEntityByID(message.lastAttackerId)) != null)
+					player.setLastAttacker(lastAttacker);
+				else
+					player.setLastAttacker(player);
+			}
 		}
 		return null;
 	}

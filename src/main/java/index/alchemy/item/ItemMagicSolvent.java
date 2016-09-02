@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.util.Tool;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -17,6 +18,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe {
+	
+	static { Tool.load(Type.class); }
 	
 	protected int metadata;
 	protected Item material;

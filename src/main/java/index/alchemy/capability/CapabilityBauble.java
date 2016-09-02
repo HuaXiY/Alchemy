@@ -24,12 +24,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -47,16 +43,6 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	public static final String KEY_INVENTORY = "key.inventory";
 	
 	@Override
-	public NBTBase writeNBT(Capability<InventoryBauble> capability, InventoryBauble instance, EnumFacing side) {
-		return instance.saveToNBT(new NBTTagCompound());
-	}
-
-	@Override
-	public void readNBT(Capability<InventoryBauble> capability, InventoryBauble instance, EnumFacing side, NBTBase nbt) {
-		instance.readFromNBT((NBTTagCompound) nbt);
-	}
-	
-	@Override
 	public Class<InventoryBauble> getDataClass() {
 		return InventoryBauble.class;
 	}
@@ -68,9 +54,8 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	
 	@SubscribeEvent
 	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent.Entity event) {
-		if (event.getEntity() instanceof EntityPlayer || event.getEntity() instanceof EntityZombie) {
+		if (event.getEntity() instanceof EntityPlayer || event.getEntity() instanceof EntityZombie)
 			event.addCapability(RESOURCE, new InventoryBauble((EntityLivingBase) event.getEntity()));
-		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
@@ -123,7 +108,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent
 	public void onPlayer_StartTracking(PlayerEvent.StartTracking event) {
 		InventoryBauble inventory = event.getTarget().getCapability(AlchemyCapabilityLoader.bauble, null);
-		if (inventory != null && inventory.hasBauble())
+		if (inventory != null && inventory.hasItem())
 			inventory.updatePlayer((EntityPlayerMP) event.getEntityPlayer());
 	}
 
@@ -139,6 +124,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_INVENTORY)
 	public void onKeyInventory(KeyBinding binding) {
+		System.out.println(binding);
 		if (!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
 			binding.unpressKey();
 			AlchemyNetworkHandler.openGui(this);

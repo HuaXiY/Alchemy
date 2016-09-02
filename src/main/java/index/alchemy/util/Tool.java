@@ -84,6 +84,14 @@ public class Tool {
 		}
 	}
 	
+	public static final void load(Class<?> clazz) {
+		try {
+			Class.forName(clazz.getName());
+		} catch (ClassNotFoundException e) {
+			AlchemyRuntimeException.onException(e);
+		}
+	}
+	
 	public static final void init(Class<?> clazz) {
 		Object instance = instance(clazz);
 		if (instance != null)

@@ -12,7 +12,6 @@ public class EntityHelper {
 	public static <T extends Entity> T clone(T entity) {
 		T result = (T) EntityList.createEntityFromNBT(entity.serializeNBT(), entity.worldObj);
 		result.setUniqueId(UUID.randomUUID());
-		entity.worldObj.spawnEntityInWorld(result);
 		return result;
 	}
 	

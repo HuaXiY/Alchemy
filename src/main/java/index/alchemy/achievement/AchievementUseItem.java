@@ -28,7 +28,7 @@ public class AchievementUseItem extends AlchemyAchievement implements IEventHand
 	}
 	
 	@SubscribeEvent
-	public void onLivingEntityUseItemEventFinish(LivingEntityUseItemEvent.Finish event) {
+	public void onLivingEntityUseItem_Finish(LivingEntityUseItemEvent.Finish event) {
 		if (event.getEntityLiving() instanceof EntityPlayer && item.isInstance(event.getItem().getItem()))
 			((EntityPlayer) event.getEntityLiving()).addStat(this);
 	}

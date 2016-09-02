@@ -49,7 +49,6 @@ public class BlockOre extends AlchemyBlock implements IColorBlock, IOreDictionar
 		return new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int index) {
-				System.out.println(index);
 				return index == 0 ? -1 : -1;
 			}
 		};

@@ -100,9 +100,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 		
 		@Override
 		public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-			if (hasCapability(capability, facing))
-				return (T) this;
-			return null;
+			return hasCapability(capability, facing) ? (T) this : null;
 		}
 		
 	}

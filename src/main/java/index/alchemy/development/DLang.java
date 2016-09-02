@@ -1,6 +1,6 @@
 package index.alchemy.development;
 
-import index.alchemy.api.IItemInventory;
+import index.alchemy.api.IInventoryProvider;
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyConstants;
@@ -147,7 +147,7 @@ public class DLang {
 		damageMap.put("death.attack." + damage.getDamageType(), "%1$s");
 	}
 	
-	public static void init(IItemInventory inventory) {
+	public static void init(IInventoryProvider inventory) {
 		inventoryMap.put(inventory.getInventoryUnlocalizedName(), "");
 	}
 	

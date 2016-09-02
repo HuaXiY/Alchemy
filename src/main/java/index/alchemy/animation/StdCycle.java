@@ -1,5 +1,7 @@
 package index.alchemy.animation;
 
+import index.alchemy.api.ICycle;
+
 public class StdCycle implements ICycle {
 	
 	/*
@@ -97,7 +99,7 @@ public class StdCycle implements ICycle {
 	public float update(int tick) {
 		if (!hasNext())
 			return max;
-		now +=tick;
+		now += tick;
 		while (now >= lenght) {
 			now -= lenght;
 			cycles++;

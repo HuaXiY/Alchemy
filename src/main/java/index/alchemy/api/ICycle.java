@@ -1,4 +1,4 @@
-package index.alchemy.animation;
+package index.alchemy.api;
 
 public interface ICycle {
 	

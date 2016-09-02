@@ -1,6 +1,6 @@
 package index.alchemy.client.fx.update;
 
-import index.alchemy.animation.ICycle;
+import index.alchemy.api.ICycle;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.client.fx.AlchemyFX;
 import net.minecraftforge.fml.relauncher.Side;

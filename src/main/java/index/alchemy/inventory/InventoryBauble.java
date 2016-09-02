@@ -1,7 +1,5 @@
 package index.alchemy.inventory;
 
-import java.util.RandomAccess;
-
 import baubles.api.IBauble;
 import index.alchemy.api.Always;
 import index.alchemy.api.IPhaseRunnable;
@@ -9,65 +7,39 @@ import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.MessageNBTUpdate;
-import index.alchemy.util.NBTHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
-public class InventoryBauble extends AlchemyInventory implements ICapabilitySerializable, RandomAccess {
+public class InventoryBauble extends AlchemyInventory {
 	
-	protected static final String CONTENTS = "bauble_contents";
-	
-	public static final int SIZE = 4;
+	public static final int SIZE = 4, LIMIT = 1;
+	public static final String NAME = "bauble";
 	
 	protected EntityLivingBase living;
-	protected ItemStack[] contents = new ItemStack[SIZE];
 	
 	public InventoryBauble(final EntityLivingBase living) {
+		super(SIZE, NAME, LIMIT);
 		this.living = living;
-	}
-	
-	public void readFromNBT(NBTTagCompound nbt) {
-		NBTTagList list = nbt.getTagList(CONTENTS, NBT.TAG_COMPOUND);
-		if (!list.hasNoTags())
-			contents = NBTHelper.getItemStacksFormNBTList(list);
-		update(true);
-	}
-	
-	public NBTTagCompound saveToNBT(NBTTagCompound nbt) {
-		nbt.setTag(CONTENTS, NBTHelper.getNBTListFormItemStacks(contents));
-		return nbt;
 	}
 	
 	@Override
 	public void markDirty() {}
 	
-	public boolean hasBauble() {
-		int flag = 0;
-		for (ItemStack item : contents)
-			if (item != null)
-				flag++;
-		return flag > 0;
-	}
-	
 	public void update(boolean init) {
-		if (Always.isServer() && (!init || hasBauble()))
+		if (Always.isServer() && (!init || hasItem()))
 			updateTracker();
 	}
 	
 	public void updateTracker() {
-		final NBTTagCompound data = saveToNBT(new NBTTagCompound());
+		final NBTTagCompound data = serializeNBT();
 		AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
 			@Override
 			public void run(Phase phase) {
@@ -80,7 +52,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilitySeri
 	}
 	
 	public void updatePlayer(EntityPlayerMP player) {
-		updatePlayer(player, saveToNBT(new NBTTagCompound()));
+		updatePlayer(player, serializeNBT());
 	}
 	
 	public void updatePlayer(EntityPlayerMP player, NBTTagCompound data) {
@@ -88,28 +60,16 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilitySeri
 	}
 	
 	public void copy(EntityLivingBase living) {
-		living.getCapability(AlchemyCapabilityLoader.bauble, null).readFromNBT(saveToNBT(new NBTTagCompound()));
+		living.getCapability(AlchemyCapabilityLoader.bauble, null).deserializeNBT(serializeNBT());
 	}
 	
 	public EntityLivingBase getLiving() {
 		return living;
 	}
 	
-	public void updateNBT() { }
-
-	@Override
-	public int getSizeInventory() {
-		return SIZE;
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int index) {
-		return contents[index];
-	}
-
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		ItemStack item = ItemStackHelper.getAndSplit(contents, index, count);
+		ItemStack item = super.decrStackSize(index, count);
 		if (item != null) {
 			change(item, null);
 			update(false);
@@ -119,7 +79,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilitySeri
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
-		ItemStack item = ItemStackHelper.getAndRemove(contents, index);
+		ItemStack item = super.removeStackFromSlot(index);
 		if (item != null) {
 			change(item, null);
 			update(false);
@@ -130,16 +90,11 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilitySeri
 	@Override
 	public void setInventorySlotContents(int index, ItemStack item) {
 		ItemStack old = contents[index];
-		contents[index] = item;
+		super.setInventorySlotContents(index, item);
 		if (old != item) {
 			change(old, item);
 			update(false);
 		}
-	}
-
-	@Override
-	public int getInventoryStackLimit() {
-		return 1;
 	}
 
 	@Override
@@ -154,10 +109,7 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilitySeri
 
 	@Override
 	public void clear() {
-		for (int i = 0; i < contents.length; i++) {
-			change(contents[i], null);
-			contents[i] = null;
-		}
+		super.clear();
 		update(false);
 	}
 	
@@ -174,20 +126,9 @@ public class InventoryBauble extends AlchemyInventory implements ICapabilitySeri
 	}
 	
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-		if (hasCapability(capability, facing))
-			return (T) this;
-		return null;
-	}
-
-	@Override
-	public NBTBase serializeNBT() {
-		return AlchemyCapabilityLoader.bauble.getStorage().writeNBT(AlchemyCapabilityLoader.bauble, this, null);
-	}
-
-	@Override
 	public void deserializeNBT(NBTBase nbt) {
-		AlchemyCapabilityLoader.bauble.getStorage().readNBT(AlchemyCapabilityLoader.bauble, this, null, nbt);
+		super.deserializeNBT(nbt);
+		update(true);
 	}
 
 }

@@ -12,6 +12,7 @@ public class Double6IntArrayPackage {
 		this.ox = ox;
 		this.oy = oy;
 		this.oz = oz;
+		this.args = args;
 	}
 	
 }

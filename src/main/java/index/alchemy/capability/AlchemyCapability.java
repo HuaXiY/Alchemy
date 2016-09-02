@@ -6,6 +6,7 @@ import index.alchemy.core.AlchemyInitHook;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.INBTSerializable;
 
 public abstract class AlchemyCapability<T> implements ICapability<T>, IRegister {
 	
@@ -16,11 +17,14 @@ public abstract class AlchemyCapability<T> implements ICapability<T>, IRegister 
 	
 	@Override
 	public NBTBase writeNBT(Capability<T> capability, T instance, EnumFacing side) {
-		return null;
+		return instance instanceof INBTSerializable ? ((INBTSerializable) instance).serializeNBT() : null;
 	}
 
 	@Override
-	public void readNBT(Capability<T> capability, T instance, EnumFacing side, NBTBase nbt) { }
+	public void readNBT(Capability<T> capability, T instance, EnumFacing side, NBTBase nbt) {
+		if (instance instanceof INBTSerializable)
+			((INBTSerializable) instance).deserializeNBT(nbt);
+	}
 
 	public AlchemyCapability() {
 		register();
