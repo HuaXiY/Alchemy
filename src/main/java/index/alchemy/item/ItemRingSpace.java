@@ -9,7 +9,7 @@ import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
-import index.alchemy.api.IInventoryProvider.IItemInventoryProvider;
+import index.alchemy.api.IInventoryProvider;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
@@ -51,7 +51,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
 
-public class ItemRingSpace extends AlchemyItemRing implements IItemInventoryProvider, IInputHandle, IGuiHandle, ICoolDown,
+public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider.ItemProvider, IInputHandle, IGuiHandle, ICoolDown,
 	INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
@@ -95,10 +95,10 @@ public class ItemRingSpace extends AlchemyItemRing implements IItemInventoryProv
         int hook = ForgeEventFactory.onItemPickup(entity, player, itemstack);
         if (hook < 0)
         	return;
-
+        
         if ((entity.getOwner() == null || entity.lifespan - entity.getAge() <= 200 ||
         		entity.getOwner().equals(player.getName())) && (hook == 1 || i <= 0 || player.inventory.addItemStackToInventory(itemstack))) {
-            if (itemstack.getItem() == Item.getItemFromBlock(Blocks.LOG))
+        	if (itemstack.getItem() == Item.getItemFromBlock(Blocks.LOG))
             	player.addStat(AchievementList.MINE_WOOD);
 
             if (itemstack.getItem() == Item.getItemFromBlock(Blocks.LOG2))

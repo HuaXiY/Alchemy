@@ -58,7 +58,7 @@ public final class FinalFieldSetter {
     	return getInstance() != null;
     }
 
-    @Unsafe(value = "sun.misc.unsafe api")
+    @Unsafe(Unsafe.UNSAFE_API)
     public void set(final Object o, final Field field, final Object value) throws Exception {
         final Object fieldBase = o;
         final long fieldOffset = (Long) objectFieldOffsetMethod.invoke(unsafeObj, field);
@@ -66,7 +66,7 @@ public final class FinalFieldSetter {
         putObjectMethod.invoke(unsafeObj, fieldBase, fieldOffset, value);
     }
 
-    @Unsafe(value = "sun.misc.unsafe api")
+    @Unsafe(Unsafe.UNSAFE_API)
     public void setStatic(final Field field, final Object value) throws Exception {
         final Object fieldBase = staticFieldBaseMethod.invoke(unsafeObj, field);
         final long fieldOffset = (Long) staticFieldOffsetMethod.invoke(unsafeObj, field);

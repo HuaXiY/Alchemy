@@ -11,6 +11,6 @@ public interface IInventoryProvider<T> {
 	
 	public String getInventoryUnlocalizedName();
 	
-	public interface IItemInventoryProvider extends IInventoryProvider<ItemStack> { }
+	public interface ItemProvider extends IInventoryProvider<ItemStack> { }
 	
 }

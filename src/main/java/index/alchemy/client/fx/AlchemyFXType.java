@@ -67,7 +67,7 @@ public class AlchemyFXType {
 		for (Entry<FX, Class<?>> entry : FX_MAPPING.entrySet()) {
 			FX fx = entry.getKey();
 			Class<?> clazz = entry.getValue();
-			AlchemyModLoader.logger.info("	init: <" + clazz.getName() + "> " + fx);
+			AlchemyModLoader.info(clazz, fx);
 			try {
 				Tool.setType(clazz, registerParticleTypes(fx.name(), 
 						Tool.forName(clazz.getName().replace("Info", "Factory"), false), fx.ignoreRange()));

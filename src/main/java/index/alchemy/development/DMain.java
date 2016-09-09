@@ -64,7 +64,7 @@ public class DMain {
 		AlchemyModLoader.checkState(ModState.AVAILABLE);
 		for (Method method : init)
 			try {
-				AlchemyModLoader.logger.info("	init: <" + method.getDeclaringClass() + "> " + method);
+				AlchemyModLoader.info(method.getDeclaringClass(), method);
 				method.invoke(null);
 			} catch (Exception e) {
 				AlchemyModLoader.logger.warn("Catch a Exception in init method with class(" + method.getDeclaringClass().getName() + ")");

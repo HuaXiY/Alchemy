@@ -1,7 +1,7 @@
 package index.alchemy.capability;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.api.IInventoryProvider.IItemInventoryProvider;
+import index.alchemy.api.IInventoryProvider;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
@@ -28,8 +28,8 @@ public class CapabilityInventory extends AlchemyCapability<AlchemyInventory> imp
 	
 	@SubscribeEvent
 	public void onAttachCapabilities_Item(AttachCapabilitiesEvent.Item event) {
-		if (event.getItem() instanceof IItemInventoryProvider)
-			event.addCapability(RESOURCE, ((IItemInventoryProvider) event.getItem()).initInventory(event.getItemStack()));
+		if (event.getItem() instanceof IInventoryProvider.ItemProvider)
+			event.addCapability(RESOURCE, ((IInventoryProvider.ItemProvider) event.getItem()).initInventory(event.getItemStack()));
 	}
 
 }

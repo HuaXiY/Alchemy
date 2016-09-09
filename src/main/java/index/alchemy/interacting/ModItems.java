@@ -116,9 +116,8 @@ public class ModItems {
 		
 		for (Field field : ModItems.class.getFields()) {
 			Object obj = field.get(null);
-			AlchemyModLoader.logger.info("    init: <" + field.getType().getName() + "> " +
-					field.getName() + " - " + (obj instanceof Item ? ((Item) obj).getUnlocalizedName() :
-				obj instanceof ItemStack ? ((ItemStack) obj).getDisplayName() : ""));
+			AlchemyModLoader.info(field.getType(), field.getName() + " - " + (obj instanceof Item ? 
+					((Item) obj).getUnlocalizedName() : obj instanceof ItemStack ? ((ItemStack) obj).getDisplayName() : ""));
 		}
 	}
 	

@@ -56,7 +56,7 @@ public class AlchemyConfigLoader {
 
 	private static void loadConfiguration() {
 		for (Field field : config_list) {
-			AlchemyModLoader.logger.info("    init : <" + field.getClass() + "> " + field.toString());
+			AlchemyModLoader.info(field.getClass(), field);
 			Config config = field.getAnnotation(Config.class);
 			if (config != null) {
 				try {

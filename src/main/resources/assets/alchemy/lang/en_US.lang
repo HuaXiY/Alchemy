@@ -94,3 +94,9 @@ death.attack.plague=%1$s
 //inventoryMap
 
 //miscMap
+solvent.type.null=
+solvent.type.unstable=
+solvent.type.powerful=
+solvent.type.benign=
+solvent.type.wonderful=
+solvent.type.dangerous=

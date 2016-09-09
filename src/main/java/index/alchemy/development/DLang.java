@@ -81,7 +81,7 @@ public class DLang {
 	}
 	
 	public static void save(String name) {
-		AlchemyModLoader.logger.info("        save: " + name);
+		AlchemyModLoader.info("Save", name);
 		File file = new File(lang_dir, name);
 		try {
 			Map<String, String> map = getMap(file);

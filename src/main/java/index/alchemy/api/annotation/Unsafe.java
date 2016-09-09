@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Unsafe {
 	
+	public static final String UNSAFE_API = "sun.misc.Unsafe", ASM_API = "org.objectweb.asm", REFLECT_API = "java.lang.reflect";
+	
 	public String value() default "unknown";
 
 }

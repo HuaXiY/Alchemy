@@ -67,7 +67,7 @@ public class AlchemyBlockLoader {
     				if (block == toReplace){
     					ResourceLocation registryName = Block.REGISTRY.getNameForObject(block);
     					int id = Block.getIdFromBlock(block);
-    					AlchemyModLoader.logger.info("    Replacing block - " + id + " / " + registryName);
+    					AlchemyModLoader.info("Replacing-block", id + " / " + registryName);
     					
     					Block newBlock = blockClass.newInstance();
     					Tool.set(Impl.class, 2, newBlock, resource == null ? registryName : resource);

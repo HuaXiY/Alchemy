@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.TraceClassVisitor;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyInitHook;
@@ -41,6 +43,13 @@ public class Tool {
 	public static final void where() {
         for (StackTraceElement s : new Throwable().getStackTrace())
             System.err.println(s);
+	}
+	
+	public static final String makeString(char c, int len) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < len; i++)
+			builder.append(c);
+		return builder.toString();
 	}
 	
 	public static final <T extends AccessibleObject> T setAccessible(T t) {
@@ -66,13 +75,8 @@ public class Tool {
 	public static final void addURLToClassLoader(ClassLoader loader, URL url) throws Exception {
 		if (loader instanceof URLClassLoader)
 			$(loader, "addURL", url);
-	}
-	
-	public static final String getDescriptor(Class<?> clazz) {
-		if (clazz.isPrimitive())
-			return clazz.getName() + ";";
-		else
-			return "L" + clazz.getName().replace('.', '/') + ";";
+		else if (loader.getParent() != null)
+			addURLToClassLoader(loader.getParent(), url);
 	}
 	
 	@Nullable
@@ -108,7 +112,7 @@ public class Tool {
 		return null;
 	}
 	
-	@Unsafe
+	@Unsafe(Unsafe.REFLECT_API)
 	public static final <Src, To> To proxy(Src src, To to, int i) {
 		Field fasrc[] = src.getClass().getDeclaredFields(), fato[] = to.getClass().getDeclaredFields();
 		int index = -1;
@@ -359,12 +363,12 @@ public class Tool {
 		return str == null || str.isEmpty() ? or : str;
 	}
 	
-	@Unsafe
+	@Unsafe(Unsafe.REFLECT_API)
 	public static final <T> T get(Class cls, int index) {
 		return get(cls, index, null);
 	}
 	
-	@Unsafe
+	@Unsafe(Unsafe.REFLECT_API)
 	public static final <T> T get(Class cls, int index, Object obj) {
 		try {
 			return (T) setAccessible(cls.getDeclaredFields()[index]).get(obj);
@@ -374,12 +378,12 @@ public class Tool {
 		}
 	}
 	
-	@Unsafe
+	@Unsafe(Unsafe.REFLECT_API)
 	public static final void set(Class cls, int index, Object to) {
 		set(cls, index, null, to);
 	}
 	
-	@Unsafe
+	@Unsafe(Unsafe.REFLECT_API)
 	public static final void set(Class cls, int index, Object src, Object to) {
 		try {
 			setAccessible(cls.getDeclaredFields()[index]).set(src, to);
@@ -504,6 +508,18 @@ public class Tool {
 			builder.append(arg).append(", ");
 		builder.setLength(Math.max(builder.length(), builder.length() - 2));
 		throw new RuntimeException("Can't invoke: " + builder.toString());
+	}
+	
+	public static final void printClass(String name) {
+		try {
+			new ClassReader(name).accept(new TraceClassVisitor(new PrintWriter(System.out)), 0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static final void printClass(byte[] code) {
+		new ClassReader(code).accept(new TraceClassVisitor(new PrintWriter(System.out)), 0);
 	}
 	
 }

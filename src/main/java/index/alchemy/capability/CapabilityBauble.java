@@ -124,7 +124,6 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SideOnly(Side.CLIENT)
 	@KeyEvent(KEY_INVENTORY)
 	public void onKeyInventory(KeyBinding binding) {
-		System.out.println(binding);
 		if (!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode) {
 			binding.unpressKey();
 			AlchemyNetworkHandler.openGui(this);

@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -28,10 +29,12 @@ import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraftforge.common.MinecraftForge;
 import sun.reflect.annotation.AnnotationParser;
 
+import static index.alchemy.core.AlchemyConstants.*;
+
 @Loading
 public class AlchemyDLCLoader {
 	
-	public static final String DESCRIPTOR = Tool.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/alchemy";
+	public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID;
 	
 	private static final Map<DLC, Throwable> errors = new HashMap<DLC, Throwable>();
 	
@@ -60,7 +63,7 @@ public class AlchemyDLCLoader {
 		AlchemyModLoader.checkState();
 		
 		AlchemyModLoader.logger.info("Setup: " + AlchemyDLCLoader.class.getName());
-
+		
 		String val = System.getProperty("index.alchemy.dlcs.bin", "");
 		if (!val.isEmpty())
 			for (String path : val.split(";"))
@@ -108,7 +111,7 @@ public class AlchemyDLCLoader {
 	public static File update(DLC dlc, File file) {
 		if (file.isDirectory())
 			return file;
-		// Test
+		// TODO
 		return file;
 	}
 	
@@ -120,20 +123,16 @@ public class AlchemyDLCLoader {
 			List<URL> list = new LinkedList<URL>();
 			Tool.getAllURL(file, list);
 			for (URL url : list)
-				if ((dlc = checkClassIsDLC(url.openStream())) != null) {
+				if ((dlc = checkClassIsDLC(url.openStream())) != null)
 					result.add(dlc);
-					dlc = null;
-				}
 		} else {
 			ZipInputStream input = new ZipInputStream(new FileInputStream(file));
 			for (ZipEntry entry; (entry = input.getNextEntry()) != null;)
-				if (!entry.isDirectory() && entry.getName().endsWith(".class") && (dlc = checkClassIsDLC(input)) != null) {
+				if (!entry.isDirectory() && entry.getName().endsWith(".class") && (dlc = checkClassIsDLC(input)) != null)
 					result.add(dlc);
-					dlc = null;
-				}
-			if (result.size() > 1)
-				AlchemyRuntimeException.onException(new RuntimeException("This file has multiple DLC"));
 		}
+		if (result.size() > 1)
+			AlchemyRuntimeException.onException(new RuntimeException("This file has multiple DLC"));
 		return Tool.getSafe(result, 0);
 	}
 	
@@ -155,9 +154,9 @@ public class AlchemyDLCLoader {
 	
 	private static Map<String, Object> toMap(List<Object> list) {
 		Map<String, Object> result = new HashMap<String, Object>();
-		if (list.size() % 2 != 0) {
+		if (list.size() % 2 != 0)
 			AlchemyRuntimeException.onException(new RuntimeException("list.size() % 2 != 0"));
-		} else {
+		else {
 			String temp = null;
 			for (Object obj : list)
 				if (temp == null)

@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Stack;
 
 import javax.annotation.Nullable;
 
@@ -71,9 +72,44 @@ public class AlchemyModLoader {
 	
 	public static final String REQUIRED_BEFORE = "required-before:", REQUIRED_AFTER = "required-after:";
 	
+	public static final Random random = new Random();
+	
 	public static final Logger logger = LogManager.getLogger(MOD_NAME);
 	
-	public static final Random random = new Random();
+	public static final Stack<String> log_stack = new Stack<String>();
+	
+	public static synchronized void updateStack(String prefix) {
+		int index = log_stack.indexOf(prefix);
+		if (log_stack.size() == 0 || index == -1)
+			log_stack.push(prefix);
+		else
+			if (index != log_stack.size() - 1)
+				for (int i = 0, len = log_stack.size() - 1 - index; i < len; i++)
+					log_stack.pop();
+	}
+	
+	public static void info(String prefix, String info) {
+		updateStack(prefix);
+		logger.info(Tool.makeString(' ', log_stack.size() * 4) + prefix + ": " + info);
+	}
+	
+	public static void info(Class<?> clazz, Object obj) {
+		info("Init", "<" + clazz.getName() + "> " + obj);
+	}
+	
+	public static class ASMClassLoader extends ClassLoader {
+		
+        private ASMClassLoader() {
+            super(ASMClassLoader.class.getClassLoader());
+        }
+
+        public Class<?> define(String name, byte[] data) {
+            return defineClass(name, data, 0, data.length);
+        }
+        
+    }
+	
+	public static final ASMClassLoader asm_loader = new ASMClassLoader();
 	
 	@Nullable
 	@Deprecated

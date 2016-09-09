@@ -31,7 +31,7 @@ public class AlchemyEntityManager {
 		try {
 			return list.get(id).getConstructor(World.class).newInstance(world);
 		} catch (Exception e) {
-			AlchemyModLoader.logger.warn("Cannot be instantiated: " + clazz.getName(), e);
+			AlchemyModLoader.logger.warn("Can't be instantiated: " + clazz.getName(), e);
 			return new EntityPig(world);
 		}
 	}
