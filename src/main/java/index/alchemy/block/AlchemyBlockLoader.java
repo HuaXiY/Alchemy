@@ -58,13 +58,11 @@ public class AlchemyBlockLoader {
 	@Change("1.9.4")
 	public static boolean replaceBlock(Block toReplace, Class<? extends Block> blockClass, ResourceLocation resource,
 			ItemBlockSpecial item, Class<?> tileEntityClass, String tile){
-		Field modifiersField = null;
     	try{
-    		modifiersField = Tool.setAccessible(Field.class.getDeclaredField("modifiers"));
-    		for(Field field : Blocks.class.getDeclaredFields()){
-        		if (Block.class.isAssignableFrom(field.getType())){
+    		for (Field field : Blocks.class.getDeclaredFields()) {
+        		if (Block.class.isAssignableFrom(field.getType())) {
     				Block block = (Block) field.get(null);
-    				if (block == toReplace){
+    				if (block == toReplace) {
     					ResourceLocation registryName = Block.REGISTRY.getNameForObject(block);
     					int id = Block.getIdFromBlock(block);
     					AlchemyModLoader.info("Replacing-block", id + " / " + registryName);

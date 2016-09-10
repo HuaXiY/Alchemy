@@ -206,7 +206,7 @@ public class Tool {
 	
 	public static final boolean isInstance(Class<?> supers, Class<?> clazz) {
 		for (Class<?> i : clazz.getInterfaces())
-			if (i == supers || getPrimitiveMapping(supers) == clazz)
+			if (isInstance(supers, i) || getPrimitiveMapping(supers) == clazz)
 				return true;
 		return isSubclass(supers, clazz);
 	}

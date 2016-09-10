@@ -1,7 +1,6 @@
 package index.alchemy.item;
 
 import java.util.List;
-import java.util.Random;
 
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.util.Tool;
@@ -69,7 +68,6 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 		public static final String PREFIX = "solvent.type.";
 		
 		private static final String EFFECT = "solvent_effect";
-		private static final Random RANDOM = new Random();
 		
 		public boolean has(Type type){
 			return ordinal() == type.ordinal();

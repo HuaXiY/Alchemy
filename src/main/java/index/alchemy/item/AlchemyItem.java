@@ -1,5 +1,7 @@
 package index.alchemy.item;
 
+import java.util.Random;
+
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyInitHook;
@@ -21,6 +23,8 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 			return AlchemyItemLoader.solvent_lapis_lazuli;
 		}
 	};
+	
+	protected static final Random RANDOM = new Random();
 	
 	protected String name_color;
 	

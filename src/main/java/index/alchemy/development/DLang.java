@@ -1,12 +1,5 @@
 package index.alchemy.development;
 
-import index.alchemy.api.IInventoryProvider;
-import index.alchemy.api.annotation.DInit;
-import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.AlchemyConstants;
-import index.alchemy.item.ItemMagicSolvent;
-import index.alchemy.util.Tool;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -17,6 +10,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import index.alchemy.api.IInventoryProvider;
+import index.alchemy.api.annotation.DInit;
+import index.alchemy.core.AlchemyConstants;
+import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.item.ItemMagicSolvent;
+import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.enchantment.Enchantment;
@@ -154,5 +153,5 @@ public class DLang {
 	public static void init(ItemMagicSolvent.Type type) {
 		miscMap.put(ItemMagicSolvent.Type.PREFIX + type.name().toLowerCase(), "");
 	}
-
+	
 }
