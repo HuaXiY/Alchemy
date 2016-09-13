@@ -1,30 +1,35 @@
 package index.alchemy.config;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import index.alchemy.api.annotation.Config;
+import index.alchemy.api.annotation.Config.Handle.Type;
 
 public class AlchemyConfig {
 	
-	private static final String CATEGORY_NETWORK ="network";
+	public static final String HANDLE_INT_ARRAY = "int_array";
 	
-	@Config(category = CATEGORY_NETWORK, comment = "Can hear the sound of the range.")
-	private static int sound_range = 32;
-	
-	public static int getSoundRange() {
-		return sound_range;
+	@Config.Handle(name = HANDLE_INT_ARRAY, type = Type.MAKE)
+	public static int[] makeIntArray(String[] sa) {
+		int ia[] = new int[sa.length];
+		int index = 0;
+		for (String s : sa)
+			try {
+				ia[index] = Integer.valueOf(s);
+				index++;
+			} catch (Exception e) { }
+		if (index != sa.length)
+			ia = ArrayUtils.subarray(ia, 0, index);
+		return ia;
 	}
 	
-	@Config(category = CATEGORY_NETWORK, comment = "Can see the particle of the range.")
-	private static int particle_range = 32;
-	
-	public static int getParticleRange() {
-		return particle_range;
-	}
-	
-	@Config(category = CATEGORY_NETWORK, comment = "Can receive the change of the tileentity of the range.")
-	private static int tileentity_update_range = 128;
-	
-	public static int getTileEntityUpdateRange() {
-		return tileentity_update_range;
+	@Config.Handle(name = HANDLE_INT_ARRAY, type = Type.SAVE)
+	public static String[] saveStringArray(int[] ia) {
+		String sa[] = new String[ia.length];
+		int index = 0;
+		for (int i : ia)
+			sa[index++] = String.valueOf(i);
+		return sa;
 	}
 
 }

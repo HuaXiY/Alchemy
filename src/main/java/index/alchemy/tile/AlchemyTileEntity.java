@@ -1,6 +1,6 @@
 package index.alchemy.tile;
 
-import index.alchemy.config.AlchemyConfig;
+import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.AABBHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -31,7 +31,7 @@ public class AlchemyTileEntity extends TileEntity {
 	public void updateTracker() {
 		SPacketUpdateTileEntity packet = getUpdatePacket();
 		for (EntityPlayerMP player : worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, 
-				AABBHelper.getAABBFromBlockPos(pos, AlchemyConfig.getTileEntityUpdateRange())))
+				AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getTileEntityUpdateRange())))
 			updatePlayer(player, packet);
 	}
 	

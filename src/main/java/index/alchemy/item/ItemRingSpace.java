@@ -1,5 +1,7 @@
 package index.alchemy.item;
 
+import static java.lang.Math.max;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,7 +16,6 @@ import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.AlchemyKeyBinding;
-import index.alchemy.config.AlchemyConfig;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryItem;
@@ -48,8 +49,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import static java.lang.Math.*;
 
 public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider.ItemProvider, IInputHandle, IGuiHandle, ICoolDown,
 	INetworkMessage.Server<MessageSpaceRingPickup> {
@@ -193,7 +192,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		}
 		if (list.size() > 0) {
 			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player,
-					AlchemyConfig.getParticleRange()), player.worldObj, d6iap);
+					AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iap);
 		}
 	}
 	

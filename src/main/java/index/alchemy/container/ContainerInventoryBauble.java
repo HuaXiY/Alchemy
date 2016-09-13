@@ -105,11 +105,11 @@ public class ContainerInventoryBauble extends ContainerPlayer {
 				if (!mergeItemStack(slot_item, 9, 45, false))
 					return null;
 			} else if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR &&
-					!inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) {
+					!inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) { // armor
 				int i = 8 - entityequipmentslot.getIndex();
 				if (!mergeItemStack(slot_item, i, i + 1, false))
 					return null;
-			} else if (item.getItem() instanceof IBauble) {
+			} else if (item.getItem() instanceof IBauble) { // bauble
 				IBauble bauble = (IBauble) item.getItem();
 				if (!mergeItemStack(slot_item, start_id, start_id + 4, false))
 					return null;

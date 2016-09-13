@@ -7,7 +7,6 @@ import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
-import index.alchemy.config.AlchemyConfig;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
@@ -55,7 +54,7 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 						d6iap.add(new Double6IntArrayPackage(living.posX - 1 + living.rand.nextDouble() * 2, living.posY + 1,
 								living.posZ - 1 + living.rand.nextDouble() * 2, 0D, 0D, 0D));
 					AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.WATER_SPLASH, AABBHelper.getAABBFromEntity(living,
-							AlchemyConfig.getParticleRange()), living.worldObj, d6iap);
+							AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iap);
 					living.getEntityData().setInteger(NBT_KEY_CD, living.ticksExisted);
 					if (living instanceof EntityPlayerMP)
 						AlchemyNetworkHandler.network_wrapper.sendTo(new MessagePurifyCallback(), (EntityPlayerMP) living);

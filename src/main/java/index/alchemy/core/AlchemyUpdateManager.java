@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Joiner;
 import com.google.gson.Gson;
-import com.sun.corba.se.impl.util.Version;
 
 import biomesoplenty.api.item.BOPItems;
 import index.alchemy.api.Always;
@@ -191,20 +190,20 @@ public class AlchemyUpdateManager {
 			
 		}
 		
-		public static final String NAME = "JenkinsCI", SUCCESS = "SUCCESS", UNIVERSAL = "universal", SEPARATOT = "://";
+		public static final String HANDLE_JENKINS_CI = "JenkinsCI", SUCCESS = "SUCCESS", UNIVERSAL = "universal", SEPARATOT = "://";
 		
 		public static final Class TYPES[] = {String.class, String.class};
 		
 		public static final String tree_api = makeTreeApi(Result.class);
 		
-		@Config(handle = NAME, category = CATEGORY_UPDATE, comment = "Custom Jenkins CI URL.")
+		@Config(handle = HANDLE_JENKINS_CI, category = CATEGORY_UPDATE, comment = "Custom Jenkins CI URL.")
 		private static JenkinsCI custom = MICKEY;
 		
 		public static JenkinsCI getCustom() {
 			return custom;
 		}
 		
-		@Config.Handle(name = NAME, type = Type.MAKE)
+		@Config.Handle(name = HANDLE_JENKINS_CI, type = Type.MAKE)
 		public static JenkinsCI makeJenkinsCI(String url) {
 			if (url.isEmpty())
 				return MICKEY;
@@ -220,7 +219,7 @@ public class AlchemyUpdateManager {
 			return EnumHelper.addEnum(JenkinsCI.class, "custom", TYPES, scheme, host);
 		}
 		
-		@Config.Handle(name = NAME, type = Type.SAVE)
+		@Config.Handle(name = HANDLE_JENKINS_CI, type = Type.SAVE)
 		public static String saveJenkinsCI(JenkinsCI ci) {
 			if (ci == null)
 				ci = MICKEY;

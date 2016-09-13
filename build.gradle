@@ -125,7 +125,7 @@ void reobfDLC(String inputName) {
    	remapper.remapJar(inputJar, outputFile)
 }
 
-void reobfCSL(String inputName) {
+void deobfCSL(String inputName) {
 	def mcpVersion = project.config.mappings_version.substring('snapshot_'.length()) // custom
 	def outputName = inputName.replace('.jar', '-deobf.jar')
 	def mapping = new net.md_5.specialsource.JarMapping()
@@ -165,8 +165,36 @@ void reobfCSL(String inputName) {
 	outputFile.delete()
 }
 
-task csl << {
-	reobfCSL('mods/CustomSkinLoader_1.10-14.3.jar');
+task deobf_csl << {
+	deobfCSL('mods/CustomSkinLoader_1.10-14.3.jar')
+}
+
+void deobf(String inputName) {
+	def mcpVersion = project.config.mappings_version.substring('snapshot_'.length())
+	def outputName = inputName.replace('dev', 'deobf')
+	def mapping = new net.md_5.specialsource.JarMapping()
+	def srgFile = file(System.getProperty('user.home') +
+		"/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/notch-mcp.srg")
+	def inputFile = file("deobf/${inputName}")
+	def outputFile = file("deobf/${outputName}")
+	def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
+	def inputJar = net.md_5.specialsource.Jar.init(inputFile)
+	def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
+	def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
+	inheritanceProviders.add(jarProvider)
+	mapping.loadMappings(srgFile)
+	mapping.setFallbackInheritanceProvider(inheritanceProviders)
+   	remapper.remapJar(inputJar, outputFile)
+}
+
+task deobf_shaders << {
+	deobf('ShadersMod-1-10-2-dev.jar')
+}
+
+task deobf << {
+	fileList('deobf').each { File f ->
+		deobf(f.name)
+	}
 }
 
 File[] fileList(String dir) {

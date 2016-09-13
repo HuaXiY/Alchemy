@@ -302,10 +302,7 @@ public class AlchemyModLoader {
 		ProgressBar bar = ProgressManager.push("AlchemyModLoader", init_map.get(state).size());
 		for (Class clazz : init_map.get(state)) {
 			bar.step(clazz.getSimpleName());
-			if (clazz.getAnnotation(Test.class) != null) {
-				if (enable_test)
-					Tool.init(clazz);
-			} else
+			if (clazz.getAnnotation(Test.class) == null || enable_test)
 				init(clazz);
 		}
 		ProgressManager.pop(bar);

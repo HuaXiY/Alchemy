@@ -37,18 +37,6 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		
 		glDisable(GL_LIGHTING);
 		
-	    glBegin(GL_LINE_LOOP);
-	    float aa=(float) cos(54.0/360.0*2*PI);
-	    float bb=(float) (aa*tan(36.0/360.0*2*PI));
-	    float cc=(float) (sin(54.0/360.0*2*PI)-bb);
-
-	    for(int i=0;i<360;i+=72)
-	    {
-	        glVertex3f((float) (cos(i/360.0*2.0*PI)-0.5), 0F, (float) (sin(i/360.0*2.0*PI)+0.5));
-	        glVertex3f((float) (cc*cos((i+36)/360.0*2.0*PI)-0.5), 0F, (float) (cc*sin((i+36)/360.0*2.0*PI)+0.5));
-	    }
-	    glEnd();
-		
 		/*glRotatef(tick % 72 * 5, 0, 1, 0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
@@ -62,7 +50,7 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		glEnable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
 		glRotatef(-tick % 72 * 5, 0, 1, 0);*/
-		float points[][] = {
+		/*float points[][] = {
 			    { -4F, -4F, 0F }, { -2F, 4F, 0F },
 			    { 2F, -4F, 0F }, { 4F, 4F, 0F }
 		};
@@ -78,16 +66,16 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 	    for (int i = 0; i < 31; i++)
 	        glEvalCoord1f(i / 30F);
 	    glEnd();
-	    glDisable(GL_MAP1_VERTEX_3);
+	    glDisable(GL_MAP1_VERTEX_3);*/
 		
 		RenderHelper.setColor(new Color(0x66, 0xCC, 0xFF, 0x77));
 		MagicMatrix.renderHexagram();
 		
 		// Render Cube
-		glDisable(GL_TEXTURE_2D);
+		/*glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
 		glEnable(GL_BLEND);
-		for (int i = 0, max = 6 /*(int) (tick / 20 % 20)*/; i < max; i++) {
+		for (int i = 0, max = 6; i < max; i++) {
 			float r = 1F / 1.5F, deg = (int) (tick / 0.5F % 360F + (360 / max) * i),
 					offest = (1 / 8F - 2 * abs(1 / 8F - tick * 0.2F % 10 / 40F)) * (i % 2 == 0 ? 1 : -1);
 			glPushMatrix();
@@ -102,9 +90,9 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		}
 		glDisable(GL_BLEND);
 		glEnable(GL_LIGHTING);
-		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_2D);*/
 		// End
-
+		
 		for(ItemStack item : te.getContainer()) {
 			float offset = offsetPerPetal * index;
 			float deg = (int) (tick / 0.5F % 360F + offset);

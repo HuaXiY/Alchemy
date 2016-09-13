@@ -4,7 +4,6 @@ import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
-import index.alchemy.config.AlchemyConfig;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.ai.EntityArrowTracker;
@@ -85,7 +84,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 				List<Double3Float2Package> d3f2ps = new LinkedList<Double3Float2Package>();
 				d3f2ps.add(d3f2p);
 				AlchemyNetworkHandler.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, SoundCategory.PLAYERS,
-						AABBHelper.getAABBFromEntity(living, AlchemyConfig.getSoundRange()), living.worldObj, d3f2ps);
+						AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getSoundRange()), living.worldObj, d3f2ps);
 				if (living instanceof EntityPlayerMP)
 					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(arrow.shootingEntity.getEntityId()),
 							(EntityPlayerMP) living);

@@ -62,14 +62,19 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IRegis
 		if (Always.isServer()) {
 			int i = ((Integer)state.getValue(LEVEL)).intValue();
 			
+			TileEntityCauldron cauldron = getTileEntityCauldron(world, pos);
+			
 			CauldronActivatedEvent event;
-			if (MinecraftForge.EVENT_BUS.post(event = new CauldronActivatedEvent(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)))
+			if (MinecraftForge.EVENT_BUS.post(event = new CauldronActivatedEvent(world, pos, state, player, hand, cauldron,
+					heldItem, side, hitX, hitY, hitZ)))
 				return event.getResult() == Result.DEFAULT;
 			
 			if (heldItem == null) {
 				LinkedList<ItemStack> list = getTileEntityCauldron(world, pos).getContainer();
-				if (list.size() > 0)
+				if (list.size() > 0) {
 					player.setHeldItem(hand, list.removeLast());
+					cauldron.updateTracker();
+				}
 			} else {
 				Item item = heldItem.getItem();
 				if (item == Items.BUCKET) {

@@ -29,7 +29,7 @@ public class AlchemyBlockLoader {
 	
 	public static final Block 
 			ice_temp = new BlockIceTemp(),
-			silver_ore = new BlockOre("ore_silver", null, 0xFFFFFF);
+			silver_ore = new BlockOre("ore_silver", null, 0xFFFFFF, new BlockOre.OreGeneratorSetting(9, 4, 0, 40));
 	
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();
@@ -88,7 +88,7 @@ public class AlchemyBlockLoader {
     				}
         		}
         	}
-    	}catch(Exception e){
+    	} catch(Exception e){
     		AlchemyRuntimeException.onException(e);
     		return false;
     	}

@@ -6,6 +6,8 @@ import index.alchemy.core.AlchemyInitHook;
 
 public abstract class AlchemyWorldGenerator implements IGenerator, IRegister {
 	
+	public static final String CATEGORY_GENERATOR = "generator";
+	
 	private int level;
 	
 	@Override

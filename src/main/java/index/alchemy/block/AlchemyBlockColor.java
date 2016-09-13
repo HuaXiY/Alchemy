@@ -20,7 +20,7 @@ public class AlchemyBlockColor extends AlchemyBlock implements IColorBlock {
 		return new IBlockColor() {
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int index) {
-				return color;
+				return 0x775decf5;
 			}
 		};
 	}

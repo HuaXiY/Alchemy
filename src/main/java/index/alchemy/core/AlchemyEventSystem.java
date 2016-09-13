@@ -1,5 +1,20 @@
 package index.alchemy.core;
 
+import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
+import static org.objectweb.asm.Opcodes.ACC_SUPER;
+import static org.objectweb.asm.Opcodes.ACC_SYNTHETIC;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.CHECKCAST;
+import static org.objectweb.asm.Opcodes.GETFIELD;
+import static org.objectweb.asm.Opcodes.ICONST_1;
+import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.PUTFIELD;
+import static org.objectweb.asm.Opcodes.RETURN;
+import static org.objectweb.asm.Opcodes.V1_6;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -37,6 +52,7 @@ import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -68,8 +84,6 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import static org.objectweb.asm.Opcodes.*;
 
 @Loading
 @Init(state = ModState.CONSTRUCTED)
@@ -252,31 +266,41 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "47";
+		String flag = "48";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
-				//EntityPlayer player = event.player;
+				EntityPlayer player = event.player;
 				//float groundYOffset = 0.015625F;
-				//double offsetX = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
-				//double offsetZ = 0.3 - player.worldObj.rand.nextFloat() * 0.6;
+				double offsetX = 6 - player.worldObj.rand.nextFloat() * 12;
+				double offsetY = 6 - player.worldObj.rand.nextFloat() * 12;
+				double offsetZ = 6 - player.worldObj.rand.nextFloat() * 12;
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
 				//GL11.glPushMatrix();
 				//GL11.glTranslated(player.posX, player.posY, player.posZ);
 				//RenderHelper.Draw2D.drawRound(3, 0, 360, 1, 0xFF66CCFF, false);
 				//GL11.glPopMatrix();
-				//Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
-				//		+ offsetX, ((int)player.posY) + 2, player.posZ + offsetZ));
+				Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
+						+ offsetX, player.posY + offsetY, player.posZ + offsetZ));
+				
+				/*ItemStack item = Minecraft.getMinecraft().thePlayer.getHeldItemMainhand();
+				if (item != null) {
+					Block block = Block.getBlockFromItem(item.getItem());
+					if (block != null)
+						System.out.println(Block.getIdFromBlock(block));
+				}*/
+				//System.out.println(Tool.get(Names.Name.class, 1, Tool.get(Names.class, 3)));
 			}
 			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
 			//System.out.println(DimensionManager.getWorld(10).getDefaultTeleporter()); 
 			//event.player.changeDimension(0);
 			//System.out.println(DimensionManager.getWorld(1).getDefaultTeleporter().placeInExistingPortal(event.player, event.player.rotationYaw));
 			//new MagicTeleportDirectional(1).apply(null, event.player, 1);
-			System.setProperty("index.alchemy.runtime.debug.player", flag);
+			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		for (IPlayerTickable tickable : event.side.isServer() ? server_tickable : client_tickable)
 			tickable.onTick(event.player, event.phase);
@@ -323,7 +347,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onServerTick(ServerTickEvent event) {
-		String flag = "4";
+		String flag = "6";
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -336,7 +360,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onClientTick(ClientTickEvent event) {
-		String flag = "9";
+		String flag = "12";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{

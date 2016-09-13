@@ -83,6 +83,8 @@ public class AlchemyConfigLoader {
 										config.min(), config.max(), config.comment());
 					else if (type == String.class)
 						result = getConfiguration().getString(field.getName(), config.category(), (String) value, config.comment());
+					else if (type == String[].class)
+						result = getConfiguration().getStringList(field.getName(), config.category(), (String[]) value, config.comment());
 					if (make != null)
 						result = make.invoke(null, result);
 					field.set(null, result);

@@ -30,7 +30,7 @@ public class FXWisp extends AlchemyFX {
 		
 	}
 	
-	private static final String TEXTURE_NAME[] = FXWisp.class.getAnnotation(Texture.class).value();
+	private static final String TEXTURE_NAME[] = FXWisp.Info.class.getAnnotation(Texture.class).value();
 	
 	private Iterator<Color> iterator = ahsbStep(new Color(0x7766CCFF), Color.RED, 2000 / 20, true, true, true);
 	private boolean render;

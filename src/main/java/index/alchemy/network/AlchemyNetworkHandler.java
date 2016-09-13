@@ -7,13 +7,14 @@ import java.util.Map.Entry;
 
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Message;
+import index.alchemy.core.AlchemyConstants;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.AlchemyConstants;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -34,6 +35,29 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Loading
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
+	
+public static final String CATEGORY_NETWORK ="network";
+	
+	@Config(category = CATEGORY_NETWORK, comment = "Can hear the sound of the range.")
+	private static int sound_range = 32;
+	
+	public static int getSoundRange() {
+		return sound_range;
+	}
+	
+	@Config(category = CATEGORY_NETWORK, comment = "Can see the particle of the range.")
+	private static int particle_range = 32;
+	
+	public static int getParticleRange() {
+		return particle_range;
+	}
+	
+	@Config(category = CATEGORY_NETWORK, comment = "Can receive the change of the tileentity of the range.")
+	private static int tileentity_update_range = 128;
+	
+	public static int getTileEntityUpdateRange() {
+		return tileentity_update_range;
+	}
 	
 	public static final SimpleNetworkWrapper network_wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(AlchemyConstants.MOD_ID);
 	
