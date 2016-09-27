@@ -18,6 +18,9 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
 
 import com.google.common.base.Joiner;
 import com.google.common.reflect.ClassPath;
@@ -51,13 +54,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static index.alchemy.core.AlchemyConstants.*;
 import static index.alchemy.core.AlchemyModLoader.*;
 
+import static org.objectweb.asm.Opcodes.*;
+
 /* 
  * -----------------------------------------------
  *    __    __    ___  _   _  ____  __  __  _  _ 
  *   /__\  (  )  / __)( )_( )( ___)(  \/  )( \/ )
  *  /(__)\  )(__( (__  ) _ (  )__)  )    (  \  / 
  * (__)(__)(____)\___)(_) (_)(____)(_/\/\_) (__) 
- * 
+ *                                               
  * -----------------------------------------------
  */
 
@@ -105,6 +110,20 @@ public class AlchemyModLoader {
 
         public Class<?> define(String name, byte[] data) {
             return defineClass(name, data, 0, data.length);
+        }
+        
+        public <T> T wrapper(T obj, Method... methods) throws IOException {
+        	ClassReader reader = new ClassReader(obj.getClass().getName());
+        	ClassWriter writer = new ClassWriter(0);
+        	ClassVisitor visitor = new ClassVisitor(ASM5, writer) {
+        		
+        		@Override
+        		public void visitEnd() {
+        			//visitMethod(access, name, desc, signature, exceptions)
+        		}
+        		
+			};
+        	return obj;
         }
         
     }

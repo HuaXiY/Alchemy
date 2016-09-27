@@ -1,6 +1,7 @@
 package index.alchemy.inventory;
 
 import baubles.api.IBauble;
+import baubles.common.container.InventoryBaubles;
 import index.alchemy.api.Always;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.capability.AlchemyCapabilityLoader;
@@ -18,7 +19,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
-public class InventoryBauble extends AlchemyInventory {
+public class InventoryBauble extends InventoryBaubles {
 	
 	public static final int SIZE = 4, LIMIT = 1;
 	public static final String NAME = "bauble";

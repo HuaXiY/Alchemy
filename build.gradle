@@ -174,7 +174,7 @@ void deobf(String inputName) {
 	def outputName = inputName.replace('dev', 'deobf')
 	def mapping = new net.md_5.specialsource.JarMapping()
 	def srgFile = file(System.getProperty('user.home') +
-		"/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/notch-mcp.srg")
+		"/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/srg-mcp.srg")
 	def inputFile = file("deobf/${inputName}")
 	def outputFile = file("deobf/${outputName}")
 	def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)

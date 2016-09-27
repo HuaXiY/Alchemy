@@ -1,5 +1,7 @@
 package index.alchemy.client.render.tile;
 
+import java.awt.Color;
+
 import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.client.render.MagicMatrix;
@@ -12,13 +14,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static java.lang.Math.*;
 import static org.lwjgl.opengl.GL11.*;
-
-import java.awt.Color;
-import java.nio.FloatBuffer;
-
-import org.lwjgl.BufferUtils;
 
 @SideOnly(Side.CLIENT)
 @Render(TileEntityCauldron.class)
@@ -93,7 +89,7 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		glEnable(GL_TEXTURE_2D);*/
 		// End
 		
-		for(ItemStack item : te.getContainer()) {
+		for (ItemStack item : te.getContainer()) {
 			float offset = offsetPerPetal * index;
 			float deg = (int) (tick / 0.5F % 360F + offset);
 			

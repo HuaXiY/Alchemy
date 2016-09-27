@@ -9,6 +9,8 @@ public interface IAlchemyRecipe {
 	
 	public ResourceLocation getAlchemyName();
 	
+	public int getAlchemyTime();
+	
 	public ItemStack getAlchemyResult();
 	
 	public List<IMaterialConsumer> getAlchemyMaterials();

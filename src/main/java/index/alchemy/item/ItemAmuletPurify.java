@@ -42,13 +42,13 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
 		if (Always.isServer()) {
 			if (living.ticksExisted - living.getEntityData().getInteger(NBT_KEY_CD) > INTERVAL) {
-				boolean flag = false;
+				List<PotionEffect> effects = new LinkedList<PotionEffect>();
 				for (PotionEffect effect : living.getActivePotionEffects())
-					if (effect.getPotion().isBadEffect()) {
+					if (effect.getPotion().isBadEffect())
+						effects.add(effect);
+				if (effects.size() > 0) {
+					for (PotionEffect effect : effects)
 						living.removePotionEffect(effect.getPotion());
-						flag = true;
-					}
-				if (flag) {
 					List<Double6IntArrayPackage> d6iap = new LinkedList<Double6IntArrayPackage>();
 					for (int i = 0; i < 9; i++)
 						d6iap.add(new Double6IntArrayPackage(living.posX - 1 + living.rand.nextDouble() * 2, living.posY + 1,

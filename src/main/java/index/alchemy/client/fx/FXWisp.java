@@ -66,7 +66,7 @@ public class FXWisp extends AlchemyFX {
 	public static class Factory implements IParticleFactory {
 		
 		@Override
-		public Particle getEntityFX(int id, World world, double x, double y, double z, double vx, double vy, double vz, int... args) {
+		public Particle createParticle(int id, World world, double x, double y, double z, double vx, double vy, double vz, int... args) {
                 return new FXWisp(world, x, y, z).addFXUpdate(FXUpdateHelper.getResultByArgs(args));
 		}
 		

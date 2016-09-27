@@ -87,7 +87,6 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 			for (int i = 0; i < setting.count; i++) {
 				BlockPos pos = new BlockPos(chunkX * 16 + random.nextInt(16),
 						random.nextInt(setting.dH) + setting.minH, chunkZ * 16 + random.nextInt(16));
-				System.out.println(pos);
 				if (setting.canGenerator(world, pos))
 					generator.generate(world, random, pos);
 			}

@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import index.alchemy.animation.StdCycle;
 import index.alchemy.api.Always;
 import index.alchemy.api.IFXUpdate;
@@ -17,11 +19,9 @@ import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -48,28 +48,25 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		return result;
 	}
 	
-	public static enum State {
-		NULL,
-		ALCHEMY,
-		OVER
-	}
+	public static enum State { NULL, ALCHEMY, OVER }
 	
 	public static final int CONTAINER_MAX_ITEM = 6;
 	
-	private static final String 
+	protected static final String 
 			NBT_KEY_CONTAINER = "container",
 			NBT_KEY_STATE = "state",
 			NBT_KEY_TIME = "time",
 			NBT_KEY_FLUID = "fluid",
 			NBT_KEY_ALCHEMY = "alchemy";
 	
-	private final LinkedList<ItemStack> container = new LinkedList<ItemStack>();
-	private volatile boolean flag;
+	protected final LinkedList<ItemStack> container = new LinkedList<ItemStack>();
+	protected volatile boolean flag;
 	
-	private State state = State.NULL;
-	private int time;
+	protected State state = State.NULL;
+	protected int time, level;
 	
-	private Fluid fluid;
+	@Nullable
+	protected Fluid fluid;
 	/*  alchemy: 
 	 *  	Magic Solvent volume	 -> alchemy & 4
 	 *  	Glow Stone volume		 -> alchemy >> 4 & 4
@@ -94,6 +91,15 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		this.time = time;
 	}
 	
+	public int getLevel() {
+		return level;
+	}
+	
+	public void setLevel(int level) {
+		this.level = level;
+	}
+	
+	@Nullable
 	public Fluid getLiquid() {
 		return fluid;
 	}
@@ -112,9 +118,9 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 
 	@Override
 	public void update() {
-		if (Always.isServer())
-			if (fluid == FluidRegistry.LAVA) {
-				List<Entity> entitys = worldObj.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos).addCoord(0, 1, 0));
+		if (Always.isServer()) {
+			List<Entity> entitys = worldObj.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos));
+			/*if (fluid == FluidRegistry.LAVA) {
 				for (Entity entity : entitys) {
 					if (entity instanceof EntityItem) {
 						entity.motionY = 0.2D;
@@ -122,15 +128,16 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 						entity.motionZ = (double) ((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.2F);
 						entity.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, 2.0F + entity.rand.nextFloat() * 0.4F);
 					}
-					entity.attackEntityFrom(DamageSource.lava, 4.0F);
-					entity.setFire(15);
+					entity.setOnFireFromLava();
+					entity.fallDistance *= 0.5F;
 				}
-			} else {
-				List<EntityItem> entitys = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).addCoord(0, 1, 0));
-				for (EntityItem entity : entitys) {
-					ItemStack item = entity.getEntityItem();
+			}*/
+			
+			for (Entity entity : entitys) {
+				if (entity instanceof EntityItem) {
+					ItemStack item = ((EntityItem) entity).getEntityItem();
 					for (ItemStack c_item : container) {
-						if (c_item.getItem() == entity.getEntityItem().getItem() && c_item.stackSize < c_item.getMaxStackSize()) {
+						if (c_item.getItem() == ((EntityItem) entity).getEntityItem().getItem() && c_item.stackSize < c_item.getMaxStackSize()) {
 							flag = true;
 							int change = Math.min(c_item.getMaxStackSize() - c_item.stackSize, item.stackSize);
 							c_item.stackSize += change;
@@ -147,9 +154,10 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 				}
 			}
 		
-		if (flag) {
-			updateState();
-			flag = false;
+			if (flag) {
+				updateState();
+				flag = false;
+			}
 		}
 	}
 	

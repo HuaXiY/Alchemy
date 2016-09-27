@@ -1,17 +1,21 @@
 package baubles.api;
 
-import java.lang.reflect.Method;
-
+import baubles.common.lib.PlayerHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraftforge.fml.common.FMLLog;
 
 /**
- * @author Azanor
+ * @author Azanor, Mickeyxiami
  */
 public class BaublesApi 
 {
-	static Method getBaubles;
+	static boolean enable;
+	static {
+		try {
+			enable = Class.forName("baubles.common.lib.PlayerHandler") != null;
+		} catch (ClassNotFoundException e) { }
+	}
 	
 	/**
 	 * Retrieves the baubles inventory for the supplied player
@@ -20,20 +24,15 @@ public class BaublesApi
 	{
 		IInventory ot = null;
 		
-	    try
-	    {
-	        if(getBaubles == null) 
-	        {
-	            Class<?> fake = Class.forName("baubles.common.lib.PlayerHandler");
-	            getBaubles = fake.getMethod("getPlayerBaubles", EntityPlayer.class);
-	        }
-	        
-	        ot = (IInventory) getBaubles.invoke(null, player);
-	    } 
-	    catch(Exception ex) 
-	    { 
-	    	FMLLog.warning("[Baubles API] Could not invoke baubles.common.lib.PlayerHandler method getPlayerBaubles");
-	    }
+		if (enable) 
+		    try
+		    {
+		        ot = PlayerHandler.getPlayerBaubles(player);
+		    }
+		    catch(Exception ex) 
+		    { 
+		    	FMLLog.warning("[Baubles API] Could not invoke baubles.common.lib.PlayerHandler method getPlayerBaubles");
+		    }
 	    
 		return ot;
 	}

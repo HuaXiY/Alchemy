@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -19,11 +20,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,12 +40,24 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import sun.reflect.annotation.AnnotationParser;
 
 public class Tool {
 	
+	public static final StackTraceElement[] getStackTrace() {
+		return new Throwable().getStackTrace();
+	}
+	
 	public static final void where() {
-        for (StackTraceElement s : new Throwable().getStackTrace())
+        for (StackTraceElement s : getStackTrace())
             System.err.println(s);
+	}
+	
+	public static final boolean equals(Object src, Object... objs) {
+		for (Object obj : objs)
+			if (Objects.equals(src, obj))
+				return true;
+		return false;
 	}
 	
 	public static final String makeString(char c, int len) {
@@ -110,6 +125,29 @@ public class Tool {
 			AlchemyRuntimeException.onException(e);
 		}
 		return null;
+	}
+	
+	@Unsafe(Unsafe.REFLECT_API)
+	public static final <T extends Annotation> T makeAnnotation(Class<T> clazz, List<Object> objects, Object... others) {
+		objects.addAll(Arrays.asList(others));
+		Map<String, Object> args = new HashMap<String, Object>();
+		if (objects.size() % 2 != 0)
+			AlchemyRuntimeException.onException(new RuntimeException("objects.size() % 2 != 0"));
+		else {
+			String temp = null;
+			for (Object obj : objects)
+				if (temp == null)
+					if (obj instanceof String)
+						temp = (String) obj;
+					else
+						AlchemyRuntimeException.onException(new RuntimeException("object is not a string"));
+				else {
+					if (!args.containsKey(temp))
+						args.put(temp, obj);
+					temp = null;
+				}
+		}
+		return (T) AnnotationParser.annotationForMap(clazz, args);
 	}
 	
 	@Unsafe(Unsafe.REFLECT_API)
@@ -484,7 +522,7 @@ public class Tool {
 	public static final Void VOID = instance(Void.class);
 	
 	@Nullable
-	public static final Object $(Object... args) throws Exception {
+	public static final <T> T $(Object... args) throws Exception {
 		checkArrayLength(args, 2);
 		Object object = args[0].getClass() == Class.class ? null : args[0];
 		String name = (String) args[1];
@@ -501,7 +539,7 @@ public class Tool {
 		do {
 			Method method = searchMethod(clazz, name, args);
 			if (method != null)
-				return isNullOr(method.invoke(object, args), VOID);
+				return (T) isNullOr(method.invoke(object, args), VOID);
 		} while((clazz = clazz.getSuperclass()) != null);
 		StringBuilder builder = new StringBuilder();
 		for (Object arg : args)

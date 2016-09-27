@@ -1,5 +1,8 @@
 package index.alchemy.item;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
@@ -35,9 +38,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INetworkMessage.Client<MessageGuardCallback>, ICoolDown {
 	

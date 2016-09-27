@@ -1,6 +1,6 @@
 package index.alchemy.item;
 
-import static java.lang.Math.max;
+import static java.lang.Math.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,10 +8,12 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.api.Always;
+import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IInventoryProvider;
+import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
@@ -40,6 +42,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -51,7 +54,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider.ItemProvider, IInputHandle, IGuiHandle, ICoolDown,
-	INetworkMessage.Server<MessageSpaceRingPickup> {
+	INetworkMessage.Server<MessageSpaceRingPickup>, IAlchemyRecipe {
 	
 	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
 	public static final String NBT_KEY_CD = "cd_ring_space",
@@ -74,15 +77,14 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Always.isServer()) {
+		if (Always.isServer())
 			if (living instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) living;
 				if (player.getHealth() > 0.0F && !player.isSpectator())
 					for (EntityItem entity : player.worldObj.getEntitiesWithinAABB(EntityItem.class, player.getEntityBoundingBox().expand(5D, 5D, 5D)))
 						if (!entity.isDead)
-				        	   onCollideWithPlayer((EntityItem) entity, player);
+				        	   onCollideWithPlayer(entity, player);
 			}
-		}
 	}
 	
 	private void onCollideWithPlayer(EntityItem entity, EntityPlayer player) {
@@ -254,6 +256,30 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 	
 	public ItemRingSpace() {
 		super("ring_space", 0xE451F2);
+	}
+
+	@Override
+	public ResourceLocation getAlchemyName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getAlchemyTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public ItemStack getAlchemyResult() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<IMaterialConsumer> getAlchemyMaterials() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

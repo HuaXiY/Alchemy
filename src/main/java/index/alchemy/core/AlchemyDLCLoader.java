@@ -27,7 +27,6 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraftforge.common.MinecraftForge;
-import sun.reflect.annotation.AnnotationParser;
 
 import static index.alchemy.core.AlchemyConstants.*;
 
@@ -145,28 +144,11 @@ public class AlchemyDLCLoader {
 			if (node.visibleAnnotations != null)
 				for (AnnotationNode annotation : node.visibleAnnotations)
 					if (DESCRIPTOR.equals(annotation.desc))
-						return (DLC) AnnotationParser.annotationForMap(DLC.class, toMap(annotation.values));
+						return Tool.makeAnnotation(DLC.class, annotation.values);
 		} finally {
 			IOUtils.closeQuietly(input);
 		}
 		return null;
-	}
-	
-	private static Map<String, Object> toMap(List<Object> list) {
-		Map<String, Object> result = new HashMap<String, Object>();
-		if (list.size() % 2 != 0)
-			AlchemyRuntimeException.onException(new RuntimeException("list.size() % 2 != 0"));
-		else {
-			String temp = null;
-			for (Object obj : list)
-				if (temp == null)
-					temp = (String) obj;
-				else {
-					result.put(temp, obj);
-					temp = null;
-				}
-		}
-		return result;
 	}
 	
 	public static class GuiAlchemyDLCError extends GuiErrorScreen {

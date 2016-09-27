@@ -32,7 +32,7 @@ public class Always {
 	
 	public static final int SEA_LEVEL = 62;
 	
-	private static final boolean client = Tool.forName("net.minecraft.client.Minecraft", false) != null;
+	private static final boolean isClient = Tool.forName("net.minecraft.client.Minecraft", false) != null;
 	
 	public static final Predicate<EntityLivingBase> IS_MONSTER = new Predicate<EntityLivingBase>() {
 		@Override
@@ -59,7 +59,11 @@ public class Always {
 	
 	
 	public static boolean runOnClient() {
-		return client;
+		return isClient;
+	}
+	
+	public static void markSide(Side side) {
+		SIDE_MAPPING.put(Thread.currentThread(), side);
 	}
 	
 	public static Side getSide() {
