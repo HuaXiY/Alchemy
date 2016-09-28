@@ -18,15 +18,15 @@ public class AlchemyModContainer extends DummyModContainer implements IFMLCallHo
 	
 	public AlchemyModContainer() {
 		this(new ModMetadata());
-		LogManager.getLogger(MOD_NAME).info("AlchemyModContainer -> new");
+		LogManager.getLogger(CORE_MOD_NAME).info("AlchemyModContainer -> new");
 	}
 	
 	public AlchemyModContainer(ModMetadata metadata) {
 		super(metadata);
-		metadata.modId = "alchemy_core";
-		metadata.name = "Alchemy-Core";
-		metadata.version = "@core_version@";
-		metadata.authorList = Arrays.asList("Mickeyxiami");
+		metadata.modId = CORE_MOD_ID;
+		metadata.name = CORE_MOD_NAME;
+		metadata.version = CORE_MOD_VERSION;
+		metadata.authorList = Arrays.asList(AUTHORLIST);
 		metadata.description = "Alchemy mod core, as the pre-loading mod.";
 		metadata.credits = "Mojang AB, and the Forge and FML guys. ";
 	}
@@ -38,7 +38,7 @@ public class AlchemyModContainer extends DummyModContainer implements IFMLCallHo
 
 	@Override
 	public Void call() throws Exception {
-		LogManager.getLogger(MOD_NAME).info("AlchemyModContainer -> call");
+		LogManager.getLogger(CORE_MOD_NAME).info("AlchemyModContainer -> call");
 		return null;
 	}
 

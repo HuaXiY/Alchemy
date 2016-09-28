@@ -25,6 +25,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyHooks;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
@@ -43,13 +45,14 @@ public final class TransformerHook implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName);
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = new ClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)
 			if (method.name.equals(srgName) && checkMethodNode(method)) {
+				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName + method.desc + "\n->  " +
+						AlchemyHooks.class.getName() + "#" + hookMethod.name + hookMethod.desc);
 				Type args[] = Type.getArgumentTypes(method.desc), returnType = Type.getReturnType(method.desc);
 				int returnOpcode = ASMHelper.getReturnOpcode(returnType);
 				insn_node: for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
@@ -126,18 +129,20 @@ public final class TransformerHook implements IClassTransformer {
 		this.owner = ASMHelper.getClassName(owner);
 		String desc, result = null;
 		Type args[] = Type.getArgumentTypes(hookMethod.desc);
-		StringBuilder builder = new StringBuilder("(");
-		for (int i = isStatic ? 0 : 1; i < args.length; i++)
-			builder.append(args[i].getDescriptor());
-		desc = srgName + builder.append(")").toString();
-		try {
-			for (Entry<String, String> entry : Tool.<Map<String, String>>$(FMLDeobfuscatingRemapper.INSTANCE, "getMethodMap", this.owner).entrySet())
-				if (entry.getKey().startsWith(desc)) {
-					result = entry.getValue();
-					break;
-				}
-		} catch (Exception e) {
-			AlchemyRuntimeException.onException(e);
+		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
+			StringBuilder builder = new StringBuilder("(");
+			for (int i = isStatic ? 0 : 1; i < args.length; i++)
+				builder.append(args[i].getDescriptor());
+			desc = srgName + builder.append(")").toString();
+			try {
+				for (Entry<String, String> entry : Tool.<Map<String, String>>$(FMLDeobfuscatingRemapper.INSTANCE, "getMethodMap", this.owner).entrySet())
+					if (entry.getKey().startsWith(desc)) {
+						result = entry.getValue();
+						break;
+					}
+			} catch (Exception e) {
+				AlchemyRuntimeException.onException(e);
+			}
 		}
 		this.srgName = Tool.isNullOr(result, srgName);
 		this.isStatic = isStatic;

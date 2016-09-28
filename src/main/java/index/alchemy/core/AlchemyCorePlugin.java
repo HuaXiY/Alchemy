@@ -13,6 +13,12 @@ import static index.alchemy.core.AlchemyConstants.*;
 @MCVersion(MC_VERSION)
 @TransformerExclusions(MOD_TRANSFORMER_PACKAGE)
 public class AlchemyCorePlugin implements IFMLLoadingPlugin {
+	
+	private static boolean runtimeDeobfuscationEnabled;
+	
+	public static boolean isRuntimeDeobfuscationEnabled() {
+		return runtimeDeobfuscationEnabled;
+	}
 
 	@Override
 	public String[] getASMTransformerClass() {
@@ -32,7 +38,9 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	}
 
 	@Override
-	public void injectData(Map<String, Object> data) { }
+	public void injectData(Map<String, Object> data) {
+		runtimeDeobfuscationEnabled = (Boolean) data.get("runtimeDeobfuscationEnabled");
+	}
 
 	@Override
 	public String getAccessTransformerClass() {
