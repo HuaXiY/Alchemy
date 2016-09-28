@@ -1,7 +1,9 @@
 package index.alchemy.core.asm.transformer;
 
-import java.io .IOException;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +35,15 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyTransformerManager.class.getSimpleName());
 	
-	public static final Map<String, IClassTransformer> transformer_mapping = new HashMap<String, IClassTransformer>();
+	public static final Map<String, List<IClassTransformer>> transformers_mapping = new HashMap<String, List<IClassTransformer>>() {
+		@Override
+		public List<IClassTransformer> get(Object key) {
+			List<IClassTransformer> result = super.get(key);
+			if (result == null)
+				put((String) key, result = new LinkedList());
+			return result;
+		}
+	};;
 	static {
 		try {
 			loadAllHook();
@@ -52,10 +62,11 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			if (methodNode.visibleAnnotations != null)
 				for (AnnotationNode annotationNode : methodNode.visibleAnnotations)
 					if (annotationNode.desc.equals(ANNOTATION_DESC)) {
-						Hook hook = Tool.makeAnnotation(Hook.class, annotationNode.values, "isStatic", false);
+						Hook hook = Tool.makeAnnotation(Hook.class, annotationNode.values,
+								"isStatic", false, "type", Hook.Type.HEAD);
 						String args[] = hook.value().split("#");
 						if (args.length == 2) {
-							transformer_mapping.put(args[0], new TransformerHook(methodNode, args[0], args[1], hook.isStatic()));
+							transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1], hook.isStatic(), hook.type()));
 						} else
 							AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
 					}
@@ -69,7 +80,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			if (Tool.isInstance(IAlchemyClassTransformer.class, clazz))
 				try {
 					IAlchemyClassTransformer transformer = (IAlchemyClassTransformer) clazz.newInstance();
-					transformer_mapping.put(transformer.getTransformerClassName(), transformer);
+					transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
 				} catch (Exception e) { }
 		}
 	}
@@ -77,9 +88,11 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		IClassTransformer transformer = transformer_mapping.get(transformedName);
-		if (transformer != null)
-			return transformer.transform(name, transformedName, basicClass);
+		if (transformers_mapping.containsKey(transformedName)) {
+			List<IClassTransformer> transformers = transformers_mapping.get(transformedName);
+			for (IClassTransformer transformer : transformers)
+				basicClass = transformer.transform(name, transformedName, basicClass);
+		}
 		return basicClass;
 	}
 	

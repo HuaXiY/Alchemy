@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 import index.alchemy.util.Tool;
 
-@Target(ElementType.METHOD)
+@Target({ ElementType.METHOD, ElementType.CONSTRUCTOR })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Hook {
 	
@@ -25,7 +25,11 @@ public @interface Hook {
 		
 	}
 	
+	public static enum Type { HEAD, TAIL }
+	
 	public boolean isStatic() default false;
+	
+	public Type type() default Type.HEAD;
 	
 	public String value();
 

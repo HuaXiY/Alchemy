@@ -139,7 +139,7 @@ public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputH
 	}
 	
 	public EnchantmentPhaseShift() {
-		super("phase_shift", Rarity.RARE, EnumEnchantmentType.ARMOR_FEET, 1, EntityEquipmentSlot.FEET);
+		super("phase_shift", Rarity.VERY_RARE, EnumEnchantmentType.ARMOR_FEET, 1, EntityEquipmentSlot.FEET);
 	}
 
 }

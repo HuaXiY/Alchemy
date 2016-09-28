@@ -1,6 +1,7 @@
 package index.alchemy.core.asm.transformer;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -18,8 +20,10 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
@@ -34,6 +38,7 @@ public final class TransformerHook implements IClassTransformer {
 	protected final MethodNode hookMethod;
 	protected final String owner, srgName;
 	protected final boolean isStatic;
+	protected final Hook.Type type;
 	
 	@Override
 	@Unsafe(Unsafe.ASM_API)
@@ -45,44 +50,70 @@ public final class TransformerHook implements IClassTransformer {
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)
 			if (method.name.equals(srgName) && checkMethodNode(method)) {
-				Type returnType = Type.getReturnType(method.desc);
+				Type args[] = Type.getArgumentTypes(method.desc), returnType = Type.getReturnType(method.desc);
 				int returnOpcode = ASMHelper.getReturnOpcode(returnType);
-				InsnList list = new InsnList();
-				for (int i = 0, len = Type.getArgumentTypes(hookMethod.desc).length; i < len; i++)
-					list.add(new VarInsnNode(ALOAD, i));
-				list.add(new MethodInsnNode(INVOKESTATIC, AlchemyTransformerManager.ALCHEMY_HOOKS_DESC, hookMethod.name,
-						hookMethod.desc, false));
-				list.add(new FieldInsnNode(GETFIELD, AlchemyTransformerManager.HOOK_RESULT_DESC, "result", Type.getDescriptor(Object.class)));
-				if (returnOpcode != RETURN)
-					list.add(new InsnNode(DUP));
-				list.add(new FieldInsnNode(GETSTATIC, ASMHelper.getClassName(Tool.class), "VOID", Type.getDescriptor(Void.class)));
-				LabelNode label = new LabelNode(new Label());
-				list.add(new JumpInsnNode(IF_ACMPEQ, label));
-				switch (returnOpcode) {
-					case IRETURN:
-					case LRETURN:
-					case FRETURN:
-					case DRETURN:
-						list.add(new MethodInsnNode(INVOKEVIRTUAL, returnType.getSort() == Type.BOOLEAN ?
-								ASMHelper.getClassName(Boolean.class) : ASMHelper.getClassName(Number.class),
-								returnType.getClassName() + "Value", Type.getMethodDescriptor(returnType), false));
-						break;
-					case ARETURN:
-					case RETURN:
-					default:
+				insn_node: for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
+					AbstractInsnNode insn = iterator.next();
+					if (type == Hook.Type.HEAD || ASMHelper.isOverOpcode(insn.getOpcode())) {
+						InsnList list = new InsnList();
+						if (!isStatic)
+							list.add(new VarInsnNode(ALOAD, 0));
+						for (int i = 0, offset = isStatic ? 0 : 1, len = args.length; i < len; i++)
+							list.add(new VarInsnNode(ASMHelper.getLoadOpcode(args[i]), i + offset));
+						list.add(new MethodInsnNode(INVOKESTATIC, AlchemyTransformerManager.ALCHEMY_HOOKS_DESC, hookMethod.name,
+								hookMethod.desc, false));
+						if (Type.getReturnType(hookMethod.desc).equals(Type.getType(Hook.Result.class))) {
+							list.add(new FieldInsnNode(GETFIELD, AlchemyTransformerManager.HOOK_RESULT_DESC, "result", Type.getDescriptor(Object.class)));
+							if (returnOpcode != RETURN)
+								list.add(new InsnNode(DUP));
+							list.add(new FieldInsnNode(GETSTATIC, ASMHelper.getClassName(Tool.class), "VOID", Type.getDescriptor(Void.class)));
+							LabelNode label = new LabelNode(new Label());
+							list.add(new JumpInsnNode(IF_ACMPEQ, label));
+							switch (returnOpcode) {
+								case IRETURN:
+								case LRETURN:
+								case FRETURN:
+								case DRETURN:
+									list.add(new TypeInsnNode(CHECKCAST, returnType.getSort() == Type.BOOLEAN ?
+											ASMHelper.getClassName(Boolean.class) : ASMHelper.getClassName(Number.class)));
+									list.add(new MethodInsnNode(INVOKEVIRTUAL, returnType.getSort() == Type.BOOLEAN ?
+											ASMHelper.getClassName(Boolean.class) : ASMHelper.getClassName(Number.class),
+											returnType.getClassName() + "Value", Type.getMethodDescriptor(returnType), false));
+									break;
+								case ARETURN:
+									list.add(new TypeInsnNode(CHECKCAST, returnType.getInternalName()));
+									break;
+								case RETURN:
+								default:
+							}
+							list.add(new InsnNode(returnOpcode));
+							list.add(label);
+						}
+						switch (type) {
+							case TAIL:
+								if (insn.getPrevious() != null)
+									method.instructions.insert(insn.getPrevious(), list);
+								else
+									method.instructions.insert(list);
+								break;
+							case HEAD:
+								method.instructions.insert(list);
+								break insn_node;
+						}
+					}
 				}
-				list.add(new InsnNode(returnOpcode));
-				list.add(label);
-				method.instructions.insert(list);
+				break;
 			}
 		node.accept(writer);
 		return writer.toByteArray();
 	}
 	
 	protected boolean checkMethodNode(MethodNode method) {
+		if (isStatic == ((method.access & ACC_STATIC) == 0))
+			return false;
 		List<Type> hookMethodTypes = Arrays.asList(Type.getArgumentTypes(hookMethod.desc)),
 				srcMethodTypes = Arrays.asList(Type.getArgumentTypes(method.desc));
-		if (!isStatic && (method.access & ACC_STATIC) != 0) {
+		if (!isStatic) {
 			srcMethodTypes = new LinkedList<Type>(srcMethodTypes);
 			srcMethodTypes.add(0, Type.getType(ASMHelper.getClassDesc(owner)));
 		}
@@ -90,7 +121,7 @@ public final class TransformerHook implements IClassTransformer {
 	}
 
 	@Unsafe(Unsafe.REFLECT_API)
-	public TransformerHook(MethodNode hookMethod, String owner, String srgName, boolean isStatic) {
+	public TransformerHook(MethodNode hookMethod, String owner, String srgName, boolean isStatic, Hook.Type type) {
 		this.hookMethod = hookMethod;
 		this.owner = ASMHelper.getClassName(owner);
 		String desc, result = null;
@@ -110,6 +141,7 @@ public final class TransformerHook implements IClassTransformer {
 		}
 		this.srgName = Tool.isNullOr(result, srgName);
 		this.isStatic = isStatic;
+		this.type = type;
 	}
 
 }
