@@ -8,6 +8,8 @@ import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.core.AlchemyResourceLocation;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -31,42 +33,66 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 			public final float yaw, pitch;
 			public final float health, absorption;
 			public final int food, air, fire;
+			public final TimeNode riding;
 			
-			public TimeNode(EntityPlayer player) {
-				x = player.posX;
-				y = player.posY;
-				z = player.posZ;
-				yaw = player.rotationYaw;
-				pitch = player.rotationPitch;
-				health = player.getHealth();
-				absorption = player.getAbsorptionAmount();
-				food = player.getFoodStats().getFoodLevel();
-				air = player.getAir();
-				fire = player.fire;
+			public TimeNode(Entity entity) {
+				x = entity.posX;
+				y = entity.posY;
+				z = entity.posZ;
+				yaw = entity.rotationYaw;
+				pitch = entity.rotationPitch;
+				air = entity.getAir();
+				fire = entity.fire;
+				if (entity instanceof EntityLivingBase) {
+					EntityLivingBase living = (EntityLivingBase) entity;
+					health = living.getHealth();
+					absorption = living.getAbsorptionAmount();
+					if (living instanceof EntityPlayer) {
+						EntityPlayer player = (EntityPlayer) living;
+						food = player.getFoodStats().getFoodLevel();
+					} else
+						food = 0;
+				} else
+					health = absorption = food = 0;
+				riding = entity.getRidingEntity() != null ? new TimeNode(entity.getRidingEntity()) : null;
 			}
 			
 			@SideOnly(Side.CLIENT)
-			public void updatePlayerOnClient(EntityPlayer player) {
-				player.setPosition(x, y, z);
-				player.rotationYaw = yaw;
-				player.rotationPitch = pitch;
-				player.fire = fire;
-				player.motionX = 0;
-				player.motionY = 0;
-				player.motionZ = 0;
+			public void updateEntityOnClient(Entity entity) {
+				entity.prevPosX = entity.posX;
+				entity.prevPosY = entity.posY;
+				entity.prevPosZ = entity.posZ;
+				entity.setPosition(x, y, z);
+				entity.prevRotationYaw = entity.rotationYaw;
+				entity.prevRotationPitch = entity.rotationPitch;
+				entity.rotationYaw = yaw;
+				entity.rotationPitch = pitch;
+				entity.fire = fire;
+				if (entity.getRidingEntity() != null)
+					if (riding != null)
+						riding.updateEntityOnClient(entity.getRidingEntity());
+					else
+						entity.dismountRidingEntity();
 			}
 			
-			public void updatePlayerOnServer(EntityPlayer player) {
-				player.setHealth(health);
-				player.setAbsorptionAmount(absorption);
-				player.getFoodStats().setFoodLevel(food);
-				player.setAir(air);
-				player.setPosition(x, y, z);
-				player.fire = fire;
-				player.motionX = 0;
-				player.motionY = 0;
-				player.motionZ = 0;
-				player.fallDistance = 0;
+			public void updateEntityOnServer(Entity entity) {
+				entity.setAir(air);
+				entity.fire = fire;
+				entity.fallDistance = 0;
+				if (entity instanceof EntityLivingBase) {
+					EntityLivingBase living = (EntityLivingBase) entity;
+					living.setHealth(health);
+					living.setAbsorptionAmount(absorption);
+					if (living instanceof EntityPlayer) {
+						EntityPlayer player = (EntityPlayer) living;
+						player.getFoodStats().setFoodLevel(food);
+					}
+				}
+				if (entity.getRidingEntity() != null)
+					if (riding != null)
+						riding.updateEntityOnServer(entity.getRidingEntity());
+					else
+						entity.dismountRidingEntity();
 			}
 			
 		}
@@ -116,10 +142,9 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	}
 	
 	@SubscribeEvent
-	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent.Entity event) {
-		if (event.getEntity() instanceof EntityPlayer) {
+	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent<Entity> event) {
+		if (event.getObject() instanceof EntityPlayer)
 			event.addCapability(RESOURCE, new TimeSnapshot());
-		}
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.client.fx.update.FXUpdateHelper;
+import index.alchemy.util.Tool;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -35,20 +36,16 @@ public class FXWisp extends AlchemyFX {
 	private Iterator<Color> iterator = ahsbStep(new Color(0x7766CCFF), Color.RED, 2000 / 20, true, true, true);
 	private boolean render;
 	
-	public FXWisp(World world, double posX, double posY, double posZ) {
+	public FXWisp(World world, double posX, double posY, double posZ, int max_age) {
 		super(world, posX, posY, posZ);
 		setParticleTexture(getAtlasSprite(TEXTURE_NAME[0]));
-		setMaxAge(120);
+		setMaxAge(max_age);
 		brightness = -1;//15728640;
-		onUpdate();
 	}
 	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-		Color color = iterator.next();
-		setRBGColorF(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
-		setAlphaF(color.getAlpha() / 255F);
 	}
 	
 	@Override
@@ -67,7 +64,7 @@ public class FXWisp extends AlchemyFX {
 		
 		@Override
 		public Particle createParticle(int id, World world, double x, double y, double z, double vx, double vy, double vz, int... args) {
-                return new FXWisp(world, x, y, z).addFXUpdate(FXUpdateHelper.getResultByArgs(args));
+                return new FXWisp(world, x, y, z, Tool.getSafe(args, 1, 0) * 10).addFXUpdate(FXUpdateHelper.getResultByArgs(args));
 		}
 		
 	}

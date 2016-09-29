@@ -31,6 +31,8 @@ public @interface Hook {
 	
 	public Type type() default Type.HEAD;
 	
+	public String disable() default "";
+	
 	public String value();
 
 }

@@ -49,7 +49,7 @@ public class AlchemyFXType {
 				new Class[] { String.class, int.class, boolean.class }, name, id, ignoreRange);
 		PARTICLES.put(type.getParticleID(), type);
         BY_NAME.put(type.getParticleName(), type);
-		return null;
+		return type;
 	}
 	
 	public static void init(Class<?> clazz) {

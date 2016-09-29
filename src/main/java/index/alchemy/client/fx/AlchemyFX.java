@@ -35,6 +35,7 @@ public abstract class AlchemyFX extends Particle {
 	
 	public <T extends AlchemyFX> T addFXUpdate(List<IFXUpdate> updates) {
 		update_list.addAll(updates);
+		onUpdate();
 		return (T) this;
 	}
 	

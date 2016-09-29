@@ -63,12 +63,14 @@ public class AlchemyTransformerManager implements IClassTransformer {
 				for (AnnotationNode annotationNode : methodNode.visibleAnnotations)
 					if (annotationNode.desc.equals(ANNOTATION_DESC)) {
 						Hook hook = Tool.makeAnnotation(Hook.class, annotationNode.values,
-								"isStatic", false, "type", Hook.Type.HEAD);
-						String args[] = hook.value().split("#");
-						if (args.length == 2)
-							transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1], hook.isStatic(), hook.type()));
-						else
-							AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
+								"isStatic", false, "type", Hook.Type.HEAD, "disable", "");
+						if (hook.disable().isEmpty() || !Boolean.getBoolean(hook.disable())) {
+							String args[] = hook.value().split("#");
+							if (args.length == 2)
+								transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1], hook.isStatic(), hook.type()));
+							else
+								AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
+						}
 					}
 	}
 	

@@ -273,8 +273,8 @@ public class AlchemyModLoader {
 					continue;
 				Loading loading = clazz.getAnnotation(Loading.class);
 				if (loading != null) {
-					loading_list.add(clazz.getMethod("init", Class.class));
 					logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
+					loading_list.add(clazz.getMethod("init", Class.class));
 				}
 			} catch (ClassNotFoundException e) {
 				continue;

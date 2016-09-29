@@ -37,7 +37,6 @@ import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -251,24 +250,19 @@ public class AlchemyEventSystem implements IGuiHandler {
 		}
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onPlayerTick(PlayerTickEvent event) {
 		String flag = "48";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
-				EntityPlayer player = event.player;
-				//float groundYOffset = 0.015625F;
-				double offsetX = 6 - player.worldObj.rand.nextFloat() * 12;
-				double offsetY = 6 - player.worldObj.rand.nextFloat() * 12;
-				double offsetZ = 6 - player.worldObj.rand.nextFloat() * 12;
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
 				//GL11.glPushMatrix();
 				//GL11.glTranslated(player.posX, player.posY, player.posZ);
 				//RenderHelper.Draw2D.drawRound(3, 0, 360, 1, 0xFF66CCFF, false);
 				//GL11.glPopMatrix();
-				Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
-						+ offsetX, player.posY + offsetY, player.posZ + offsetZ));
+				//Minecraft.getMinecraft().effectRenderer.addEffect(new FXWisp(player.worldObj, player.posX
+				//		+ offsetX, player.posY + offsetY, player.posZ + offsetZ));
 				
 				/*ItemStack item = Minecraft.getMinecraft().thePlayer.getHeldItemMainhand();
 				if (item != null) {
@@ -281,6 +275,16 @@ public class AlchemyEventSystem implements IGuiHandler {
 			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+			/*EntityPlayer player = event.player;
+			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
+			int update[] = FXUpdateHelper.getIntArrayByArgs(ItemRingTime.FX_KEY_GATHER, 120, 300);
+			for (int i = 0; i < 1; i++)
+				d6iaps.add(new Double6IntArrayPackage(
+						player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
+						player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
+						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
+			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
+					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);*/
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
 			//System.out.println(DimensionManager.getWorld(10).getDefaultTeleporter()); 
@@ -332,7 +336,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 		}
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onServerTick(ServerTickEvent event) {
 		String flag = "6";
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
@@ -345,7 +349,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onClientTick(ClientTickEvent event) {
 		String flag = "12";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
@@ -383,6 +387,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SideOnly(Side.CLIENT)
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
 		return gui_handle.get(id).getClientGuiElement(player, world, x, y, z);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static boolean isHookInput() {
+		return hookInputState;
 	}
 	
 	@SideOnly(Side.CLIENT)

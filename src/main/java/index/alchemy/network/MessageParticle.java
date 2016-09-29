@@ -32,7 +32,7 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		EnumParticleTypes type = EnumParticleTypes.getParticleFromId(message.id);
 		for (int i = 0; i < d6iap.length; i++)
-			player.worldObj.spawnParticle(type, d6iap[i].x, d6iap[i].y, d6iap[i].z, d6iap[i].ox, d6iap[i].oy, d6iap[i].oz, d6iap[i].args);
+			player.worldObj.spawnParticle(type, false, d6iap[i].x, d6iap[i].y, d6iap[i].z, d6iap[i].ox, d6iap[i].oy, d6iap[i].oz, d6iap[i].args);
 		return null;
 	}
 

@@ -182,10 +182,7 @@ public class Tool {
 	
 	public static final void setType(Class<?> clazz, Object obj) {
 		// Initialize this class, the initialization process will assign fields to null
-		try {
-			Class.forName(clazz.getName());
-		} catch (ClassNotFoundException e) {}
-		
+		load(clazz);
 		Field field = null;
 		try {
 			field = clazz.getDeclaredField("type");

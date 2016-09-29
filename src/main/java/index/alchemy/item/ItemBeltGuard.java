@@ -29,7 +29,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -41,8 +40,8 @@ import static java.lang.Math.*;
 
 public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INetworkMessage.Client<MessageGuardCallback>, ICoolDown {
 	
-	public static final int RECOVERY_INTERVAL = 20 * 3, RECOVERY_CD = 20 * 8, MAX_ABSORPTION = 20;
-	public static final float DECREASE = 0.8F;
+	public static final int RECOVERY_INTERVAL = 20 * 6, RECOVERY_CD = 20 * 12, MAX_ABSORPTION = 20;
+	public static final float DECREASE_COEFFICIENT = 0.01F;
 	
 	public boolean isCDOver(EntityLivingBase living) {
 		return living.ticksExisted - living.getLastAttackerTime() > RECOVERY_CD
@@ -51,13 +50,9 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Always.isServer()) {
+		if (Always.isServer())
 			if (living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION && isCDOver(living))
 				living.setAbsorptionAmount(min(living.getAbsorptionAmount() + 1, MAX_ABSORPTION));
-		} else if (living == Minecraft.getMinecraft().thePlayer && living.lastDamage != -1) {
-			living.lastDamage = -1;
-			living.getCombatTracker().lastDamageTime = living.ticksExisted;
-		}
 	}
 	
 	@Override
@@ -65,7 +60,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingAttack(LivingAttackEvent event) {
 		if (Always.isServer() && event.getSource().getSourceOfDamage() instanceof EntityArrow
 				&& isEquipmented(event.getEntityLiving()) && isCDOver(event.getEntityLiving())) {
@@ -92,10 +87,28 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 		}
 	}
 	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onLivingAttackCallback(LivingAttackEvent event) {
+		if (Always.isServer()) {
+			EntityLivingBase living = event.getEntityLiving(), attacker = event.getSource().getEntity() instanceof EntityLivingBase ?
+					(EntityLivingBase) event.getSource().getEntity() : null;
+			if (isEquipmented(living)) {
+				living.getCombatTracker().lastDamageTime = living.ticksExisted;
+				if (living instanceof EntityPlayerMP)
+					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(-1), (EntityPlayerMP) living);
+			}
+			if (attacker != null && isEquipmented(attacker)) {
+				attacker.setLastAttacker(living);
+				if (attacker instanceof EntityPlayerMP)
+					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(living.getEntityId()), (EntityPlayerMP) attacker);
+			}
+		}
+	}
+	
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onLivingHurt(LivingHurtEvent event) {
 		if (Always.isServer() && isEquipmented(event.getEntityLiving()) && event.getEntityLiving().getAbsorptionAmount() > 0F)
-			event.setAmount(event.getAmount() * DECREASE);
+			event.setAmount(event.getAmount() * (1 - DECREASE_COEFFICIENT * event.getEntityLiving().getAbsorptionAmount()));
 	}
 	
 	public static class MessageGuardCallback implements IMessage {
@@ -128,7 +141,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(MessageGuardCallback message, MessageContext ctx) {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		if (message.lastAttackerId != -1) {
+		if (message.lastAttackerId > -1) {
 			World world = Minecraft.getMinecraft().theWorld;
 			if (world != null) {
 				Entity lastAttacker;
@@ -137,22 +150,16 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 				else
 					player.setLastAttacker(player);
 			}
-		}
+		} else
+			player.getCombatTracker().lastDamageTime = player.ticksExisted;
 		return null;
-	}
-	
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onClientAttackEntity(AttackEntityEvent event) {
-		if (Always.isClient() && event.getEntityLiving() == Minecraft.getMinecraft().thePlayer)
-			event.getEntityLiving().setLastAttacker(event.getTarget());
 	}
 	
 	@Override
 	public int getMaxCD() {
 		return RECOVERY_CD;
 	}
-
+	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {

@@ -5,12 +5,14 @@ import java.util.Map;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.Name;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 import static index.alchemy.core.AlchemyConstants.*;
 
 @Name(MOD_ID)
 @MCVersion(MC_VERSION)
+@SortingIndex(Integer.MAX_VALUE)
 @TransformerExclusions(MOD_TRANSFORMER_PACKAGE)
 public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	

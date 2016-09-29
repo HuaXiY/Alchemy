@@ -11,16 +11,14 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
-	public static final int RECOVERY_INTERVAL = 20 * 6;
+	public static final int RECOVERY_INTERVAL = 20 * 8;
 	public static final float BALANCE_COEFFICIENT = 0.4F;
 	
 	public static final AttributeModifier KNOCKBACK_RESISTANCE =  
@@ -57,13 +55,6 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 		EntityLivingBase living = event.getEntityLiving();
 		if (isEquipmented(living))
 			event.setAmount(event.getAmount() * (1 - (1 - living.getHealth() / living.getMaxHealth()) * BALANCE_COEFFICIENT));
-	}
-	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onPlayerDrops(PlayerDropsEvent event) {
-		EntityPlayer player = event.getEntityPlayer();
-		if (!isEquipmented(player))
-			onUnequipped(null, player);
 	}
 
 	public ItemBeltTough() {

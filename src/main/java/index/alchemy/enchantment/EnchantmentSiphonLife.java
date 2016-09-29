@@ -13,9 +13,11 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import static java.lang.Math.*;
+
 public class EnchantmentSiphonLife extends AlchemyEnchantment implements IEventHandle {
 	
-	public static final float SIPHON_COEFFICIENT = 0.1F;
+	public static final float SIPHON_COEFFICIENT = 0.05F;
 	
 	@Override
 	public EventType[] getEventType() {
@@ -29,12 +31,12 @@ public class EnchantmentSiphonLife extends AlchemyEnchantment implements IEventH
 			EntityLivingBase living = (EntityLivingBase) event.getSource().getEntity();
 			int level = EnchantmentHelper.getEnchantmentLevel(this, living.getHeldItemMainhand());
 			if (level > 0)
-				living.heal(event.getAmount() * SIPHON_COEFFICIENT * level);
+				living.heal(event.getAmount() * min(SIPHON_COEFFICIENT * level, 1F));
 		}
 	}
 	
 	public EnchantmentSiphonLife() {
-		super("siphon_life", Rarity.VERY_RARE, EnumEnchantmentType.WEAPON, 2, EntityEquipmentSlot.MAINHAND);
+		super("siphon_life", Rarity.VERY_RARE, EnumEnchantmentType.WEAPON, 4, EntityEquipmentSlot.MAINHAND);
 	}
 
 }

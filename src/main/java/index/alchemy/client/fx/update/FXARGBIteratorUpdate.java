@@ -22,6 +22,7 @@ public class FXARGBIteratorUpdate implements IFXUpdate {
 		if (iterator.hasNext()) {
 			Color color = iterator.next();
 			fx.setRBGColorF(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
+			fx.setAlphaF(color.getAlpha() / 255F);
 		} else
 			fx.removeFXUpdate(this);
 	}

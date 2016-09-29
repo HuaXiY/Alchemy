@@ -1,25 +1,39 @@
 package index.alchemy.item;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
+import index.alchemy.animation.StdCycle;
 import index.alchemy.api.Always;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.ICoolDown;
+import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.IPhaseRunnable;
+import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
 import index.alchemy.client.AlchemyKeyBinding;
+import index.alchemy.client.color.ColorHelper;
+import index.alchemy.client.fx.FXWisp;
+import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
+import index.alchemy.client.fx.update.FXMotionUpdate;
+import index.alchemy.client.fx.update.FXScaleUpdate;
+import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.item.ItemRingTime.MessageTimeLeap;
 import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.network.Double6IntArrayPackage;
+import index.alchemy.util.AABBHelper;
+import index.alchemy.util.Tool;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -29,7 +43,6 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -40,10 +53,29 @@ import net.minecraftforge.items.IItemHandler;
 
 import static java.lang.Math.*;
 
+import java.awt.Color;
+
+@FX.UpdateProvider
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
 	public static final int USE_CD = 20 * 20, REPAIR_INTERVAL = 20 * 10;
-	public static final String NBT_KEY_CD = "cd_ring_time", KEY_DESCRIPTION = "key.time_ring_leap";
+	public static final String NBT_KEY_CD = "cd_ring_time", KEY_DESCRIPTION = "key.time_ring_leap", FX_KEY_GATHER = "ring_time_gather";
+	
+	@FX.UpdateMethod(FX_KEY_GATHER)
+	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
+		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
+		int i = 1, 
+			max_age = Tool.getSafe(args, i++, 120),
+			scale = Tool.getSafe(args, i++, 100);
+		/*result.add(new FXMotionUpdate(
+				new StdCycle().setLenght(max_age / 4).setLoop(true).setRotation(true).setMin(-0.3F).setMax(0.3F).setNow(max_age / (4 * 2)),
+				new StdCycle().setLenght(max_age).setMax(0.0F),
+				new StdCycle().setLenght(max_age / 4).setLoop(true).setRotation(true).setMin(-0.3F).setMax(0.3F)));*/
+		result.add(new FXARGBIteratorUpdate(ColorHelper.ahsbStep(new Color(0x66, 0xCC, 0xFF), new Color(0xFF, 0, 0, 0x22),
+				max_age, true, true, false)));
+		result.add(new FXScaleUpdate(new StdCycle().setLenght(max_age).setMin(scale / 1000F).setMax(scale / 100F)));
+		return result;
+	}
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
@@ -55,11 +87,11 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
 		if (living instanceof EntityPlayer)
 			living.getCapability(AlchemyCapabilityLoader.time_leap, null).updateTimeNode((EntityPlayer) living);
-		if (living.ticksExisted % REPAIR_INTERVAL == 0) {
-			IItemHandler handler = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.NORTH);
+		if (Always.isServer() && living.ticksExisted % REPAIR_INTERVAL == 0) {
+			IItemHandler handler = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 			for (int i = 0, len = handler.getSlots(); i < len; i++) {
 				ItemStack old = handler.getStackInSlot(i);
-				if (old != null && old.isItemDamaged() && Enchantments.MENDING.canApply(item))
+				if (old != null && old.isItemDamaged() && Enchantments.MENDING.canApply(old))
 					old.setItemDamage(old.getItemDamage() - 1);
 			}
 		}
@@ -85,11 +117,13 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	}
 	
 	public static class MessageTimeLeap implements IMessage {
+		
 		@Override
-		public void fromBytes(ByteBuf buf) {}
+		public void fromBytes(ByteBuf buf) { }
 
 		@Override
-		public void toBytes(ByteBuf buf) {}
+		public void toBytes(ByteBuf buf) { }
+		
 	}
 	
 	@Override
@@ -122,7 +156,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 				public boolean run(Phase phase) {
 					if (Always.isPlaying()) {
 						if (iterator.hasNext())
-							iterator.next().updatePlayerOnClient(player);
+							iterator.next().updateEntityOnClient(player);
 						if (!iterator.hasNext()) {
 							snapshot.setUpdate(true);
 							AlchemyEventSystem.removeInputHook(ItemRingTime.this);
@@ -151,9 +185,18 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
 				@Override
 				public boolean run(Phase phase) {
+					List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
+					int update[] = FXUpdateHelper.getIntArrayByArgs(FX_KEY_GATHER, 240, 200);
+					for (int i = 0; i < 3; i++)
+						d6iaps.add(new Double6IntArrayPackage(
+								player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
+								player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
+								player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
+					AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
+							AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
 					boolean result = false;
 					if (iterator.hasNext())
-						iterator.next().updatePlayerOnServer(player);
+						iterator.next().updateEntityOnServer(player);
 					if (!iterator.hasNext()) {
 						snapshot.setUpdate(true);
 						return true;
