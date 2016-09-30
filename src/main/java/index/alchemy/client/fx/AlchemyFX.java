@@ -17,6 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class AlchemyFX extends Particle {
 	
 	protected int brightness = -1;
+	protected boolean transparent;
 	protected final List<IFXUpdate> update_list = new LinkedList<IFXUpdate>();
 	
 	protected AlchemyFX(World world, double posX, double posY, double posZ) {
@@ -102,6 +103,15 @@ public abstract class AlchemyFX extends Particle {
 	
 	public int getBrightness() {
 		return brightness;
+	}
+	
+	public void setTransparent(boolean transparent) {
+		this.transparent = transparent;
+	}
+	
+	@Override
+	public boolean isTransparent() {
+		return transparent;
 	}
 	
 	@Override

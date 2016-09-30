@@ -27,17 +27,13 @@ public class FXWisp extends AlchemyFX {
 	
 	public FXWisp(World world, double posX, double posY, double posZ) {
 		super(world, posX, posY, posZ);
+		setTransparent(true);
 		setParticleTexture(getAtlasSprite(TEXTURE_NAME[0]));
 	}
 	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-	}
-	
-	@Override
-	public boolean isTransparent() {
-		return true;
 	}
 	
 	@SideOnly(Side.CLIENT)
