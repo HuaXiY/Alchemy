@@ -54,7 +54,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	public static void loadAllHook() throws IOException {
+	private static void loadAllHook() throws IOException {
 		ClassReader reader = new ClassReader(ALCHEMY_HOOKS_CLASS);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
@@ -67,7 +67,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 						if (hook.disable().isEmpty() || !Boolean.getBoolean(hook.disable())) {
 							String args[] = hook.value().split("#");
 							if (args.length == 2)
-								transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1], hook.isStatic(), hook.type()));
+								transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1],
+										hook.isStatic(), hook.type()));
 							else
 								AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
 						}
@@ -75,7 +76,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	public static void loadAllTransform() throws IOException {
+	private static void loadAllTransform() throws IOException {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
 		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_TRANSFORMER_PACKAGE)) {
 			Class clazz = info.load();

@@ -18,13 +18,14 @@ public class FXARGBIteratorUpdate implements IFXUpdate {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void updateFX(AlchemyFX fx, long tick) {
+	public boolean updateFX(AlchemyFX fx, long tick) {
 		if (iterator.hasNext()) {
 			Color color = iterator.next();
 			fx.setRBGColorF(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
 			fx.setAlphaF(color.getAlpha() / 255F);
+			return false;
 		} else
-			fx.removeFXUpdate(this);
+			return true;
 	}
 	
 }

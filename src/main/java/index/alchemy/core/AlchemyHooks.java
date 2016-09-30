@@ -73,16 +73,16 @@ public class AlchemyHooks {
 	
 	@Hook("net.minecraft.inventory.ContainerPlayer#func_82846_b")
 	public static final Hook.Result transferStackInSlot(ContainerPlayer container, EntityPlayer player, int index) {
-		ItemStack item = null;
 		Slot slot = container.inventorySlots.get(index);
 		int id = container.inventorySlots.size();
 		if (slot != null && slot.getHasStack()) {
-			ItemStack slot_item = slot.getStack();
-			item = slot_item.copy();
-			if (item.getItem() instanceof IBauble) {
-				IBauble bauble = (IBauble) item.getItem();
-				if (!container.mergeItemStack(slot_item, id - 4, id, false))
-					return new Hook.Result(null);
+			ItemStack item = slot.getStack();
+			if (item.getItem() instanceof IBauble && container.mergeItemStack(item, id - 4, id, false)) {
+				if (item.stackSize == 0)
+					slot.putStack(null);
+				else
+					slot.onSlotChanged();
+				return new Hook.Result(null);
 			}
 		}
 		return new Hook.Result();

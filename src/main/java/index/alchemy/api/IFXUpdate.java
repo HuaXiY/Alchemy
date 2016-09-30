@@ -7,6 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface IFXUpdate {
 	
 	@SideOnly(Side.CLIENT)
-	public void updateFX(AlchemyFX fx, long tick);
+	public boolean updateFX(AlchemyFX fx, long tick);
 
 }

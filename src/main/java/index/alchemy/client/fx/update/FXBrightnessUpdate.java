@@ -12,9 +12,9 @@ public class FXBrightnessUpdate implements IFXUpdate {
 	}
 
 	@Override
-	public void updateFX(AlchemyFX fx, long tick) {
+	public boolean updateFX(AlchemyFX fx, long tick) {
 		fx.setBrightness(brightness);
-		fx.removeFXUpdate(this);
+		return false;
 	}
 
 }

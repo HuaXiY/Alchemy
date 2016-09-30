@@ -16,8 +16,9 @@ public class FXScaleUpdate implements IFXUpdate {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void updateFX(AlchemyFX fx, long tick) {
+	public boolean updateFX(AlchemyFX fx, long tick) {
 		fx.setScaleF(cycle.next());
+		return false;
 	}
 
 }

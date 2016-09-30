@@ -12,9 +12,9 @@ public class FXAgeUpdate implements IFXUpdate {
 	}
 
 	@Override
-	public void updateFX(AlchemyFX fx, long tick) {
+	public boolean updateFX(AlchemyFX fx, long tick) {
 		fx.setMaxAge(age);
-		fx.removeFXUpdate(this);
+		return true;
 	}
 
 }

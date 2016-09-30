@@ -18,10 +18,11 @@ public class FXMotionUpdate implements IFXUpdate {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void updateFX(AlchemyFX fx, long tick) {
+	public boolean updateFX(AlchemyFX fx, long tick) {
 		fx.setMotionX(xCycle.next());
 		fx.setMotionY(yCycle.next());
 		fx.setMotionZ(zCycle.next());
+		return false;
 	}
 
 }

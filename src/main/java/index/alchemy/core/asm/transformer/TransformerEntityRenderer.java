@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IAlchemyClassTransformer;
+import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.util.ASMHelper;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
@@ -21,6 +22,7 @@ import static org.objectweb.asm.Opcodes.*;
 public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 
 	@Override
+	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		String srgMethodName = "func_175068_a", srgFieldName = "field_175078_W", clazzName = ASMHelper.getClassName(transformedName);
 		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
@@ -53,7 +55,6 @@ public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 									method.instructions.remove(insn);
 								}
 								break insn_node;
-								
 							} else
 								i++;
 						}

@@ -31,11 +31,6 @@ public class FXWisp extends AlchemyFX {
 		setParticleTexture(getAtlasSprite(TEXTURE_NAME[0]));
 	}
 	
-	@Override
-	public void onUpdate() {
-		super.onUpdate();
-	}
-	
 	@SideOnly(Side.CLIENT)
 	public static class Factory implements IParticleFactory {
 		

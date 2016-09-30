@@ -111,11 +111,11 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 			this.update = update;
 		}
 		
-		public void updateTimeNode(Entity player) {
+		public void updateTimeNode(Entity entity) {
 			if (update) {
 				if (list.size() >= SIZE)
 					list.removeLast();
-				list.addFirst(new TimeNode(player));
+				list.addFirst(new TimeNode(entity));
 			}
 		}
 		
@@ -143,8 +143,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	
 	@SubscribeEvent
 	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent<Entity> event) {
-		if (event.getObject() instanceof EntityPlayer)
-			event.addCapability(RESOURCE, new TimeSnapshot());
+		event.addCapability(RESOURCE, new TimeSnapshot());
 	}
 
 }

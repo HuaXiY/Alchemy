@@ -1,6 +1,7 @@
 package index.alchemy.client.fx;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,7 +38,6 @@ public abstract class AlchemyFX extends Particle {
 	
 	public <T extends AlchemyFX> T addFXUpdate(List<IFXUpdate> updates) {
 		update_list.addAll(updates);
-		onUpdate();
 		return (T) this;
 	}
 	
@@ -81,8 +81,9 @@ public abstract class AlchemyFX extends Particle {
 	@Override
 	public void onUpdate() {
 		long tick = Always.getClientWorldTime();
-		for (IFXUpdate update : update_list)
-			update.updateFX(this, tick);
+		for (Iterator<IFXUpdate> iterator = update_list.iterator(); iterator.hasNext();)
+			if (iterator.next().updateFX(this, tick))
+				iterator.remove();
 		super.onUpdate();
 	}
 	

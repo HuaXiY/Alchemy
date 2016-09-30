@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IAlchemyClassTransformer;
+import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
@@ -18,6 +19,7 @@ import static org.objectweb.asm.Opcodes.*;
 public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer {
 
 	@Override
+	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		String srgName = "func_147347_a";
 		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled())
