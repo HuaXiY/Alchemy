@@ -14,7 +14,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ContainerPlayer;
@@ -58,6 +60,27 @@ public class AlchemyHooks {
 		HUDManager.bind(GuiContainer.INVENTORY_BACKGROUND);
 		gui.drawTexturedModalRect(gui.guiLeft + 76, gui.guiTop + 7, 7, 7, 18, 18 * 4);
 		gui.drawTexturedModalRect(gui.guiLeft + 96, gui.guiTop + 61, 76, 61, 18, 18);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.client.gui.inventory.GuiContainerCreative#func_146976_a", type = Hook.Type.TAIL)
+	public static final void drawGuiContainerBackgroundLayer(GuiContainerCreative gui, float partialTicks, int mouseX, int mouseY) {
+		if (gui.getSelectedTabIndex() == CreativeTabs.INVENTORY.getTabIndex()) {
+			HUDManager.bind(GuiContainer.INVENTORY_BACKGROUND);
+			for (int i = 0; i < 4; i++)
+				gui.drawTexturedModalRect(gui.guiLeft + 126 + i / 2 * 18, gui.guiTop + 10 + i % 2 * 18, 76, 61, 18, 18);
+		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.client.gui.inventory.GuiContainerCreative#func_147050_b", type = Hook.Type.TAIL)
+	public static final void setCurrentCreativeTab(GuiContainerCreative gui, CreativeTabs tab) {
+		if (tab == CreativeTabs.INVENTORY)
+			for (int len = 4, start = gui.inventorySlots.inventorySlots.size() - len - 1, i = 0; i < len; i++) {
+				Slot slot = gui.inventorySlots.getSlot(start + (i == 0 ? 1 : i == 1 ? 0 : i));
+				slot.xDisplayPosition = 127 + i / 2 * 18;
+				slot.yDisplayPosition = 11 + i % 2 * 18;
+			}
 	}
 	
 	@Hook(value = "net.minecraft.inventory.ContainerPlayer#<init>", type = Hook.Type.TAIL)
