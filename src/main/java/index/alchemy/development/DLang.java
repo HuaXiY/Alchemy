@@ -18,6 +18,7 @@ import index.alchemy.item.ItemMagicSolvent;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -117,6 +118,10 @@ public class DLang {
 	public static void init(Item item) {
 		if (!(item instanceof ItemBlock))
 			itemMap.put(item.getUnlocalizedName() + ".name", "");
+	}
+	
+	public static void init(CreativeTabs tab) {
+		miscMap.put("itemGroup." + tab.getTabLabel(), AlchemyConstants.MOD_ID);
 	}
 	
 	public static void init(Block block) {

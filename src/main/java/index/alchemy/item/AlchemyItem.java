@@ -17,12 +17,28 @@ import net.minecraft.util.text.TextFormatting;
 
 public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 	
-	public static final CreativeTabs CREATIVE_TABS = new CreativeTabs(AlchemyConstants.MOD_ID) {
+	public static class AlchemyCreativeTabs extends CreativeTabs implements IRegister {
+		
+		protected Item icon;
+
 		@Override
 		public Item getTabIconItem() {
-			return AlchemyItemLoader.solvent_lapis_lazuli;
+			return icon;
 		}
-	};
+		
+		public AlchemyCreativeTabs(String label, Item icon) {
+			super(label);
+			register();
+		}
+
+		@Override
+		public void register() {
+			AlchemyInitHook.init(this);
+		}
+		
+	}
+	
+	public static final CreativeTabs CREATIVE_TABS = new AlchemyCreativeTabs(AlchemyConstants.MOD_ID, AlchemyItemLoader.solvent_lapis_lazuli);
 	
 	protected static final Random RANDOM = new Random();
 	
