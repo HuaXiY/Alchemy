@@ -41,6 +41,8 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 
 	@Override
 	public boolean isIngredient(ItemStack ingredient) {
+		System.out.println(ingredient.getMetadata());
+		System.out.println(metadata);
 		return ingredient.getItem() == material && ingredient.getMetadata() == metadata;
 	}
 
@@ -115,6 +117,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 	public ItemMagicSolvent(String name, int color, Item material, int metadata) {
 		super(name, "solvent_bottle", color);
 		this.material = material;
+		this.metadata = metadata;
 		setMaxStackSize(1);
 	}
 	
