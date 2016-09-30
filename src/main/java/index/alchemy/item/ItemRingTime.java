@@ -1,5 +1,6 @@
 package index.alchemy.item;
 
+import java.awt.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,8 @@ import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.color.ColorHelper;
 import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
-import index.alchemy.client.fx.update.FXMotionUpdate;
+import index.alchemy.client.fx.update.FXAgeUpdate;
+import index.alchemy.client.fx.update.FXBrightnessUpdate;
 import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.core.AlchemyEventSystem;
@@ -53,8 +55,6 @@ import net.minecraftforge.items.IItemHandler;
 
 import static java.lang.Math.*;
 
-import java.awt.Color;
-
 @FX.UpdateProvider
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
@@ -67,10 +67,8 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 		int i = 1, 
 			max_age = Tool.getSafe(args, i++, 120),
 			scale = Tool.getSafe(args, i++, 100);
-		/*result.add(new FXMotionUpdate(
-				new StdCycle().setLenght(max_age / 4).setLoop(true).setRotation(true).setMin(-0.3F).setMax(0.3F).setNow(max_age / (4 * 2)),
-				new StdCycle().setLenght(max_age).setMax(0.0F),
-				new StdCycle().setLenght(max_age / 4).setLoop(true).setRotation(true).setMin(-0.3F).setMax(0.3F)));*/
+		result.add(new FXAgeUpdate(max_age));
+		result.add(new FXBrightnessUpdate(0xF << 20 | 0xF << 4));
 		result.add(new FXARGBIteratorUpdate(ColorHelper.ahsbStep(new Color(0x66, 0xCC, 0xFF), new Color(0xFF, 0, 0, 0x22),
 				max_age, true, true, false)));
 		result.add(new FXScaleUpdate(new StdCycle().setLenght(max_age).setMin(scale / 1000F).setMax(scale / 100F)));
@@ -79,14 +77,16 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	
 	@Override
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
-		if (living instanceof EntityPlayer)
-			living.getCapability(AlchemyCapabilityLoader.time_leap, null).list.clear();
+		TimeSnapshot snapshot = living.getCapability(AlchemyCapabilityLoader.time_leap, null);
+		if (snapshot != null)
+			snapshot.list.clear();
 	}
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (living instanceof EntityPlayer)
-			living.getCapability(AlchemyCapabilityLoader.time_leap, null).updateTimeNode((EntityPlayer) living);
+		TimeSnapshot snapshot = living.getCapability(AlchemyCapabilityLoader.time_leap, null);
+		if (snapshot != null)
+			snapshot.updateTimeNode(living);
 		if (Always.isServer() && living.ticksExisted % REPAIR_INTERVAL == 0) {
 			IItemHandler handler = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 			for (int i = 0, len = handler.getSlots(); i < len; i++) {

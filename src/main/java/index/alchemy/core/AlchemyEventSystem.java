@@ -33,14 +33,21 @@ import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.KeyEvent;
+import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.client.fx.FXWisp;
+import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
+import index.alchemy.item.ItemRingTime;
+import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.network.Double6IntArrayPackage;
+import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Tool;
 import index.alchemy.util.cache.StdCache;
 import net.minecraft.client.Minecraft;
@@ -92,14 +99,14 @@ public class AlchemyEventSystem implements IGuiHandler {
 		
 		private static final String HANDLER_DESC = Type.getInternalName(Predicate.class);
 		private static final String HANDLER_FUNC_NAME = Predicate.class.getDeclaredMethods()[1].getName();
-	    private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Predicate.class.getDeclaredMethods()[1]);
-	    
-	    private static final ICache<Method, Predicate<KeyBinding>> cache = new StdCache<Method, Predicate<KeyBinding>>();
-	    
-	    private static int id = -1;
-	    public static synchronized int nextId() {
-	    	return ++id;
-	    }
+		private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Predicate.class.getDeclaredMethods()[1]);
+		
+		private static final ICache<Method, Predicate<KeyBinding>> cache = new StdCache<Method, Predicate<KeyBinding>>();
+		
+		private static int id = -1;
+		public static synchronized int nextId() {
+			return ++id;
+		}
 		
 		private final KeyBinding binding;
 		private final IInputHandle target;
@@ -135,11 +142,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 		}
 		
 		private String getUniqueName(Method callback) {
-	        return String.format("%s_%d_%s_%s_%s", getClass().getName(), nextId(),
-	                callback.getDeclaringClass().getSimpleName(),
-	                callback.getName(),
-	                callback.getParameterTypes()[0].getSimpleName());
-	    }
+			return String.format("%s_%d_%s_%s_%s", getClass().getName(), nextId(),
+					callback.getDeclaringClass().getSimpleName(),
+					callback.getName(),
+					callback.getParameterTypes()[0].getSimpleName());
+		}
 		
 		@Nullable
 		@Unsafe(Unsafe.ASM_API)
@@ -149,67 +156,67 @@ public class AlchemyEventSystem implements IGuiHandler {
 				return result;
 			
 			ClassWriter cw = new ClassWriter(0);
-	        MethodVisitor mv;
+			MethodVisitor mv;
 
-	        boolean isStatic = Modifier.isStatic(callback.getModifiers());
-	        String name = getUniqueName(callback);
-	        String desc = name.replace('.',  '/');
-	        String instType = Type.getInternalName(callback.getDeclaringClass());
-	        String callType = Type.getInternalName(callback.getParameterTypes()[0]);
-	        String handleName = callback.getName();
-	        String handleDesc = Type.getMethodDescriptor(callback);
+			boolean isStatic = Modifier.isStatic(callback.getModifiers());
+			String name = getUniqueName(callback);
+			String desc = name.replace('.',  '/');
+			String instType = Type.getInternalName(callback.getDeclaringClass());
+			String callType = Type.getInternalName(callback.getParameterTypes()[0]);
+			String handleName = callback.getName();
+			String handleDesc = Type.getMethodDescriptor(callback);
 
-	        cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
-	        cw.visitSource("AlchemyEventSystem.java:147", "invoke: " + instType + handleName + handleDesc);
-	        
-	        {
-	            if (!isStatic)
-	                cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
-	        }
-	        {
-	            mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", isStatic ? "()V" : "(Ljava/lang/Object;)V", null, null);
-	            mv.visitCode();
-	            mv.visitVarInsn(ALOAD, 0);
-	            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-	            if (!isStatic) {
-	                mv.visitVarInsn(ALOAD, 0);
-	                mv.visitVarInsn(ALOAD, 1);
-	                mv.visitFieldInsn(PUTFIELD, desc, "instance", "Ljava/lang/Object;");
-	            }
-	            mv.visitInsn(RETURN);
-	            mv.visitMaxs(2, 2);
-	            mv.visitEnd();
-	        }
-	        {
-	            mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, HANDLER_FUNC_NAME, HANDLER_FUNC_DESC, null, null);
-	            mv.visitCode();
-	            mv.visitVarInsn(ALOAD, 0);
-	            if (!isStatic) {
-	                mv.visitFieldInsn(GETFIELD, desc, "instance", "Ljava/lang/Object;");
-	                mv.visitTypeInsn(CHECKCAST, instType);
-	            }
-	            mv.visitVarInsn(ALOAD, 1);
-	            mv.visitTypeInsn(CHECKCAST, callType);
-	            mv.visitMethodInsn(isStatic ? INVOKESTATIC : INVOKEVIRTUAL, instType, handleName, handleDesc, false);
-	            mv.visitInsn(ICONST_1);
-	            mv.visitInsn(IRETURN);
-	            mv.visitMaxs(2, 2);
-	            mv.visitEnd();
-	        }
-	        cw.visitEnd();
-	        try {
-	        	Class<?> ret = AlchemyModLoader.asm_loader.define(name, cw.toByteArray());
-	        	AlchemyModLoader.info("Define", name);
-	        	if (isStatic)
-		        	result = (Predicate<KeyBinding>) ret.newInstance();
-		        else
-		        	result = (Predicate<KeyBinding>) ret.getConstructor(Object.class).newInstance(target);
-	        	if (result != null)
-		        	cache.add(callback, result);
-	        } catch(Exception e) {
-	        	AlchemyRuntimeException.onException(e);
-	        }
-	        return result;
+			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
+			cw.visitSource("AlchemyEventSystem.java:147", "invoke: " + instType + handleName + handleDesc);
+			
+			{
+				if (!isStatic)
+					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
+			}
+			{
+				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", isStatic ? "()V" : "(Ljava/lang/Object;)V", null, null);
+				mv.visitCode();
+				mv.visitVarInsn(ALOAD, 0);
+				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+				if (!isStatic) {
+					mv.visitVarInsn(ALOAD, 0);
+					mv.visitVarInsn(ALOAD, 1);
+					mv.visitFieldInsn(PUTFIELD, desc, "instance", "Ljava/lang/Object;");
+				}
+				mv.visitInsn(RETURN);
+				mv.visitMaxs(2, 2);
+				mv.visitEnd();
+			}
+			{
+				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, HANDLER_FUNC_NAME, HANDLER_FUNC_DESC, null, null);
+				mv.visitCode();
+				mv.visitVarInsn(ALOAD, 0);
+				if (!isStatic) {
+					mv.visitFieldInsn(GETFIELD, desc, "instance", "Ljava/lang/Object;");
+					mv.visitTypeInsn(CHECKCAST, instType);
+				}
+				mv.visitVarInsn(ALOAD, 1);
+				mv.visitTypeInsn(CHECKCAST, callType);
+				mv.visitMethodInsn(isStatic ? INVOKESTATIC : INVOKEVIRTUAL, instType, handleName, handleDesc, false);
+				mv.visitInsn(ICONST_1);
+				mv.visitInsn(IRETURN);
+				mv.visitMaxs(2, 2);
+				mv.visitEnd();
+			}
+			cw.visitEnd();
+			try {
+				Class<?> ret = AlchemyModLoader.asm_loader.define(name, cw.toByteArray());
+				AlchemyModLoader.info("Define", name);
+				if (isStatic)
+					result = (Predicate<KeyBinding>) ret.newInstance();
+				else
+					result = (Predicate<KeyBinding>) ret.getConstructor(Object.class).newInstance(target);
+				if (result != null)
+					cache.add(callback, result);
+			} catch(Exception e) {
+				AlchemyRuntimeException.onException(e);
+			}
+			return result;
 		}
 		
 	}
@@ -275,7 +282,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
-			/*EntityPlayer player = event.player;
+			EntityPlayer player = event.player;
 			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
 			int update[] = FXUpdateHelper.getIntArrayByArgs(ItemRingTime.FX_KEY_GATHER, 120, 300);
 			for (int i = 0; i < 1; i++)
@@ -284,7 +291,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 						player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
 						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
 			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
-					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);*/
+					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
 			//System.out.println(DimensionManager.getWorld(10).getDefaultTeleporter()); 
@@ -489,6 +496,9 @@ public class AlchemyEventSystem implements IGuiHandler {
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
 		if (Always.isClient()) {
+			Listener listener = clazz.getAnnotation(Listener.class);
+			if (listener != null)
+				MinecraftForge.EVENT_BUS.register(clazz);
 			Texture texture = clazz.getAnnotation(Texture.class);
 			if (texture != null)
 				if (texture.value() != null)

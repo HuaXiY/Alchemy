@@ -10,22 +10,31 @@ import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.LoaderState.ModState;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-//TODO
-//!!!!> Only in the version 1.10 working <!!!!
-//This class is used to register the EnumParticleTypes in the Minecraft.
-//Not guaranteed to work in another version, Field name and
-//position will change with the version.
+// TODO
+// !!!!> Only in the version 1.10 working <!!!!
+// This class is used to register the EnumParticleTypes in the Minecraft.
+// Not guaranteed to work in another version, Field name and
+// position will change with the version.
 @Loading
+@Listener
 @Change("1.10")
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyFXType {
@@ -34,6 +43,23 @@ public class AlchemyFXType {
     private static final Map<String, EnumParticleTypes> BY_NAME = Tool.get(EnumParticleTypes.class, 52);
     
     private static final Map<FX, Class<?>> FX_MAPPING = new HashMap<FX, Class<?>>();
+    
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onRenderWorldLast(RenderWorldLastEvent event) {
+    	Minecraft mc = Minecraft.getMinecraft();
+    	float partialTicks = event.getPartialTicks();
+    	GlStateManager.enableFog();
+    	mc.entityRenderer.enableLightmap();
+        mc.mcProfiler.endStartSection("litParticles");
+        mc.effectRenderer.renderLitParticles(mc.thePlayer, partialTicks);
+        RenderHelper.disableStandardItemLighting();
+        mc.entityRenderer.setupFog(0, partialTicks);
+        mc.mcProfiler.endStartSection("particles");
+        mc.effectRenderer.renderParticles(mc.thePlayer, partialTicks);
+        mc.entityRenderer.disableLightmap();
+        GlStateManager.disableFog();
+    }
 	
 	@Nullable
 	public static EnumParticleTypes registerParticleTypes(String name, Class factory, boolean ignoreRange) throws Exception {

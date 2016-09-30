@@ -21,6 +21,7 @@ public abstract class AlchemyFX extends Particle {
 	
 	protected AlchemyFX(World world, double posX, double posY, double posZ) {
 		super(world, posX, posY, posZ);
+		moveEntity(1, 1, 1);
 	}
 	
 	public <T extends AlchemyFX> T addFXUpdate(IFXUpdate... updates) {
@@ -87,6 +88,12 @@ public abstract class AlchemyFX extends Particle {
 	@Override
 	public int getFXLayer() {
 		return 1;
+	}
+	
+	@Override
+	public void moveEntity(double x, double y, double z) {
+		setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
+		resetPositionToBB();
 	}
 	
 	public void setBrightness(int brightness) {

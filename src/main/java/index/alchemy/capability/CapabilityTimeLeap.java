@@ -111,7 +111,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 			this.update = update;
 		}
 		
-		public void updateTimeNode(EntityPlayer player) {
+		public void updateTimeNode(Entity player) {
 			if (update) {
 				if (list.size() >= SIZE)
 					list.removeLast();
