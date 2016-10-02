@@ -16,7 +16,6 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
@@ -95,13 +94,13 @@ public static final String CATEGORY_NETWORK ="network";
 	}
 	
 	public static void spawnParticle(EnumParticleTypes particle, AxisAlignedBB aabb, World world, List<Double6IntArrayPackage> d6iaps) {
-		Double6IntArrayPackage d6iap[] = Tool.toArray(d6iaps, Double6IntArrayPackage.class);
+		Double6IntArrayPackage d6iap[] = d6iaps.toArray(new Double6IntArrayPackage[d6iaps.size()]);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
 			network_wrapper.sendTo(new MessageParticle(particle.getParticleID(), d6iap), player);
 	}
 	
 	public static void playSound(SoundEvent sound, SoundCategory category, AxisAlignedBB aabb, World world, List<Double3Float2Package> d3f2ps) {
-		Double3Float2Package d3f2p[] = Tool.toArray(d3f2ps, Double3Float2Package.class);
+		Double3Float2Package d3f2p[] = d3f2ps.toArray(new Double3Float2Package[d3f2ps.size()]);
 		for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb))
 			network_wrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
 	}

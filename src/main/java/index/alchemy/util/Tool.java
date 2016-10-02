@@ -207,10 +207,6 @@ public class Tool {
 				ea[deep - 1].getClassName() + "#" + ea[deep - 1].getMethodName()));
 	}
 	
-	public static final <T> T[] toArray(List<T> list, Class<T> type) {
-		return list.toArray((T[]) Array.newInstance(type, list.size()));
-	}
-	
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPING = new HashMap<Class<?>, Class<?>>();
 	static {
 		PRIMITIVE_MAPPING.put(byte.class, Byte.class);

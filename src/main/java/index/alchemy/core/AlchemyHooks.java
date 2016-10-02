@@ -9,6 +9,7 @@ import index.alchemy.api.annotation.Hook;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.container.ContainerInventoryBauble;
+import index.alchemy.entity.ai.EntityAIEatMeat;
 import index.alchemy.inventory.InventoryBauble;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ContainerPlayer;
@@ -129,6 +131,11 @@ public class AlchemyHooks {
 			return new Hook.Result(null);
 		} else
 			return new Hook.Result();
+	}
+	
+	@Hook(value = "net.minecraft.entity.passive.EntityWolf#func_184651_r", type = Hook.Type.TAIL)
+	public static final void initEntityAI(EntityWolf wolf) {
+		wolf.tasks.addTask(3, new EntityAIEatMeat(wolf));
 	}
 	
 }
