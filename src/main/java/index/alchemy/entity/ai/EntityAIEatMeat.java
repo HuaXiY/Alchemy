@@ -21,18 +21,9 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.Vec3i;
 
-public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityItem> {
+public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityItem>, Predicate<EntityItem> {
 	
 	protected static final String NBT_KEY_LAST_MEAL = "ai_last_meal";
-	
-	protected static final Predicate<EntityItem> IS_MEAT = new Predicate<EntityItem>() {
-		
-		@Override
-		public boolean apply(EntityItem input) {
-			return input.getEntityItem().getItem() instanceof ItemFood && ((ItemFood) input.getEntityItem().getItem()).isWolfsFavoriteMeat();
-		}
-		
-	};
 	
 	protected EntityLiving living;
 	protected EntityItem meat;
@@ -48,13 +39,17 @@ public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityIt
 	}
 	
 	@Override
+	public boolean apply(EntityItem input) {
+		return input.getEntityItem().getItem() instanceof ItemFood && ((ItemFood) input.getEntityItem().getItem()).isWolfsFavoriteMeat();
+	}
+	
+	@Override
 	public boolean shouldExecute() {
 		if (living.getEntityData().getInteger(NBT_KEY_LAST_MEAL) > living.ticksExisted)
 			living.getEntityData().setInteger(NBT_KEY_LAST_MEAL, -Time.DAY);
 		PathNavigate navigate = living.getNavigator();
-		if (living.getHealth() < living.getMaxHealth() ||
-				living.ticksExisted - living.getEntityData().getInteger(NBT_KEY_LAST_MEAL) > 1) {
-			List<EntityItem> list = living.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(living, 32), IS_MEAT);
+		if (living.getHealth() < living.getMaxHealth() || living.ticksExisted - living.getEntityData().getInteger(NBT_KEY_LAST_MEAL) > Time.DAY) {
+			List<EntityItem> list = living.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(living, 32), this);
 			list.sort(this);
 			for (int i = list.size() - 1; i > -1; i--) {
 				EntityItem item = list.get(i);
@@ -74,29 +69,22 @@ public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityIt
 	
 	@Override
 	public void updateTask() {
-		double d;
-		if (meat.isDead || (d = Math.pow(living.posX - meat.posX, 2) + Math.pow(living.posZ - meat.posZ, 2)) > 32 * 32) {
-			resetTask();
-			return;
-		}
-		if (meat.getPosition().distanceSq(living.getPosition()) < 2) {
-			if (IS_MEAT.apply(meat)) {
-				ItemStack food = meat.getEntityItem();
-				if (--food.stackSize < 1)
-					meat.setDead();
-				living.heal(((ItemFood) food.getItem()).getHealAmount(food));
-				living.getEntityData().setInteger(NBT_KEY_LAST_MEAL, living.ticksExisted);
-				List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
-				for (int i = 0; i < 7; i++)
-					d6iaps.add(new Double6IntArrayPackage(
-							living.posX + (living.rand.nextFloat() * living.width * 2.0F) - living.width,
-							living.posY + 0.5D + living.rand.nextFloat() * living.height,
-							living.posZ + (living.rand.nextFloat() * living.width * 2.0F) - living.width,
-							living.rand.nextGaussian() * 0.02D, living.rand.nextGaussian() * 0.02D, living.rand.nextGaussian() * 0.02D));
-				AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.HEART,
-						AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iaps);
-			}
-			resetTask();
+		if (!meat.isDead & Math.pow(living.posX - meat.posX, 2) + Math.pow(living.posZ - meat.posZ, 2) < 32 * 32 &&
+				meat.getPosition().distanceSq(living.getPosition()) < 2 && apply(meat)) {
+			ItemStack food = meat.getEntityItem();
+			if (--food.stackSize < 1)
+				meat.setDead();
+			living.heal(((ItemFood) food.getItem()).getHealAmount(food));
+			living.getEntityData().setInteger(NBT_KEY_LAST_MEAL, living.ticksExisted);
+			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
+			for (int i = 0; i < 7; i++)
+				d6iaps.add(new Double6IntArrayPackage(
+						living.posX + (living.rand.nextFloat() * living.width * 2.0F) - living.width,
+						living.posY + 0.5D + living.rand.nextFloat() * living.height,
+						living.posZ + (living.rand.nextFloat() * living.width * 2.0F) - living.width,
+						living.rand.nextGaussian() * 0.02D, living.rand.nextGaussian() * 0.02D, living.rand.nextGaussian() * 0.02D));
+			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.HEART,
+					AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iaps);
 		}
 	}
 	
