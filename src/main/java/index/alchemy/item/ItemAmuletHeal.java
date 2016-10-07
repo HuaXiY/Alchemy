@@ -1,11 +1,11 @@
 package index.alchemy.item;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.alchemy.potion.AlchemyPotion;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;

@@ -1,13 +1,13 @@
 package index.alchemy.capability;
 
 import baubles.api.IBauble;
-import index.alchemy.api.Always;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.inventory.InventoryBauble;
+import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityZombie;

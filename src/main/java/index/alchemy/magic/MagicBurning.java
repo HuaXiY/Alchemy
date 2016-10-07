@@ -1,6 +1,6 @@
 package index.alchemy.magic;
 
-import index.alchemy.api.Always;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 
 public class MagicBurning extends AlchemyMagic {

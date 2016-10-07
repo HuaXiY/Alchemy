@@ -1,4 +1,4 @@
-package index.alchemy.api;
+package index.alchemy.util;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,8 +8,9 @@ import java.util.Map;
 
 import com.google.common.base.Predicate;
 
+import index.alchemy.api.ILocationProvider;
+import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.AlchemyConstants;
-import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;

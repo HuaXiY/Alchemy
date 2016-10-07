@@ -2,12 +2,12 @@ package index.alchemy.inventory;
 
 import baubles.api.IBauble;
 import baubles.common.container.InventoryBaubles;
-import index.alchemy.api.Always;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.MessageNBTUpdate;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;

@@ -1,4 +1,4 @@
-package index.alchemy.api;
+package index.alchemy.interacting;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;

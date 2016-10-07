@@ -2,8 +2,8 @@ package index.alchemy.entity.ai;
 
 import static net.minecraft.util.math.MathHelper.*;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.ILocationProvider;
+import index.alchemy.util.Always;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 

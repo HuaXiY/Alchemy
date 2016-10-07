@@ -1,6 +1,5 @@
 package index.alchemy.core;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.ICapability;
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
@@ -18,6 +17,7 @@ import index.alchemy.api.annotation.Change;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;

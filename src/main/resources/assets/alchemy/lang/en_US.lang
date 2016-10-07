@@ -95,10 +95,10 @@ death.attack.plague=%1$s
 inventory.ring_space=
 
 //miscMap
+itemGroup.alchemy=alchemy
 solvent.type.null=
 solvent.type.unstable=
 solvent.type.powerful=
 solvent.type.benign=
 solvent.type.wonderful=
 solvent.type.dangerous=
-itemGroup.alchemy=alchemy

@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Init;
@@ -14,6 +13,7 @@ import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;

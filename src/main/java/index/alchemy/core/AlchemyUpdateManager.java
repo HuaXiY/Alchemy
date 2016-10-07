@@ -30,13 +30,13 @@ import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 
 import biomesoplenty.api.item.BOPItems;
-import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Config.Handle.Type;
 import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result;
 import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result.Build;
 import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result.Build.Artifact;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.ProgressManager;

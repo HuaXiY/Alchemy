@@ -27,7 +27,6 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
 import baubles.common.Baubles;
-import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.api.annotation.Loading;
@@ -35,6 +34,7 @@ import index.alchemy.api.annotation.Premise;
 import index.alchemy.api.annotation.Test;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState.ModState;

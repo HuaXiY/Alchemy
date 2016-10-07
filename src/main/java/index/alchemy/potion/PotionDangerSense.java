@@ -1,7 +1,7 @@
 package index.alchemy.potion;
 
-import index.alchemy.api.Always;
 import index.alchemy.util.AABBHelper;
+import index.alchemy.util.Always;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;

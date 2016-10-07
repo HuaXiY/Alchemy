@@ -17,16 +17,9 @@ import net.minecraft.util.text.TextFormatting;
 
 public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 	
-	public static class AlchemyCreativeTabs extends CreativeTabs implements IRegister {
+	public static abstract class AlchemyCreativeTabs extends CreativeTabs implements IRegister {
 		
-		protected Item icon;
-
-		@Override
-		public Item getTabIconItem() {
-			return icon;
-		}
-		
-		public AlchemyCreativeTabs(String label, Item icon) {
+		public AlchemyCreativeTabs(String label) {
 			super(label);
 			register();
 		}
@@ -38,7 +31,14 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 		
 	}
 	
-	public static final CreativeTabs CREATIVE_TABS = new AlchemyCreativeTabs(AlchemyConstants.MOD_ID, AlchemyItemLoader.solvent_lapis_lazuli);
+	public static final CreativeTabs CREATIVE_TABS = new AlchemyCreativeTabs(AlchemyConstants.MOD_ID){
+
+		@Override
+		public Item getTabIconItem() {
+			return AlchemyItemLoader.solvent_lapis_lazuli;
+		}
+		
+	};
 	
 	protected static final Random RANDOM = new Random();
 	

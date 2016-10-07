@@ -1,10 +1,10 @@
 	package index.alchemy.potion;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.AlchemyDamageSourceLoader;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntityZombie;

@@ -1,7 +1,7 @@
 package index.alchemy.interacting;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.annotation.Init;
+import index.alchemy.util.Always;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.LoaderState.ModState;

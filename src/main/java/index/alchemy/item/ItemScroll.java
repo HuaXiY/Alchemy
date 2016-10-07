@@ -2,7 +2,7 @@ package index.alchemy.item;
 
 import java.util.List;
 
-import index.alchemy.api.Always;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;

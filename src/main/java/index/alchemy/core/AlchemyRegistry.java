@@ -1,4 +1,4 @@
-package index.alchemy.api;
+package index.alchemy.core;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -6,12 +6,13 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.api.IAlchemyRecipe;
+import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class Alchemy {
+public class AlchemyRegistry {
 	
 	private static final ArrayList<IAlchemyRecipe> ALCHEMY_LIST = new ArrayList<IAlchemyRecipe>();
 	

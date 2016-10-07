@@ -77,11 +77,11 @@ public final class TransformerHook implements IClassTransformer {
 								case LRETURN:
 								case FRETURN:
 								case DRETURN:
-									list.add(new TypeInsnNode(CHECKCAST, returnType.getSort() == Type.BOOLEAN ?
-											ASMHelper.getClassName(Boolean.class) : ASMHelper.getClassName(Number.class)));
-									list.add(new MethodInsnNode(INVOKEVIRTUAL, returnType.getSort() == Type.BOOLEAN ?
-											ASMHelper.getClassName(Boolean.class) : ASMHelper.getClassName(Number.class),
-											returnType.getClassName() + "Value", Type.getMethodDescriptor(returnType), false));
+									String desc = returnType.getSort() == Type.BOOLEAN ?
+											ASMHelper.getClassName(Boolean.class) : ASMHelper.getClassName(Number.class);
+									list.add(new TypeInsnNode(CHECKCAST, desc));
+									list.add(new MethodInsnNode(INVOKEVIRTUAL, desc, returnType.getClassName() + "Value",
+											Type.getMethodDescriptor(returnType), false));
 									break;
 								case ARETURN:
 									list.add(new TypeInsnNode(CHECKCAST, returnType.getInternalName()));

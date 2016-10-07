@@ -1,7 +1,7 @@
 package index.alchemy.world;
 
-import index.alchemy.api.Always;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.util.Always;
 
 import java.util.Random;
 

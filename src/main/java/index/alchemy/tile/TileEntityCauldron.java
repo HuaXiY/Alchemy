@@ -8,25 +8,26 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import index.alchemy.animation.StdCycle;
-import index.alchemy.api.Always;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.client.color.ColorHelper;
 import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
 import index.alchemy.client.fx.update.FXMotionUpdate;
 import index.alchemy.client.fx.update.FXScaleUpdate;
+import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.util.Constants.NBT;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 
 @FX.UpdateProvider
 public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
@@ -56,7 +57,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			NBT_KEY_CONTAINER = "container",
 			NBT_KEY_STATE = "state",
 			NBT_KEY_TIME = "time",
-			NBT_KEY_FLUID = "fluid",
+			NBT_KEY_LIQUID = "liquid",
 			NBT_KEY_ALCHEMY = "alchemy";
 	
 	protected final LinkedList<ItemStack> container = new LinkedList<ItemStack>();
@@ -66,7 +67,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	protected int time, level;
 	
 	@Nullable
-	protected Fluid fluid;
+	protected IBlockState liquid = Blocks.LAVA.getDefaultState();
 	/*  alchemy: 
 	 *  	Magic Solvent volume	 -> alchemy & 4
 	 *  	Glow Stone volume		 -> alchemy >> 4 & 4
@@ -100,12 +101,12 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	}
 	
 	@Nullable
-	public Fluid getLiquid() {
-		return fluid;
+	public IBlockState getLiquid() {
+		return liquid;
 	}
 	
-	public void setLiquid(Fluid fluid) {
-		this.fluid = fluid;
+	public void setLiquid(IBlockState liquid) {
+		this.liquid = liquid;
 	}
 	
 	public void setAlchemy(int alchemy) {
@@ -120,19 +121,6 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	public void update() {
 		if (Always.isServer()) {
 			List<Entity> entitys = worldObj.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos));
-			/*if (fluid == FluidRegistry.LAVA) {
-				for (Entity entity : entitys) {
-					if (entity instanceof EntityItem) {
-						entity.motionY = 0.2D;
-						entity.motionX = (double) ((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.2F);
-						entity.motionZ = (double) ((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.2F);
-						entity.playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.4F, 2.0F + entity.rand.nextFloat() * 0.4F);
-					}
-					entity.setOnFireFromLava();
-					entity.fallDistance *= 0.5F;
-				}
-			}*/
-			
 			for (Entity entity : entitys) {
 				if (entity instanceof EntityItem) {
 					ItemStack item = ((EntityItem) entity).getEntityItem();
@@ -171,24 +159,24 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound compound) {
+	public void readFromNBT(NBTTagCompound nbt) {
 		container.clear();
-		container.addAll(Arrays.asList(NBTHelper.getItemStacksFormNBTList(compound.getTagList(NBT_KEY_CONTAINER, NBT.TAG_COMPOUND))));
-		state = State.values()[compound.getInteger(NBT_KEY_STATE)];
-		time = compound.getInteger(NBT_KEY_TIME);
-		fluid = FluidRegistry.getFluid(compound.getString(NBT_KEY_FLUID));
-		alchemy = compound.getInteger(NBT_KEY_ALCHEMY);
-		super.readFromNBT(compound);
+		container.addAll(Arrays.asList(NBTHelper.getItemStacksFormNBTList(nbt.getTagList(NBT_KEY_CONTAINER, NBT.TAG_COMPOUND))));
+		state = State.values()[nbt.getInteger(NBT_KEY_STATE)];
+		time = nbt.getInteger(NBT_KEY_TIME);
+		liquid = Block.getStateById(nbt.getInteger(NBT_KEY_LIQUID));
+		alchemy = nbt.getInteger(NBT_KEY_ALCHEMY);
+		super.readFromNBT(nbt);
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		compound.setTag(NBT_KEY_CONTAINER, NBTHelper.getNBTListFormItemStacks(container.toArray(new ItemStack[container.size()])));
-		compound.setInteger(NBT_KEY_STATE, state.ordinal());
-		compound.setInteger(NBT_KEY_TIME, time);
-		compound.setString(NBT_KEY_FLUID, Tool.isNullOr(FluidRegistry.getFluidName(fluid), ""));
-		compound.setInteger(NBT_KEY_ALCHEMY, alchemy);
-		return super.writeToNBT(compound);
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+		nbt.setTag(NBT_KEY_CONTAINER, NBTHelper.getNBTListFormItemStacks(container.toArray(new ItemStack[container.size()])));
+		nbt.setInteger(NBT_KEY_STATE, state.ordinal());
+		nbt.setInteger(NBT_KEY_TIME, time);
+		nbt.setInteger(NBT_KEY_LIQUID, Block.getStateId(liquid));
+		nbt.setInteger(NBT_KEY_ALCHEMY, alchemy);
+		return super.writeToNBT(nbt);
 	}
 
 }

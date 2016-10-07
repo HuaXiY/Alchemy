@@ -1,8 +1,8 @@
 package index.alchemy.magic;
 
-import index.alchemy.api.Always;
-import index.alchemy.api.Elemix;
 import index.alchemy.block.AlchemyBlockLoader;
+import index.alchemy.interacting.Elemix;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

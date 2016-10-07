@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import javax.annotation.Nullable;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.ITileEntity;
@@ -12,6 +11,7 @@ import index.alchemy.api.annotation.Change;
 import index.alchemy.api.event.CauldronActivatedEvent;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.tile.TileEntityCauldron;
+import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.material.Material;
@@ -35,7 +35,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
 @Change("1.9.4")
@@ -166,20 +165,27 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	@Override
 	public Boolean isEntityInsideMaterial(IBlockAccess world, BlockPos pos, IBlockState state, Entity entity,
 			double yToTest, Material material, boolean testingHead) {
-		Fluid fluid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
-		return fluid == null ? null : fluid.getBlock().getDefaultState().getMaterial() == material;
+		IBlockState liquid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
+		return liquid == null ? false : liquid.getMaterial() == material;
 	}
 	
 	@Override
 	public Boolean isAABBInsideMaterial(World world, BlockPos pos, AxisAlignedBB boundingBox, Material material) {
-		Fluid fluid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
-		return fluid == null ? null : fluid.getBlock().getDefaultState().getMaterial() == material;
+		IBlockState liquid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
+		return liquid == null ? false : liquid.getMaterial() == material;
 	}
 	
 	@Override
 	public boolean isMaterialInBB(World world, BlockPos pos, Material material) {
-		Fluid fluid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
-		return fluid == null ? false : fluid.getBlock().getDefaultState().getMaterial() == material;
+		IBlockState liquid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
+		return liquid == null ? false : liquid.getMaterial() == material;
+	}
+	
+	@Override
+	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+		TileEntityCauldron te = ((TileEntityCauldron) world.getTileEntity(pos));
+		IBlockState liquid = te == null ? null : te.getLiquid();
+		return liquid == null ? super.getLightValue(state, world, pos) : liquid.getLightValue();
 	}
 	
 	public PBlockCauldron() {

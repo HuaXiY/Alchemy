@@ -3,7 +3,7 @@ package index.alchemy.util.cache;
 import java.util.HashMap;
 import java.util.Map;
 
-import index.alchemy.api.Always;
+import index.alchemy.util.Always;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class SideCache<K, V> extends Cache<K, V> {

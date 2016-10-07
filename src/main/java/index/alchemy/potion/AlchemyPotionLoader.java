@@ -209,11 +209,12 @@ public class AlchemyPotionLoader extends PotionType {
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
+		
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "luck", "unluck",
-				getItemPredicate(ModItems.bop$flower_miners_delight), null, new Potion[]{MobEffects.LUCK}, new Potion[]{MobEffects.UNLUCK});
+				getItemPredicate(ModItems.bop$flower_miners_delight), null, new Potion[]{ MobEffects.LUCK }, new Potion[]{ MobEffects.UNLUCK });
 		
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 45, "feather_fall", "levitation",
-				getItemPredicate(Items.FEATHER), null, new Potion[]{feather_fall}, new Potion[]{MobEffects.LEVITATION});
+				getItemPredicate(Items.FEATHER), null, new Potion[]{ feather_fall }, new Potion[]{ MobEffects.LEVITATION });
 		
 		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 45, "hunger", 
 				getItemPredicate(Items.ROTTEN_FLESH), MobEffects.HUNGER);

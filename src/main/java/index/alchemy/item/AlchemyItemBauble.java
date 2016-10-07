@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-import index.alchemy.api.Always;
 import index.alchemy.api.IBaubleEquipment;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.inventory.InventoryBauble;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

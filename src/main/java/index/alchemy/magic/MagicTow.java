@@ -1,7 +1,7 @@
 package index.alchemy.magic;
 
-import index.alchemy.api.Always;
 import index.alchemy.entity.ai.EntityTrackTracker;
+import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
 
 public class MagicTow extends AlchemyMagic {

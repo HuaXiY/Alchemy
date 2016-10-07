@@ -22,7 +22,6 @@ import org.objectweb.asm.Type;
 
 import com.google.common.base.Predicate;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.ICache;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
@@ -48,6 +47,7 @@ import index.alchemy.item.ItemRingTime;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.util.AABBHelper;
+import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import index.alchemy.util.cache.StdCache;
 import net.minecraft.client.Minecraft;

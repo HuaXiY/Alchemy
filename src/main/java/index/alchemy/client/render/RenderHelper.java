@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -24,23 +25,45 @@ public class RenderHelper {
 		Minecraft.getMinecraft().getRenderItem().renderItem(item, ItemCameraTransforms.TransformType.GROUND);
 	}
 	
-	public static void renderBlock(IBlockState block, BlockPos pos) {
+	public static void renderBlock(IBlockState state, BlockPos pos) {
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer vertexbuffer = tessellator.getBuffer();
 		vertexbuffer.begin(7, DefaultVertexFormats.BLOCK);
 		Minecraft minecraft = Minecraft.getMinecraft();
 		BlockRendererDispatcher dispatcher = minecraft.getBlockRendererDispatcher();
-		dispatcher.getBlockModelRenderer().renderModel(minecraft.theWorld, dispatcher.getModelForState(block),
-				block, BlockPos.ORIGIN, vertexbuffer, false, 0);
+		dispatcher.renderBlock(state, pos, minecraft.theWorld, vertexbuffer);
 		tessellator.draw();
 	}
 	
-	public static void renderEntity(Entity entity, double x, double y, double z, float yaw, float partialTick, boolean box) {
-		Minecraft.getMinecraft().getRenderManager().doRenderEntity(entity, x, y, z, yaw, partialTick, box);
+	public static void renderEntity(Entity entity, double x, double y, double z, float yaw, float partialTicks, boolean box) {
+		Minecraft.getMinecraft().getRenderManager().doRenderEntity(entity, x, y, z, yaw, partialTicks, box);
 	}
 	
 	public static void renderEntity(Entity entity, float partialTick) {
 		renderEntity(entity, 0, 0, 0, 0, partialTick, false);
+	}
+	
+	public static float getRenderPartialTicks() {
+		return Minecraft.getMinecraft().getRenderPartialTicks();
+	}
+	
+	public static void scaleAndCorrectThePosition(float x, float y, float z, float dx, float dy, float dz) {
+		glTranslatef(dx * (1F - x), dy * (1F - y), dz * (1F - z));
+		glScalef(x, y, z);
+	}
+	
+	public static float calculateRenderOffset(float now, float last, float partialTicks) {
+		return last + (now - last) * partialTicks;
+	}
+	
+	public static void translateToZero() {
+		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		float partialTicks = getRenderPartialTicks();
+		glTranslatef(
+				-calculateRenderOffset((float) player.posX, (float) player.lastTickPosX, partialTicks),
+				-calculateRenderOffset((float) player.posY, (float) player.lastTickPosY, partialTicks),
+				-calculateRenderOffset((float) player.posZ, (float) player.lastTickPosZ, partialTicks)
+		);
 	}
 	
 	public static void setColor(Color color) {

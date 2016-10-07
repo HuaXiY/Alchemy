@@ -3,7 +3,6 @@ package index.alchemy.item;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
@@ -16,6 +15,7 @@ import index.alchemy.item.ItemBeltGuard.MessageGuardCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double3Float2Package;
 import index.alchemy.util.AABBHelper;
+import index.alchemy.util.Always;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

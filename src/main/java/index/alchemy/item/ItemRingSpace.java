@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.api.Always;
 import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
@@ -26,6 +25,7 @@ import index.alchemy.item.ItemRingSpace.MessageSpaceRingPickup;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.util.AABBHelper;
+import index.alchemy.util.Always;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
