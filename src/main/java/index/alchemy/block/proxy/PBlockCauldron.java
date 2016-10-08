@@ -18,13 +18,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.init.PotionTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBanner;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionUtils;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBanner;
@@ -35,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
 @Change("1.9.4")
@@ -62,70 +60,50 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	}
 	
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem,
-			EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (Always.isServer()) {
-			int i = ((Integer)state.getValue(LEVEL)).intValue();
-			
-			TileEntityCauldron cauldron = getTileEntityCauldron(world, pos);
-			
-			CauldronActivatedEvent event;
-			if (MinecraftForge.EVENT_BUS.post(event = new CauldronActivatedEvent(world, pos, state, player, hand, cauldron,
-					heldItem, side, hitX, hitY, hitZ)))
-				return event.getResult() == Result.DEFAULT;
-			
-			if (heldItem == null) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
+			@Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+		int i = ((Integer)state.getValue(LEVEL)).intValue();
+		
+		TileEntityCauldron cauldron = getTileEntityCauldron(world, pos);
+		
+		CauldronActivatedEvent event;
+		if (MinecraftForge.EVENT_BUS.post(event = new CauldronActivatedEvent(world, pos, state, player, hand, cauldron,
+				heldItem, side, hitX, hitY, hitZ)))
+			return event.getResult() == Result.DEFAULT;
+		
+		if (heldItem == null) {
+			if (Always.isServer()) {
 				LinkedList<ItemStack> list = getTileEntityCauldron(world, pos).getContainer();
 				if (list.size() > 0) {
 					player.setHeldItem(hand, list.removeLast());
+					player.inventory.markDirty();
 					cauldron.updateTracker();
 				}
-			} else {
-				Item item = heldItem.getItem();
-				if (item == Items.BUCKET) {
-					if (i == 3) {
-						InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, new ItemStack(Items.WATER_BUCKET));
-						player.addStat(StatList.CAULDRON_USED);
-						setWaterLevel(world, pos, state, 0);
-					}
-				} else if (item == Items.WATER_BUCKET) {
-					if (i < 3) {
-						InventoryHelper.addNonCreativeModeItemStackOrSetToHand(player, hand, heldItem, new ItemStack(Items.BUCKET));
-						player.addStat(StatList.CAULDRON_FILLED);
-						setWaterLevel(world, pos, state, 3);
-					}
-				} else if (item == Items.POTIONITEM) {
-					if (i < 3 && PotionUtils.getPotionFromItem(heldItem) == PotionTypes.WATER) {
-						InventoryHelper.addNonCreativeModeItemStackOrSetToHand(player, hand, heldItem, new ItemStack(Items.GLASS_BOTTLE));
-						player.addStat(StatList.CAULDRON_FILLED);
-						setWaterLevel(world, pos, state, i + 1);
-					}
-				} else if (item == Items.GLASS_BOTTLE) {
-					if (i > 0) {
-						ItemStack potion = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.WATER);
-						InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, potion);
-						player.addStat(StatList.CAULDRON_USED);
-						setWaterLevel(world, pos, state, i - 1);
-					}
-				} else if (item instanceof ItemArmor) {
-					if (i > 0) {
-						ItemArmor armor = (ItemArmor)item;
-						if (armor.getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER && armor.hasColor(heldItem)) {
-							armor.removeColor(heldItem);
-							player.addStat(StatList.ARMOR_CLEANED);
-							setWaterLevel(world, pos, state, i - 1);
-						}
-					}
-				} else if (item instanceof ItemBanner) {
-					if (i > 0 && TileEntityBanner.getPatterns(heldItem) > 0) {
-						ItemStack banner = heldItem.copy();
-						banner.stackSize = 1;
-						TileEntityBanner.removeBannerData(banner);
-						InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, banner);
-						player.addStat(StatList.BANNER_CLEANED);
+			}
+		} else {
+			Item item = heldItem.getItem();
+			if (item instanceof ItemArmor) {
+				if (i > 0) {
+					ItemArmor armor = (ItemArmor)item;
+					if (armor.getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER && armor.hasColor(heldItem)) {
+						armor.removeColor(heldItem);
+						player.addStat(StatList.ARMOR_CLEANED);
 						setWaterLevel(world, pos, state, i - 1);
 					}
 				}
+			} else if (item instanceof ItemBanner) {
+				if (i > 0 && TileEntityBanner.getPatterns(heldItem) > 0) {
+					ItemStack banner = heldItem.copy();
+					banner.stackSize = 1;
+					TileEntityBanner.removeBannerData(banner);
+					InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, banner);
+					player.addStat(StatList.BANNER_CLEANED);
+					setWaterLevel(world, pos, state, i - 1);
+				}
+			} /*else if (item instanceof ItemBucket) {
+				
+			}*/ else {
+				FluidUtil.interactWithFluidHandler(heldItem, cauldron.getTank(), player);
 			}
 		}
 		return true;
@@ -146,17 +124,22 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	}
 	
 	@Override
-	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entityIn) { }
+	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
+		IBlockState liquid = getTileEntityCauldron(world, pos).getLiquid();
+		if (liquid != null) {
+			liquid.getBlock().onEntityWalk(world, pos, entity);
+			liquid.getBlock().onEntityCollidedWithBlock(world, pos, state, entity);
+		}
+		super.onEntityCollidedWithBlock(world, pos, state, entity);
+	}
 	
 	@Override
 	public void fillWithRain(World world, BlockPos pos) {
 		if (world.rand.nextInt(20) == 1) {
 			float f = world.getBiome(pos).getFloatTemperature(pos);
-
 			if (world.getBiomeProvider().getTemperatureAtHeight(f, pos.getY()) >= 0.15F) {
 				int level = getWaterLevel(world, pos, null);
-
-				if (level < 3)
+				if (level < 3 && level > -1)
 					setWaterLevel(world, pos, null, level + 1);
 			}
 		}

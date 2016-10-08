@@ -10,6 +10,7 @@ import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Source;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.FinalFieldSetter;
+import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,7 +30,7 @@ public class ModItems {
 	//  Biomes O' Plenty
 
 	@Deprecated
-	@Source(biomesoplenty.api.item.BOPItems.class)
+	@Source("biomesoplenty.api.item.BOPItems")
 	public static final Item
 			bop$gem = null;
 	
@@ -45,7 +46,7 @@ public class ModItems {
 			bop$gem_amber = null;								//  琥珀  ---- 时间
 	
 	@Deprecated
-	@Source(biomesoplenty.api.block.BOPBlocks.class)
+	@Source("biomesoplenty.api.block.BOPBlocks")
 	public static final Item
 			bop$mushroom = null,
 			bop$flower_0 = null,
@@ -94,9 +95,12 @@ public class ModItems {
 		String last = null;
 		for (Field field : ModItems.class.getFields()) {
 			Source source = field.getAnnotation(Source.class);
-			if (source != null && source.value() != null) {
-				Object obj = source.value().getField(field.getName().replaceAll(".*\\$", "")).get(null);
-				FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
+			if (source != null) {
+				Class<?> clazz = Tool.forName(source.value(), true);
+				if (clazz != null) {
+					Object obj = clazz.getField(field.getName().replaceAll(".*\\$", "")).get(null);
+					FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
+				}
 			}
 		}
 		

@@ -96,6 +96,8 @@ public class Tool {
 	
 	@Nullable
 	public static final Class forName(String name, boolean init) {
+		if (name == null || name.isEmpty())
+			return null;
 		try {
 			return Class.forName(name);
 		} catch (ClassNotFoundException e) {

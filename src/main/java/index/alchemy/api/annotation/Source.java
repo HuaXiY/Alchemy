@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Source {
 	
-	public Class<?> value();
+	public String value();
 	
 }

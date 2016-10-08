@@ -17,17 +17,22 @@ import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
 @FX.UpdateProvider
 public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
@@ -64,10 +69,13 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	protected volatile boolean flag;
 	
 	protected State state = State.NULL;
-	protected int time, level;
+	protected int time;
 	
-	@Nullable
-	protected IBlockState liquid = Blocks.LAVA.getDefaultState();
+	protected FluidTank tank = new FluidTank(Fluid.BUCKET_VOLUME);
+	{
+		tank.setTileEntity(this);
+	}
+	
 	/*  alchemy: 
 	 *  	Magic Solvent volume	 -> alchemy & 4
 	 *  	Glow Stone volume		 -> alchemy >> 4 & 4
@@ -93,20 +101,27 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	}
 	
 	public int getLevel() {
-		return level;
+		FluidStack stack = tank.getFluid();
+		if (stack != null)
+			if (stack.getFluid() == FluidRegistry.WATER)
+				return stack.amount / 333;
+			else
+				return -1;
+		return 0;
 	}
 	
 	public void setLevel(int level) {
-		this.level = level;
+		if (getLevel() > -1)
+			tank.getFluid().amount = (int) (level / 3F * 1000);
 	}
 	
 	@Nullable
 	public IBlockState getLiquid() {
-		return liquid;
+		return tank.getFluid() == null ? null : tank.getFluid().getFluid().getBlock().getDefaultState();
 	}
 	
-	public void setLiquid(IBlockState liquid) {
-		this.liquid = liquid;
+	public FluidTank getTank() {
+		return tank;
 	}
 	
 	public void setAlchemy(int alchemy) {
@@ -164,8 +179,8 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		container.addAll(Arrays.asList(NBTHelper.getItemStacksFormNBTList(nbt.getTagList(NBT_KEY_CONTAINER, NBT.TAG_COMPOUND))));
 		state = State.values()[nbt.getInteger(NBT_KEY_STATE)];
 		time = nbt.getInteger(NBT_KEY_TIME);
-		liquid = Block.getStateById(nbt.getInteger(NBT_KEY_LIQUID));
 		alchemy = nbt.getInteger(NBT_KEY_ALCHEMY);
+		tank.readFromNBT(nbt);
 		super.readFromNBT(nbt);
 	}
 	
@@ -174,9 +189,21 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		nbt.setTag(NBT_KEY_CONTAINER, NBTHelper.getNBTListFormItemStacks(container.toArray(new ItemStack[container.size()])));
 		nbt.setInteger(NBT_KEY_STATE, state.ordinal());
 		nbt.setInteger(NBT_KEY_TIME, time);
-		nbt.setInteger(NBT_KEY_LIQUID, Block.getStateId(liquid));
 		nbt.setInteger(NBT_KEY_ALCHEMY, alchemy);
+		tank.writeToNBT(nbt);
 		return super.writeToNBT(nbt);
+	}
+	
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+		return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
+	}
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+			return (T) tank;
+		return super.getCapability(capability, facing);
 	}
 
 }

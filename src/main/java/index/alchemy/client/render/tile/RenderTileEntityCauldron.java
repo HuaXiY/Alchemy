@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -47,14 +48,16 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		HUDManager.bind(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		HUDManager.restore(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		
-		if (te.getLiquid() != null) {
+		FluidStack stack = te.getTank().getFluid();
+		if (stack != null) {
 			pushMatrix();
 			enableBlend();
 			tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
 			BlockPos renderPos = te.getPos().up();
+			float offest = (float) stack.amount / te.getTank().getCapacity();
 			RenderHelper.translateToZero();
-			translate(0.125F, -0.125F, 0.125F);
-			RenderHelper.scaleAndCorrectThePosition(0.75F, 0.75F, 0.75F, renderPos.getX(), renderPos.getY(), renderPos.getZ());
+			translate(0.125F, -(0.125F + (1 - 0.125F * 2) * (1 - offest)), 0.125F);
+			RenderHelper.scaleAndCorrectThePosition(0.75F, 0.75F * offest, 0.75F, renderPos.getX(), renderPos.getY(), renderPos.getZ());
 			net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 			RenderHelper.renderBlock(te.getLiquid(), renderPos);
 			net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
