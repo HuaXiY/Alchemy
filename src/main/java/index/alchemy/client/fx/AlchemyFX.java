@@ -77,6 +77,11 @@ public abstract class AlchemyFX extends Particle {
 	public float getScale() {
 		return particleScale;
 	}
+	
+	public <T extends AlchemyFX> T update() {
+		onUpdate();
+		return (T) this;
+	}
 
 	@Override
 	public void onUpdate() {

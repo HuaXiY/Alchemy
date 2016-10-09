@@ -12,10 +12,13 @@ import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.AlchemyConstants;
 import net.minecraft.client.Minecraft;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -80,6 +83,16 @@ public class Always {
 	
 	public static boolean isClient() {
 		return getSide().isClient();
+	}
+	
+	public static ItemStack getEnchantmentBook(Enchantment enchantment) {
+		ItemStack book = new ItemStack(Items.BOOK);
+		Items.ENCHANTED_BOOK.addEnchantment(book, new EnchantmentData(enchantment, 1));
+		return book;
+	}
+	
+	public static double calculateTheStraightLineDistance(double x, double y, double z) {
+		return x * x + y * y + z * z;
 	}
 	
 	public static Biome getCurrentBiome(EntityPlayer player) {

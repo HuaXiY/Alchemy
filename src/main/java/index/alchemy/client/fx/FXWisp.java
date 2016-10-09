@@ -36,7 +36,7 @@ public class FXWisp extends AlchemyFX {
 		
 		@Override
 		public Particle createParticle(int id, World world, double x, double y, double z, double vx, double vy, double vz, int... args) {
-                return new FXWisp(world, x, y, z).addFXUpdate(FXUpdateHelper.getResultByArgs(args));
+                return new FXWisp(world, x, y, z).addFXUpdate(FXUpdateHelper.getResultByArgs(args)).update();
 		}
 		
 	}

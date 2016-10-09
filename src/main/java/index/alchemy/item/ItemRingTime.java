@@ -45,6 +45,7 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -60,6 +61,8 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	
 	public static final int USE_CD = 20 * 20, REPAIR_INTERVAL = 20 * 10;
 	public static final String NBT_KEY_CD = "cd_ring_time", KEY_DESCRIPTION = "key.time_ring_leap", FX_KEY_GATHER = "ring_time_gather";
+	
+	public static final ItemStack mending_book = Always.getEnchantmentBook(Enchantments.MENDING);
 	
 	@FX.UpdateMethod(FX_KEY_GATHER)
 	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
@@ -88,13 +91,16 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 		if (snapshot != null)
 			snapshot.updateTimeNode(living);
 		if (Always.isServer() && living.ticksExisted % REPAIR_INTERVAL == 0) {
-			IItemHandler handler = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			for (int i = 0, len = handler.getSlots(); i < len; i++) {
-				ItemStack old = handler.getStackInSlot(i);
-				if (old != null && old.isItemDamaged() && Enchantments.MENDING.canApply(old))
-					old.setItemDamage(old.getItemDamage() - 1);
-			}
+			IItemHandler handler = living.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.NORTH);
+			for (int i = 0, len = handler.getSlots(); i < len; i++)
+				itemToTimeBack(handler.getStackInSlot(i));
+			itemToTimeBack(living.getHeldItemMainhand());
 		}
+	}
+	
+	public void itemToTimeBack(ItemStack old) {
+		if (old != null && old.isItemDamaged() && old.getItem().isBookEnchantable(old, mending_book))
+			old.setItemDamage(old.getItemDamage() - 1);
 	}
 
 	@Override

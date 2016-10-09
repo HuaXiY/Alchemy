@@ -13,12 +13,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.Color;
 
 import static org.lwjgl.opengl.GL11.*;
 import static net.minecraft.util.math.MathHelper.*;
 
+@SideOnly(Side.CLIENT)
 public class RenderHelper {
 	
 	public static void renderItem(ItemStack item) {
@@ -28,7 +31,7 @@ public class RenderHelper {
 	public static void renderBlock(IBlockState state, BlockPos pos) {
 		Tessellator tessellator = Tessellator.getInstance();
 		VertexBuffer vertexbuffer = tessellator.getBuffer();
-		vertexbuffer.begin(7, DefaultVertexFormats.BLOCK);
+		vertexbuffer.begin(GL_QUADS, DefaultVertexFormats.BLOCK);
 		Minecraft minecraft = Minecraft.getMinecraft();
 		BlockRendererDispatcher dispatcher = minecraft.getBlockRendererDispatcher();
 		dispatcher.renderBlock(state, pos, minecraft.theWorld, vertexbuffer);

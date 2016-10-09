@@ -7,6 +7,7 @@ import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyEventSystem.EventType;
+import index.alchemy.util.Always;
 import index.alchemy.core.AlchemyResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -59,10 +60,12 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 			
 			@SideOnly(Side.CLIENT)
 			public void updateEntityOnClient(Entity entity) {
-				entity.prevPosX = entity.posX;
-				entity.prevPosY = entity.posY;
-				entity.prevPosZ = entity.posZ;
-				entity.setPosition(x, y, z);
+				if (Always.calculateTheStraightLineDistance(entity.posX - x, entity.posY - y, entity.posZ - z) < 900) {
+					entity.prevPosX = entity.posX;
+					entity.prevPosY = entity.posY;
+					entity.prevPosZ = entity.posZ;
+					entity.setPosition(x, y, z);
+				}
 				entity.prevRotationYaw = entity.rotationYaw;
 				entity.prevRotationPitch = entity.rotationPitch;
 				entity.rotationYaw = yaw;
@@ -86,6 +89,8 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 					if (living instanceof EntityPlayer) {
 						EntityPlayer player = (EntityPlayer) living;
 						player.getFoodStats().setFoodLevel(food);
+						if (Always.calculateTheStraightLineDistance(player.posX - x, player.posY - y, player.posZ - z) > 900)
+							player.setPositionAndUpdate(x, y, z);
 					}
 				}
 				if (entity.getRidingEntity() != null)
