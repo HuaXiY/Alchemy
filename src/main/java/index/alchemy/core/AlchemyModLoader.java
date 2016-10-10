@@ -87,7 +87,7 @@ public class AlchemyModLoader {
 	
 	public static final Stack<String> log_stack = new Stack<String>();
 	
-	public static synchronized void updateStack(String prefix) {
+	public static void updateStack(String prefix) {
 		int index = log_stack.indexOf(prefix);
 		if (log_stack.size() == 0 || index == -1)
 			log_stack.push(prefix);
