@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.LinkedHashMap;
@@ -18,10 +19,11 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -32,8 +34,10 @@ import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Premise;
 import index.alchemy.api.annotation.Test;
+import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -104,6 +108,15 @@ public class AlchemyModLoader {
 	
 	public static class ASMClassLoader extends ClassLoader {
 		
+		private static final String HANDLER_DESC = Type.getInternalName(Function.class);
+		private static final String HANDLER_FUNC_NAME = Function.class.getDeclaredMethods()[1].getName();
+		private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Function.class.getDeclaredMethods()[1]);
+		
+		private static int id = -1;
+		public static synchronized int nextId() {
+			return ++id;
+		}
+		
         private ASMClassLoader() {
             super(ASMClassLoader.class.getClassLoader());
         }
@@ -112,19 +125,87 @@ public class AlchemyModLoader {
             return defineClass(name, data, 0, data.length);
         }
         
-        public <T> T wrapper(T obj, Method... methods) throws IOException {
-        	ClassReader reader = new ClassReader(obj.getClass().getName());
-        	ClassWriter writer = new ClassWriter(0);
-        	ClassVisitor visitor = new ClassVisitor(ASM5, writer) {
-        		
-        		@Override
-        		public void visitEnd() {
-        			//visitMethod(access, name, desc, signature, exceptions)
-        		}
-        		
-			};
-        	return obj;
-        }
+        private String getUniqueName(Method callback) {
+			return String.format(
+					"%s_%d_%s_%s_%s",
+					getClass().getName(), nextId(),
+					callback.getDeclaringClass().getSimpleName().replace("[]", "_L"),
+					callback.getName(),
+					callback.getParameterTypes()[0].getSimpleName().replace("[]", "_L")
+			);
+		}
+        
+        @Nullable
+		@Unsafe(Unsafe.ASM_API)
+		public Function createWrapper(Method callback, Object target) {
+        	Function result = null;
+			
+			ClassWriter cw = new ClassWriter(0);
+			MethodVisitor mv;
+
+			boolean isStatic = Modifier.isStatic(callback.getModifiers());
+			String name = getUniqueName(callback);
+			String desc = name.replace('.',  '/');
+			String instType = Type.getInternalName(callback.getDeclaringClass());
+			String callType = Type.getInternalName(callback.getParameterTypes()[0]);
+			String handleName = callback.getName();
+			String handleDesc = Type.getMethodDescriptor(callback);
+
+			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
+			cw.visitSource("AlchemyModLoader.java:133", "invoke: " + instType + handleName + handleDesc);
+			
+			{
+				if (!isStatic)
+					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
+			}
+			{
+				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", isStatic ? "()V" : "(Ljava/lang/Object;)V", null, null);
+				mv.visitCode();
+				mv.visitVarInsn(ALOAD, 0);
+				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+				if (!isStatic) {
+					mv.visitVarInsn(ALOAD, 0);
+					mv.visitVarInsn(ALOAD, 1);
+					mv.visitFieldInsn(PUTFIELD, desc, "instance", "Ljava/lang/Object;");
+				}
+				mv.visitInsn(RETURN);
+				mv.visitMaxs(2, 2);
+				mv.visitEnd();
+			}
+			{
+				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, HANDLER_FUNC_NAME, HANDLER_FUNC_DESC, null, null);
+				mv.visitCode();
+				mv.visitVarInsn(ALOAD, 0);
+				if (!isStatic) {
+					mv.visitFieldInsn(GETFIELD, desc, "instance", "Ljava/lang/Object;");
+					mv.visitTypeInsn(CHECKCAST, instType);
+				}
+				mv.visitVarInsn(ALOAD, 1);
+				mv.visitTypeInsn(CHECKCAST, callType);
+				mv.visitMethodInsn(isStatic ? INVOKESTATIC : INVOKEVIRTUAL, instType, handleName, handleDesc, false);
+				Class<?> returnType = callback.getReturnType(), pack = Tool.getPrimitiveMapping(returnType);
+				if (returnType == void.class)
+					mv.visitInsn(ACONST_NULL);
+				else if (returnType.isPrimitive())
+					mv.visitMethodInsn(INVOKEVIRTUAL, ASMHelper.getClassDesc(pack),
+							"valueOf", Type.getMethodDescriptor(Type.getType(pack), Type.getType(returnType)), false);
+				mv.visitInsn(ARETURN);
+				mv.visitMaxs(2, 2);
+				mv.visitEnd();
+			}
+			cw.visitEnd();
+			try {
+				Class<?> ret = define(name, cw.toByteArray());
+				info("Define", name);
+				if (isStatic)
+					result = (Function) ret.newInstance();
+				else
+					result = (Function) ret.getConstructor(Object.class).newInstance(target);
+			} catch(Exception e) {
+				AlchemyRuntimeException.onException(e);
+			}
+			return result;
+		}
         
     }
 	
@@ -250,7 +331,7 @@ public class AlchemyModLoader {
 		ClassLoader loader = new URLClassLoader(new URL[]{ url }, null);
 		ClassPath path = ClassPath.from(loader);
 		for (ClassInfo info : path.getAllClasses())
-			if (!info.getName().matches(".*\\$[0-9]+"))
+			if (!info.getName().matches(".*\\$[0-9]+") && !info.getName().contains("$$"))
 				result.add(info.getName());
 		return result;
 	}

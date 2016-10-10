@@ -1,7 +1,6 @@
 package index.alchemy.core;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,17 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 
-import com.google.common.base.Predicate;
+import com.google.common.base.Function;
 
-import index.alchemy.api.ICache;
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
@@ -36,7 +29,6 @@ import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
-import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.client.render.HUDManager;
@@ -49,7 +41,6 @@ import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
-import index.alchemy.util.cache.StdCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
@@ -76,8 +67,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static org.objectweb.asm.Opcodes.*;
-
 @Loading
 @Init(state = ModState.CONSTRUCTED)
 public class AlchemyEventSystem implements IGuiHandler {
@@ -97,27 +86,16 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SideOnly(Side.CLIENT)
 	private static class KeyBindingHandle {
 		
-		private static final String HANDLER_DESC = Type.getInternalName(Predicate.class);
-		private static final String HANDLER_FUNC_NAME = Predicate.class.getDeclaredMethods()[1].getName();
-		private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Predicate.class.getDeclaredMethods()[1]);
-		
-		private static final ICache<Method, Predicate<KeyBinding>> cache = new StdCache<Method, Predicate<KeyBinding>>();
-		
-		private static int id = -1;
-		public static synchronized int nextId() {
-			return ++id;
-		}
-		
 		private final KeyBinding binding;
 		private final IInputHandle target;
 		private final Method method;
-		private final Predicate<KeyBinding> handler;
+		private final Function<KeyBinding, Void> handler;
 		
 		public KeyBindingHandle(KeyBinding binding, IInputHandle target, Method method) {
 			this.binding = binding;
 			this.target = target;
 			this.method = method;
-			this.handler = createWrapper(method, target);
+			this.handler = AlchemyModLoader.asm_loader.createWrapper(method, target);
 		}
 		
 		public KeyBinding getBinding() {
@@ -139,84 +117,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 				} catch (Exception e) {
 					AlchemyRuntimeException.onException(e);
 				}
-		}
-		
-		private String getUniqueName(Method callback) {
-			return String.format("%s_%d_%s_%s_%s", getClass().getName(), nextId(),
-					callback.getDeclaringClass().getSimpleName(),
-					callback.getName(),
-					callback.getParameterTypes()[0].getSimpleName());
-		}
-		
-		@Nullable
-		@Unsafe(Unsafe.ASM_API)
-		private Predicate<KeyBinding> createWrapper(Method callback, Object target) {
-			Predicate<KeyBinding> result = cache.get(callback);
-			if (result != null)
-				return result;
-			
-			ClassWriter cw = new ClassWriter(0);
-			MethodVisitor mv;
-
-			boolean isStatic = Modifier.isStatic(callback.getModifiers());
-			String name = getUniqueName(callback);
-			String desc = name.replace('.',  '/');
-			String instType = Type.getInternalName(callback.getDeclaringClass());
-			String callType = Type.getInternalName(callback.getParameterTypes()[0]);
-			String handleName = callback.getName();
-			String handleDesc = Type.getMethodDescriptor(callback);
-
-			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
-			cw.visitSource("AlchemyEventSystem.java:147", "invoke: " + instType + handleName + handleDesc);
-			
-			{
-				if (!isStatic)
-					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
-			}
-			{
-				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", isStatic ? "()V" : "(Ljava/lang/Object;)V", null, null);
-				mv.visitCode();
-				mv.visitVarInsn(ALOAD, 0);
-				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-				if (!isStatic) {
-					mv.visitVarInsn(ALOAD, 0);
-					mv.visitVarInsn(ALOAD, 1);
-					mv.visitFieldInsn(PUTFIELD, desc, "instance", "Ljava/lang/Object;");
-				}
-				mv.visitInsn(RETURN);
-				mv.visitMaxs(2, 2);
-				mv.visitEnd();
-			}
-			{
-				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, HANDLER_FUNC_NAME, HANDLER_FUNC_DESC, null, null);
-				mv.visitCode();
-				mv.visitVarInsn(ALOAD, 0);
-				if (!isStatic) {
-					mv.visitFieldInsn(GETFIELD, desc, "instance", "Ljava/lang/Object;");
-					mv.visitTypeInsn(CHECKCAST, instType);
-				}
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitTypeInsn(CHECKCAST, callType);
-				mv.visitMethodInsn(isStatic ? INVOKESTATIC : INVOKEVIRTUAL, instType, handleName, handleDesc, false);
-				mv.visitInsn(ICONST_1);
-				mv.visitInsn(IRETURN);
-				mv.visitMaxs(2, 2);
-				mv.visitEnd();
-			}
-			cw.visitEnd();
-			try {
-				Class<?> ret = AlchemyModLoader.asm_loader.define(name, cw.toByteArray());
-				AlchemyModLoader.info("Define", name);
-				if (isStatic)
-					result = (Predicate<KeyBinding>) ret.newInstance();
-				else
-					result = (Predicate<KeyBinding>) ret.getConstructor(Object.class).newInstance(target);
-				if (result != null)
-					cache.add(callback, result);
-			} catch(Exception e) {
-				AlchemyRuntimeException.onException(e);
-			}
-			return result;
 		}
 		
 	}

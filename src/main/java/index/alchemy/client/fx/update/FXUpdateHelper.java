@@ -7,17 +7,20 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Function;
+
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Loading;
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 
 @Loading
 public class FXUpdateHelper {
 	
-	private static final List<String> STRING_LIST = new ArrayList<String>();
-	private static final List<Method> METHOD_LIST = new ArrayList<Method>();
+	private static final List<String> strings = new ArrayList<String>();
+	private static final List<Function<int[], List<IFXUpdate>>> functions = new ArrayList<Function<int[], List<IFXUpdate>>>();
 	
 	public static void init(Class<?> clazz) {
 		FX.UpdateProvider provider = clazz.getAnnotation(FX.UpdateProvider.class);
@@ -30,8 +33,8 @@ public class FXUpdateHelper {
 							if (method.getParameterTypes().length == 1 
 							&& method.getParameterTypes()[0].isArray() && method.getParameterTypes()[0].getComponentType() == int.class)
 								if (method.getReturnType() == List.class) {
-									STRING_LIST.add(m.value());
-									METHOD_LIST.add(method);
+									strings.add(m.value());
+									functions.add(AlchemyModLoader.asm_loader.createWrapper(method, null));
 								} else
 									AlchemyRuntimeException.onException(new ClassCastException(
 											clazz + "#" + method.getName() + "() -> return type != " + List.class.getName()));
@@ -48,7 +51,7 @@ public class FXUpdateHelper {
 	}
 	
 	public static int getIdByName(String name) {
-		return STRING_LIST.indexOf(name);
+		return strings.indexOf(name);
 	}
 	
 	public static int[] getIntArrayByArgs(String name, int... args) {
@@ -62,7 +65,7 @@ public class FXUpdateHelper {
 	public static List<IFXUpdate> getResultByArgs(int... args) {
 		Tool.checkArrayLength(args, 1);
 		try {
-			return (List<IFXUpdate>) Tool.getSafe(METHOD_LIST, args[0]).invoke(null, args);
+			return (List<IFXUpdate>) Tool.getSafe(functions, args[0]).apply(args);
 		} catch (Exception e) {
 			AlchemyRuntimeException.onException(e);
 		}
