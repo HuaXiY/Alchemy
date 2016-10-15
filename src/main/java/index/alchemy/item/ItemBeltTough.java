@@ -3,8 +3,6 @@ package index.alchemy.item;
 import java.util.UUID;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
@@ -43,11 +41,6 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
 		if (Always.isServer() && living.ticksExisted % RECOVERY_INTERVAL == 0)
 			living.heal(1F);
-	}
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOW)

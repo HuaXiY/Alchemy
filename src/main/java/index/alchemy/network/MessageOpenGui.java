@@ -1,6 +1,7 @@
 package index.alchemy.network;
 
 import index.alchemy.api.annotation.Message;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,7 +15,7 @@ public class MessageOpenGui implements IMessage, IMessageHandler<MessageOpenGui,
 	
 	public int id;
 	
-	public MessageOpenGui() {}
+	public MessageOpenGui() { }
 	
 	public MessageOpenGui(int id) {
 		this.id = id;
@@ -23,8 +24,8 @@ public class MessageOpenGui implements IMessage, IMessageHandler<MessageOpenGui,
 	@Override
 	public IMessage onMessage(MessageOpenGui message, MessageContext ctx) {
 		EntityPlayer player = ctx.getServerHandler().playerEntity;
-		player.openGui(AlchemyModLoader.instance(), message.id, player.worldObj,
-				(int) player.posX, (int) player.posY, (int) player.posZ);
+		AlchemyEventSystem.addDelayedRunnable(p -> player.openGui(AlchemyModLoader.instance(), message.id, player.worldObj,
+				(int) player.posX, (int) player.posY, (int) player.posZ), 0);
 		return null;
 	}
 

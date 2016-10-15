@@ -17,6 +17,7 @@ import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.AlchemyKeyBinding;
+import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryItem;
@@ -61,8 +62,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 			KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
 	
 	@Override
-	public InventoryItem initInventory(ItemStack item) {
-		return new InventoryItem(item, SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
+	public InventoryItem initInventory() {
+		return new InventoryItem(SIZE, I18n.translateToLocal(getInventoryUnlocalizedName()));
 	}
 	
 	@Override
@@ -157,7 +158,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		if (isCDOver()) {
 			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageSpaceRingPickup());
 			restartCD();
-		}
+		} else
+			HUDManager.setSnake(this);
 	}
 	
 	public static class MessageSpaceRingPickup implements IMessage {
@@ -250,10 +252,6 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		return 1;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void renderCD(int x, int y, int w, int h) {}
-	
 	public ItemRingSpace() {
 		super("ring_space", 0xE451F2);
 	}

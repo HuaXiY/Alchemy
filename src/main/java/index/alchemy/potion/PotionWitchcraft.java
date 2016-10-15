@@ -4,7 +4,6 @@ import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.client.render.RenderHelper;
 import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.AlchemyEntityManager;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.potion.PotionWitchcraft.MessageWitchcraftUpdate;
@@ -36,11 +35,6 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 	public static final String NBT_KEY_RENDER = "wc_render";
 	
 	private EntityLivingBase last;
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
-	}
 	
 	@Override
 	public void performEffect(EntityLivingBase base, int level) {

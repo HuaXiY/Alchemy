@@ -26,25 +26,26 @@ public interface IBauble {
 	/**
 	 * This method is called once per tick if the bauble is being worn by a living
 	 */
-	public void onWornTick(ItemStack itemstack, EntityLivingBase living);
+	public default void onWornTick(ItemStack itemstack, EntityLivingBase living) { }
 	
 	/**
 	 * This method is called when the bauble is equipped by a living
 	 */
-	public void onEquipped(ItemStack itemstack, EntityLivingBase living);
+	public default void onEquipped(ItemStack itemstack, EntityLivingBase living) { }
 	
 	/**
 	 * This method is called when the bauble is unequipped by a living
 	 */
-	public void onUnequipped(ItemStack itemstack, EntityLivingBase living);
+	public default void onUnequipped(ItemStack itemstack, EntityLivingBase living) { }
 
 	/**
 	 * can this bauble be placed in a bauble slot
 	 */
-	public boolean canEquip(ItemStack itemstack, EntityLivingBase living);
+	public default boolean canEquip(ItemStack itemstack, EntityLivingBase living) { return true; }
 	
 	/**
 	 * Can this bauble be removed from a bauble slot
 	 */
-	public boolean canUnequip(ItemStack itemstack, EntityLivingBase living);
+	public default boolean canUnequip(ItemStack itemstack, EntityLivingBase living) { return true; }
+	
 }

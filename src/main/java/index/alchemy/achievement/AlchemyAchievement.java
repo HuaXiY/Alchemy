@@ -1,7 +1,6 @@
 package index.alchemy.achievement;
 
 import index.alchemy.api.IRegister;
-import index.alchemy.core.AlchemyInitHook;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -34,10 +33,6 @@ public class AlchemyAchievement extends Achievement implements IRegister {
 		
 		register();
 	}
-
-	@Override
-	public void register() {
-		AlchemyInitHook.init(this);
-	}
 	
 }
+	

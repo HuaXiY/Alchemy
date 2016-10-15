@@ -14,7 +14,7 @@ import index.alchemy.api.IInventoryProvider;
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.item.ItemMagicSolvent;
+import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
@@ -38,13 +38,14 @@ public class DLang {
 	
 	private static Set<String> mcSet = new HashSet<String>(); 
 	
-	private static Map<String, String> itemMap, blockMap, potionMap, enchantmentMap, keyMap, damageMap, inventoryMap, miscMap;
-	private static Map<Class<?>, Method> _funcMap;
+	public static final Map<String, String> itemMap = null, blockMap = null, potionMap = null, enchantmentMap = null,
+			keyMap = null, damageMap = null, inventoryMap = null, miscMap = null;
+	public static final Map<Class<?>, Method> _funcMap = null;
 	static {
 		for (Field field : DLang.class.getDeclaredFields())
 			if (Tool.setAccessible(field).getType() == Map.class)
 				try {
-					field.set(null, new LinkedHashMap());
+					FinalFieldSetter.getInstance().setStatic(field, new LinkedHashMap<>());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -153,10 +154,6 @@ public class DLang {
 	
 	public static void init(IInventoryProvider inventory) {
 		inventoryMap.put(inventory.getInventoryUnlocalizedName(), "");
-	}
-	
-	public static void init(ItemMagicSolvent.Type type) {
-		miscMap.put(ItemMagicSolvent.Type.PREFIX + type.name().toLowerCase(), "");
 	}
 	
 }

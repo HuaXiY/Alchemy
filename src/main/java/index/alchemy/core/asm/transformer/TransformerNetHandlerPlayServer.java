@@ -6,9 +6,11 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import index.alchemy.api.AlchemyBaubles;
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
@@ -21,23 +23,36 @@ public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		String srgName = "func_147347_a";
-		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled())
-			srgName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName,
+		String srgName1 = "func_147347_a"/* processPlayer */, srgName2 = "func_147344_a"/* processCreativeInventoryAction */;
+		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
+			srgName1 = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName1,
 					"(Lnet/minecraft/network/play/client/CPacketPlayer;)V");
+			srgName2 = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName2,
+					"(Lnet/minecraft/network/play/client/CPacketCreativeInventoryAction;)V");
+		}
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = new ClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)
-			if (method.name.equals(srgName)) {
-				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName + method.desc);
+			if (method.name.equals(srgName1)) {
+				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName1 + method.desc);
 				for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
 					AbstractInsnNode insn = iterator.next();
 					if (insn instanceof LdcInsnNode) {
 						LdcInsnNode ldc = (LdcInsnNode) insn;
 						if (ldc.cst.equals(100.0F) || ldc.cst.equals(300.0F))
 							ldc.cst = 900.0F;
+					}
+				}
+			} else if (method.name.equals(srgName2)) {
+				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName2 + method.desc);
+				for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
+					AbstractInsnNode insn = iterator.next();
+					if (insn instanceof IntInsnNode) {
+						IntInsnNode var = (IntInsnNode) insn;
+						if (var.getOpcode() == BIPUSH && var.operand == 45)
+							var.operand += AlchemyBaubles.asm_offset;
 					}
 				}
 			}

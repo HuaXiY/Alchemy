@@ -9,7 +9,6 @@ import index.alchemy.api.IRegister;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.event.CauldronActivatedEvent;
-import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
@@ -176,10 +175,10 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 		setUnlocalizedName("cauldron");
 		register();
 	}
-
+	
 	@Override
-	public void register() {
-		AlchemyInitHook.init(this);
+	public boolean shouldRegisterToGame() {
+		return false;
 	}
-
+	
 }

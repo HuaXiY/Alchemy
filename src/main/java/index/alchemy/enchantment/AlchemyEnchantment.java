@@ -1,7 +1,6 @@
 package index.alchemy.enchantment;
 
 import index.alchemy.api.IRegister;
-import index.alchemy.core.AlchemyInitHook;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -48,11 +47,6 @@ public class AlchemyEnchantment extends Enchantment implements IRegister {
 		setName(name);
 		setRegistryName(name);
 		register();
-	}
-	
-	@Override
-	public void register() {
-		AlchemyInitHook.init_impl(this);
 	}
 
 }

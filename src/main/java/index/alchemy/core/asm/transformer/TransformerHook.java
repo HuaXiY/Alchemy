@@ -27,7 +27,6 @@ import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.core.AlchemyHooks;
-import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -77,8 +76,9 @@ public final class TransformerHook implements IClassTransformer {
 								case LRETURN:
 								case FRETURN:
 								case DRETURN:
-									String desc = returnType.getSort() == Type.BOOLEAN ?
-											ASMHelper.getClassName(Boolean.class) : ASMHelper.getClassName(Number.class);
+									String desc = returnType.getSort() == Type.BOOLEAN ? ASMHelper.getClassName(Boolean.class) :
+											returnType.getSort() == Type.CHAR ? ASMHelper.getClassName(Character.class) :
+											ASMHelper.getClassName(Number.class);
 									list.add(new TypeInsnNode(CHECKCAST, desc));
 									list.add(new MethodInsnNode(INVOKEVIRTUAL, desc, returnType.getClassName() + "Value",
 											Type.getMethodDescriptor(returnType), false));
@@ -141,7 +141,7 @@ public final class TransformerHook implements IClassTransformer {
 						break;
 					}
 			} catch (Exception e) {
-				AlchemyRuntimeException.onException(e);
+				throw new RuntimeException(e);
 			}
 		}
 		this.srgName = Tool.isNullOr(result, srgName);

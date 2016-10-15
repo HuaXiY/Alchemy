@@ -2,18 +2,17 @@ package index.alchemy.network;
 
 import java.util.Iterator;
 
-import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.Message;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.inventory.InventoryBauble;
+import index.alchemy.util.NBTHelper;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -33,7 +32,7 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 	public int id;
 	public NBTTagCompound data;
 	
-	public MessageNBTUpdate() {}
+	public MessageNBTUpdate() { }
 	
 	public MessageNBTUpdate(Type type, int id, NBTTagCompound data) {
 		this.type = type;
@@ -44,24 +43,25 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(final MessageNBTUpdate message, MessageContext ctx) {
-		AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
-			@Override
-			public void run(Phase phase) {
-				World world = Minecraft.getMinecraft().theWorld;
-				if (world == null)
-					return;
-				Entity entity = world.getEntityByID(message.id);
-				if (entity != null)
-					switch (message.type) {
-						case ENTITY_BAUBLE_DATA:
-							InventoryBauble inventory = entity.getCapability(AlchemyCapabilityLoader.bauble, null);
-							if (inventory != null)
+		AlchemyEventSystem.addDelayedRunnable(p -> {
+			World world = Minecraft.getMinecraft().theWorld;
+			if (world == null)
+				return;
+			Entity entity = world.getEntityByID(message.id);
+			if (entity != null)
+				switch (message.type) {
+					case ENTITY_BAUBLE_DATA:
+						InventoryBauble inventory = entity.getCapability(AlchemyCapabilityLoader.bauble, null);
+						if (inventory != null)
+							if (message.data.hasKey(InventoryBauble.UPDATE_INDEX_NBT_KEY))
+								inventory.setInventorySlotContents(message.data.getInteger(InventoryBauble.UPDATE_INDEX_NBT_KEY),
+										NBTHelper.getItemStackFormNBT((NBTTagCompound) message.data.getTag(InventoryBauble.CONTENTS)));
+							else
 								inventory.deserializeNBT(message.data);
-						case ENTITY_DATA:
-							updateNBT(entity.getEntityData(), message.data);
-							break;
-					}
-			}
+					case ENTITY_DATA:
+						updateNBT(entity.getEntityData(), message.data);
+						break;
+				}
 		}, 1);
 		return null;
 	}

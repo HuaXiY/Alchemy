@@ -1,8 +1,6 @@
 package index.alchemy.enchantment;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.entity.EntityLivingBase;
@@ -18,11 +16,6 @@ import static java.lang.Math.*;
 public class EnchantmentSiphonLife extends AlchemyEnchantment implements IEventHandle {
 	
 	public static final float SIPHON_COEFFICIENT = 0.05F;
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
-	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingHurt(LivingHurtEvent event) {

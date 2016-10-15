@@ -1,6 +1,7 @@
 package index.alchemy.network;
 
 import index.alchemy.api.annotation.Message;
+import index.alchemy.core.AlchemyEventSystem;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,7 +22,7 @@ public class MessageSound implements IMessage, IMessageHandler<MessageSound, IMe
 	public String id, category;
 	public Double3Float2Package d3f2p[];
 	
-	public MessageSound() {}
+	public MessageSound() { }
 	
 	public MessageSound(String id, String category, Double3Float2Package... d3f2p) {
 		this.id = id;
@@ -36,8 +37,10 @@ public class MessageSound implements IMessage, IMessageHandler<MessageSound, IMe
 		SoundEvent sound = SoundEvent.REGISTRY.getObject(new ResourceLocation(message.id));
 		SoundCategory category = SoundCategory.getByName(message.category);
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		for (int i = 0; i < d3f2p.length; i++)
-			player.worldObj.playSound(d3f2p[i].x, d3f2p[i].y, d3f2p[i].z, sound, category, d3f2p[i].a, d3f2p[i].b, true);
+		AlchemyEventSystem.addDelayedRunnable(p -> {
+			for (int i = 0; i < d3f2p.length; i++)
+				player.worldObj.playSound(d3f2p[i].x, d3f2p[i].y, d3f2p[i].z, sound, category, d3f2p[i].a, d3f2p[i].b, true);
+		}, 0);
 		return null;
 	}
 

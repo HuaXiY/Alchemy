@@ -105,8 +105,13 @@ public class InventoryHelper  {
 	public static final boolean canMergeItemStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {
 		return 	a.getItem() == b.getItem() &&
 				a.getItemDamage() == b.getItemDamage() &&
+				a.getMetadata() == b.getMetadata() &&
 				Objects.equals(a.getTagCompound(), b.getTagCompound()) &&
 				a.areCapsCompatible(b);
+	}
+	
+	public static final boolean areItemsEqual(ItemStack a, ItemStack b) {
+		return a == null ? b == null : b != null && canMergeItemStack(a, b);
 	}
 	
 }

@@ -121,32 +121,6 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 	}
 
-	@Override
-	public abstract BaubleType getBaubleType(ItemStack item);
-
-	@Override
-	public void onWornTick(ItemStack item, EntityLivingBase living) {}
-
-	@Override
-	public void onEquipped(ItemStack item, EntityLivingBase living) {}
-
-	@Override
-	public void onUnequipped(ItemStack item, EntityLivingBase living) {}
-
-	@Override
-	public boolean canEquip(ItemStack item, EntityLivingBase living) {
-		return true;
-	}
-
-	@Override
-	public boolean canUnequip(ItemStack item, EntityLivingBase living) {
-		return true;
-	}
-	
-	public boolean isEquipmented(EntityLivingBase living) {
-		return getFormLiving(living) != null;
-	}
-	
 	@Nullable
 	@Override
 	public ItemStack getFormLiving(EntityLivingBase living) {

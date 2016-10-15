@@ -1,13 +1,11 @@
 package index.alchemy.network;
 
-import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.Message;
 import index.alchemy.core.AlchemyEventSystem;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -20,7 +18,7 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 	public int id, len;
 	public Double6IntArrayPackage d6iaps[];
 	
-	public MessageParticle() {}
+	public MessageParticle() { }
 	
 	public MessageParticle(int id, Double6IntArrayPackage... d6iaps) {
 		this.id = id;
@@ -31,16 +29,13 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 	@Override
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(final MessageParticle message, MessageContext ctx) {
-		AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
-			@Override
-			public void run(Phase phase) {
-				Double6IntArrayPackage d6iaps[] = message.d6iaps;
-				EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-				EnumParticleTypes type = EnumParticleTypes.getParticleFromId(message.id);
-				for (int i = 0; i < d6iaps.length; i++)
-					player.worldObj.spawnParticle(type, false, d6iaps[i].x, d6iaps[i].y, d6iaps[i].z,
-							d6iaps[i].ox, d6iaps[i].oy, d6iaps[i].oz, d6iaps[i].args);
-			}
+		AlchemyEventSystem.addDelayedRunnable(p -> {
+			Double6IntArrayPackage d6iaps[] = message.d6iaps;
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			EnumParticleTypes type = EnumParticleTypes.getParticleFromId(message.id);
+			for (int i = 0; i < d6iaps.length; i++)
+				player.worldObj.spawnParticle(type, false, d6iaps[i].x, d6iaps[i].y, d6iaps[i].z,
+						d6iaps[i].ox, d6iaps[i].oy, d6iaps[i].oz, d6iaps[i].args);
 		}, 0);
 		return null;
 	}

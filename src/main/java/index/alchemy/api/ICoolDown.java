@@ -23,6 +23,6 @@ public interface ICoolDown {
 	public int getRenderID();
 	
 	@SideOnly(Side.CLIENT)
-	public void renderCD(int x, int y, int w, int h);
+	public default void renderCD(int x, int y, int w, int h) { }
 
 }

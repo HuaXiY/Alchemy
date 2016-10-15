@@ -1,7 +1,11 @@
 package index.alchemy.core;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
+import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.Tool;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.Name;
@@ -16,6 +20,22 @@ import static index.alchemy.core.AlchemyConstants.*;
 @TransformerExclusions(MOD_TRANSFORMER_PACKAGE)
 public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	
+	static {
+		String libs = System.getProperty("index.alchemy.runtime.lib.ext");
+		if (libs != null)
+			for (String lib : libs.split(";"))
+				addRuntimeExtLibFromJRE(lib);
+	}
+	
+	public static void addRuntimeExtLibFromJRE(String name) {
+		try {
+			URL url = new File(System.getProperty("java.home") + "/lib/ext/" + name + ".jar").toURI().toURL();
+			Tool.addURLToClassLoader(AlchemyCorePlugin.class.getClassLoader(), url);
+		} catch (Exception e) {
+			AlchemyRuntimeException.onException(e);
+		}
+	}
+	
 	private static boolean runtimeDeobfuscationEnabled;
 	
 	public static boolean isRuntimeDeobfuscationEnabled() {
@@ -25,7 +45,7 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	@Override
 	public String[] getASMTransformerClass() {
 		return new String[] {
-				
+				"index.alchemy.core.asm.transformer.TransformerSideLambda"
 		};
 	}
 

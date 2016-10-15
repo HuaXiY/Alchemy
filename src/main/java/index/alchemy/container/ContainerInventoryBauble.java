@@ -21,11 +21,11 @@ public class ContainerInventoryBauble {
 		"alchemy:items/empty_amulet",
 		"alchemy:items/empty_belt"
 	})
-	public static class SlotBauble extends Slot {
+	public class SlotBauble extends Slot {
 		
 		private final BaubleType type;
 		private final EntityLivingBase living;
-
+		
 		public SlotBauble(EntityLivingBase living, IInventory inventory, BaubleType type, int index, int x, int y) {
 			super(inventory, index, x, y);
 			this.living = living;
@@ -50,7 +50,7 @@ public class ContainerInventoryBauble {
 			return getStack() != null &&
 				   ((IBauble) getStack().getItem()).canUnequip(getStack(), player);
 		}
-
+		
 		@Override
 		public int getSlotStackLimit() {
 			return 1;

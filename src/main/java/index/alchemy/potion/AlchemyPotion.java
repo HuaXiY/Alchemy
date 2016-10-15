@@ -4,7 +4,6 @@ import java.util.Random;
 
 import index.alchemy.api.IRegister;
 import index.alchemy.client.render.HUDManager;
-import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -48,6 +47,12 @@ public class AlchemyPotion extends Potion implements IRegister {
 		performEffect(living, level);
 	}
 	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean isBeneficial() {
+		return !isBadEffect();
+	}
+	
 	public AlchemyPotion(String name, boolean isbad, int color) {
 		this(name, isbad, color, false);
 	}
@@ -61,11 +66,6 @@ public class AlchemyPotion extends Potion implements IRegister {
 		setPotionName("effect." + name);
 		setRegistryName("potion_" + name);
 		register();
-	}
-	
-	@Override
-	public void register() {
-		AlchemyInitHook.init_impl(this);
 	}
 	
 }

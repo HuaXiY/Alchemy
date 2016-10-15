@@ -9,6 +9,7 @@ import java.util.List;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.Config;
+import index.alchemy.api.annotation.SideOnlyLambda;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
@@ -18,7 +19,8 @@ import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiErrorScreen;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class AlchemyRuntimeException extends RuntimeException {
 	
@@ -29,7 +31,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 		super(t);
 	}
 	
-	public static void onException(Throwable t) {
+	public static void onException(Throwable t) throws RuntimeException {
 		if (t instanceof AlchemyRuntimeException)
 			return;
 		
@@ -56,14 +58,10 @@ public class AlchemyRuntimeException extends RuntimeException {
 				continue;
 			}
 		
-		if (Always.runOnClient()) {
-			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
-				@Override
-				public void run(Phase phase) {
-					Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyRuntimeError(e, error));
-				}
-			}, 0);
-		} else
+		if (Always.runOnClient())
+			AlchemyEventSystem.addDelayedRunnable((@SideOnlyLambda(Side.CLIENT) IPhaseRunnable)
+					(p -> Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyRuntimeError(e, error))), 0);
+		else
 			throw e;
 		
 	}
@@ -90,6 +88,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 		AlchemyModLoader.logger.error("AlchemyRuntimeException: change >>> " + msg);
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public static class GuiAlchemyRuntimeError extends GuiErrorScreen {
 		
 	    private Exception e;

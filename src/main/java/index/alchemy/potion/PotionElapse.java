@@ -3,8 +3,6 @@ package index.alchemy.potion;
 import com.google.common.base.Predicate;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.ai.EntityAIFindEntityNearestHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -23,11 +21,6 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 	
 	public PotionElapse() {
 		super("elapse", false, 0xFFFFFF);
-	}
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)

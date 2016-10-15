@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 
 public interface IInventoryProvider<T> {
 	
-	public AlchemyInventory initInventory(T provider);
+	public AlchemyInventory initInventory();
 	
 	public AlchemyInventory getInventory(T provider);
 	

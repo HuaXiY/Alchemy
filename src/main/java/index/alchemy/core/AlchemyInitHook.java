@@ -11,6 +11,7 @@ import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IPlayerTickable;
+import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
@@ -63,8 +64,6 @@ public class AlchemyInitHook {
 		if (impl instanceof ITileEntity)
 			GameRegistry.registerTileEntity(((ITileEntity) impl).getTileEntityClass(), ((ITileEntity) impl).getTileEntityName());
 		
-		init(impl);
-		
 	}
 	
 	@Change("1.9.4")
@@ -73,6 +72,9 @@ public class AlchemyInitHook {
 		
 		Tool.checkNull(obj);
 		AlchemyModLoader.checkState();
+		
+		if (obj instanceof Impl && obj instanceof IRegister && ((IRegister) obj).shouldRegisterToGame())
+			init_impl((Impl) obj);
 		
 		if (obj instanceof IOreDictionary)
 			OreDictionary.registerOre(((IOreDictionary) obj).getNameInOreDictionary(), ((IOreDictionary) obj).getItemStackInOreDictionary());

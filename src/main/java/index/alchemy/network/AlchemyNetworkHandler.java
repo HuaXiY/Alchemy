@@ -35,7 +35,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
 	
-public static final String CATEGORY_NETWORK ="network";
+	public static final String CATEGORY_NETWORK ="network";
 	
 	@Config(category = CATEGORY_NETWORK, comment = "Can hear the sound of the range.")
 	private static int sound_range = 32;

@@ -41,6 +41,9 @@ archivesBaseName = "Alchemy-${config.show_version}"
 version = "${config.minecraft_version}-${config.mod_version}.${config.dev_version}"
 config.build_number = config.dev_version
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
 minecraft {
     version = config.minecraft_version + "-" + config.forge_version
     runDir = "run"
@@ -83,8 +86,8 @@ task dlc {
         task "compileDLC-${name}"(type: JavaCompile) {
             source = fileTree(dir: "dlcs/${name}/src/main/java", include: '**/*.java')
             destinationDir = file("build/classes/${name}")
-            sourceCompatibility = '1.6'
-            targetCompatibility = '1.6'
+            sourceCompatibility = '1.8'
+            targetCompatibility = '1.8'
             dependencyCacheDir = file("build/classes/${name}")
             classpath = tasks['compileJava'].classpath + files('build/classes/main')
         }
@@ -218,7 +221,9 @@ task rename << {
 build.finalizedBy rename
 
 def commonManifest = {
-    attributes 'FMLAT' : 'alchemy_at.cfg'
+    attributes 'FMLAT' : 'alchemy_at.cfg',
+	           'FMLCorePlugin': 'index.alchemy.core.AlchemyCorePlugin', 
+               'FMLCorePluginContainsFMLMod': 'true'
 }
 
 jar {

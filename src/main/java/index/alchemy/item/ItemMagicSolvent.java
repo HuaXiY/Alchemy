@@ -2,8 +2,7 @@ package index.alchemy.item;
 
 import java.util.List;
 
-import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.util.Tool;
+import index.alchemy.api.annotation.Lang;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -17,8 +16,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe {
-	
-	static { Tool.load(Type.class); }
 	
 	protected int metadata;
 	protected Item material;
@@ -41,8 +38,6 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 
 	@Override
 	public boolean isIngredient(ItemStack ingredient) {
-		System.out.println(ingredient.getMetadata());
-		System.out.println(metadata);
 		return ingredient.getItem() == material && ingredient.getMetadata() == metadata;
 	}
 
@@ -51,6 +46,7 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 		return new ItemStack(this, 1, 0, Type.randomOutput());
 	}
 	
+	@Lang
 	public static enum Type {
 		
 		NULL(TextFormatting.WHITE),
@@ -64,18 +60,17 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 		
 		Type(TextFormatting formatting) {
 			this.formatting = formatting;
-			AlchemyInitHook.init(this);
 		}
 		
 		public static final String PREFIX = "solvent.type.";
 		
 		private static final String EFFECT = "solvent_effect";
 		
-		public boolean has(Type type){
+		public boolean has(Type type) {
 			return ordinal() == type.ordinal();
 		}
 		
-		public boolean has(NBTTagCompound nbt){
+		public boolean has(NBTTagCompound nbt) {
 			return has(get(nbt));
 		}
 		

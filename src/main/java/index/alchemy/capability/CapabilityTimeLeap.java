@@ -1,25 +1,30 @@
 package index.alchemy.capability;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.util.Always;
 import index.alchemy.core.AlchemyResourceLocation;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import static java.lang.Math.*;
 
 @InitInstance(AlchemyCapabilityLoader.TYPE)
 public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implements IEventHandle {
@@ -105,8 +110,23 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 		public static final int SIZE = 80;
 		
 		public final LinkedList<TimeNode> list = new LinkedList<TimeNode>();
+		private boolean update = true, leaping;
 		
-		private boolean update = true;
+		public void clear() {
+			list.clear();
+		}
+		
+		public Iterator<TimeNode> iterator() {
+			return list.iterator();
+		}
+		
+		public void setLeaping(boolean leaping) {
+			this.leaping = leaping;
+		}
+		
+		public boolean isLeaping() {
+			return leaping;
+		}
 		
 		public boolean isUpdate() {
 			return update;
@@ -140,10 +160,20 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	public Class<TimeSnapshot> getDataClass() {
 		return TimeSnapshot.class;
 	}
-
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
+	
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onEntityViewRender_FOVModifier(EntityViewRenderEvent.FOVModifier event) {
+		TimeSnapshot snapshot = Minecraft.getMinecraft().thePlayer.getCapability(AlchemyCapabilityLoader.time_leap, null);
+		if (snapshot != null && snapshot.isLeaping())
+			event.setFOV(max(80, event.getFOV()));
+	}
+	
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onLivingAttack(LivingAttackEvent event) {
+		TimeSnapshot snapshot = event.getEntityLiving().getCapability(AlchemyCapabilityLoader.time_leap, null);
+		if (snapshot != null && snapshot.isLeaping())
+			event.setCanceled(true);
 	}
 	
 	@SubscribeEvent

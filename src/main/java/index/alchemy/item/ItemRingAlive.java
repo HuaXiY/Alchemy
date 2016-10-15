@@ -1,8 +1,6 @@
 package index.alchemy.item;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.alchemy.util.AABBHelper;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,11 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ItemRingAlive extends AlchemyItemRing implements IEventHandle {
 	
 	public static final int RADIUS = 12;
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
-	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingDeath(LivingDeathEvent event) {

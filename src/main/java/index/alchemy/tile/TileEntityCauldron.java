@@ -47,7 +47,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			scale = Tool.getSafe(args, i++, 1);
 		result.add(new FXMotionUpdate(
 				new StdCycle().setLoop(true).setRotation(true).setMax(0.5F),
-				new StdCycle().setMax(0.3F),
+				new StdCycle().setMax(-0.3F),
 				new StdCycle().setLoop(true).setRotation(true).setMax(0.5F)));
 		result.add(new FXARGBIteratorUpdate(ColorHelper.ahsbStep(Color.RED, new Color(0x66, 0xCC, 0xFF, 0x22), max_age, true, true, false)));
 		result.add(new FXScaleUpdate(new StdCycle().setMax(scale / 100F)));

@@ -8,12 +8,10 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.animation.StdCycle;
-import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.INetworkMessage;
-import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
@@ -27,6 +25,7 @@ import index.alchemy.client.fx.update.FXAgeUpdate;
 import index.alchemy.client.fx.update.FXBrightnessUpdate;
 import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.client.fx.update.FXUpdateHelper;
+import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
@@ -42,11 +41,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
-import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -82,7 +78,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public void onUnequipped(ItemStack item, EntityLivingBase living) {
 		TimeSnapshot snapshot = living.getCapability(AlchemyCapabilityLoader.time_leap, null);
 		if (snapshot != null)
-			snapshot.list.clear();
+			snapshot.clear();
 	}
 	
 	@Override
@@ -119,7 +115,8 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
 			Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
 			timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
-		}
+		} else
+			HUDManager.setSnake(this);
 	}
 	
 	public static class MessageTimeLeap implements IMessage {
@@ -144,71 +141,55 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public void timeLeapOnClinet(final EntityPlayer player) {
-		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
+	public void timeLeapOnClinet(EntityPlayer player) {
+		TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
 		if (snapshot.isUpdate()) {
 			snapshot.setUpdate(false);
+			snapshot.setLeaping(true);
 			AlchemyEventSystem.addInputHook(this);
-			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
-				@Override
-				public void run(Phase phase) {
-					if (Always.isPlaying())
-						player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
-				}
-			}, 0);
-			final Iterator<TimeNode> iterator = snapshot.list.iterator();
-			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
-				@Override
-				public boolean run(Phase phase) {
-					if (Always.isPlaying()) {
-						if (iterator.hasNext())
-							iterator.next().updateEntityOnClient(player);
-						if (!iterator.hasNext()) {
-							snapshot.setUpdate(true);
-							AlchemyEventSystem.removeInputHook(ItemRingTime.this);
-							return true;
-						}
-					} else 
+			Iterator<TimeNode> iterator = snapshot.iterator();
+			AlchemyEventSystem.addContinuedRunnable(p -> {
+				if (Always.isPlaying()) {
+					if (iterator.hasNext())
+						iterator.next().updateEntityOnClient(player);
+					if (!iterator.hasNext()) {
+						snapshot.setUpdate(true);
+						snapshot.setLeaping(false);
+						AlchemyEventSystem.removeInputHook(ItemRingTime.this);
 						return true;
-					return false;
-				}
+					}
+				} else 
+					return true;
+				return false;
 			});
 		}
 	}
 	
-	public void timeLeapOnServer(final EntityPlayer player) {	
-		final TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
+	public void timeLeapOnServer(EntityPlayer player) {	
+		TimeSnapshot snapshot = player.getCapability(AlchemyCapabilityLoader.time_leap, null);
 		if (isEquipmented(player) && snapshot.isUpdate()) {
 			snapshot.setUpdate(false);
-			AlchemyEventSystem.addDelayedRunnable(new IPhaseRunnable() {
-				@Override
-				public void run(Phase phase) {
-					player.addPotionEffect(new PotionEffect(MobEffects.SPEED, TimeSnapshot.SIZE / 2, 3));
-					player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, TimeSnapshot.SIZE / 2, 3));
+			snapshot.setLeaping(true);
+			Iterator<TimeNode> iterator = snapshot.iterator();
+			AlchemyEventSystem.addContinuedRunnable(p -> {
+				List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
+				int update[] = FXUpdateHelper.getIntArrayByArgs(FX_KEY_GATHER, 240, 200);
+				for (int i = 0; i < 3; i++)
+					d6iaps.add(new Double6IntArrayPackage(
+							player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
+							player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
+							player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
+				AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
+						AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
+				boolean result = false;
+				if (iterator.hasNext())
+					iterator.next().updateEntityOnServer(player);
+				if (!iterator.hasNext()) {
+					snapshot.setUpdate(true);
+					snapshot.setLeaping(false);
+					return true;
 				}
-			}, 0);
-			final Iterator<TimeNode> iterator = snapshot.list.iterator();
-			AlchemyEventSystem.addContinuedRunnable(new IContinuedRunnable() {
-				@Override
-				public boolean run(Phase phase) {
-					List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
-					int update[] = FXUpdateHelper.getIntArrayByArgs(FX_KEY_GATHER, 240, 200);
-					for (int i = 0; i < 3; i++)
-						d6iaps.add(new Double6IntArrayPackage(
-								player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
-								player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
-								player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
-					AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
-							AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
-					boolean result = false;
-					if (iterator.hasNext())
-						iterator.next().updateEntityOnServer(player);
-					if (!iterator.hasNext()) {
-						snapshot.setUpdate(true);
-						return true;
-					}
-					return false;
-				}
+				return false;
 			});
 		}
 	}
@@ -252,10 +233,6 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 		return 0;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void renderCD(int x, int y, int w, int h) {}
-	
 	public ItemRingTime() {
 		super("ring_time", 0xFFBA31);
 	}

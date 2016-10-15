@@ -1,8 +1,6 @@
 package index.alchemy.item;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.alchemy.potion.AlchemyPotion;
 import index.alchemy.util.Always;
@@ -24,11 +22,6 @@ public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle {
 			living.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, AlchemyPotion.NOT_FLASHING_TIME));
 			living.fire = 0;
 		}
-	}
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOW)

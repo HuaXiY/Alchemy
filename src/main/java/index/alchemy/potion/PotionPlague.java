@@ -1,8 +1,6 @@
-	package index.alchemy.potion;
+package index.alchemy.potion;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.AlchemyDamageSourceLoader;
 import index.alchemy.util.Always;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,11 +25,6 @@ public class PotionPlague extends AlchemyPotion implements IEventHandle {
 	@Override
 	public void performEffect(EntityLivingBase living, int level) {
 		living.attackEntityFrom(AlchemyDamageSourceLoader.plague, 1F);
-	}
-
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)

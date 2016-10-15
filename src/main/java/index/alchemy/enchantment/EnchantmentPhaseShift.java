@@ -5,6 +5,7 @@ import org.lwjgl.input.Keyboard;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.annotation.KeyEvent;
+import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyModLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -49,25 +50,28 @@ public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputH
 		GameSettings settings = Minecraft.getMinecraft().gameSettings;
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		if (Keyboard.isKeyDown(settings.keyBindSprint.getKeyCode())
-				&& System.currentTimeMillis() - player.getEntityData().getLong(NBT_KEY_LAST) > PHASE_SHIFT_INTERVAL && isCDOver()) {
-			double strafe = 0, forward = 0;
-			if (key_code == settings.keyBindLeft.getKeyCode())
-				strafe = PHASE_SHIFT_MOTION;
-			else if (key_code == settings.keyBindRight.getKeyCode())
-				strafe = -PHASE_SHIFT_MOTION;
-			else if (key_code == settings.keyBindForward.getKeyCode())
-				forward = PHASE_SHIFT_MOTION;
-			else if (key_code == settings.keyBindBack.getKeyCode())
-				forward = -PHASE_SHIFT_MOTION;
-			if (!player.onGround) {
-				strafe *= BALANCE_COEFFICIENT;
-				forward *= BALANCE_COEFFICIENT;
-			}
-			float sin = sin(player.rotationYaw * 0.017453292F);
-            float cos = cos(player.rotationYaw * 0.017453292F);
-            player.motionX += strafe * cos - forward * sin;
-            player.motionZ += forward * cos + strafe * sin;
-			restartCD();
+				&& System.currentTimeMillis() - player.getEntityData().getLong(NBT_KEY_LAST) > PHASE_SHIFT_INTERVAL) {
+			if (isCDOver()) {
+				double strafe = 0, forward = 0;
+				if (key_code == settings.keyBindLeft.getKeyCode())
+					strafe = PHASE_SHIFT_MOTION;
+				else if (key_code == settings.keyBindRight.getKeyCode())
+					strafe = -PHASE_SHIFT_MOTION;
+				else if (key_code == settings.keyBindForward.getKeyCode())
+					forward = PHASE_SHIFT_MOTION;
+				else if (key_code == settings.keyBindBack.getKeyCode())
+					forward = -PHASE_SHIFT_MOTION;
+				if (!player.onGround) {
+					strafe *= BALANCE_COEFFICIENT;
+					forward *= BALANCE_COEFFICIENT;
+				}
+				float sin = sin(player.rotationYaw * 0.017453292F);
+	            float cos = cos(player.rotationYaw * 0.017453292F);
+	            player.motionX += strafe * cos - forward * sin;
+	            player.motionZ += forward * cos + strafe * sin;
+				restartCD();
+			} else
+				HUDManager.setSnake(this);
 		}
 	}
 	

@@ -35,6 +35,7 @@ import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Premise;
 import index.alchemy.api.annotation.Test;
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
@@ -222,14 +223,15 @@ public class AlchemyModLoader {
 		return instance;
 	}
 	
-	public AlchemyModLoader() {
+	public AlchemyModLoader() throws Exception {
 		if (instance != null)
 			AlchemyRuntimeException.onException(new RuntimeException("Before this has been instantiate"));
 		else 
 			try {
 				bootstrap();
 			} catch (Exception e) {
-				AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e));
+				throw e;
+				//AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e));
 			}
 	}
 	
@@ -324,6 +326,8 @@ public class AlchemyModLoader {
 		
 		enable_dmain = is_modding && Boolean.getBoolean("index.alchemy.enable_dmain");
 		logger.info("Development mode state: " + enable_dmain);
+		
+		AlchemyTransformerManager.loadAllTransformClass();
 	}
 	
 	public static List<String> findClassFromURL(URL url) throws Exception {
@@ -337,6 +341,7 @@ public class AlchemyModLoader {
 	}
 	
 	private static void bootstrap() throws Exception {
+		Tool.forName(AlchemyRuntimeException.class.getName(), false);
 		AlchemyDebug.start("bootstrap");
 		URL url = new File(mod_path).toURI().toURL();
 		class_list.addAll(findClassFromURL(url));
@@ -382,6 +387,7 @@ public class AlchemyModLoader {
 			}
 		}
 		AlchemyDebug.end("bootstrap");
+		log_stack.clear();
 		
 		init(ModState.LOADED);
 		AlchemyUpdateManager.invoke(MOD_ID, DEV_VERSION, null, new File(mod_path));
@@ -396,6 +402,7 @@ public class AlchemyModLoader {
 		if (AlchemyModLoader.state.ordinal() >= state.ordinal())
 			AlchemyRuntimeException.onException(new RuntimeException(
 					"old state(" + getState().name() + ") > new state(" + state.name() + ")"));
+		log_stack.clear();
 		AlchemyModLoader.state = state;
 		String state_str = format(state.toString(), ModState.POSTINITIALIZED.toString());
 		logger.info("************************************   " + state_str + " START   ************************************");

@@ -40,7 +40,6 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import sun.reflect.annotation.AnnotationParser;
 
 public class Tool {
 	
@@ -70,6 +69,10 @@ public class Tool {
 	public static final <T extends AccessibleObject> T setAccessible(T t) {
 		t.setAccessible(true);
 		return t;
+	}
+	
+	public static final int getRandom(int min, int max) {
+		return AlchemyModLoader.random.nextInt(max - min + 1) + min;
 	}
 	
 	public static final String get(String str, String key) {
@@ -160,7 +163,7 @@ public class Tool {
 					temp = null;
 				}
 		}
-		return (T) AnnotationParser.annotationForMap(clazz, args);
+		return (T) sun.reflect.annotation.AnnotationParser.annotationForMap(clazz, args);
 	}
 	
 	@Unsafe(Unsafe.REFLECT_API)

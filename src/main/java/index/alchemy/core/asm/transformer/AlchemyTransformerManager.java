@@ -53,6 +53,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		}
 	}
 	
+	public static final boolean debug_print = Boolean.getBoolean("index.alchemy.core.asm.classloader.at.debug.print");
+	
 	@Unsafe(Unsafe.ASM_API)
 	private static void loadAllHook() throws IOException {
 		ClassReader reader = new ClassReader(ALCHEMY_HOOKS_CLASS);
@@ -78,7 +80,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	@Unsafe(Unsafe.ASM_API)
 	private static void loadAllTransform() throws IOException {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
-		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_TRANSFORMER_PACKAGE)) {
+		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_TRANSFORMER_PACKAGE.substring(0, MOD_TRANSFORMER_PACKAGE.length() - 1))) {
 			Class clazz = info.load();
 			if (Tool.isInstance(IAlchemyClassTransformer.class, clazz))
 				try {
@@ -91,12 +93,20 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		if (debug_print)
+			if (transformedName.startsWith("index."))
+				logger.info("loading: " + transformedName);
 		if (transformers_mapping.containsKey(transformedName)) {
 			List<IClassTransformer> transformers = transformers_mapping.get(transformedName);
 			for (IClassTransformer transformer : transformers)
 				basicClass = transformer.transform(name, transformedName, basicClass);
 		}
 		return basicClass;
+	}
+	
+	public static void loadAllTransformClass() {
+		for (String clazz : transformers_mapping.keySet())
+			Tool.forName(clazz, false);
 	}
 	
 	public static void transform(String name) {

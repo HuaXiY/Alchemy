@@ -1,8 +1,6 @@
 package index.alchemy.achievement;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.stats.Achievement;
@@ -22,11 +20,6 @@ public class AchievementUseItem extends AlchemyAchievement implements IEventHand
 		item = clazz;
 	}
 
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
-	}
-	
 	@SubscribeEvent
 	public void onLivingEntityUseItem_Finish(LivingEntityUseItemEvent.Finish event) {
 		if (event.getEntityLiving() instanceof EntityPlayer && item.isInstance(event.getItem().getItem()))

@@ -38,6 +38,10 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IInve
 		this(size, "", LIMIT);
 	}
 	
+	public AlchemyInventory(int size, String name) {
+		this(size, name, 64);
+	}
+	
 	public AlchemyInventory(int size, String name, int limit) {
 		this.name = name;
 		this.limit = limit;

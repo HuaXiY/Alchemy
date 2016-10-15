@@ -6,8 +6,6 @@ import java.util.List;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.entity.ai.EntityArrowTracker;
 import index.alchemy.entity.ai.EntityHelper;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
@@ -53,11 +51,6 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 		if (Always.isServer())
 			if (living.ticksExisted % RECOVERY_INTERVAL == 0 && living.getAbsorptionAmount() < MAX_ABSORPTION && isCDOver(living))
 				living.setAbsorptionAmount(min(living.getAbsorptionAmount() + 1, MAX_ABSORPTION));
-	}
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -187,10 +180,6 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	public int getRenderID() {
 		return 2;
 	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void renderCD(int x, int y, int w, int h) {}
 
 	public ItemBeltGuard() {
 		super("belt_guard", 0xFFCC00);

@@ -93,7 +93,7 @@ public class AlchemyDLCLoader {
 					return;
 				}
 				URL url = file.toURI().toURL();
-				Tool.addURLToClassLoader(Thread.currentThread().getContextClassLoader(), url);
+				Tool.addURLToClassLoader(AlchemyDLCLoader.class.getClassLoader(), url);
 				List<String> classes = AlchemyModLoader.findClassFromURL(url);
 				AlchemyModLoader.addClass(classes);
 				file_mapping.put(dlc.name(), file);

@@ -24,7 +24,8 @@ public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		String srgMethodName = "func_175068_a", srgFieldName = "field_175078_W", clazzName = ASMHelper.getClassName(transformedName);
+		String srgMethodName = "func_175068_a"/* renderWorldPass */, srgFieldName = "field_175078_W"/* debugView */,
+				clazzName = ASMHelper.getClassName(transformedName);
 		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
 			srgMethodName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(clazzName, srgMethodName, "(IFJ)V");
 			srgFieldName = FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(clazzName, srgFieldName, "Z");

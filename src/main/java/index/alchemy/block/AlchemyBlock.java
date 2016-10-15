@@ -4,7 +4,6 @@ import java.util.Random;
 
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
-import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.item.AlchemyItem;
 import net.minecraft.block.Block;
@@ -46,11 +45,5 @@ public class AlchemyBlock extends Block implements IResourceLocation, IRegister 
 	public boolean hasCreativeTab() {
 		return true;
 	}
-	
-	@Override
-	public void register() {
-		AlchemyInitHook.init_impl(this);
-	}
-
 	
 }

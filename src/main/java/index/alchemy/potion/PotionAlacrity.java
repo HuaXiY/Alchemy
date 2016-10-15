@@ -106,10 +106,6 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 		return -1;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void renderCD(int x, int y, int w, int h) {}
-	
 	public PotionAlacrity() {
 		super("alacrity", false, 0x66CCFF);
 	}

@@ -1,8 +1,6 @@
 package index.alchemy.item;
 
 import index.alchemy.api.IEventHandle;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,11 +13,6 @@ public class ItemRingBlessing extends AlchemyItemRing implements IEventHandle {
 	
 	public static final String DAMAGETYPE = "player";
 	public static final float HURT_MIN_VALUE = 3, HURT_PERCENTAGE = 0.02F;
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
-	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingHurt(LivingHurtEvent event) {

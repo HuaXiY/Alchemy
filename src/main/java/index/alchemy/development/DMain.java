@@ -10,8 +10,10 @@ import java.util.Map.Entry;
 
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Lang;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -44,6 +46,17 @@ public class DMain {
 				init.add(clazz.getMethod("init"));
 			} catch (NoSuchMethodException e) {
 				AlchemyModLoader.logger.warn("Can't find init method in: " + clazz.getName());
+			}
+		}
+		Lang lang = clazz.getAnnotation(Lang.class);
+		if (lang != null && Tool.isSubclass(Enum.class, clazz)) {
+			try {
+				Enum[] enums = (Enum[]) Tool.setAccessible(clazz.getDeclaredField("ENUM$VALUES")).get(null);
+				String prefix = (String) Tool.setAccessible(clazz.getDeclaredField("PREFIX")).get(null);
+				for (Enum e : enums)
+					DLang.miscMap.put(prefix + e.name().toLowerCase(), e.name().toLowerCase());
+			} catch (Exception e) {
+				AlchemyRuntimeException.onException(e);
 			}
 		}
 	}

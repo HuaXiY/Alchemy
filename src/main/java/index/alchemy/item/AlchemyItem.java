@@ -4,7 +4,6 @@ import java.util.Random;
 
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
-import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.AlchemyConstants;
 import net.minecraft.creativetab.CreativeTabs;
@@ -22,11 +21,6 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 		public AlchemyCreativeTabs(String label) {
 			super(label);
 			register();
-		}
-
-		@Override
-		public void register() {
-			AlchemyInitHook.init(this);
 		}
 		
 	}
@@ -80,11 +74,6 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 		setUnlocalizedName(name);
 		setRegistryName(name);
 		register();
-	}
-	
-	@Override
-	public void register() {
-		AlchemyInitHook.init_impl(this);
 	}
 	
 }

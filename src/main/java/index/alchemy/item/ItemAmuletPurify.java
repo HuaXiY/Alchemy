@@ -6,8 +6,6 @@ import java.util.List;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
-import index.alchemy.core.AlchemyEventSystem;
-import index.alchemy.core.AlchemyEventSystem.EventType;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.alchemy.item.ItemAmuletPurify.MessagePurifyCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -65,11 +63,6 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 				living.setAir(MAX_AIR);
 			}
 		}
-	}
-	
-	@Override
-	public EventType[] getEventType() {
-		return AlchemyEventSystem.EVENT_BUS;
 	}
 	
 	@SubscribeEvent
@@ -135,10 +128,6 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	public int getRenderID() {
 		return 3;
 	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void renderCD(int x, int y, int w, int h) {}
 
 	public ItemAmuletPurify() {
 		super("amulet_purify", 0x66CCFF);
