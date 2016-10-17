@@ -28,14 +28,15 @@ import static index.alchemy.core.AlchemyConstants.*;
 
 public class TransformerSideLambda implements IClassTransformer {
 	
+	public static final String SIDE_ONLY_DESC = ASMHelper.getClassDesc("net.minecraftforge.fml.relauncher.SideOnly"),
+			SIDE_ONLY_LAMBDA_DESC = ASMHelper.getClassDesc("index.alchemy.api.annotation.SideOnlyLambda");
+	
 	public static final Side runtime_side = FMLLaunchHandler.side();
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if (!transformedName.startsWith(MOD_PACKAGE))
 			return basicClass;
-		String 	side_desc = ASMHelper.getClassDesc("net.minecraftforge.fml.relauncher.SideOnly"),
-				side_lambda_desc = ASMHelper.getClassDesc("index.alchemy.api.annotation.SideOnlyLambda");
 		LinkedList<Type> types = new LinkedList<>();
 		LinkedList<Boolean> marks = new LinkedList<>();
 		int flag = -1;
@@ -53,7 +54,7 @@ public class TransformerSideLambda implements IClassTransformer {
 			Side side = null;
 			if (method.visibleAnnotations != null)
 				for (AnnotationNode ann : method.visibleAnnotations)
-					if (ann.desc.equals(side_desc))
+					if (ann.desc.equals(SIDE_ONLY_DESC))
 						side = Tool.makeAnnotation(SideOnly.class, ann.values).value();
 			for (Iterator<AbstractInsnNode> insnIterator = method.instructions.iterator(); insnIterator.hasNext(); flag--) {
 				AbstractInsnNode insn = insnIterator.next();
@@ -69,7 +70,7 @@ public class TransformerSideLambda implements IClassTransformer {
 					if (Type.getType(ASMHelper.getClassDesc(type.desc)).equals(types.getLast()) &&
 							insn.visibleTypeAnnotations != null)
 						for (TypeAnnotationNode ann : insn.visibleTypeAnnotations)
-							if (ann.desc.equals(side_lambda_desc) &&
+							if (ann.desc.equals(SIDE_ONLY_LAMBDA_DESC) &&
 									Tool.makeAnnotation(SideOnlyLambda.class, ann.values).value() != runtime_side)
 								marks.set(marks.size() - 1, true);
 				}

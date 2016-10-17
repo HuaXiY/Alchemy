@@ -13,6 +13,9 @@ public @interface Hook {
 	
 	public static class Result {
 		
+		public static final Result VOID = new Result(), NULL = new Result(null),
+				TRUE = new Result(Boolean.TRUE), FALSE = new Result(Boolean.FALSE);
+		
 		public final Object result;
 		
 		public Result() {

@@ -9,10 +9,10 @@ public enum BaubleType {
 	AMULET(0),
 	RING(1, 2),
 	BELT(3),
+	TRINKET(0, 1, 2, 3, 4, 5, 6),
 	HEAD(4),
 	BODY(5),
-	CHARM(6),
-	TRINKET(0, 1, 2, 3, 4, 5, 6);
+	CHARM(6);
 	
 	int[] validSlots;
 	

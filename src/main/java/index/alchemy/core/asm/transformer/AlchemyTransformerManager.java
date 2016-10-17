@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -19,6 +18,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Hook;
+import index.alchemy.api.annotation.Proxy;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
@@ -30,8 +30,12 @@ import static index.alchemy.core.AlchemyConstants.*;
 
 public class AlchemyTransformerManager implements IClassTransformer {
 	
-	public static final String ALCHEMY_HOOKS_CLASS = "index.alchemy.core.AlchemyHooks", ALCHEMY_HOOKS_DESC = "index/alchemy/core/AlchemyHooks",
-			ANNOTATION_DESC = Type.getDescriptor(Hook.class), HOOK_RESULT_DESC = "index/alchemy/api/annotation/Hook$Result";
+	public static final String 
+			ALCHEMY_HOOKS_CLASS = "index.alchemy.core.AlchemyHooks",
+			ALCHEMY_HOOKS_DESC = "index/alchemy/core/AlchemyHooks",
+			HOOK_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook;",
+			HOOK_RESULT_DESC = "index/alchemy/api/annotation/Hook$Result",
+			PROXY_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Proxy;";
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyTransformerManager.class.getSimpleName());
 	
@@ -47,6 +51,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	static {
 		try {
 			loadAllHook();
+			loadAllProxy();
 			loadAllTransform();
 		} catch (IOException e) {
 			AlchemyRuntimeException.onException(e);
@@ -62,9 +67,9 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		reader.accept(node, 0);
 		for (MethodNode methodNode : node.methods)
 			if (methodNode.visibleAnnotations != null)
-				for (AnnotationNode annotationNode : methodNode.visibleAnnotations)
-					if (annotationNode.desc.equals(ANNOTATION_DESC)) {
-						Hook hook = Tool.makeAnnotation(Hook.class, annotationNode.values,
+				for (AnnotationNode ann : methodNode.visibleAnnotations)
+					if (ann.desc.equals(HOOK_ANNOTATION_DESC)) {
+						Hook hook = Tool.makeAnnotation(Hook.class, ann.values,
 								"isStatic", false, "type", Hook.Type.HEAD, "disable", "");
 						if (hook.disable().isEmpty() || !Boolean.getBoolean(hook.disable())) {
 							String args[] = hook.value().split("#");
@@ -75,6 +80,23 @@ public class AlchemyTransformerManager implements IClassTransformer {
 								AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
 						}
 					}
+	}
+	
+	@Unsafe(Unsafe.ASM_API)
+	private static void loadAllProxy() throws IOException {
+		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
+		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_PACKAGE.substring(0, MOD_PACKAGE.length() - 1))) {
+			ClassReader reader = new ClassReader(info.getName());
+			ClassNode node = new ClassNode(ASM5);
+			reader.accept(node, 0);
+			if (node.visibleAnnotations != null)
+				for (AnnotationNode ann : node.visibleAnnotations)
+					if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
+						System.out.println("load proxy: " + info.getName());
+						Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
+						transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
+					}
+		}
 	}
 	
 	@Unsafe(Unsafe.ASM_API)

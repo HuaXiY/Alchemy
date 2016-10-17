@@ -30,25 +30,28 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 
+import static index.alchemy.core.AlchemyConstants.*;
+
 public class InventoryBauble extends AlchemyInventory implements IBaublesItemHandler {
 	
 	public static final int LIMIT = 1;
 	public static final String NAME = "bauble", UPDATE_INDEX_NBT_KEY = "";
 	
 	@Texture({
-		"alchemy:items/empty_ring",
-		"alchemy:items/empty_amulet",
-		"alchemy:items/empty_belt",
-		"alchemy:items/empty_head",
-		"alchemy:items/empty_body",
-		"alchemy:items/empty_charm"
+		MOD_ID + ":items/empty_amulet",
+		MOD_ID + ":items/empty_ring",
+		MOD_ID + ":items/empty_belt",
+		MOD_ID + ":items/empty_trinket",
+		MOD_ID + ":items/empty_head",
+		MOD_ID + ":items/empty_body",
+		MOD_ID + ":items/empty_charm"
 	})
 	public static class SlotBauble extends Slot {
 		
 		public static final String EMPTY_NAME[] = SlotBauble.class.getAnnotation(Texture.class).value();
 		
-		private final BaubleType type;
-		private final EntityLivingBase living;
+		protected final BaubleType type;
+		protected final EntityLivingBase living;
 		
 		public SlotBauble(EntityLivingBase living, IInventory inventory, BaubleType type, int index, int x, int y) {
 			super(inventory, index, x, y);
@@ -59,6 +62,10 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		
 		public BaubleType getType() {
 			return type;
+		}
+		
+		public EntityLivingBase getOwner() {
+			return living;
 		}
 		
 		@Override
@@ -114,10 +121,14 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	
 	@Nullable
 	public NBTTagCompound getUpdateNBT() {
-		NBTTagCompound nbt = new NBTTagCompound();
 		int index = ArrayUtils.indexOf(changed, true);
 		if (index == -1)
 			return null;
+		return getUpdateNBT(index);
+	}
+	
+	public NBTTagCompound getUpdateNBT(int index) {
+		NBTTagCompound nbt = new NBTTagCompound();
 		changed[index] = false;
 		nbt.setInteger(UPDATE_INDEX_NBT_KEY, index);
 		nbt.setTag(CONTENTS, NBTHelper.getNBTFormItemStack(getStackInSlot(index)));

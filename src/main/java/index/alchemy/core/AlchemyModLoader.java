@@ -56,18 +56,18 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import static index.alchemy.core.AlchemyConstants.*;
 import static index.alchemy.core.AlchemyModLoader.*;
 
-import static org.objectweb.asm.Opcodes.*;
-
 /* 
  * -----------------------------------------------
- *    __    __    ___  _   _  ____  __  __  _  _ 
+ *	__	__	___  _   _  ____  __  __  _  _ 
  *   /__\  (  )  / __)( )_( )( ___)(  \/  )( \/ )
- *  /(__)\  )(__( (__  ) _ (  )__)  )    (  \  / 
+ *  /(__)\  )(__( (__  ) _ (  )__)  )	(  \  / 
  * (__)(__)(____)\___)(_) (_)(____)(_/\/\_) (__) 
- *                                               
+ *											   
  * -----------------------------------------------
  */
 
@@ -118,15 +118,15 @@ public class AlchemyModLoader {
 			return ++id;
 		}
 		
-        private ASMClassLoader() {
-            super(ASMClassLoader.class.getClassLoader());
-        }
+		private ASMClassLoader() {
+			super(ASMClassLoader.class.getClassLoader());
+		}
 
-        public Class<?> define(String name, byte[] data) {
-            return defineClass(name, data, 0, data.length);
-        }
-        
-        private String getUniqueName(Method callback) {
+		public Class<?> define(String name, byte[] data) {
+			return defineClass(name, data, 0, data.length);
+		}
+		
+		private String getUniqueName(Method callback) {
 			return String.format(
 					"%s_%d_%s_%s_%s",
 					getClass().getName(), nextId(),
@@ -135,11 +135,11 @@ public class AlchemyModLoader {
 					callback.getParameterTypes()[0].getSimpleName().replace("[]", "_L")
 			);
 		}
-        
-        @Nullable
+		
+		@Nullable
 		@Unsafe(Unsafe.ASM_API)
 		public Function createWrapper(Method callback, Object target) {
-        	Function result = null;
+			Function result = null;
 			
 			ClassWriter cw = new ClassWriter(0);
 			MethodVisitor mv;
@@ -207,8 +207,8 @@ public class AlchemyModLoader {
 			}
 			return result;
 		}
-        
-    }
+		
+	}
 	
 	public static final ASMClassLoader asm_loader = new ASMClassLoader();
 	
@@ -230,8 +230,7 @@ public class AlchemyModLoader {
 			try {
 				bootstrap();
 			} catch (Exception e) {
-				throw e;
-				//AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e));
+				AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e));
 			}
 	}
 	
@@ -413,7 +412,7 @@ public class AlchemyModLoader {
 				init(clazz);
 		}
 		ProgressManager.pop(bar);
-		logger.info("************************************   " + state_str + "  END    ************************************");
+		logger.info("************************************   " + state_str + "  END	************************************");
 	}
 	
 	public static void init(Class<?> clazz) {

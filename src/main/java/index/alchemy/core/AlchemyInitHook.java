@@ -61,9 +61,6 @@ public class AlchemyInitHook {
 		if (impl instanceof Block)
 			init_impl(new ItemBlock((Block) impl).setRegistryName(((Block) impl).getRegistryName()));
 		
-		if (impl instanceof ITileEntity)
-			GameRegistry.registerTileEntity(((ITileEntity) impl).getTileEntityClass(), ((ITileEntity) impl).getTileEntityName());
-		
 	}
 	
 	@Change("1.9.4")
@@ -75,6 +72,9 @@ public class AlchemyInitHook {
 		
 		if (obj instanceof Impl && obj instanceof IRegister && ((IRegister) obj).shouldRegisterToGame())
 			init_impl((Impl) obj);
+		
+		if (obj instanceof ITileEntity)
+			GameRegistry.registerTileEntity(((ITileEntity) obj).getTileEntityClass(), ((ITileEntity) obj).getTileEntityName());
 		
 		if (obj instanceof IOreDictionary)
 			OreDictionary.registerOre(((IOreDictionary) obj).getNameInOreDictionary(), ((IOreDictionary) obj).getItemStackInOreDictionary());

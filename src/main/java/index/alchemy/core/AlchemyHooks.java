@@ -13,10 +13,12 @@ import index.alchemy.entity.ai.EntityAIEatMeat;
 import index.alchemy.inventory.InventoryBauble;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,6 +36,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class AlchemyHooks {
 	
+	@Hook(value = "biomesoplenty.common.remote.TrailManager#retrieveTrails", isStatic = true)
+	public static final Hook.Result retrieveTrails() {
+		return Hook.Result.NULL;
+	}
+	
 	@Hook("net.minecraft.world.World#func_72875_a")
 	public static final Hook.Result isMaterialInBB(World world, AxisAlignedBB bb, Material material) {
 		int minX = MathHelper.floor_double(bb.minX);
@@ -49,11 +56,11 @@ public class AlchemyHooks {
 					Block block = world.getBlockState(pos.setPos(x, y, z)).getBlock();
 					if (block instanceof IMaterialContainer && ((IMaterialContainer) block).isMaterialInBB(world, pos, material)) {
 						pos.release();
-						return new Hook.Result(Boolean.TRUE);
+						return Hook.Result.TRUE;
 					}
 				}
 		pos.release();
-		return new Hook.Result();
+		return Hook.Result.VOID;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -112,19 +119,19 @@ public class AlchemyHooks {
 					slot.putStack(null);
 				else
 					slot.onSlotChanged();
-				return new Hook.Result(null);
+				return Hook.Result.NULL;
 			}
 		}
-		return new Hook.Result();
+		return Hook.Result.VOID;
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@Hook(value = "net.minecraft.client.Minecraft#func_184124_aB", disable = "index.alchemy.asm.hook.disable_mouse_hook")
 	public static final Hook.Result runTickMouse(Minecraft minecraft) {
 		if (AlchemyEventSystem.isHookInput())
-			return new Hook.Result(null);
+			return Hook.Result.NULL;
 		else
-			return new Hook.Result();
+			return Hook.Result.VOID;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -133,14 +140,21 @@ public class AlchemyHooks {
 		if (AlchemyEventSystem.isHookInput()) {
 			Mouse.getDX();
 			Mouse.getDY();
-			return new Hook.Result(null);
+			return Hook.Result.NULL;
 		} else
-			return new Hook.Result();
+			return Hook.Result.VOID;
 	}
 	
 	@Hook(value = "net.minecraft.entity.passive.EntityWolf#func_184651_r", type = Hook.Type.TAIL)
 	public static final void initEntityAI(EntityWolf wolf) {
 		wolf.tasks.addTask(3, new EntityAIEatMeat(wolf));
+	}
+	
+	@Hook("net.minecraft.client.renderer.block.statemap.DefaultStateMapper#func_178132_a")
+	public static final void getModelResourceLocation(DefaultStateMapper mapper, IBlockState state) {
+		//System.out.println(state);
+		//System.out.println(state.getBlock());
+		//System.out.println(state.getBlock().getClass());
 	}
 	
 }

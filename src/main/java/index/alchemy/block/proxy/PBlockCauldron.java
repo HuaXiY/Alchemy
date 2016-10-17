@@ -8,6 +8,7 @@ import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
+import index.alchemy.api.annotation.Proxy;
 import index.alchemy.api.event.CauldronActivatedEvent;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.Always;
@@ -35,6 +36,7 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
 @Change("1.9.4")
+@Proxy("net.minecraft.block.BlockCauldron")
 public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMaterialContainer, IRegister {
 	
 	@Override
@@ -99,9 +101,7 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 					player.addStat(StatList.BANNER_CLEANED);
 					setWaterLevel(world, pos, state, i - 1);
 				}
-			} /*else if (item instanceof ItemBucket) {
-				
-			}*/ else {
+			} else {
 				FluidUtil.interactWithFluidHandler(heldItem, cauldron.getTank(), player);
 			}
 		}

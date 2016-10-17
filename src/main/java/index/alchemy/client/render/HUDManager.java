@@ -36,6 +36,7 @@ public class HUDManager {
 	@Config(category = CATEGORY, comment = "The y-axis offset when render the CoolDown.")
 	private static int render_cool_down_offset_y = 0;
 	
+	@Config(category = CATEGORY, comment = "The number of rows when render the CoolDown.")
 	public static int render_num = 4;
 	
 	public static void registerCoolDown(ICoolDown cd) {
@@ -74,7 +75,7 @@ public class HUDManager {
 			++i;
 			int x = getCDXStart(i), y = getCDYStart(i), snake = Tool.isNullOr(snakes.get(cd), 0), sx = 0, sy = 0;
 			if (snake > 0) {
-				snakes.put(cd, --snake);
+				snakes.put(cd, cd.getResidualCD() == 1 ? 0 : --snake);
 				sx = Tool.getRandom(-SNAKE, SNAKE);
 				sy = Tool.getRandom(-SNAKE, SNAKE);
 			}
@@ -102,7 +103,7 @@ public class HUDManager {
 	}
 	
 	public static int getCDXStart(int i) {
-		return Minecraft.getMinecraft().displayWidth - (CD_SIZE + INTERVAL) *  (1 + (i % render_num)) + render_cool_down_offset_x;
+		return Minecraft.getMinecraft().displayWidth - (CD_SIZE + INTERVAL) * (1 + (i % render_num)) + render_cool_down_offset_x;
 	}
 	
 	public static int getCDYStart(int i) {
