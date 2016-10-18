@@ -36,7 +36,7 @@ public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 		reader.accept(node, 0);
 		insn_node: for (MethodNode method : node.methods)
 			if (method.name.equals(srgMethodName)) {
-				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgMethodName + method.desc);
+				AlchemyTransformerManager.transform("<remove>" + name + "|" + transformedName + "#" + srgMethodName + method.desc);
 				int i = 0;
 				for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
 					AbstractInsnNode insn = iterator.next();

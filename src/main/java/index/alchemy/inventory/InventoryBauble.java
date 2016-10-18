@@ -35,7 +35,7 @@ import static index.alchemy.core.AlchemyConstants.*;
 public class InventoryBauble extends AlchemyInventory implements IBaublesItemHandler {
 	
 	public static final int LIMIT = 1;
-	public static final String NAME = "bauble", UPDATE_INDEX_NBT_KEY = "";
+	public static final String NAME = "bauble", UPDATE_INDEX_NBT_KEY = "bauble_index";
 	
 	@Texture({
 		MOD_ID + ":items/empty_amulet",
@@ -70,10 +70,7 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		
 		@Override
 		public boolean isItemValid(ItemStack item) {
-			return item != null && item.getItem() != null &&
-					item.getItem() instanceof IBauble && 
-				   ((IBauble) item.getItem()).getBaubleType(item) == type &&
-				   ((IBauble) item.getItem()).canEquip(item, living);
+			return inventory.isItemValidForSlot(getSlotIndex(), item);
 		}
 
 		@Override
@@ -185,7 +182,9 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack item) {
-		return item != null && item.getItem() instanceof IBauble;
+		return item != null && item.getItem() instanceof IBauble &&
+				((IBauble) item.getItem()).getBaubleType(item).hasSlot(index) &&
+				((IBauble) item.getItem()).canEquip(item, living);
 	}
 
 	@Override
@@ -224,10 +223,8 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int slot, ItemStack stack, EntityLivingBase player) {
-		return stack != null && stack.getItem() instanceof IBauble &&
-				((IBauble) stack.getItem()).canEquip(stack, player) &&
-				((IBauble) stack.getItem()).getBaubleType(stack).hasSlot(slot);
+	public boolean isItemValidForSlot(int index, ItemStack item, EntityLivingBase living) {
+		return isItemValidForSlot(index, item);
 	}
 
 	@Override

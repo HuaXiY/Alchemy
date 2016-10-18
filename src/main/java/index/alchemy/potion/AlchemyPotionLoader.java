@@ -203,7 +203,7 @@ public class AlchemyPotionLoader extends PotionType {
 	
 	public static void registerPotionType(String name, PotionType potion) {
 		potion.setRegistryName(name);
-        AlchemyInitHook.init_impl(potion);
+        AlchemyInitHook.init(potion);
     }
 	
 	public static void init() {

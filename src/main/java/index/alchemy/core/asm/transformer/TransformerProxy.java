@@ -32,7 +32,7 @@ public class TransformerProxy implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		AlchemyTransformerManager.transform(name + "|" + transformedName + "\n->  " + proxy.name.replace('/', '.'));
+		AlchemyTransformerManager.transform("<proxy>" + name + "|" + transformedName + "\n->  " + proxy.name.replace('/', '.'));
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = new ClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);

@@ -50,7 +50,7 @@ public final class TransformerHook implements IClassTransformer {
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)
 			if (method.name.equals(srgName) && checkMethodNode(method)) {
-				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName + method.desc + "\n->  " +
+				AlchemyTransformerManager.transform("<hook>" + name + "|" + transformedName + "#" + srgName + method.desc + "\n->  " +
 						AlchemyHooks.class.getName() + "#" + hookMethod.name + hookMethod.desc);
 				Type args[] = Type.getArgumentTypes(method.desc), returnType = Type.getReturnType(method.desc);
 				int returnOpcode = ASMHelper.getReturnOpcode(returnType);

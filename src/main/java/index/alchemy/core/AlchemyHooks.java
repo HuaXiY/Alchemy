@@ -4,9 +4,11 @@ import org.lwjgl.input.Mouse;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
+import baubles.client.BaublesRenderLayer;
 import index.alchemy.api.AlchemyBaubles;
 import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.annotation.Hook;
+import index.alchemy.api.annotation.Hook.Type;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.entity.ai.EntityAIEatMeat;
@@ -17,6 +19,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,6 +41,12 @@ public class AlchemyHooks {
 	@Hook(value = "biomesoplenty.common.remote.TrailManager#retrieveTrails", isStatic = true)
 	public static final Hook.Result retrieveTrails() {
 		return Hook.Result.NULL;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.client.renderer.entity.RenderPlayer#<init>", type = Type.TAIL)
+	public static final void init_RenderPlayer(RenderPlayer renderPlayer, RenderManager renderManager, boolean useSmallArms) {
+		renderPlayer.addLayer(new BaublesRenderLayer());
 	}
 	
 	@Hook("net.minecraft.world.World#func_72875_a")

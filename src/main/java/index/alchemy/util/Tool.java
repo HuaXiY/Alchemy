@@ -102,7 +102,7 @@ public class Tool {
 		if (name == null || name.isEmpty())
 			return null;
 		try {
-			return Class.forName(name);
+			return Class.forName(name, init, Tool.class.getClassLoader());
 		} catch (ClassNotFoundException e) {
 			return null;
 		}

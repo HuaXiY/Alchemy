@@ -36,7 +36,7 @@ public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)
 			if (method.name.equals(srgName1)) {
-				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName1 + method.desc);
+				AlchemyTransformerManager.transform("<ldc>" + name + "|" + transformedName + "#" + srgName1 + method.desc);
 				for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
 					AbstractInsnNode insn = iterator.next();
 					if (insn instanceof LdcInsnNode) {
@@ -46,7 +46,7 @@ public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer
 					}
 				}
 			} else if (method.name.equals(srgName2)) {
-				AlchemyTransformerManager.transform(name + "|" + transformedName + "#" + srgName2 + method.desc);
+				AlchemyTransformerManager.transform("<ldc>" + name + "|" + transformedName + "#" + srgName2 + method.desc);
 				for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {
 					AbstractInsnNode insn = iterator.next();
 					if (insn instanceof IntInsnNode) {
