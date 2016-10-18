@@ -45,7 +45,8 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	@Override
 	public String[] getASMTransformerClass() {
 		return new String[] {
-				"index.alchemy.core.asm.transformer.TransformerSideLambda"
+				"index.alchemy.core.asm.transformer.TransformerSideLambda",
+				"index.alchemy.core.asm.transformer.TransformerDeobfuscating"
 		};
 	}
 

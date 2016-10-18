@@ -14,6 +14,7 @@ import index.alchemy.api.IInventoryProvider;
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
@@ -43,11 +44,11 @@ public class DLang {
 	public static final Map<Class<?>, Method> _funcMap = null;
 	static {
 		for (Field field : DLang.class.getDeclaredFields())
-			if (Tool.setAccessible(field).getType() == Map.class)
+			if (field.getType() == Map.class)
 				try {
 					FinalFieldSetter.getInstance().setStatic(field, new LinkedHashMap<>());
 				} catch (Exception e) {
-					e.printStackTrace();
+					AlchemyRuntimeException.onException(e);
 				}
 		
 		for (Method method : DLang.class.getDeclaredMethods()) {

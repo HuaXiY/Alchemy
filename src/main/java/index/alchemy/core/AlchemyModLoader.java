@@ -310,6 +310,8 @@ public class AlchemyModLoader {
 	}
 	
 	static {
+		AlchemyTransformerManager.loadAllTransformClass();
+		
 		try {
 			for (String line : Tool.read(AlchemyModLoader.class.getResourceAsStream("/ascii_art.txt")).split("\n"))
 				logger.info(line);
@@ -325,8 +327,6 @@ public class AlchemyModLoader {
 		
 		enable_dmain = is_modding && Boolean.getBoolean("index.alchemy.enable_dmain");
 		logger.info("Development mode state: " + enable_dmain);
-		
-		AlchemyTransformerManager.loadAllTransformClass();
 	}
 	
 	public static List<String> findClassFromURL(URL url) throws Exception {

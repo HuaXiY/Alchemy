@@ -127,7 +127,7 @@ public final class TransformerHook implements IClassTransformer {
 	public TransformerHook(MethodNode hookMethod, String owner, String srgName, boolean isStatic, Hook.Type type) {
 		this.hookMethod = hookMethod;
 		this.owner = ASMHelper.getClassName(owner);
-		String desc, result = null;
+		String desc = null, result = null;
 		Type args[] = Type.getArgumentTypes(hookMethod.desc);
 		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
 			StringBuilder builder = new StringBuilder("(");

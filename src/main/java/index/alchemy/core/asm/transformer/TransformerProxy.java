@@ -20,7 +20,6 @@ import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -79,7 +78,6 @@ public class TransformerProxy implements IClassTransformer {
 		node.fields.addAll(proxy.fields);
 		node.interfaces.addAll(proxy.interfaces);
 		node.accept(writer);
-		Tool.printClass(writer.toByteArray());
 		return writer.toByteArray();
 	}
 	

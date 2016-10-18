@@ -92,7 +92,6 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			if (node.visibleAnnotations != null)
 				for (AnnotationNode ann : node.visibleAnnotations)
 					if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
-						System.out.println("load proxy: " + info.getName());
 						Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
 						transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
 					}

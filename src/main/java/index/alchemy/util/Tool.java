@@ -531,30 +531,37 @@ public class Tool {
 	public static final Void VOID = instance(Void.class);
 	
 	@Nullable
-	public static final <T> T $(Object... args) throws Exception {
-		checkArrayLength(args, 2);
-		Object object = args[0].getClass() == Class.class ? null : args[0];
-		String name = (String) args[1];
-		Class<?> clazz = null;
-		if (args[0].getClass() == String.class) {
-			String str = (String) args[0];
-			if (str.startsWith("L"))
-				clazz = Tool.forName(str.substring(1), false);
-			if (clazz == null)
-				clazz = String.class;
-		} else
-			clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
-		args = ArrayUtils.subarray(args, 2, args.length);
-		do {
-			Method method = searchMethod(clazz, name, args);
-			if (method != null)
-				return (T) isNullOr(method.invoke(object, args), VOID);
-		} while((clazz = clazz.getSuperclass()) != null);
-		StringBuilder builder = new StringBuilder();
-		for (Object arg : args)
-			builder.append(arg).append(", ");
-		builder.setLength(Math.max(builder.length(), builder.length() - 2));
-		throw new RuntimeException("Can't invoke: " + builder.toString());
+	@Unsafe(Unsafe.REFLECT_API)
+	public static final <T> T $(Object... args) {
+		try {
+			checkArrayLength(args, 2);
+			String name = (String) args[1];
+			Class<?> clazz = null;
+			if (args[0].getClass() == String.class) {
+				String str = (String) args[0];
+				if (str.startsWith("L"))
+					clazz = Tool.forName(str.substring(1), false);
+				if (clazz == null)
+					clazz = String.class;
+			} else
+				clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
+			Object object = args[0].getClass() == clazz ? args[0] : null;
+			if (args.length == 2)
+				return (T) Tool.setAccessible(clazz.getDeclaredField((String) args[1])).get(object);
+			args = ArrayUtils.subarray(args, 2, args.length);
+			do {
+				Method method = searchMethod(clazz, name, args);
+				if (method != null)
+					return (T) isNullOr(method.invoke(object, args), VOID);
+			} while((clazz = clazz.getSuperclass()) != null);
+			throw new IllegalArgumentException();
+		} catch(Exception e) {
+			StringBuilder builder = new StringBuilder();
+			for (Object arg : args)
+				builder.append(arg).append(", ");
+			builder.setLength(Math.max(builder.length(), builder.length() - 2));
+			throw new RuntimeException("Can't invoke: " + builder.toString(), e);
+		}
 	}
 	
 	public static final void printClass(String name) {

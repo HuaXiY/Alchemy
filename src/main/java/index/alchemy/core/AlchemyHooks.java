@@ -13,12 +13,10 @@ import index.alchemy.entity.ai.EntityAIEatMeat;
 import index.alchemy.inventory.InventoryBauble;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -148,13 +146,6 @@ public class AlchemyHooks {
 	@Hook(value = "net.minecraft.entity.passive.EntityWolf#func_184651_r", type = Hook.Type.TAIL)
 	public static final void initEntityAI(EntityWolf wolf) {
 		wolf.tasks.addTask(3, new EntityAIEatMeat(wolf));
-	}
-	
-	@Hook("net.minecraft.client.renderer.block.statemap.DefaultStateMapper#func_178132_a")
-	public static final void getModelResourceLocation(DefaultStateMapper mapper, IBlockState state) {
-		//System.out.println(state);
-		//System.out.println(state.getBlock());
-		//System.out.println(state.getBlock().getClass());
 	}
 	
 }
