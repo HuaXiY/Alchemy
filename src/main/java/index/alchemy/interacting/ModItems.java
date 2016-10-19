@@ -16,7 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
-@Init(state = ModState.PREINITIALIZED)
+@Init(state = ModState.INITIALIZED)
 public class ModItems {
 	
 	@Target(ElementType.FIELD)
@@ -88,6 +88,12 @@ public class ModItems {
 			bop$flower_miners_delight = null,			//  乐矿花 ---- 幸运
 			bop$flower_icy_iris = null,						//  冰虹膜花 ----神性
 			bop$flower_rose = null;								//  玫瑰 ---- 爱情
+	
+	//  Botania
+	
+	@Source("vazkii.botania.common.item.ModItems")
+	public static final Item
+			botania$waterRod = null;
 	
 	public static void init() throws Exception {
 		AlchemyModLoader.checkInvokePermissions();

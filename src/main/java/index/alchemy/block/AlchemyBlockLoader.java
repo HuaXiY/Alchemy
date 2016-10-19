@@ -9,6 +9,6 @@ public class AlchemyBlockLoader {
 	
 	public static final Block 
 			ice_temp = new BlockIceTemp(),
-			silver_ore = new BlockOre("ore_silver", null, 0xFFFFFF, new BlockOre.OreGeneratorSetting(9, 4, 0, 40));
+			ore_silver = new BlockOre("ore_silver", null, 0xFFFFFF, new BlockOre.OreGeneratorSetting(9, 4, 0, 40));
 	
 }

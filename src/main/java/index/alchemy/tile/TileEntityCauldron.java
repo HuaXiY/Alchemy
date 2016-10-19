@@ -20,6 +20,7 @@ import index.alchemy.util.Tool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -71,10 +72,49 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	protected State state = State.NULL;
 	protected int time;
 	
-	protected FluidTank tank = new FluidTank(Fluid.BUCKET_VOLUME);
-	{
-		tank.setTileEntity(this);
-	}
+	protected FluidTank tank = new FluidTank(Fluid.BUCKET_VOLUME) {
+		
+		{
+			setTileEntity(TileEntityCauldron.this);
+		}
+		
+		public Fluid getFluidType() {
+			return getFluid() != null ? getFluid().getFluid() : null;
+		}
+		
+		public void setFluid(FluidStack stack) {
+			Fluid fluid = getFluidType();
+			super.setFluid(stack);
+			if (getFluidType() != fluid)
+				update();
+		};
+		
+		@Override
+		public int fillInternal(FluidStack resource, boolean doFill) {
+			Fluid fluid = getFluidType();
+			int result = super.fillInternal(resource, doFill);
+			if (getFluidType() != fluid)
+				update();
+			return result;
+		}
+		
+		public FluidStack drainInternal(int maxDrain, boolean doDrain) {
+			Fluid fluid = getFluidType();
+			FluidStack result = super.drainInternal(maxDrain, doDrain);
+			if (getFluidType() != fluid)
+				update();
+			return result;
+		};
+		
+		public void update() {
+			if (worldObj != null && pos != null) {
+				worldObj.checkLight(pos);
+				worldObj.updateComparatorOutputLevel(pos, Blocks.CAULDRON);
+			}
+		}
+		
+	};
+	
 	
 	/*  alchemy: 
 	 *  	Magic Solvent volume	 -> alchemy & 4
@@ -111,8 +151,13 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	}
 	
 	public void setLevel(int level) {
-		if (getLevel() > -1)
+		if (level == 0)
+			tank.setFluid(null);
+		else if (getLevel() > -1) {
+			if (tank.getFluid() == null)
+				tank.setFluid(new FluidStack(FluidRegistry.WATER, 0));
 			tank.getFluid().amount = (int) (level / 3F * 1000);
+		}
 	}
 	
 	@Nullable
@@ -196,12 +241,13 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	@Override
 	public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-		return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
+		return capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && facing == EnumFacing.UP ||
+				super.hasCapability(capability, facing);
 	}
 
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && facing == EnumFacing.UP)
 			return (T) tank;
 		return super.getCapability(capability, facing);
 	}

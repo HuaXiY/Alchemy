@@ -1,6 +1,7 @@
 package index.alchemy.block.proxy;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -10,6 +11,7 @@ import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.Proxy;
 import index.alchemy.api.event.CauldronActivatedEvent;
+import index.alchemy.interacting.ModItems;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
@@ -25,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBanner;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -34,6 +37,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import vazkii.botania.api.mana.ManaItemHandler;
+import vazkii.botania.common.item.rod.ItemWaterRod;
 
 @Change("1.9.4")
 @Proxy("net.minecraft.block.BlockCauldron")
@@ -63,7 +70,7 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
 			@Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-		int i = ((Integer)state.getValue(LEVEL)).intValue();
+		int i = getWaterLevel(world, pos, state);
 		
 		TileEntityCauldron cauldron = getTileEntityCauldron(world, pos);
 		
@@ -101,15 +108,31 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 					player.addStat(StatList.BANNER_CLEANED);
 					setWaterLevel(world, pos, state, i - 1);
 				}
-			} else {
+			} else if (item == ModItems.botania$waterRod) {
+				if (i > -1 && i < 3 && ManaItemHandler.requestManaExact(heldItem, player, ItemWaterRod.COST, true))
+					setWaterLevel(world, pos, state, 3);
+			} else
 				FluidUtil.interactWithFluidHandler(heldItem, cauldron.getTank(), player);
-			}
 		}
 		return true;
 	}
 	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+		IBlockState liquid = getTileEntityCauldron(world, pos).getLiquid();
+		if (liquid != null)
+			liquid.getBlock().randomDisplayTick(liquid, world, pos, rand);
+	}
+	
 	@Nullable
-	public TileEntityCauldron getTileEntityCauldron(World world, BlockPos pos) {
+	public TileEntityCauldron getTileEntityCauldron(IBlockAccess world, BlockPos pos) {
 		return (TileEntityCauldron) world.getTileEntity(pos);
 	}
 	
@@ -147,27 +170,39 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	@Override
 	public Boolean isEntityInsideMaterial(IBlockAccess world, BlockPos pos, IBlockState state, Entity entity,
 			double yToTest, Material material, boolean testingHead) {
-		IBlockState liquid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
+		IBlockState liquid = getTileEntityCauldron(world, pos).getLiquid();
 		return liquid == null ? false : liquid.getMaterial() == material;
 	}
 	
 	@Override
 	public Boolean isAABBInsideMaterial(World world, BlockPos pos, AxisAlignedBB boundingBox, Material material) {
-		IBlockState liquid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
+		IBlockState liquid = getTileEntityCauldron(world, pos).getLiquid();
 		return liquid == null ? false : liquid.getMaterial() == material;
 	}
 	
 	@Override
 	public boolean isMaterialInBB(World world, BlockPos pos, Material material) {
-		IBlockState liquid = ((TileEntityCauldron) world.getTileEntity(pos)).getLiquid();
+		IBlockState liquid = getTileEntityCauldron(world, pos).getLiquid();
 		return liquid == null ? false : liquid.getMaterial() == material;
 	}
 	
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-		TileEntityCauldron te = ((TileEntityCauldron) world.getTileEntity(pos));
-		IBlockState liquid = te == null ? null : te.getLiquid();
-		return liquid == null ? super.getLightValue(state, world, pos) : liquid.getLightValue();
+		if (world.getTileEntity(pos) instanceof TileEntityCauldron) {
+			TileEntityCauldron te = getTileEntityCauldron(world, pos);
+			IBlockState liquid = te == null ? null : te.getLiquid();
+			return liquid == null ? super.getLightValue(state, world, pos) : liquid.getLightValue();
+		} return super.getLightValue(state, world, pos);
+	}
+	
+	@Override
+	public boolean hasComparatorInputOverride(IBlockState state) {
+		return true;
+	}
+	
+	@Override
+	public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos) {
+		return getTileEntityCauldron(world, pos).getLevel();
 	}
 	
 	public PBlockCauldron() {
