@@ -46,6 +46,18 @@ public abstract class AlchemyFX extends Particle {
 		return (T) this;
 	}
 	
+	public double getPosX() {
+		return posX;
+	}
+	
+	public double getPosY() {
+		return posY;
+	}
+	
+	public double getPosZ() {
+		return posZ;
+	}
+	
 	public void setMotionX(double motionX) {
 		this.motionX = motionX;
 	}

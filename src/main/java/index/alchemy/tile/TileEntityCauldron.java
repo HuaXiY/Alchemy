@@ -13,6 +13,7 @@ import index.alchemy.api.annotation.FX;
 import index.alchemy.client.color.ColorHelper;
 import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
 import index.alchemy.client.fx.update.FXMotionUpdate;
+import index.alchemy.client.fx.update.FXPosUpdate;
 import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
@@ -43,15 +44,16 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	@FX.UpdateMethod(FX_KEY_GATHER)
 	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
 		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
-		int i = 0, 
-			max_age = Tool.getSafe(args, i++, 0),
+		int i = 1, 
+			max_age = Tool.getSafe(args, i++, 1),
 			scale = Tool.getSafe(args, i++, 1);
+		result.add(new FXPosUpdate(0, 0, -5));
 		result.add(new FXMotionUpdate(
-				new StdCycle().setLoop(true).setRotation(true).setMax(0.5F),
-				new StdCycle().setMax(-0.3F),
-				new StdCycle().setLoop(true).setRotation(true).setMax(0.5F)));
+				new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setMin(-0.5F).setMax(0.5F),
+				new StdCycle().setLenght(max_age).setMax(-0.3F),
+				new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setNow(max_age / 6).setMin(-0.5F).setMax(0.5F)));
 		result.add(new FXARGBIteratorUpdate(ColorHelper.ahsbStep(Color.RED, new Color(0x66, 0xCC, 0xFF, 0x22), max_age, true, true, false)));
-		result.add(new FXScaleUpdate(new StdCycle().setMax(scale / 100F)));
+		result.add(new FXScaleUpdate(new StdCycle().setMin(scale / 1000F).setMax(scale / 100F)));
 		return result;
 	}
 	

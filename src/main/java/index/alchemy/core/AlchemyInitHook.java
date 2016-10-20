@@ -17,13 +17,13 @@ import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.client.AlchemyColorLoader;
 import index.alchemy.client.render.HUDManager;
+import index.alchemy.item.AlchemyItemBlock;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -59,7 +59,7 @@ public class AlchemyInitHook {
 		GameRegistry.register(impl);
 		
 		if (impl instanceof Block)
-			init_impl(new ItemBlock((Block) impl).setRegistryName(((Block) impl).getRegistryName()));
+			init(new AlchemyItemBlock((Block) impl).setRegistryName(((Block) impl).getRegistryName()));
 		
 	}
 	

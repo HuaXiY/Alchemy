@@ -29,10 +29,16 @@ import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
+import index.alchemy.client.fx.FXWisp;
+import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
+import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.network.Double6IntArrayPackage;
+import index.alchemy.tile.TileEntityCauldron;
+import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
@@ -176,16 +182,16 @@ public class AlchemyEventSystem implements IGuiHandler {
 			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
-			/*EntityPlayer player = event.player;
+			EntityPlayer player = event.player;
 			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
-			int update[] = FXUpdateHelper.getIntArrayByArgs(ItemRingTime.FX_KEY_GATHER, 120, 300);
+			int update[] = FXUpdateHelper.getIntArrayByArgs(TileEntityCauldron.FX_KEY_GATHER, 120, 300);
 			for (int i = 0; i < 1; i++)
 				d6iaps.add(new Double6IntArrayPackage(
 						player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
 						player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
 						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
 			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
-					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);*/
+					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
 			//System.out.println(DimensionManager.getWorld(10).getDefaultTeleporter()); 

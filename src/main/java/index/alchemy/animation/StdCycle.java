@@ -100,7 +100,7 @@ public class StdCycle implements ICycle {
 		if (!hasNext())
 			return max;
 		now += tick;
-		while (now >= lenght) {
+		while (lenght > 0 && now >= lenght) {
 			now -= lenght;
 			cycles++;
 		}

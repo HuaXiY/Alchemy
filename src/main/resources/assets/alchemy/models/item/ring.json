@@ -1,5 +1,5 @@
 {
-    "parent": "builtin/generated",
+    "parent": "item/generated",
     "textures": {
         "layer0": "alchemy:items/ring_overlay",
         "layer1": "alchemy:items/ring_icon"

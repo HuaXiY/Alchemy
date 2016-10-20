@@ -18,10 +18,12 @@ public class AlchemyBlockColor extends AlchemyBlock implements IColorBlock {
 	@SideOnly(Side.CLIENT)
 	public IBlockColor getBlockColor() {
 		return new IBlockColor() {
+			
 			@Override
 			public int colorMultiplier(IBlockState state, IBlockAccess access, BlockPos pos, int index) {
-				return 0x775decf5;
+				return index == 1 ? color : -1;
 			}
+			
 		};
 	}
 	

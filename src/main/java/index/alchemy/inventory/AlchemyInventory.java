@@ -5,7 +5,6 @@ import java.util.RandomAccess;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
-import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -187,11 +186,6 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IInve
 
 	@Override
 	public ItemStack getStackInSlot(int index) {
-		String aString = Tool.getStackTrace()[2].toString();
-		if (aString.startsWith("vazkii.botania.common.item.equipment.bauble") && aString.contains("onItemRightClick")) {
-			System.out.println(Tool.getStackTrace()[2]);
-			System.out.println(index);
-		}
 		return contents[index];
 	}
 

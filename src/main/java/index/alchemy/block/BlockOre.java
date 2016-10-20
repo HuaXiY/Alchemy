@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import index.alchemy.api.IColorItem;
 import index.alchemy.api.IGenerator;
 import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.annotation.Config;
@@ -12,6 +13,7 @@ import index.alchemy.util.Tool;
 import index.alchemy.world.AlchemyWorldGenerator;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -20,8 +22,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGenerator {
+public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGenerator, IColorItem {
 	
 	@Config(handle = AlchemyConfig.HANDLE_INT_ARRAY, category = AlchemyWorldGenerator.CATEGORY_GENERATOR, comment = "Ore generation exception dimension ids.")
 	public static int not_generator_dimension_ids[] = { -1, 1 };
@@ -95,6 +99,19 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 	@Override
 	public int getWeight() {
 		return 1;
+	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public IItemColor getItemColor() {
+		return new IItemColor() {
+			
+			@Override
+			public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+				return color;
+			}
+			
+		};
 	}
 	
 	public BlockOre(String name, Item drop, int color, OreGeneratorSetting setting) {

@@ -74,10 +74,8 @@ public final class AlchemyThreadManager {
 					try {
 						run.run();
 					} catch (Throwable e) {
-						System.err.println("[ThreadManager]Catch a Throwable in runtime loop: ");
-						System.err.println("**********************************************************");
+						AlchemyModLoader.logger.error("[ThreadManager]Catch a Throwable in runtime loop: ");
 						AlchemyRuntimeException.onException(new OtherThreadThrowable(e));
-						System.err.println("**********************************************************");
 					}
 					lock.lock();
 					list.remove(0);
@@ -109,7 +107,7 @@ public final class AlchemyThreadManager {
 
 	public void addThread() {
 		if (size > max && ++warning > 100) {
-			System.err.println("Warning: ThreadManager can't meet the list needs.(" + ++num + ")");
+			AlchemyModLoader.logger.error("Warning: ThreadManager can't meet the list needs.(" + ++num + ")");
 			return;
 		}
 		lock.lock();
