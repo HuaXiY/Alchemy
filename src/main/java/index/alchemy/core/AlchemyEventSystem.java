@@ -184,7 +184,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			EntityPlayer player = event.player;
 			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
-			int update[] = FXUpdateHelper.getIntArrayByArgs(TileEntityCauldron.FX_KEY_GATHER, 120, 300);
+			int update[] = FXUpdateHelper.getIntArrayByArgs(TileEntityCauldron.FX_KEY_GATHER, 360, 300);
 			for (int i = 0; i < 1; i++)
 				d6iaps.add(new Double6IntArrayPackage(
 						player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
@@ -192,6 +192,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
 			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
 					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
+			//System.out.println(Arrays.toString(new AttachCapabilitiesEvent(null).getListenerList().getListeners(0)));
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
 			//System.out.println(DimensionManager.getWorld(10).getDefaultTeleporter()); 

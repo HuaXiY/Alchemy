@@ -8,7 +8,6 @@ import baubles.client.BaublesRenderLayer;
 import index.alchemy.api.AlchemyBaubles;
 import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.annotation.Hook;
-import index.alchemy.api.annotation.Hook.Type;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.entity.ai.EntityAIEatMeat;
@@ -44,7 +43,7 @@ public class AlchemyHooks {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@Hook(value = "net.minecraft.client.renderer.entity.RenderPlayer#<init>", type = Type.TAIL)
+	@Hook(value = "net.minecraft.client.renderer.entity.RenderPlayer#<init>", type = Hook.Type.TAIL)
 	public static final void init_RenderPlayer(RenderPlayer renderPlayer, RenderManager renderManager, boolean useSmallArms) {
 		renderPlayer.addLayer(new BaublesRenderLayer());
 	}
@@ -109,7 +108,6 @@ public class AlchemyHooks {
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.HEAD,  4, 77, 8 + 0 * 18));
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.BODY,  5, 77, 8 + 1 * 18));
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.CHARM, 6, 77, 8 + 2 * 18));
-		
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.AMULET, 0, 80 + 18 * 1, 8 + 3 * 18));
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.RING,   1, 80 + 18 * 2, 8 + 3 * 18));
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.RING,   2, 80 + 18 * 3, 8 + 3 * 18));

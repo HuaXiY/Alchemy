@@ -362,6 +362,7 @@ public class AlchemyModLoader {
 					loading_list.add(clazz.getMethod("init", Class.class));
 				}
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 				continue;
 			}
 		}
@@ -382,6 +383,7 @@ public class AlchemyModLoader {
 					else
 						AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @InitInstance.value()"));
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 				continue;
 			}
 		}

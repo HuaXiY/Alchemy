@@ -5,7 +5,6 @@ import index.alchemy.api.IInventoryProvider;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.inventory.AlchemyInventory;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,9 +20,8 @@ public class CapabilityInventory extends AlchemyCapability<AlchemyInventory> imp
 	}
 	
 	@SubscribeEvent
-	public void onAttachCapabilities_Item(AttachCapabilitiesEvent<Item> event) {
-		if (event.getObject() instanceof IInventoryProvider.ItemProvider)
-			event.addCapability(RESOURCE, ((IInventoryProvider.ItemProvider) event.getObject()).initInventory());
+	public void onAttachCapabilities(AttachCapabilitiesEvent<? extends IInventoryProvider> event) {
+		event.addCapability(RESOURCE, event.getObject().initInventory());
 	}
 
 }

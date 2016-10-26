@@ -25,7 +25,6 @@ import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import static org.objectweb.asm.Opcodes.*;
-
 import static index.alchemy.core.AlchemyConstants.*;
 
 public class AlchemyTransformerManager implements IClassTransformer {
@@ -94,6 +93,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 					if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
 						Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
 						transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
+						break;
 					}
 		}
 	}

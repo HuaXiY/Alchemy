@@ -18,7 +18,7 @@ public class FXPosUpdate implements IFXUpdate {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean updateFX(AlchemyFX fx, long tick) {
-		fx.moveEntity(fx.getPosX() + offsetX, fx.getPosY() + offsetY, fx.getPosZ() + offsetZ);
+		fx.moveEntity(offsetX, offsetY, offsetZ);
 		return true;
 	}
 
