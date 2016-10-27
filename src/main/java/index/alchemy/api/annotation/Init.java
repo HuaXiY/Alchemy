@@ -11,8 +11,8 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Init {
 	
-	public ModState state() default ModState.UNLOADED;
+	ModState state() default ModState.UNLOADED;
 	
-	public boolean enable() default true;
+	boolean enable() default true;
 	
 }

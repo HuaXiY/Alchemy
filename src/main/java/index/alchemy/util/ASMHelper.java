@@ -1,15 +1,14 @@
 package index.alchemy.util;
 
+import java.io.IOException;
+
+import javax.annotation.Nullable;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 import static org.objectweb.asm.Opcodes.*;
-
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.annotation.Nullable;
 
 public class ASMHelper {
 	
@@ -75,18 +74,28 @@ public class ASMHelper {
 	}
 	
 	public static final boolean isPrimaryClass(String name) {
-		System.out.println(name);
-		System.out.println(name.replace('/', '.'));
 		String temp[] = name.replace('/', '.').split("\\.");
-		System.out.println(Arrays.toString(temp));
-		System.out.println(temp[temp.length - 1]);
-		System.out.println(temp[temp.length - 2]);
 		return temp.length > 1 && temp[temp.length - 1].equalsIgnoreCase(temp[temp.length - 2]);
+	}
+	
+	public static final String getGeneric(String signature) {
+		return Tool.get(signature, "(<.*>)");
+	}
+	
+	public static final String[] getGenericType(String generic) {
+		Type types[] = Type.getArgumentTypes("(" + removeGeneric(Tool.get(generic, "<(.*)>")).replace("+", "").replace("-", "") + ")V");
+		String result[] = new String[types.length];
+		for (int i = 0; i < types.length; i++)
+			result[i] = types[i].getDescriptor();
+		return result;
+	}
+	
+	public static final String removeGeneric(String signature) {
+		return signature.replaceAll("(<.*>)", "");
 	}
 	
 	@Nullable
 	public static final ClassNode getSuperClassNode(String name) {
-		System.out.println("getSuperClassNode1: " + name);
 		try {
 			ClassReader reader = new ClassReader(name);
 			ClassNode result = new ClassNode();
@@ -99,7 +108,6 @@ public class ASMHelper {
 	
 	@Nullable
 	public static final ClassNode getSuperClassNode(ClassNode node) {
-		System.out.println("getSuperClassNode2: " + node.name);
 		if (node.superName == null || node.superName.isEmpty())
 			return null;
 		else {

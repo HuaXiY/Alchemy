@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.reflect.ClassPath;
@@ -21,6 +22,7 @@ import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Proxy;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -32,9 +34,13 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	public static final String 
 			ALCHEMY_HOOKS_CLASS = "index.alchemy.core.AlchemyHooks",
 			ALCHEMY_HOOKS_DESC = "index/alchemy/core/AlchemyHooks",
+			HOOK_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook$Provider;",
 			HOOK_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook;",
 			HOOK_RESULT_DESC = "index/alchemy/api/annotation/Hook$Result",
-			PROXY_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Proxy;";
+			PROXY_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Proxy;",
+			FIELD_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field$Provider;",
+			FIELD_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field;",
+			FIELD_ACCESS_DESC = "Lindex/alchemy/api/IFieldAccess;";
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyTransformerManager.class.getSimpleName());
 	
@@ -49,8 +55,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	};
 	static {
 		try {
-			loadAllHook();
-			loadAllProxy();
+			loadAllProvider();
 			loadAllTransform();
 		} catch (IOException e) {
 			AlchemyRuntimeException.onException(e);
@@ -60,42 +65,67 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	public static final boolean debug_print = Boolean.getBoolean("index.alchemy.core.asm.classloader.at.debug.print");
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadAllHook() throws IOException {
-		ClassReader reader = new ClassReader(ALCHEMY_HOOKS_CLASS);
-		ClassNode node = new ClassNode(ASM5);
-		reader.accept(node, 0);
-		for (MethodNode methodNode : node.methods)
-			if (methodNode.visibleAnnotations != null)
-				for (AnnotationNode ann : methodNode.visibleAnnotations)
-					if (ann.desc.equals(HOOK_ANNOTATION_DESC)) {
-						Hook hook = Tool.makeAnnotation(Hook.class, ann.values,
-								"isStatic", false, "type", Hook.Type.HEAD, "disable", "");
-						if (hook.disable().isEmpty() || !Boolean.getBoolean(hook.disable())) {
-							String args[] = hook.value().split("#");
-							if (args.length == 2)
-								transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1],
-										hook.isStatic(), hook.type()));
-							else
-								AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
-						}
-					}
-	}
-	
-	@Unsafe(Unsafe.ASM_API)
-	private static void loadAllProxy() throws IOException {
+	private static void loadAllProvider() throws IOException {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
 		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_PACKAGE.substring(0, MOD_PACKAGE.length() - 1))) {
 			ClassReader reader = new ClassReader(info.getName());
 			ClassNode node = new ClassNode(ASM5);
 			reader.accept(node, 0);
-			if (node.visibleAnnotations != null)
-				for (AnnotationNode ann : node.visibleAnnotations)
-					if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
-						Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
-						transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
-						break;
-					}
+			loadHook(node);
+			loadProxy(node);
+			loadField(node);
 		}
+	}
+	
+	@Unsafe(Unsafe.ASM_API)
+	private static void loadHook(ClassNode node) throws IOException {
+		if (node.visibleAnnotations != null)
+			for (AnnotationNode nann : node.visibleAnnotations)
+				if (nann.desc.equals(HOOK_PROVIDER_ANNOTATION_DESC)) {
+					for (MethodNode methodNode : node.methods)
+						if (methodNode.visibleAnnotations != null)
+							for (AnnotationNode ann : methodNode.visibleAnnotations)
+								if (ann.desc.equals(HOOK_ANNOTATION_DESC)) {
+									Hook hook = Tool.makeAnnotation(Hook.class, ann.values,
+											"isStatic", false, "type", Hook.Type.HEAD, "disable", "");
+									if (hook.disable().isEmpty() || !Boolean.getBoolean(hook.disable())) {
+										String args[] = hook.value().split("#");
+										if (args.length == 2)
+											transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1],
+													hook.isStatic(), hook.type()));
+										else
+											AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
+									}
+								}
+					break;
+				}
+	}
+	
+	@Unsafe(Unsafe.ASM_API)
+	private static void loadProxy(ClassNode node) throws IOException {
+		if (node.visibleAnnotations != null)
+			for (AnnotationNode ann : node.visibleAnnotations)
+				if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
+					Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
+					transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
+					break;
+				}
+	}
+	
+	@Unsafe(Unsafe.ASM_API)
+	private static void loadField(ClassNode node) throws IOException {
+		if (node.visibleAnnotations != null)
+			for (AnnotationNode nann : node.visibleAnnotations)
+				if (nann.desc.equals(FIELD_PROVIDER_ANNOTATION_DESC)) {
+					for (FieldNode fieldNode : node.fields)
+						if (fieldNode.desc.equals(FIELD_ACCESS_DESC)) {
+							String generics[] = ASMHelper.getGenericType(ASMHelper.getGeneric(fieldNode.signature));
+							if (generics.length > 1)
+								transformers_mapping.get(ASMHelper.getClassName(generics[0]).replace("/", "."))
+										.add(new TransformerFieldAccess(node.name.replace('/', '.'), fieldNode));
+						}
+					break;
+				}
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
@@ -128,6 +158,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	public static void loadAllTransformClass() {
 		for (String clazz : transformers_mapping.keySet())
 			Tool.forName(clazz, false);
+		for (java.lang.reflect.Field field : net.minecraft.entity.Entity.class.getDeclaredFields())
+			System.out.println(field);
 	}
 	
 	public static void transform(String name) {

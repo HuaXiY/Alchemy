@@ -6,6 +6,6 @@ import net.minecraft.world.World;
 
 public interface IMaterialContainer {
 	
-	public boolean isMaterialInBB(World world, BlockPos pos, Material material);
+	boolean isMaterialInBB(World world, BlockPos pos, Material material);
 
 }

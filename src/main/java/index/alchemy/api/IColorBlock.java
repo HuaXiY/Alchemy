@@ -7,6 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface IColorBlock {
 	
     @SideOnly(Side.CLIENT)
-    public IBlockColor getBlockColor();
+     IBlockColor getBlockColor();
     
 }

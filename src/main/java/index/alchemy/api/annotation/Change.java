@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Change {
 	
-	public String value() default "unknown";
+	String value() default "unknown";
 	
 }

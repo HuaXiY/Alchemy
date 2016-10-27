@@ -2,10 +2,10 @@ package index.alchemy.api;
 
 public interface ICycle {
 	
-	public float next();
+	float next();
 	
-	public float update(int tick);
+	float update(int tick);
 	
-	public ICycle copy();
+	ICycle copy();
 	
 }

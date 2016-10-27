@@ -4,6 +4,6 @@ import net.minecraftforge.fml.common.IWorldGenerator;
 
 public interface IGenerator extends IWorldGenerator {
 	
-	public int getWeight();
+	int getWeight();
 
 }

@@ -9,10 +9,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Dimension {
 	
-	public String name();
+	String name();
 	
-	public String suffix() default "";
+	String suffix() default "";
 	
-	public boolean load() default false;
+	boolean load() default false;
 
 }

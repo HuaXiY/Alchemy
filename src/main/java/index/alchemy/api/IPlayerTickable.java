@@ -9,8 +9,8 @@ import net.minecraftforge.fml.relauncher.Side;
 public interface IPlayerTickable {
 	
 	@Nullable
-	public Side getSide();
+	Side getSide();
 	
-	public void onTick(EntityPlayer player, Phase phase);
+	void onTick(EntityPlayer player, Phase phase);
 	
 }

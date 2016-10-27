@@ -7,11 +7,11 @@ import net.minecraft.item.ItemStack;
 
 public interface IBaubleEquipment {
 	
-	public default boolean isEquipmented(EntityLivingBase living) {
+	default boolean isEquipmented(EntityLivingBase living) {
 		return getFormLiving(living) != null;
 	}
 	
 	@Nullable
-	public ItemStack getFormLiving(EntityLivingBase living);
+	ItemStack getFormLiving(EntityLivingBase living);
 
 }

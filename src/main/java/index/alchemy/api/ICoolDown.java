@@ -5,24 +5,24 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface ICoolDown {
 	
-	public int getMaxCD();
+	int getMaxCD();
 	
 	@SideOnly(Side.CLIENT)
-	public int getResidualCD();
+	int getResidualCD();
 	
 	@SideOnly(Side.CLIENT)
-	public boolean isCDOver();
+	boolean isCDOver();
 	
 	@SideOnly(Side.CLIENT)
-	public void setResidualCD(int cd);
+	void setResidualCD(int cd);
 	
 	@SideOnly(Side.CLIENT)
-	public void restartCD();
+	void restartCD();
 	
 	@SideOnly(Side.CLIENT)
-	public int getRenderID();
+	int getRenderID();
 	
 	@SideOnly(Side.CLIENT)
-	public default void renderCD(int x, int y, int w, int h) { }
+	default void renderCD(int x, int y, int w, int h) { }
 
 }

@@ -4,8 +4,8 @@ import net.minecraft.item.ItemStack;
 
 public interface IOreDictionary {
 	
-	public String getNameInOreDictionary();
+	String getNameInOreDictionary();
 	
-	public ItemStack getItemStackInOreDictionary();
+	ItemStack getItemStackInOreDictionary();
 
 }

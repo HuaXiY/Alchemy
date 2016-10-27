@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DLC {
 	
-	public String name();
+	String name();
 	
-	public String version();
+	String version();
 	
 }

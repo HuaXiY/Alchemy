@@ -7,13 +7,13 @@ public interface INetworkMessage<T extends IMessage> extends IMessageHandler<T, 
 	
 	public static interface Client<T extends IMessage> extends INetworkMessage<T> {
 		
-		public Class<T> getClientMessageClass();
+		Class<T> getClientMessageClass();
 		
 	}
 	
 	public static interface Server<T extends IMessage> extends INetworkMessage<T> {
 		
-		public Class<T> getServerMessageClass();
+		Class<T> getServerMessageClass();
 		
 	}
 	

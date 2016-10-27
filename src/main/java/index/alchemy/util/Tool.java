@@ -576,4 +576,8 @@ public class Tool {
 		new ClassReader(code).accept(new TraceClassVisitor(new PrintWriter(System.out)), 0);
 	}
 	
+	public static final void dumpClass(byte[] code, String path) {
+		new ClassReader(code).accept(new TraceClassVisitor(new PrintWriter(getPrintWriter(path))), 0);
+	}
+	
 }

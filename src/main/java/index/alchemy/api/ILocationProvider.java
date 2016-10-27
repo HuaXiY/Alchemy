@@ -4,6 +4,6 @@ import net.minecraft.util.math.Vec3d;
 
 public interface ILocationProvider {
 	
-	public Vec3d getLocation();
+	Vec3d getLocation();
 
 }

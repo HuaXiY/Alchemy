@@ -11,27 +11,27 @@ public @interface Config {
 	
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface Handle {
+	@interface Handle {
 		
-		public static enum Type {
+		enum Type {
 			MAKE,
 			SAVE
 		}
 		
-		public String name();
+		String name();
 		
-		public Type type();
+		Type type();
 		
 	}
 	
-	public String handle() default "";
+	String handle() default "";
 	
-	public String category();
+	String category();
 	
-	public String comment() default "";
+	String comment() default "";
 	
-	public float min() default Float.MIN_VALUE;
+	float min() default Float.MIN_VALUE;
 	
-	public float max() default Float.MAX_VALUE;
+	float max() default Float.MAX_VALUE;
 	
 }

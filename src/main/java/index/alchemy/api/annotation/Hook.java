@@ -11,7 +11,7 @@ import index.alchemy.util.Tool;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Hook {
 	
-	public static class Result {
+	class Result {
 		
 		public static final Result VOID = new Result(), NULL = new Result(null),
 				TRUE = new Result(Boolean.TRUE), FALSE = new Result(Boolean.FALSE);
@@ -28,14 +28,18 @@ public @interface Hook {
 		
 	}
 	
-	public static enum Type { HEAD, TAIL }
+	enum Type { HEAD, TAIL }
 	
-	public boolean isStatic() default false;
+	boolean isStatic() default false;
 	
-	public Type type() default Type.HEAD;
+	Type type() default Type.HEAD;
 	
-	public String disable() default "";
+	String disable() default "";
 	
-	public String value();
+	String value();
+	
+	@Target(ElementType.TYPE)
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface Provider { }
 
 }

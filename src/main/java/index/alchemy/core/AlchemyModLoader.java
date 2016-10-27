@@ -154,7 +154,6 @@ public class AlchemyModLoader {
 
 			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
 			cw.visitSource("AlchemyModLoader.java:133", "invoke: " + instType + handleName + handleDesc);
-			
 			{
 				if (!isStatic)
 					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
@@ -195,6 +194,7 @@ public class AlchemyModLoader {
 				mv.visitEnd();
 			}
 			cw.visitEnd();
+			
 			try {
 				Class<?> ret = define(name, cw.toByteArray());
 				info("Define", name);
@@ -237,6 +237,7 @@ public class AlchemyModLoader {
 	public static final String mc_dir, mod_path;
 	public static final boolean is_modding, enable_test, enable_dmain;
 	private static final Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>() {
+		
 		@Override
 		public List<Class<?>> get(Object key) {
 			List<Class<?>> result = super.get(key);
@@ -244,8 +245,10 @@ public class AlchemyModLoader {
 				put((ModState) key, result = new LinkedList());
 			return result;
 		}
+		
 	};
 	private static final Map<String, List<Class<?>>> instance_map = new LinkedHashMap<String, List<Class<?>>>() {
+		
 		@Override
 		public List<Class<?>> get(Object key) {
 			List<Class<?>> result = super.get(key);
@@ -253,6 +256,7 @@ public class AlchemyModLoader {
 				put((String) key, result = new LinkedList());
 			return result;
 		}
+		
 	};
 	private static final List<Method> loading_list = new LinkedList<Method>();
 	private static final List<String> class_list = new LinkedList<String>();
@@ -310,13 +314,6 @@ public class AlchemyModLoader {
 	}
 	
 	static {
-		AlchemyTransformerManager.loadAllTransformClass();
-		
-		try {
-			for (String line : Tool.read(AlchemyModLoader.class.getResourceAsStream("/ascii_art.txt")).split("\n"))
-				logger.info(line);
-		} catch (Exception e) {}
-		
 		is_modding = AlchemyModLoader.class.getResource("/alchemy.info").getProtocol().equals("file");
 		mod_path = AlchemyModLoader.class.getProtectionDomain().getCodeSource().getLocation().getPath()
 				.replace(AlchemyModLoader.class.getName().replace('.', '/') + ".class", "");
@@ -340,7 +337,13 @@ public class AlchemyModLoader {
 	}
 	
 	private static void bootstrap() throws Exception {
-		Tool.forName(AlchemyRuntimeException.class.getName(), false);
+		AlchemyTransformerManager.loadAllTransformClass();
+		
+		try {
+			for (String line : Tool.read(AlchemyModLoader.class.getResourceAsStream("/ascii_art.txt")).split("\n"))
+				logger.info(line);
+		} catch (Exception e) {}
+		
 		AlchemyDebug.start("bootstrap");
 		URL url = new File(mod_path).toURI().toURL();
 		class_list.addAll(findClassFromURL(url));

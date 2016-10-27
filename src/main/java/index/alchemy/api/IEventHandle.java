@@ -5,7 +5,7 @@ import index.alchemy.core.AlchemyEventSystem.EventType;
 
 public interface IEventHandle {
 	
-	public default EventType[] getEventType() {
+	default EventType[] getEventType() {
 		return AlchemyEventSystem.EVENT_BUS;
 	}
 	

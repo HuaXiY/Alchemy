@@ -10,6 +10,6 @@ public interface IMaterialConsumer {
 	 * if (has Material) return true & items remove material
 	 * else return false;
 	 */
-	public boolean treatmentMaterial(List<ItemStack> items);
+	boolean treatmentMaterial(List<ItemStack> items);
 
 }

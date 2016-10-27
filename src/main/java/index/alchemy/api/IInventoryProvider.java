@@ -1,16 +1,13 @@
 package index.alchemy.api;
 
 import index.alchemy.inventory.AlchemyInventory;
-import net.minecraft.item.ItemStack;
 
 public interface IInventoryProvider<T> {
 	
-	public AlchemyInventory initInventory();
+	AlchemyInventory initInventory();
 	
-	public AlchemyInventory getInventory(T provider);
+	AlchemyInventory getInventory(T provider);
 	
-	public String getInventoryUnlocalizedName();
-	
-	public interface ItemProvider extends IInventoryProvider<ItemStack> { }
+	String getInventoryUnlocalizedName();
 	
 }

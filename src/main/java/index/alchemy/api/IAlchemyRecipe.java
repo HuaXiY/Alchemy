@@ -7,12 +7,12 @@ import net.minecraft.util.ResourceLocation;
 
 public interface IAlchemyRecipe {
 	
-	public ResourceLocation getAlchemyName();
+	ResourceLocation getAlchemyName();
 	
-	public int getAlchemyTime();
+	int getAlchemyTime();
 	
-	public ItemStack getAlchemyResult();
+	ItemStack getAlchemyResult();
 	
-	public List<IMaterialConsumer> getAlchemyMaterials();
+	List<IMaterialConsumer> getAlchemyMaterials();
 
 }

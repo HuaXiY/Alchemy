@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Proxy {
 	
-	public String value();
+	String value();
 
 }

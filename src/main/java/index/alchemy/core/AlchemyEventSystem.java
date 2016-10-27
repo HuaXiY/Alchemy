@@ -192,6 +192,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
 			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
 					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
+			System.out.println(AlchemyFieldAccess.test.get(event.player));
+			if (AlchemyFieldAccess.test.get(event.player) == null)
+				AlchemyFieldAccess.test.set(event.player, 1);
+			else
+				AlchemyFieldAccess.test.set(event.player, AlchemyFieldAccess.test.get(event.player) + 1);
 			//System.out.println(Arrays.toString(new AttachCapabilitiesEvent(null).getListenerList().getListeners(0)));
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire

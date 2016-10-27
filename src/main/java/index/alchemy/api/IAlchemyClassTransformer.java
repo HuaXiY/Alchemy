@@ -4,6 +4,6 @@ import net.minecraft.launchwrapper.IClassTransformer;
 
 public interface IAlchemyClassTransformer extends IClassTransformer {
 	
-	public String getTransformerClassName();
+	String getTransformerClassName();
 	
 }

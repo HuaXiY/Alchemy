@@ -6,6 +6,6 @@ import net.minecraftforge.common.capabilities.Capability.IStorage;
 
 public interface ICapability<T> extends IStorage<T>, Callable<T> {
 	
-	public Class<T> getDataClass();
+	 Class<T> getDataClass();
 
 }

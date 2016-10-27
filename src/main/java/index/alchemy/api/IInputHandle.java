@@ -7,6 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public interface IInputHandle {
 	
 	@SideOnly(Side.CLIENT)
-	public KeyBinding[] getKeyBindings();
+	KeyBinding[] getKeyBindings();
 	
 }

@@ -16,6 +16,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
 import index.alchemy.api.annotation.SideOnlyLambda;
+import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -34,6 +35,7 @@ public class TransformerSideLambda implements IClassTransformer {
 	public static final Side runtime_side = FMLLaunchHandler.side();
 
 	@Override
+	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if (!transformedName.startsWith(MOD_PACKAGE))
 			return basicClass;

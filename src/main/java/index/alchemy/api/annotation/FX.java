@@ -9,19 +9,19 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FX {
 	
-	public String name();
+	String name();
 	
-	public boolean ignoreRange() default false;
+	boolean ignoreRange() default false;
 	
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface UpdateProvider {}
+	@interface UpdateProvider { }
 	
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface UpdateMethod {
+	@interface UpdateMethod {
 		
-		public String value();
+		String value();
 		
 	}
 

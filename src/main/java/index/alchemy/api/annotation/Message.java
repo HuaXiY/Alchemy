@@ -11,6 +11,6 @@ import net.minecraftforge.fml.relauncher.Side;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Message {
 	
-	public Side value();
+	Side value();
 
 }

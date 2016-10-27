@@ -54,7 +54,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider.ItemProvider, IInputHandle, IGuiHandle, ICoolDown,
+public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider<ItemStack>, IInputHandle, IGuiHandle, ICoolDown,
 	INetworkMessage.Server<MessageSpaceRingPickup>, IAlchemyRecipe {
 	
 	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
