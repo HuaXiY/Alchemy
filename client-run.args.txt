@@ -1,0 +1,1 @@
+-Xincgc -Xms1024M -Xmx4096M -XX:+HeapDumpOnOutOfMemoryError -Dindex.alchemy.enable_test=true -Dindex.alchemy.enable_dmain=true -Dindex.alchemy.dlcs.bin=$mc_dir/dlcs-bin/VolcanicIsland -Dfml.coreMods.load=index.alchemy.core.AlchemyCorePlugin -Dindex.alchemy.runtime.lib.ext=jfxrt;

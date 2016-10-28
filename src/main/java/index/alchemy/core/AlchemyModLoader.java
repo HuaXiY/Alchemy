@@ -63,11 +63,11 @@ import static index.alchemy.core.AlchemyModLoader.*;
 
 /* 
  * -----------------------------------------------
- *	__	__	___  _   _  ____  __  __  _  _ 
+ *	  __	__	  ___  _   _  ____  __  __  _  _ 
  *   /__\  (  )  / __)( )_( )( ___)(  \/  )( \/ )
- *  /(__)\  )(__( (__  ) _ (  )__)  )	(  \  / 
+ *  /(__)\  )(__( (__  ) _ (  )__)  )	 (  \  / 
  * (__)(__)(____)\___)(_) (_)(____)(_/\/\_) (__) 
- *											   
+ *											     
  * -----------------------------------------------
  */
 
@@ -76,7 +76,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
 		modid = MOD_ID,
 		name = MOD_NAME,
 		version = MOD_VERSION,
-		dependencies = REQUIRED_AFTER + BOP_ID
+		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.2.2099,);"
 )
 public class AlchemyModLoader {
 	

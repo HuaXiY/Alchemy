@@ -18,6 +18,8 @@ Member:
   </ul>
 <hr>
 Minecraft version: 1.10.2<br>
-Forge version: 1.10.2-12.18.1.2011<br>
-MCP version: snapshot_20160712<br>
+Forge version: 12.18.2.2114<br>
+MCP version: snapshot_20161027<br>
 Development state: informal version<br>
+Jenkins CI: <a href="https://ci.infstudio.net/job/Alchemy/">https://ci.infstudio.net/job/Alchemy/</a><br>
+

@@ -96,7 +96,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 		try {
 			Tool.setAccessible(Tool.forName(owner, true).getDeclaredField(field.name)).set(null, createAccess(clazzName, field, desc, false));
 		} catch (Exception e) {
-			e.printStackTrace();
+			AlchemyRuntimeException.onException(e);
 		}
 	}
 	
@@ -155,7 +155,6 @@ public class TransformerFieldAccess implements IClassTransformer {
 			Class<?> ret =  AlchemyModLoader.asm_loader.define(name, cw.toByteArray());
 			result = (IFieldAccess) ret.newInstance();
 		} catch(Exception e) {
-			e.printStackTrace();
 			AlchemyRuntimeException.onException(e);
 		}
 		return result;
