@@ -1,0 +1,7 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "alchemy:items/record_overlay",
+        "layer1": "alchemy:items/record_icon"
+    }
+}

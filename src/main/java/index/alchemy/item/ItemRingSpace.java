@@ -82,7 +82,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 			if (living instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) living;
 				if (player.getHealth() > 0.0F && !player.isSpectator())
-					for (EntityItem entity : player.worldObj.getEntitiesWithinAABB(EntityItem.class, player.getEntityBoundingBox().expand(5D, 5D, 5D)))
+					for (EntityItem entity : player.worldObj.getEntitiesWithinAABB(EntityItem.class,
+							player.getEntityBoundingBox().expand(5D, 5D, 5D)))
 						if (!entity.isDead)
 				        	   onCollideWithPlayer(entity, player);
 			}
@@ -123,8 +124,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 
             FMLCommonHandler.instance().firePlayerItemPickupEvent(player, entity);
             if (!entity.isSilent())
-            	entity.worldObj.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F,
-            			((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+            	entity.worldObj.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP,
+            			SoundCategory.PLAYERS, 0.2F, ((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
 
             player.onItemPickup(entity, i);
             
@@ -267,6 +268,12 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	@Override
+	public int getAlchemyColor() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 	@Override
 	public ItemStack getAlchemyResult() {
@@ -279,5 +286,5 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

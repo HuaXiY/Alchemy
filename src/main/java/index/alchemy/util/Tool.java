@@ -439,6 +439,21 @@ public class Tool {
 		}
 	}
 	
+	public static final List<Field> getAllFields(Class<?> clazz) {
+		List<Field> result = new LinkedList<>();
+		do
+			result.addAll(Arrays.asList(clazz.getDeclaredFields()));
+		while ((clazz = clazz.getSuperclass()) != null);
+		return result;
+	}
+	
+	public static final Field findField(Class<?> clazz, String name) throws NoSuchFieldException {
+		for (Field field : getAllFields(clazz))
+			if (field.getName().equals(name))
+				return field;
+		throw new NoSuchFieldError(clazz + ": " + name);
+	}
+	
 	@Nullable
 	public static final Method searchMethod(Class<?> clazz, Class<?>... args) {
 		method_forEach:
@@ -547,7 +562,7 @@ public class Tool {
 				clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
 			Object object = args[0].getClass() == clazz ? args[0] : null;
 			if (args.length == 2)
-				return (T) Tool.setAccessible(clazz.getDeclaredField((String) args[1])).get(object);
+				return (T) Tool.setAccessible(findField(clazz, (String) args[1])).get(object);
 			args = ArrayUtils.subarray(args, 2, args.length);
 			do {
 				Method method = searchMethod(clazz, name, args);

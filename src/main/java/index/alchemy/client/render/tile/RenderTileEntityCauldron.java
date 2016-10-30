@@ -50,11 +50,11 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 		
 		FluidStack stack = te.getTank().getFluid();
 		if (stack != null) {
+			float offest = (float) stack.amount / te.getTank().getCapacity();
 			pushMatrix();
 			enableBlend();
 			tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
 			BlockPos renderPos = te.getPos().up();
-			float offest = (float) stack.amount / te.getTank().getCapacity();
 			RenderHelper.translateToZero();
 			translate(0.125F, -(0.125F + (1 - 0.125F * 2) * (1 - offest)), 0.125F);
 			RenderHelper.scaleAndCorrectThePosition(0.75F, 0.75F * offest, 0.75F, renderPos.getX(), renderPos.getY(), renderPos.getZ());

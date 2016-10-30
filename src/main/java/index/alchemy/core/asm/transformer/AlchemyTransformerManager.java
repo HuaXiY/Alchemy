@@ -158,8 +158,6 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	public static void loadAllTransformClass() {
 		for (String clazz : transformers_mapping.keySet())
 			Tool.forName(clazz, false);
-		for (java.lang.reflect.Field field : net.minecraft.entity.Entity.class.getDeclaredFields())
-			System.out.println(field);
 	}
 	
 	public static void transform(String name) {

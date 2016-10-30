@@ -35,13 +35,9 @@ public class AlchemyRuntimeException extends RuntimeException {
 		if (t instanceof AlchemyRuntimeException)
 			return;
 		
-		final AlchemyRuntimeException e = new AlchemyRuntimeException(t);
+		AlchemyRuntimeException e = new AlchemyRuntimeException(t);
 		
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		e.printStackTrace(pw);
-		
-		final String error = sw.toString();
+		String error = getStringFormThrowable(e);
 		
 		AlchemyModLoader.logger.error(error);
 		
@@ -64,6 +60,13 @@ public class AlchemyRuntimeException extends RuntimeException {
 		else
 			throw e;
 		
+	}
+	
+	public static String getStringFormThrowable(Throwable t) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		t.printStackTrace(pw);
+		return sw.toString();
 	}
 	
 	private static boolean checkAnnotation(Class<?> clazz, Method method) {

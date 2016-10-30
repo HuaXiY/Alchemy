@@ -11,6 +11,8 @@ public interface IAlchemyRecipe {
 	
 	int getAlchemyTime();
 	
+	int getAlchemyColor();
+	
 	ItemStack getAlchemyResult();
 	
 	List<IMaterialConsumer> getAlchemyMaterials();

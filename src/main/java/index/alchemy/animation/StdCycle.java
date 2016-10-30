@@ -92,14 +92,14 @@ public class StdCycle implements ICycle {
 	
 	@Override
 	public float next() {
-		return update(1);
+		return update(++now);
 	}
 	
 	@Override
 	public float update(int tick) {
 		if (!hasNext())
 			return max;
-		now += tick;
+		now = tick;
 		while (lenght > 0 && now >= lenght) {
 			now -= lenght;
 			cycles++;

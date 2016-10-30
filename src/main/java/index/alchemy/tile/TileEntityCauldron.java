@@ -11,11 +11,13 @@ import index.alchemy.animation.StdCycle;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.client.color.ColorHelper;
+import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
 import index.alchemy.client.fx.update.FXAgeUpdate;
 import index.alchemy.client.fx.update.FXMotionUpdate;
 import index.alchemy.client.fx.update.FXPosUpdate;
 import index.alchemy.client.fx.update.FXScaleUpdate;
+import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
@@ -42,6 +44,8 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	public static final String FX_KEY_GATHER = "cauldron_gather";
 	
+	public static final int fx_id = FXUpdateHelper.getIdByName(FX_KEY_GATHER);
+	
 	@FX.UpdateMethod(FX_KEY_GATHER)
 	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
 		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
@@ -49,7 +53,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			max_age = Tool.getSafe(args, i++, 1),
 			scale = Tool.getSafe(args, i++, 1);
 		result.add(new FXAgeUpdate(max_age));
-		result.add(new FXPosUpdate(0, 0, 15));
+		result.add(new FXPosUpdate(-1.5, 8, 1.5));
 		result.add(new FXMotionUpdate(
 				new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setMin(-0.5F).setMax(0.5F),
 				new StdCycle().setLenght(max_age).setMax(-0.2F),
@@ -210,6 +214,12 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 				updateState();
 				flag = false;
 			}
+		} else {
+			worldObj.spawnParticle(FXWisp.Info.type, false,
+					pos.getX() + .5 - 2 + worldObj.rand.nextFloat() * 4,
+					pos.getY() + .5 - .5 + worldObj.rand.nextFloat(),
+					pos.getZ() + .5 - 2 + worldObj.rand.nextFloat() * 4,
+					0, 0, 0, new int[]{ fx_id, 60, 200 });
 		}
 	}
 	

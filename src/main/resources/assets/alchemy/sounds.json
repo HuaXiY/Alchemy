@@ -1,0 +1,20 @@
+{
+	"record.re-awake": {
+        "category": "record",
+        "sounds": [
+            {
+                "name": "alchemy:records/re-awake",
+                "stream": true
+            }
+        ]
+    },
+	"music.sea": {
+        "category": "music",
+        "sounds": [
+            {
+                "name": "alchemy:music/sea",
+                "stream": true
+            }
+        ]
+    }
+}

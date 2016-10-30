@@ -66,7 +66,7 @@ public class TransformerGenericEvent implements IClassTransformer {
 								list.add(new VarInsnNode(ALOAD, (method.access & ACC_STATIC) == 0 ? 1 : 0));
 								list.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/event/AttachCapabilitiesEvent",
 										"getObject", "()Ljava/lang/Object;", false));
-								if (type.contains("+")) {
+								if (generic.contains("+")) {
 									list.add(new TypeInsnNode(INSTANCEOF, clazz));
 									list.add(new JumpInsnNode(IFNE, label));
 								} else {

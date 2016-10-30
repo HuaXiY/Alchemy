@@ -1,11 +1,21 @@
 package index.alchemy.api;
 
+import javax.annotation.Nullable;
+
+@FunctionalInterface
 public interface ICycle {
-	
-	float next();
 	
 	float update(int tick);
 	
-	ICycle copy();
+	default float next() { return update(1); }
+	
+	@Nullable
+	default ICycle copy() {
+		try {
+			return getClass().newInstance();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 	
 }

@@ -35,8 +35,11 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
+import index.alchemy.item.AlchemyItemLoader;
+import index.alchemy.item.ItemRingSpace;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6IntArrayPackage;
+import index.alchemy.sound.AlchemySoundLoader;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
@@ -159,10 +162,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "48";
+		String flag = "63";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
+				System.out.println(((ItemRingSpace)AlchemyItemLoader.ring_space).getInventory(AlchemyItemLoader.ring_space.getFormLiving(Minecraft.getMinecraft().thePlayer)));;
+				Minecraft.getMinecraft().thePlayer.playSound(AlchemySoundLoader.record_re_awake, 1, 1);
+				System.out.println("play");
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
 				//GL11.glPushMatrix();
 				//GL11.glTranslated(player.posX, player.posY, player.posZ);
@@ -179,7 +185,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 				}*/
 				//System.out.println(Tool.get(Names.Name.class, 1, Tool.get(Names.class, 3)));
 			}
-			//System.setProperty("index.alchemy.runtime.debug.player", flag);
+			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			EntityPlayer player = event.player;
@@ -192,11 +198,12 @@ public class AlchemyEventSystem implements IGuiHandler {
 						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
 			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
 					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
-			System.out.println(AlchemyFieldAccess.test.get(event.player));
-			if (AlchemyFieldAccess.test.get(event.player) == null)
-				AlchemyFieldAccess.test.set(event.player, 1);
-			else
-				AlchemyFieldAccess.test.set(event.player, AlchemyFieldAccess.test.get(event.player) + 1);
+//			try {
+//					System.out.println(Tool.<ClassLoader>$(Javarepl.evaluator, "classLoader")
+//							.loadClass("Evaluation$wxy8ivdqzjka6fsetolr").getDeclaredConstructor(EvaluationContext.class));
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
 			//System.out.println(Arrays.toString(new AttachCapabilitiesEvent(null).getListenerList().getListeners(0)));
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
@@ -209,9 +216,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 		for (IPlayerTickable tickable : event.side.isServer() ? server_tickable : client_tickable)
 			tickable.onTick(event.player, event.phase);
 	}
-		
-	public static void addDelayedRunnable(final IPhaseRunnable runnable, final int tick) {
-		addContinuedRunnable(new IContinuedRunnable() {
+	
+	public static void addDelayedRunnable(IPhaseRunnable runnable, int tick) {
+		addDelayedRunnable(Always.getSide(), runnable, tick);
+	}
+	
+	public static void addDelayedRunnable(Side side, IPhaseRunnable runnable, int tick) {
+		addContinuedRunnable(side, new IContinuedRunnable() {
 			int c_tick = tick;
 			@Override
 			public boolean run(Phase phase) {
@@ -224,8 +235,12 @@ public class AlchemyEventSystem implements IGuiHandler {
 		});
 	}
 	
-	public static void addContinuedRunnable(final IIndexRunnable runnable, final int tick) {
-		addContinuedRunnable(new IContinuedRunnable() {
+	public static void addContinuedRunnable(IIndexRunnable runnable, int tick) {
+		addContinuedRunnable(Always.getSide(), runnable, tick);
+	}
+	
+	public static void addContinuedRunnable(Side side, IIndexRunnable runnable, int tick) {
+		addContinuedRunnable(side, new IContinuedRunnable() {
 			int c_tick = tick;
 			@Override
 			public boolean run(Phase phase) {
@@ -236,7 +251,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	public static void addContinuedRunnable(IContinuedRunnable runnable) {
-		runnable_mapping.get(Always.getSide()).add(runnable);
+		addContinuedRunnable(Always.getSide(), runnable);
+	}
+	
+	public static void addContinuedRunnable(Side side, IContinuedRunnable runnable) {
+		runnable_mapping.get(side).add(runnable);
 	}
 	
 	public static void onRunnableTick(Side side, Phase phase) {

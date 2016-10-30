@@ -23,6 +23,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemRecord;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionType;
 import net.minecraft.util.DamageSource;
@@ -117,9 +118,20 @@ public class DLang {
 				}
 	}
 	
+	public static String getName(String str) {
+		return getName(str, 0);
+	}
+	
+	public static String getName(String str, int offset) {
+		String temp[] = str.split("\\.");
+		return temp.length < offset + 1 ? "" : temp[temp.length - offset - 1];
+	}
+	
 	public static void init(Item item) {
-		if (!(item instanceof ItemBlock))
-			itemMap.put(item.getUnlocalizedName() + ".name", "");
+		if (item instanceof ItemRecord) {
+			miscMap.put(((ItemRecord) item).getRecordNameLocal(), getName(Tool.<String>$(item, "displayName"), 1));
+		} else if (!(item instanceof ItemBlock))
+			itemMap.put(item.getUnlocalizedName() + ".name", getName(item.getUnlocalizedName()));
 	}
 	
 	public static void init(CreativeTabs tab) {
@@ -127,26 +139,27 @@ public class DLang {
 	}
 	
 	public static void init(Block block) {
-		blockMap.put(block.getUnlocalizedName() + ".name", "");
+		blockMap.put(block.getUnlocalizedName() + ".name", getName(block.getUnlocalizedName()));
 	}
 	
 	public static void init(Potion potion) {
-		potionMap.put(potion.getName(), "");
+		potionMap.put(potion.getName(), getName(potion.getName()));
 	}
 	
 	public static void init(PotionType potion) {
-		potionMap.put(potion.getNamePrefixed("potion.effect."), "");
-		potionMap.put(potion.getNamePrefixed("splash_potion.effect."), "");
-		potionMap.put(potion.getNamePrefixed("lingering_potion.effect."), "");
-		potionMap.put(potion.getNamePrefixed("tipped_arrow.effect."), "");
+		String name = getName(potion.getNamePrefixed("."));
+		potionMap.put(potion.getNamePrefixed("potion.effect."), name);
+		potionMap.put(potion.getNamePrefixed("splash_potion.effect."), name);
+		potionMap.put(potion.getNamePrefixed("lingering_potion.effect."), name);
+		potionMap.put(potion.getNamePrefixed("tipped_arrow.effect."), name);
 	}
 	
 	public static void init(Enchantment enchantment) {
-		enchantmentMap.put(enchantment.getName(), "");
+		enchantmentMap.put(enchantment.getName(), getName(enchantment.getName()));
 	}
 	
 	public static void init(KeyBinding key) {
-		keyMap.put(key.getKeyDescription(), "");
+		keyMap.put(key.getKeyDescription(), getName(key.getKeyDescription()));
 	}
 	
 	public static void init(DamageSource damage) {
@@ -154,7 +167,7 @@ public class DLang {
 	}
 	
 	public static void init(IInventoryProvider inventory) {
-		inventoryMap.put(inventory.getInventoryUnlocalizedName(), "");
+		inventoryMap.put(inventory.getInventoryUnlocalizedName(), getName(inventory.getInventoryUnlocalizedName()));
 	}
 	
 }

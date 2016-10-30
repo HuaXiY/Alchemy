@@ -24,6 +24,7 @@ import index.alchemy.core.AlchemyFieldAccess;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -33,7 +34,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 	
 	public static final String I_FIELD_ACCESS_DESC = Type.getInternalName(IFieldAccess.class);
 	
-	public static Map<String, List<Runnable>> callback_mapping = new HashMap<String, List<Runnable>>() {
+	public static final Map<String, List<Runnable>> callback_mapping = new HashMap<String, List<Runnable>>() {
 		
 		@Override
 		public List<Runnable> get(Object key) {
@@ -82,7 +83,6 @@ public class TransformerFieldAccess implements IClassTransformer {
 				"callback", "(Ljava/lang/String;)V", false));
 		clinit.instructions.insert(list);
 		node.accept(writer);
-		Tool.dumpClass(writer.toByteArray(), "D:/output.txt");
 		return writer.toByteArray();
 	}
 	
@@ -94,7 +94,8 @@ public class TransformerFieldAccess implements IClassTransformer {
 	
 	public void updateAccessField(String clazzName, FieldNode field, String desc) {
 		try {
-			Tool.setAccessible(Tool.forName(owner, true).getDeclaredField(field.name)).set(null, createAccess(clazzName, field, desc, false));
+			FinalFieldSetter.getInstance().setStatic(Tool.forName(owner, true).getDeclaredField(field.name),
+					createAccess(clazzName, field, desc, false));
 		} catch (Exception e) {
 			AlchemyRuntimeException.onException(e);
 		}
@@ -112,7 +113,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 				desc = ASMHelper.getClassName(clazzName), type = ASMHelper.getClassName(fieldDesc);
 
 		cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, nameDesc, null, "java/lang/Object", new String[]{ I_FIELD_ACCESS_DESC });
-		cw.visitSource("TransformerFieldAccess.java:64", "invoke: " + clazzName + "." + field.name);
+		cw.visitSource("TransformerFieldAccess.java:104", "invoke: " + clazzName + "." + field.name);
 		{
 			mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", "()V", null, null);
 			mv.visitCode();

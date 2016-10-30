@@ -8,12 +8,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -49,10 +51,20 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
+import net.minecraftforge.fml.common.event.FMLEvent;
+import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
+import net.minecraftforge.fml.common.event.FMLModDisabledEvent;
+import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -261,6 +273,27 @@ public class AlchemyModLoader {
 	private static final List<Method> loading_list = new LinkedList<Method>();
 	private static final List<String> class_list = new LinkedList<String>();
 	
+	private static final Map<Class<? extends FMLEvent>, List<Consumer<? extends FMLEvent>>>
+			fml_event_callback_mapping = new HashMap<Class<? extends FMLEvent>, List<Consumer<? extends FMLEvent>>>() {
+		
+		@Override
+		public List<Consumer<? extends FMLEvent>> get(Object key) {
+			List<Consumer<? extends FMLEvent>> result = super.get(key);
+			if (result == null)
+				put((Class<? extends FMLEvent>) key, result = new LinkedList());
+			return result;
+		}
+		
+	};
+	
+	public static <T extends FMLEvent> void addFMLEventCallback(Class<T> clazz, Consumer<T> consumer) {
+		fml_event_callback_mapping.get(clazz).add(consumer);
+	}
+	
+	public static <T extends FMLEvent> void onFMLEvent(T event) {
+		((List<Consumer<T>>)(Object) fml_event_callback_mapping.get(event.getClass())).forEach(c -> c.accept(event));
+	}
+	
 	public static List<Class<?>> getInstance(String key) {
 		return instance_map.get(key);
 	}
@@ -442,26 +475,76 @@ public class AlchemyModLoader {
 	@EventHandler
 	public void onFMLConstruction(FMLConstructionEvent event) {
 		init(ModState.CONSTRUCTED);
+		onFMLEvent(event);
 	}
 	
 	@EventHandler
 	public void onFMLPreInitialization(FMLPreInitializationEvent event) {
 		init(ModState.PREINITIALIZED);
+		onFMLEvent(event);
 	}
 	
 	@EventHandler
 	public void onFMLInitialization(FMLInitializationEvent event) {
 		init(ModState.INITIALIZED);
+		onFMLEvent(event);
 	}
 	
 	@EventHandler
 	public void onFMLPostInitialization(FMLPostInitializationEvent event) {
 		init(ModState.POSTINITIALIZED);
+		onFMLEvent(event);
 	}
 	
 	@EventHandler
 	public void onFMLLoadComplete(FMLLoadCompleteEvent event) {
 		init(ModState.AVAILABLE);
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLServerAboutToStart(FMLServerAboutToStartEvent event) {
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLServerStarting(FMLServerStartingEvent event) {
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLServerStarted(FMLServerStartedEvent event) {
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLServerStopping(FMLServerStoppingEvent event) {
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLServerStopped(FMLServerStoppedEvent event) {
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLFingerprintViolation(FMLFingerprintViolationEvent event) {
+		onFMLEvent(event);
+	}
+
+	@EventHandler
+	public void onFMLMissingMappings(FMLMissingMappingsEvent event) {
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLModDisabled(FMLModDisabledEvent event) {
+		onFMLEvent(event);
+	}
+	
+	@EventHandler
+	public void onFMLModIdMapping(FMLModIdMappingEvent event) {
+		onFMLEvent(event);
 	}
 	
 }
