@@ -16,7 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
-@Init(state = ModState.INITIALIZED)
+@Init(state = ModState.PREINITIALIZED, index = -1)
 public class ModItems {
 	
 	@Target(ElementType.FIELD)

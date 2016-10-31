@@ -23,7 +23,7 @@ public class MagicIceScreen extends AlchemyMagic {
 				for (int y = -1; y < 3; y++) 
 					for (int z = -1; z < 2; z++) {
 						if ((!(x == 0 && z == 0) || (y == -1 || y == 2)) &&
-								Elemix.blockCanToIce(world.getBlockState(new BlockPos(posX + x, posY + y, posZ + z)).getBlock())) {
+								Elemix.blockCanToIce(world, new BlockPos(posX + x, posY + y, posZ + z))) {
 							world.setBlockState(new BlockPos(posX + x, posY + y, posZ + z), AlchemyBlockLoader.ice_temp.getDefaultState());
 						}
 					}

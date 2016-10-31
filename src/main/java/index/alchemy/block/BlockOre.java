@@ -81,11 +81,6 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 	}
 	
 	@Override
-	public ItemStack getItemStackInOreDictionary() {
-		return new ItemStack(this);
-	}
-	
-	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
 		if (!ArrayUtils.contains(not_generator_dimension_ids, world.provider.getDimension()))
 			for (int i = 0; i < setting.count; i++) {

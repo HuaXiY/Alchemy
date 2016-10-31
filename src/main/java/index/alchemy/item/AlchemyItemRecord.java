@@ -1,6 +1,7 @@
 package index.alchemy.item;
 
 import index.alchemy.api.IColorItem;
+import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyResourceLocation;
@@ -12,7 +13,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class AlchemyItemRecord extends ItemRecord implements IRegister, IResourceLocation, IColorItem {
+public class AlchemyItemRecord extends ItemRecord implements IRegister, IResourceLocation, IColorItem, IOreDictionary {
 	
 	public static final ResourceLocation ICON = new AlchemyResourceLocation("record");
 	
@@ -40,6 +41,11 @@ public class AlchemyItemRecord extends ItemRecord implements IRegister, IResourc
 		setUnlocalizedName("record");
 		setRegistryName("record_" + name);
 		register();
+	}
+
+	@Override
+	public String getNameInOreDictionary() {
+		return "record";
 	}
 
 }

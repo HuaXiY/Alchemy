@@ -1,10 +1,15 @@
 package index.alchemy.item;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
+import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.IBaubleEquipment;
+import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.inventory.InventoryBauble;
 import index.alchemy.util.Always;
@@ -15,10 +20,22 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment {
-
+public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment, IAlchemyRecipe {
+	
+	protected int alchemyTime = 20 * 30, alchemyColor = -1;
+	protected final List<IMaterialConsumer> alchemyMaterials = new LinkedList<>();
+	
+	public void setAlchemyTime(int alchemyTime) {
+		this.alchemyTime = alchemyTime;
+	}
+	
+	public void setAlchemyColor(int alchemyColor) {
+		this.alchemyColor = alchemyColor;
+	}
+	
 	public static class AlchemyItemAmulet extends AlchemyItemBauble {
 		
 		@Override
@@ -132,6 +149,31 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 					return item;
 			}
 		return null;
+	}
+	
+	@Override
+	public ResourceLocation getAlchemyName() {
+		return getRegistryName();
+	}
+	
+	@Override
+	public int getAlchemyTime() {
+		return alchemyTime;
+	}
+	
+	@Override
+	public int getAlchemyColor() {
+		return alchemyColor == -1 ? color : alchemyColor;
+	}
+	
+	@Override
+	public ItemStack getAlchemyResult() {
+		return new ItemStack(this);
+	}
+	
+	@Override
+	public List<IMaterialConsumer> getAlchemyMaterials() {
+		return alchemyMaterials;
 	}
 	
 	public AlchemyItemBauble(String name, String icon_name, int color) {

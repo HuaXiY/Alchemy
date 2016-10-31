@@ -21,9 +21,11 @@ public abstract class AlchemyFX extends Particle {
 	protected boolean transparent;
 	protected final List<IFXUpdate> update_list = new LinkedList<IFXUpdate>();
 	
-	protected AlchemyFX(World world, double posX, double posY, double posZ) {
+	protected AlchemyFX(World world, double vX, double vY, double vZ, double posX, double posY, double posZ) {
 		super(world, posX, posY, posZ);
-		moveEntity(1, 1, 1);
+		motionX = vX;
+		motionY = vY;
+		motionZ = vZ;
 	}
 	
 	public <T extends AlchemyFX> T addFXUpdate(IFXUpdate... updates) {
@@ -37,12 +39,14 @@ public abstract class AlchemyFX extends Particle {
 	}
 	
 	public <T extends AlchemyFX> T addFXUpdate(List<IFXUpdate> updates) {
-		update_list.addAll(updates);
+		if (updates != null)
+			update_list.addAll(updates);
 		return (T) this;
 	}
 	
 	public <T extends AlchemyFX> T removeFXUpdate(List<IFXUpdate> updates) {
-		update_list.removeAll(updates);
+		if (updates != null)
+			update_list.removeAll(updates);
 		return (T) this;
 	}
 	

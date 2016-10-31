@@ -35,11 +35,8 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
-import index.alchemy.item.AlchemyItemLoader;
-import index.alchemy.item.ItemRingSpace;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6IntArrayPackage;
-import index.alchemy.sound.AlchemySoundLoader;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
@@ -166,9 +163,8 @@ public class AlchemyEventSystem implements IGuiHandler {
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
-				System.out.println(((ItemRingSpace)AlchemyItemLoader.ring_space).getInventory(AlchemyItemLoader.ring_space.getFormLiving(Minecraft.getMinecraft().thePlayer)));;
-				Minecraft.getMinecraft().thePlayer.playSound(AlchemySoundLoader.record_re_awake, 1, 1);
-				System.out.println("play");
+				//System.out.println(((ItemRingSpace)AlchemyItemLoader.ring_space).getInventory(AlchemyItemLoader.ring_space.getFormLiving(Minecraft.getMinecraft().thePlayer)));;
+				//Minecraft.getMinecraft().thePlayer.playSound(AlchemySoundLoader.record_re_awake, 1, 1);
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
 				//GL11.glPushMatrix();
 				//GL11.glTranslated(player.posX, player.posY, player.posZ);
@@ -198,12 +194,6 @@ public class AlchemyEventSystem implements IGuiHandler {
 						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
 			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
 					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
-//			try {
-//					System.out.println(Tool.<ClassLoader>$(Javarepl.evaluator, "classLoader")
-//							.loadClass("Evaluation$wxy8ivdqzjka6fsetolr").getDeclaredConstructor(EvaluationContext.class));
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
 			//System.out.println(Arrays.toString(new AttachCapabilitiesEvent(null).getListenerList().getListeners(0)));
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire

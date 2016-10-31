@@ -1,5 +1,6 @@
 package index.alchemy.block.proxy;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -79,40 +80,66 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 				heldItem, side, hitX, hitY, hitZ)))
 			return event.getResult() == Result.DEFAULT;
 		
+		LinkedList<ItemStack> list = getTileEntityCauldron(world, pos).getContainer();
 		if (heldItem == null) {
 			if (Always.isServer()) {
-				LinkedList<ItemStack> list = getTileEntityCauldron(world, pos).getContainer();
 				if (list.size() > 0) {
 					player.setHeldItem(hand, list.removeLast());
 					player.inventory.markDirty();
+					cauldron.onContainerChange();
 					cauldron.updateTracker();
 				}
 			}
 		} else {
 			Item item = heldItem.getItem();
-			if (item instanceof ItemArmor) {
-				if (i > 0) {
-					ItemArmor armor = (ItemArmor)item;
-					if (armor.getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER && armor.hasColor(heldItem)) {
-						armor.removeColor(heldItem);
-						player.addStat(StatList.ARMOR_CLEANED);
+			if (item == ModItems.botania$waterRod) {
+				if (i > -1 && i < 3 && ManaItemHandler.requestManaExact(heldItem, player, ItemWaterRod.COST, true))
+					setWaterLevel(world, pos, state, 3);
+			} else if (FluidUtil.getFluidHandler(heldItem) != null) {
+				FluidUtil.interactWithFluidHandler(heldItem, cauldron.getTank(), player);
+			} else if (!list.isEmpty()) {
+				if (Always.isServer()) {
+					boolean flag = false;
+					int limit = heldItem.getMaxStackSize();
+					if (heldItem.stackSize >= limit)
+						return false;
+					for (Iterator<ItemStack> iterator = list.iterator(); iterator.hasNext();) {
+						ItemStack citem = iterator.next();
+						if (InventoryHelper.canMergeItemStack(heldItem, citem))
+							if (heldItem.stackSize < limit) {
+								heldItem.stackSize++;
+								iterator.remove();
+								flag = true;
+							} else
+								break;
+					}
+					if (flag) {
+						player.inventory.markDirty();
+						cauldron.onContainerChange();
+						cauldron.updateTracker();
+					}
+				}
+			} else {
+				if (item instanceof ItemArmor) {
+					if (i > 0) {
+						ItemArmor armor = (ItemArmor) item;
+						if (armor.getArmorMaterial() == ItemArmor.ArmorMaterial.LEATHER && armor.hasColor(heldItem)) {
+							armor.removeColor(heldItem);
+							player.addStat(StatList.ARMOR_CLEANED);
+							setWaterLevel(world, pos, state, i - 1);
+						}
+					}
+				} else if (item instanceof ItemBanner) {
+					if (i > 0 && TileEntityBanner.getPatterns(heldItem) > 0) {
+						ItemStack banner = heldItem.copy();
+						banner.stackSize = 1;
+						TileEntityBanner.removeBannerData(banner);
+						InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, banner);
+						player.addStat(StatList.BANNER_CLEANED);
 						setWaterLevel(world, pos, state, i - 1);
 					}
 				}
-			} else if (item instanceof ItemBanner) {
-				if (i > 0 && TileEntityBanner.getPatterns(heldItem) > 0) {
-					ItemStack banner = heldItem.copy();
-					banner.stackSize = 1;
-					TileEntityBanner.removeBannerData(banner);
-					InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, banner);
-					player.addStat(StatList.BANNER_CLEANED);
-					setWaterLevel(world, pos, state, i - 1);
-				}
-			} else if (item == ModItems.botania$waterRod) {
-				if (i > -1 && i < 3 && ManaItemHandler.requestManaExact(heldItem, player, ItemWaterRod.COST, true))
-					setWaterLevel(world, pos, state, 3);
-			} else
-				FluidUtil.interactWithFluidHandler(heldItem, cauldron.getTank(), player);
+			}
 		}
 		return true;
 	}
@@ -203,6 +230,13 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	@Override
 	public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos) {
 		return getTileEntityCauldron(world, pos).getLevel();
+	}
+	
+	@Override
+	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+		super.eventReceived(state, worldIn, pos, id, param);
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
 	}
 	
 	public PBlockCauldron() {

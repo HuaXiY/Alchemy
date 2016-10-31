@@ -1,5 +1,6 @@
 package index.alchemy.core;
 
+import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.ICapability;
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
@@ -99,6 +100,9 @@ public class AlchemyInitHook {
 		
 		if (obj instanceof ICapability)
 			CapabilityManager.INSTANCE.register((Class<C>) obj.getClass(), (ICapability<C>) obj, (ICapability<C>) obj);
+		
+		if (obj instanceof IAlchemyRecipe)
+			AlchemyRegistry.registerAlchemyRecipe((IAlchemyRecipe) obj);
 		
 		if (Always.isClient()) {
 			

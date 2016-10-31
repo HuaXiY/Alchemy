@@ -25,8 +25,8 @@ public class FXWisp extends AlchemyFX {
 	
 	private static final String TEXTURE_NAME[] = FXWisp.Info.class.getAnnotation(Texture.class).value();
 	
-	public FXWisp(World world, double posX, double posY, double posZ) {
-		super(world, posX, posY, posZ);
+	public FXWisp(World world, double vX, double vY, double vZ, double posX, double posY, double posZ) {
+		super(world, posX, posY, posZ, vX, vY, vZ);
 		setTransparent(true);
 		setParticleTexture(getAtlasSprite(TEXTURE_NAME[0]));
 	}
@@ -35,8 +35,8 @@ public class FXWisp extends AlchemyFX {
 	public static class Factory implements IParticleFactory {
 		
 		@Override
-		public Particle createParticle(int id, World world, double x, double y, double z, double vx, double vy, double vz, int... args) {
-                return new FXWisp(world, x, y, z).addFXUpdate(FXUpdateHelper.getResultByArgs(args)).update();
+		public Particle createParticle(int id, World world, double x, double y, double z, double vX, double vY, double vZ, int... args) {
+                return new FXWisp(world, x, y, z, vX, vY, vZ).addFXUpdate(FXUpdateHelper.getResultByArgs(args)).update();
 		}
 		
 	}

@@ -1,8 +1,8 @@
 package index.alchemy.core;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -38,36 +38,29 @@ public class AlchemyRegistry {
 	}
 	
 	@Nullable
+	public static IAlchemyRecipe findRecipe(String name) {
+		return findRecipe(new ResourceLocation(name));
+	}
+	
+	@Nullable
 	public static IAlchemyRecipe findRecipe(ResourceLocation name) {
 		for (IAlchemyRecipe recipe : ALCHEMY_LIST)
-			if (recipe.equals(name))
+			if (recipe.getAlchemyName().equals(name))
 				return recipe;
 		return null;
 	}
 	
-	/*
-	 * Use A COPY(List<ItemStack> materials) to invoke this method
-	 * This method may change the content of the collection
-	 * 
-	 * if (return != null) materials -> residues material
-	 */
 	@Nullable
-	public static ItemStack findResult(List<ItemStack> materials) {
+	public static IAlchemyRecipe findRecipe(List<ItemStack> materials) {
 		List<ItemStack> copy = null;
-		boolean change = true;
 		alchemy: for (IAlchemyRecipe recipe : ALCHEMY_LIST) {
-			if (change) {
-				copy = new LinkedList<ItemStack>(materials);
-				change = false;
-			}
+			copy = materials.stream().map(ItemStack::copy).collect(Collectors.toList());
 			for (IMaterialConsumer consumer : recipe.getAlchemyMaterials())
-				if (consumer.treatmentMaterial(copy))
-					change = true;
-				else
+				if (!consumer.treatmentMaterial(copy))
 					continue alchemy;
-			materials.clear();
-			materials.addAll(copy);
-			return recipe.getAlchemyResult();
+			if (!copy.isEmpty())
+				continue alchemy;
+			return recipe;
 		}
 		return null;
 	}

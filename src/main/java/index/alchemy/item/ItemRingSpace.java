@@ -19,6 +19,7 @@ import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.interacting.ModItems;
 import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryItem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
@@ -55,7 +56,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider<ItemStack>, IInputHandle, IGuiHandle, ICoolDown,
-	INetworkMessage.Server<MessageSpaceRingPickup>, IAlchemyRecipe {
+	INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
 	public static final String NBT_KEY_CD = "cd_ring_space",
@@ -255,36 +256,8 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 
 	public ItemRingSpace() {
 		super("ring_space", 0xE451F2);
-	}
-
-	@Override
-	public ResourceLocation getAlchemyName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getAlchemyTime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
-	public int getAlchemyColor() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public ItemStack getAlchemyResult() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<IMaterialConsumer> getAlchemyMaterials() {
-		// TODO Auto-generated method stub
-		return null;
+		alchemyMaterials.addAll(Always.generateMaterialConsumers("ingotSilver", 2, Items.MAGMA_CREAM,
+				ModItems.bop$flower_burning_blossom));
 	}
 
 }

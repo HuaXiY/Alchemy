@@ -88,7 +88,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
 		modid = MOD_ID,
 		name = MOD_NAME,
 		version = MOD_VERSION,
-		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.2.2099,);"
+		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.2.2099,);after:*;"
 )
 public class AlchemyModLoader {
 	
@@ -248,22 +248,22 @@ public class AlchemyModLoader {
 	
 	public static final String mc_dir, mod_path;
 	public static final boolean is_modding, enable_test, enable_dmain;
-	private static final Map<ModState, List<Class<?>>> init_map = new LinkedHashMap<ModState, List<Class<?>>>() {
+	private static final Map<ModState, LinkedList<Class<?>>> init_map = new LinkedHashMap<ModState, LinkedList<Class<?>>>() {
 		
 		@Override
-		public List<Class<?>> get(Object key) {
-			List<Class<?>> result = super.get(key);
+		public LinkedList<Class<?>> get(Object key) {
+			LinkedList<Class<?>> result = super.get(key);
 			if (result == null)
 				put((ModState) key, result = new LinkedList());
 			return result;
 		}
 		
 	};
-	private static final Map<String, List<Class<?>>> instance_map = new LinkedHashMap<String, List<Class<?>>>() {
+	private static final Map<String, LinkedList<Class<?>>> instance_map = new LinkedHashMap<String, LinkedList<Class<?>>>() {
 		
 		@Override
-		public List<Class<?>> get(Object key) {
-			List<Class<?>> result = super.get(key);
+		public LinkedList<Class<?>> get(Object key) {
+			LinkedList<Class<?>> result = super.get(key);
 			if (result == null)
 				put((String) key, result = new LinkedList());
 			return result;
@@ -398,7 +398,6 @@ public class AlchemyModLoader {
 					loading_list.add(clazz.getMethod("init", Class.class));
 				}
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
 				continue;
 			}
 		}
@@ -411,7 +410,10 @@ public class AlchemyModLoader {
 					method.invoke(null, clazz);
 				Init init = clazz.getAnnotation(Init.class);
 				if (init != null && init.enable())
-					init_map.get(init.state()).add(clazz);
+					if (init.index() < 0)
+						init_map.get(init.state()).addFirst(clazz);
+					else
+						init_map.get(init.state()).add(clazz);
 				InitInstance instance = clazz.getAnnotation(InitInstance.class);
 				if (instance != null)
 					if (instance.value() != null)
@@ -419,7 +421,6 @@ public class AlchemyModLoader {
 					else
 						AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @InitInstance.value()"));
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
 				continue;
 			}
 		}

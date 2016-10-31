@@ -11,6 +11,7 @@ import com.google.common.base.Predicate;
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.AlchemyConstants;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
@@ -19,6 +20,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +33,8 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
+
+import static java.lang.Math.*;
 
 public class Always {
 	
@@ -140,18 +144,42 @@ public class Always {
 		};
 	}
 	
-	public static IMaterialConsumer generateMaterialConsumer(final ItemStack material) {
+	public static List<IMaterialConsumer> generateMaterialConsumers(Object... args) {
+		Tool.checkNull(args);
+		List<IMaterialConsumer> result = new LinkedList<>();
+		for (int i = 0, len = args.length + 1; i < len; i++) {
+			Object last = i > 0 ? args[i - 1] : null, obj = i == args.length ? null : args[i];
+			if (last != null && !(last instanceof ItemStack || last instanceof Number)) {
+				if (last instanceof Item)
+					result.add(generateMaterialConsumer(new ItemStack((Item) last, obj instanceof Number ? ((Number) obj).intValue() : 1)));
+				else if (last instanceof Block)
+					result.add(generateMaterialConsumer(new ItemStack((Block) last, obj instanceof Number ? ((Number) obj).intValue() : 1)));
+				else if (last instanceof String)
+					result.add(generateMaterialConsumer((String) last, obj instanceof Number ? ((Number) obj).intValue() : 1));
+				else
+					throw new IllegalArgumentException("Type mismatch, type: " + last.getClass().getName() + " , index: " + (i - 1));
+			}
+			if (obj != null && obj instanceof ItemStack)
+				result.add(generateMaterialConsumer((ItemStack) obj));
+		}
+		return result;
+	}
+	
+	public static IMaterialConsumer generateMaterialConsumer(ItemStack material) {
 		return new IMaterialConsumer() {
 			@Override
 			public boolean treatmentMaterial(List<ItemStack> items) {
+				int need = material.stackSize;
 				for (Iterator<ItemStack> iterator = items.iterator(); iterator.hasNext();) {
 					ItemStack item = iterator.next();
 					if (item.isItemEqualIgnoreDurability(material)) {
-						if (item.stackSize >= material.stackSize)
-							item.stackSize -= material.stackSize;
+						int change = min(need, item.stackSize);
+						need -= change;
+						item.stackSize -= change;
 						if (item.stackSize == 0)
 							iterator.remove();
-						return true;
+						if (need < 1)
+							return true;
 					}
 				}
 				return false;
@@ -159,19 +187,23 @@ public class Always {
 		};
 	}
 	
-	public static IMaterialConsumer generateMaterialConsumer(final String material_str, final int size) {
+	public static IMaterialConsumer generateMaterialConsumer(String material_str, int size) {
 		return new IMaterialConsumer() {
 			@Override
 			public boolean treatmentMaterial(List<ItemStack> items) {
+				int need = size;
 				for (Iterator<ItemStack> iterator = items.iterator(); iterator.hasNext();) {
 					ItemStack item = iterator.next();
 					for (ItemStack material : OreDictionary.getOres(material_str))
-						if (item.isItemEqualIgnoreDurability(item)) {
-							if (item.stackSize >= size)
-								item.stackSize -= size;
+						if (item.isItemEqualIgnoreDurability(material)) {
+							int change = min(need, item.stackSize);
+							need -= change;
+							item.stackSize -= change;
 							if (item.stackSize == 0)
 								iterator.remove();
-							return true;
+							if (need < 1)
+								return true;
+							break;
 						}
 				}
 				return false;

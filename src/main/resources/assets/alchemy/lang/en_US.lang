@@ -2,6 +2,7 @@
 alchemy=alchemy
 
 //itemMap
+item.ingot_silver.name=ingot_silver
 item.lapis_lazuli.name=lapis_lazuli
 item.scroll_boom.name=scroll_boom
 item.scroll_ice_screen.name=scroll_ice_screen
@@ -109,4 +110,4 @@ solvent.type.benign=benign
 solvent.type.wonderful=wonderful
 solvent.type.dangerous=dangerous
 itemGroup.alchemy=alchemy
-item.record.re_awake.desc=re_awake
+re_awake=re_awake

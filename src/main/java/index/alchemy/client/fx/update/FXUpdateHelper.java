@@ -63,7 +63,8 @@ public class FXUpdateHelper {
 	
 	@Nullable
 	public static List<IFXUpdate> getResultByArgs(int... args) {
-		Tool.checkArrayLength(args, 1);
+		if (args.length == 0)
+			return null;
 		try {
 			return (List<IFXUpdate>) Tool.getSafe(functions, args[0]).apply(args);
 		} catch (Exception e) {

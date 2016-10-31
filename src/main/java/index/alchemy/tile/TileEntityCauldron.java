@@ -8,21 +8,24 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import index.alchemy.animation.StdCycle;
+import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.client.color.ColorHelper;
 import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
+import index.alchemy.client.fx.update.FXARGBUpdate;
 import index.alchemy.client.fx.update.FXAgeUpdate;
 import index.alchemy.client.fx.update.FXMotionUpdate;
 import index.alchemy.client.fx.update.FXPosUpdate;
 import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.client.fx.update.FXUpdateHelper;
+import index.alchemy.core.AlchemyRegistry;
+import index.alchemy.interacting.Elemix;
 import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryHelper;
@@ -42,9 +45,11 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 @FX.UpdateProvider
 public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
-	public static final String FX_KEY_GATHER = "cauldron_gather";
+	public static final String FX_KEY_GATHER = "fx_cauldron_gather", FX_KEY_HOVER = "fx_cauldron_hover";
 	
-	public static final int fx_id = FXUpdateHelper.getIdByName(FX_KEY_GATHER);
+	public static final int 
+			fx_id_gather = FXUpdateHelper.getIdByName(FX_KEY_GATHER),
+			fx_id_hover = FXUpdateHelper.getIdByName(FX_KEY_HOVER);
 	
 	@FX.UpdateMethod(FX_KEY_GATHER)
 	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
@@ -53,12 +58,26 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			max_age = Tool.getSafe(args, i++, 1),
 			scale = Tool.getSafe(args, i++, 1);
 		result.add(new FXAgeUpdate(max_age));
-		result.add(new FXPosUpdate(-1.5, 8, 1.5));
+		result.add(new FXPosUpdate(0, 6, 3));
 		result.add(new FXMotionUpdate(
-				new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setMin(-0.5F).setMax(0.5F),
-				new StdCycle().setLenght(max_age).setMax(-0.2F),
-				new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setNow(max_age / 6).setMin(-0.5F).setMax(0.5F)));
+				new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setMin(-.5F).setMax(.5F),
+				new StdCycle().setLenght(max_age).setMax(-.2F),
+				new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setNow(max_age / 6).setMin(-.5F).setMax(.5F)));
 		result.add(new FXARGBIteratorUpdate(ColorHelper.ahsbStep(new Color(0x66, 0xCC, 0xFF), Color.RED, max_age, true, true, false)));
+		result.add(new FXScaleUpdate(new StdCycle().setLenght(max_age).setMin(scale / 1000F).setMax(scale / 100F)));
+		return result;
+	}
+	
+	@FX.UpdateMethod(FX_KEY_HOVER)
+	public static List<IFXUpdate> getFXUpdateHover(int[] args) {
+		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
+		int i = 1, 
+			max_age = Tool.getSafe(args, i++, 1),
+			scale = Tool.getSafe(args, i++, 1),
+			color = Tool.getSafe(args, i++, 0x66CCFF);
+		System.out.println(max_age + " - " + scale + " - " + color);
+		result.add(new FXAgeUpdate(max_age));
+		result.add(new FXARGBUpdate(color | 0x88 << 24));
 		result.add(new FXScaleUpdate(new StdCycle().setLenght(max_age).setMin(scale / 1000F).setMax(scale / 100F)));
 		return result;
 	}
@@ -67,17 +86,22 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	public static final int CONTAINER_MAX_ITEM = 6;
 	
+	protected static final int
+			UPDATE_STATE_ID = 0;
+	
 	protected static final String 
 			NBT_KEY_CONTAINER = "container",
 			NBT_KEY_STATE = "state",
+			NBT_KEY_RECIPE = "recipe",
 			NBT_KEY_TIME = "time",
 			NBT_KEY_LIQUID = "liquid",
 			NBT_KEY_ALCHEMY = "alchemy";
 	
 	protected final LinkedList<ItemStack> container = new LinkedList<ItemStack>();
-	protected volatile boolean flag;
+	protected volatile boolean flag, check;
 	
 	protected State state = State.NULL;
+	protected IAlchemyRecipe recipe;
 	protected int time;
 	
 	protected FluidTank tank = new FluidTank(Fluid.BUCKET_VOLUME) {
@@ -184,47 +208,100 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	public int getAlchemy() {
 		return alchemy;
 	}
+	
+	public void onContainerChange() {
+		state = State.NULL;
+		flag = true;
+		check = false;
+		recipe = null;
+		
+	}
+	
+	@Override
+	public boolean restrictNBTCopy() {
+		return true;
+	}
 
 	@Override
 	public void update() {
 		if (Always.isServer()) {
-			List<Entity> entitys = worldObj.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(pos));
-			for (Entity entity : entitys) {
-				if (entity instanceof EntityItem) {
-					ItemStack item = ((EntityItem) entity).getEntityItem();
-					for (ItemStack c_item : container) {
-						if (c_item.getItem() == ((EntityItem) entity).getEntityItem().getItem() && c_item.stackSize < c_item.getMaxStackSize()) {
-							flag = true;
-							int change = Math.min(c_item.getMaxStackSize() - c_item.stackSize, item.stackSize);
-							c_item.stackSize += change;
-							item.stackSize -= change;
-							if (item.stackSize <= 0)
-								break;
-						}
-					}
-					if (item.stackSize > 0 && container.size() < CONTAINER_MAX_ITEM) {
-						flag = true;
-						container.add(item.copy());
-						item.stackSize = 0;
-					}
+			List<EntityItem> entitys = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).setMaxY(pos.getY() + .6));
+			for (EntityItem entity : entitys) {
+				ItemStack item = entity.getEntityItem();
+				while (item.stackSize > 0 && container.size() < CONTAINER_MAX_ITEM) {
+					ItemStack itemStack = item.splitStack(1);
+					container.add(itemStack);
+					onContainerChange();
+				}
+				if (item.stackSize == 0)
+					entity.setDead();
+			}
+			
+			if (!check && state == State.NULL && container.size() > 0) {
+				recipe = AlchemyRegistry.findRecipe(container);
+				check = true;
+			}
+			
+			if (recipe != null && state != State.OVER) {
+				if (worldObj.isAirBlock(pos.up()) && Elemix.blockIsHeatSource(worldObj, pos.down())) {
+					time++;
+					checkStateChange(State.ALCHEMY);
+				} else {
+					time = 0;
+					checkStateChange(State.NULL);
+				}
+				if (state == State.ALCHEMY && time >= recipe.getAlchemyTime()) {
+					container.clear();
+					container.add(recipe.getAlchemyResult());
+					state = State.OVER;
+					time = 0;
+					flag = true;
 				}
 			}
 		
-			if (flag) {
-				updateState();
-				flag = false;
-			}
+			if (flag)
+				updateTracker();
 		} else {
-			worldObj.spawnParticle(FXWisp.Info.type, false,
-					pos.getX() + .5 - 2 + worldObj.rand.nextFloat() * 4,
-					pos.getY() + .5 - .5 + worldObj.rand.nextFloat(),
-					pos.getZ() + .5 - 2 + worldObj.rand.nextFloat() * 4,
-					0, 0, 0, new int[]{ fx_id, 60, 200 });
+			if (recipe != null) {
+				if (worldObj.getWorldTime() % 3 == 0)
+					worldObj.spawnParticle(FXWisp.Info.type, false,
+							pos.getX() + worldObj.rand.nextFloat(),
+							pos.getY() + 1 + worldObj.rand.nextFloat(),
+							pos.getZ() + worldObj.rand.nextFloat(),
+							worldObj.rand.nextGaussian() * .05, worldObj.rand.nextFloat() * .15, worldObj.rand.nextGaussian() * .05,
+							new int[]{ fx_id_hover, 20, (int) (100 + worldObj.rand.nextFloat() * 50), recipe.getAlchemyColor() });
+				if (state == State.ALCHEMY)
+					worldObj.spawnParticle(FXWisp.Info.type, false,
+							pos.getX() + .5 - 2 + worldObj.rand.nextFloat() * 4,
+							pos.getY() + worldObj.rand.nextFloat(),
+							pos.getZ() + .5 - 2 + worldObj.rand.nextFloat() * 4,
+							0, 0, 0, new int[]{ fx_id_gather, 60, 200 });
+			}
 		}
 	}
 	
-	public void updateState() {
-		updateTracker();
+	public void checkStateChange(State state) {
+		if (this.state != state) {
+			this.state = state;
+			worldObj.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_STATE_ID, state.ordinal());
+		}
+	}
+	
+	@Override
+	public boolean receiveClientEvent(int id, int type) {
+		System.out.println(id + " - " + type);
+		switch (id) {
+			case UPDATE_STATE_ID:
+				state = Tool.getSafe(State.values(), type, state);
+				return true;
+			default:
+				return super.receiveClientEvent(id, type);
+		}
+	}
+	
+	public void updateTracker() {
+		super.updateTracker();
+		flag = false;
 	}
 	
 	public void onBlockBreak() {
@@ -237,6 +314,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		container.clear();
 		container.addAll(Arrays.asList(NBTHelper.getItemStacksFormNBTList(nbt.getTagList(NBT_KEY_CONTAINER, NBT.TAG_COMPOUND))));
 		state = State.values()[nbt.getInteger(NBT_KEY_STATE)];
+		recipe = AlchemyRegistry.findRecipe(nbt.getString(NBT_KEY_RECIPE));
 		time = nbt.getInteger(NBT_KEY_TIME);
 		alchemy = nbt.getInteger(NBT_KEY_ALCHEMY);
 		tank.readFromNBT(nbt);
@@ -247,6 +325,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		nbt.setTag(NBT_KEY_CONTAINER, NBTHelper.getNBTListFormItemStacks(container.toArray(new ItemStack[container.size()])));
 		nbt.setInteger(NBT_KEY_STATE, state.ordinal());
+		nbt.setString(NBT_KEY_RECIPE, recipe != null ? recipe.getAlchemyName().toString() : "");
 		nbt.setInteger(NBT_KEY_TIME, time);
 		nbt.setInteger(NBT_KEY_ALCHEMY, alchemy);
 		tank.writeToNBT(nbt);
