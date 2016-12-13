@@ -56,7 +56,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 		
 		if (Always.runOnClient())
 			AlchemyEventSystem.addDelayedRunnable((@SideOnlyLambda(Side.CLIENT) IPhaseRunnable)
-					(p -> Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyRuntimeError(e, error))), 0);
+					p -> Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyRuntimeError(e, error)), 0);
 		else
 			throw e;
 		
@@ -94,68 +94,68 @@ public class AlchemyRuntimeException extends RuntimeException {
 	@SideOnly(Side.CLIENT)
 	public static class GuiAlchemyRuntimeError extends GuiErrorScreen {
 		
-	    private Exception e;
-	    private String error, msgs[];
-	    
-	    public GuiAlchemyRuntimeError(Exception e, String error) {
-	        super(null, null);
-	        this.e = e;
-	        this.error = error;
-	        msgs = error.split("\n");
-	        msgs[0] = msgs[0].replace(msgs[0].charAt(msgs[0].length() - 1), ' ');
-	        for (int i = 1; i < msgs.length; i++)
-	        	msgs[i] = msgs[i].replace(msgs[i].charAt(0), ' ').substring(0, msgs[i].length() - 1);
-	    }
-	    
-	    @Override
-	    public void initGui() {
-	        super.initGui();
-	        buttonList.clear();
-	        buttonList.add(new GuiButton(0, width / 2 - 200, height - 20, "复制"));
-	        buttonList.add(new GuiButton(0, width / 2, height - 20, "上传"));
-	    }
+		private Exception e;
+		private String error, msgs[];
+		
+		public GuiAlchemyRuntimeError(Exception e, String error) {
+			super(null, null);
+			this.e = e;
+			this.error = error;
+			msgs = error.split("\n");
+			msgs[0] = msgs[0].replace(msgs[0].charAt(msgs[0].length() - 1), ' ');
+			for (int i = 1; i < msgs.length; i++)
+				msgs[i] = msgs[i].replace(msgs[i].charAt(0), ' ').substring(0, msgs[i].length() - 1);
+		}
+		
+		@Override
+		public void initGui() {
+			super.initGui();
+			buttonList.clear();
+			buttonList.add(new GuiButton(0, width / 2 - 200, height - 20, "复制"));
+			buttonList.add(new GuiButton(0, width / 2, height - 20, "上传"));
+		}
 
-	    @Override
-	    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-	        drawDefaultBackground();
-	        String title = "Alchemy-error";
-	        drawString(fontRendererObj, title, (width - fontRendererObj.getStringWidth(title)) / 2, 30, 0xFFFFFF);
-	        int offset = 40;
-	        List<String> list = new LinkedList<String>();
-	        for (String msg : msgs) {
-	        	StringBuilder builder = new StringBuilder();
-	        	int w = 0;
-	        	boolean flag = false;
-	        	for (char c : msg.toCharArray()) {
-	        		w += fontRendererObj.getCharWidth(c);
-	        		builder.append(c);
-	        		if (w > width - 60) {
-	        			w = 0;
-	        			if (flag)
-	        				list.add("    " + builder.toString());
-	        			else {
-	        				flag = true;
-	        				list.add(builder.toString());
-	        			}
-	        			builder.replace(0, builder.length(), "");
-	        		}
-	        	}
-	        	list.add(flag ? "    " + builder.toString() : builder.toString());
-	        }
-	        boolean flag = false;
-	        for (String msg : list) {
-	        	if ((offset += fontRendererObj.FONT_HEIGHT) < height - 30)
-	        		drawString(fontRendererObj, msg, 30, offset, 0xFFFFFF);
-	        	else {
-	        		flag = true;
-	        		break;
-	        	}
-	        }
-	        if (flag)
-	        	drawString(fontRendererObj, "...", 30, offset, 0xFFFFFF);
-	        for (int i = 0; i < buttonList.size(); i++)
-	        	buttonList.get(i).drawButton(this.mc, mouseX, mouseY);
-	    }
+		@Override
+		public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+			drawDefaultBackground();
+			String title = "Alchemy-error";
+			drawString(fontRendererObj, title, (width - fontRendererObj.getStringWidth(title)) / 2, 30, 0xFFFFFF);
+			int offset = 40;
+			List<String> list = new LinkedList<String>();
+			for (String msg : msgs) {
+				StringBuilder builder = new StringBuilder();
+				int w = 0;
+				boolean flag = false;
+				for (char c : msg.toCharArray()) {
+					w += fontRendererObj.getCharWidth(c);
+					builder.append(c);
+					if (w > width - 60) {
+						w = 0;
+						if (flag)
+							list.add("	" + builder.toString());
+						else {
+							flag = true;
+							list.add(builder.toString());
+						}
+						builder.replace(0, builder.length(), "");
+					}
+				}
+				list.add(flag ? "	" + builder.toString() : builder.toString());
+			}
+			boolean flag = false;
+			for (String msg : list) {
+				if ((offset += fontRendererObj.FONT_HEIGHT) < height - 30)
+					drawString(fontRendererObj, msg, 30, offset, 0xFFFFFF);
+				else {
+					flag = true;
+					break;
+				}
+			}
+			if (flag)
+				drawString(fontRendererObj, "...", 30, offset, 0xFFFFFF);
+			for (int i = 0; i < buttonList.size(); i++)
+				buttonList.get(i).drawButton(this.mc, mouseX, mouseY);
+		}
 	}
 	
 }

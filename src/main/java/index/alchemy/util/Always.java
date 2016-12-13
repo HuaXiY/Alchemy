@@ -6,8 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Predicate;
-
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.AlchemyConstants;
@@ -16,8 +14,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -41,13 +37,6 @@ public class Always {
 	public static final int SEA_LEVEL = 62;
 	
 	private static final boolean isClient = Tool.forName("net.minecraft.client.Minecraft", false) != null;
-	
-	public static final Predicate<EntityLivingBase> IS_MONSTER = new Predicate<EntityLivingBase>() {
-		@Override
-		public boolean apply(EntityLivingBase input) {
-			return input instanceof EntityAnimal;
-		}
-	};
 	
 	public static final Map<Thread, Side> SIDE_MAPPING = new HashMap<Thread, Side>();
 	

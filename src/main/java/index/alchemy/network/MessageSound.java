@@ -40,7 +40,7 @@ public class MessageSound implements IMessage, IMessageHandler<MessageSound, IMe
 		AlchemyEventSystem.addDelayedRunnable(p -> {
 			for (int i = 0; i < d3f2p.length; i++)
 				player.worldObj.playSound(d3f2p[i].x, d3f2p[i].y, d3f2p[i].z, sound, category, d3f2p[i].a, d3f2p[i].b, true);
-		}, 0);
+		}, 1);
 		return null;
 	}
 

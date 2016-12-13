@@ -9,6 +9,7 @@ import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGenerator;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
+import index.alchemy.api.IItemMeshProvider;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IPlayerTickable;
@@ -16,7 +17,7 @@ import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
-import index.alchemy.client.AlchemyColorLoader;
+import index.alchemy.client.color.AlchemyColorLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.item.AlchemyItemBlock;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -111,7 +112,10 @@ public class AlchemyInitHook {
 				if (obj instanceof IColorItem)
 					AlchemyColorLoader.addItemColor((I) obj);
 				
-				if (obj instanceof IResourceLocation)
+				if (obj instanceof IItemMeshProvider && ((IItemMeshProvider) obj).getItemMesh() != null) {
+					ModelLoader.setCustomMeshDefinition((Item) obj, ((IItemMeshProvider) obj).getItemMesh());
+					ModelLoader.registerItemVariants((Item) obj, ((IItemMeshProvider) obj).getItemVariants());
+				} else if (obj instanceof IResourceLocation)
 					ModelLoader.setCustomModelResourceLocation((Item) obj, 0, new ModelResourceLocation(
 							((IResourceLocation) obj).getResourceLocation(), "inventory"));
 				

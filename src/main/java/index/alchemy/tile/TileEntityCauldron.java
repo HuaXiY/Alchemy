@@ -22,17 +22,23 @@ import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.core.AlchemyRegistry;
 import index.alchemy.interacting.Elemix;
+import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.network.Double3Float2Package;
+import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -75,7 +81,6 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			max_age = Tool.getSafe(args, i++, 1),
 			scale = Tool.getSafe(args, i++, 1),
 			color = Tool.getSafe(args, i++, 0x66CCFF);
-		System.out.println(max_age + " - " + scale + " - " + color);
 		result.add(new FXAgeUpdate(max_age));
 		result.add(new FXARGBUpdate(color | 0x88 << 24));
 		result.add(new FXScaleUpdate(new StdCycle().setLenght(max_age).setMin(scale / 1000F).setMax(scale / 100F)));
@@ -216,16 +221,11 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		recipe = null;
 		
 	}
-	
-	@Override
-	public boolean restrictNBTCopy() {
-		return true;
-	}
 
 	@Override
 	public void update() {
 		if (Always.isServer()) {
-			List<EntityItem> entitys = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).setMaxY(pos.getY() + .6));
+			List<EntityItem> entitys = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).setMaxY(pos.getY() + .35));
 			for (EntityItem entity : entitys) {
 				ItemStack item = entity.getEntityItem();
 				while (item.stackSize > 0 && container.size() < CONTAINER_MAX_ITEM) {
@@ -237,13 +237,25 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 					entity.setDead();
 			}
 			
+			if (!container.isEmpty() && tank.getFluid() != null && tank.getFluid().getFluid() == FluidRegistry.LAVA) {
+				container.clear();
+				onContainerChange();
+				List<Double3Float2Package> d3f2ps = new LinkedList<>();
+				d3f2ps.add(new Double3Float2Package(pos.getX() + .5F, pos.getY() + .8F, pos.getZ() + .5F,
+						.4F, 2F + worldObj.rand.nextFloat() * .4F));
+				AlchemyNetworkHandler.playSound(SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.NEUTRAL,
+						AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getSoundRange()), worldObj, d3f2ps);
+			}
+			
 			if (!check && state == State.NULL && container.size() > 0) {
 				recipe = AlchemyRegistry.findRecipe(container);
 				check = true;
 			}
 			
 			if (recipe != null && state != State.OVER) {
-				if (worldObj.isAirBlock(pos.up()) && Elemix.blockIsHeatSource(worldObj, pos.down())) {
+				if (worldObj.isAirBlock(pos.up()) && Elemix.blockIsHeatSource(worldObj, pos.down()) &&
+						tank.getFluid() != null && tank.getFluid().getFluid() == recipe.getAlchemyFluid() &&
+						tank.getFluidAmount() == Fluid.BUCKET_VOLUME) {
 					time++;
 					checkStateChange(State.ALCHEMY);
 				} else {
@@ -252,10 +264,12 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 				}
 				if (state == State.ALCHEMY && time >= recipe.getAlchemyTime()) {
 					container.clear();
-					container.add(recipe.getAlchemyResult());
+					container.add(recipe.getAlchemyResult(worldObj, pos));
 					state = State.OVER;
+					tank.setFluid(null);
 					time = 0;
 					flag = true;
+					worldObj.addWeatherEffect(new EntityLightningBolt(worldObj, pos.getX(), pos.getY(), pos.getZ(), true));
 				}
 			}
 		
@@ -289,7 +303,6 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	@Override
 	public boolean receiveClientEvent(int id, int type) {
-		System.out.println(id + " - " + type);
 		switch (id) {
 			case UPDATE_STATE_ID:
 				state = Tool.getSafe(State.values(), type, state);

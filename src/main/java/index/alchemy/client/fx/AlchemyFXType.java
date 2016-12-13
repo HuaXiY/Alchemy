@@ -79,6 +79,7 @@ public class AlchemyFXType {
 	}
 	
 	public static void init(Class<?> clazz) {
+		AlchemyModLoader.checkState();
 		FX fx = clazz.getAnnotation(FX.class);
 		if (fx != null)
 			if (fx.name() != null)

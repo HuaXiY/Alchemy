@@ -29,16 +29,10 @@ import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
-import index.alchemy.client.fx.FXWisp;
-import index.alchemy.client.fx.update.FXUpdateHelper;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
-import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.Double6IntArrayPackage;
-import index.alchemy.tile.TileEntityCauldron;
-import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
@@ -159,7 +153,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "63";
+		String flag = "66";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -184,16 +178,16 @@ public class AlchemyEventSystem implements IGuiHandler {
 			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
-			EntityPlayer player = event.player;
-			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
-			int update[] = FXUpdateHelper.getIntArrayByArgs(TileEntityCauldron.FX_KEY_GATHER, 360, 300);
-			for (int i = 0; i < 1; i++)
-				d6iaps.add(new Double6IntArrayPackage(
-						player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
-						player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
-						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
-			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
-					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
+//			EntityPlayer player = event.player;
+//			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
+//			int update[] = FXUpdateHelper.getIntArrayByArgs(TileEntityCauldron.FX_KEY_GATHER, 360, 300);
+//			for (int i = 0; i < 1; i++)
+//				d6iaps.add(new Double6IntArrayPackage(
+//						player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
+//						player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
+//						player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
+//			AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
+//					AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
 			//System.out.println(Arrays.toString(new AttachCapabilitiesEvent(null).getListenerList().getListeners(0)));
 			//event.player.worldObj.setBlockState(event.player.getPosition(), AlchemyBlockLoader.silver_ore.getDefaultState());
 			//System.out.println(DimensionManager.getWorld(10));ItemFlintAndSteel BlockFire
@@ -333,7 +327,7 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static void registerInputHandle(final IInputHandle handle) {
+	public static void registerInputHandle(IInputHandle handle) {
 		Class<?> clazz = handle.getClass();
 		for (KeyBinding binding : handle.getKeyBindings()) {
 			if (!ArrayUtils.contains(Minecraft.getMinecraft().gameSettings.keyBindings, binding))

@@ -25,8 +25,6 @@ public class AlchemyDimensionType {
 	
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
-		AlchemyModLoader.checkInvokePermissions();
-		
 		Dimension dimension = clazz.getAnnotation(Dimension.class);
 		if (dimension != null) {
 			if (dimension.name() != null) {

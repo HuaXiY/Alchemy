@@ -6,4 +6,6 @@ public interface IAlchemyClassTransformer extends IClassTransformer {
 	
 	String getTransformerClassName();
 	
+	default boolean disable() { return false; }
+	
 }

@@ -9,6 +9,7 @@ import index.alchemy.item.AlchemyItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
 
 public class AlchemyBlock extends Block implements IResourceLocation, IRegister {
@@ -27,6 +28,11 @@ public class AlchemyBlock extends Block implements IResourceLocation, IRegister 
 		return 0;
 	}
 	
+	@Override
+	public CreativeTabs getCreativeTab() {
+		return AlchemyItem.CREATIVE_TABS;
+	}
+	
 	public AlchemyBlock(String name, Material material) {
 		this(name, material, null);
 	}
@@ -36,8 +42,9 @@ public class AlchemyBlock extends Block implements IResourceLocation, IRegister 
 		if (icon != null)
 			icon_name = new AlchemyResourceLocation(icon);
 		if (hasCreativeTab())
-			setCreativeTab(AlchemyItem.CREATIVE_TABS);
-		setUnlocalizedName(name);
+			setCreativeTab(getCreativeTab());
+		int index = name.lastIndexOf(':');
+		setUnlocalizedName(index == -1 ? name : name.substring(index + 1));
 		setRegistryName(name);
 		register();
 	}

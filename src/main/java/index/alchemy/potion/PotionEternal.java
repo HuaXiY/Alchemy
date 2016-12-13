@@ -18,7 +18,7 @@ public class PotionEternal extends AlchemyPotion implements IEventHandle {
 	}
 	
 	public PotionEternal() {
-		super("eternal", false, 0xFBD860);
+		super("eternal", false, 0xFBD451);
 	}
 
 }

@@ -1,18 +1,11 @@
 package index.alchemy.item;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
-import index.alchemy.entity.ai.EntityArrowTracker;
-import index.alchemy.entity.ai.EntityHelper;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import index.alchemy.item.ItemBeltGuard.MessageGuardCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.Double3Float2Package;
-import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -21,9 +14,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -59,24 +50,9 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 				&& isEquipmented(event.getEntityLiving()) && isCDOver(event.getEntityLiving())) {
 			event.setCanceled(true);
 			EntityLivingBase living = event.getEntityLiving();
-			EntityArrow arrow = (EntityArrow) event.getSource().getSourceOfDamage();
-			if (arrow.shootingEntity != null && arrow.shootingEntity != event.getEntityLiving()) {
-				EntityArrow reflect = EntityHelper.respawnArrow(arrow);
-				EntityArrowTracker.track(reflect, arrow.shootingEntity);
-				reflect.setDamage(16);
-				reflect.shootingEntity = living;
-				arrow.worldObj.spawnEntityInWorld(reflect);
-				living.setLastAttacker(arrow.shootingEntity);
-				Double3Float2Package d3f2p = new Double3Float2Package(living.posX, living.posY, living.posZ, 1F,
-						1F / (living.rand.nextFloat() * 0.4F + 0.8F));
-				List<Double3Float2Package> d3f2ps = new LinkedList<Double3Float2Package>();
-				d3f2ps.add(d3f2p);
-				AlchemyNetworkHandler.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, SoundCategory.PLAYERS,
-						AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getSoundRange()), living.worldObj, d3f2ps);
-				if (living instanceof EntityPlayerMP)
-					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(arrow.shootingEntity.getEntityId()),
-							(EntityPlayerMP) living);
-			}
+			living.getCombatTracker().lastDamageTime = living.ticksExisted;
+			if (living instanceof EntityPlayerMP)
+				AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(-1), (EntityPlayerMP) living);
 		}
 	}
 	
@@ -85,7 +61,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 		if (Always.isServer()) {
 			EntityLivingBase living = event.getEntityLiving(), attacker = event.getSource().getEntity() instanceof EntityLivingBase ?
 					(EntityLivingBase) event.getSource().getEntity() : null;
-			if (isEquipmented(living)) {
+			if (isEquipmented(living) && !(living instanceof EntityPlayer && ((EntityPlayer) living).isCreative())) {
 				living.getCombatTracker().lastDamageTime = living.ticksExisted;
 				if (living instanceof EntityPlayerMP)
 					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(-1), (EntityPlayerMP) living);
@@ -182,7 +158,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	}
 
 	public ItemBeltGuard() {
-		super("belt_guard", 0xFFCC00);
+		super("belt_guard", 0xFFB529);
 	}
 
 }

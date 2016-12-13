@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FrameNode;
@@ -37,6 +38,9 @@ public class TransformerProxy implements IClassTransformer {
 		ClassWriter writer = new ClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
+		for (Iterator<MethodNode> iterator = proxy.methods.iterator(); iterator.hasNext();)
+			if (!checkMethodNode(iterator.next()))
+				iterator.remove();
 		proxyName = proxy.name;
 		clazzName = transformedName.replace('.', '/');
 		superName = node.superName;
@@ -81,6 +85,15 @@ public class TransformerProxy implements IClassTransformer {
 		return writer.toByteArray();
 	}
 	
+	public static boolean checkMethodNode(MethodNode method) {
+		if (method.visibleAnnotations == null)
+			return true;
+		for (AnnotationNode ann : method.visibleAnnotations)
+			if (ann.desc.equals(AlchemyTransformerManager.HOOK_ANNOTATION_DESC))
+				return false;
+		return true;
+	}
+	
 	public void proxyMethod(MethodNode methodNode, String proxyName, String clazzName) {
 		methodNode.desc = methodNode.desc.replace(proxyName, clazzName);
 		for (Iterator<AbstractInsnNode> iterator = methodNode.instructions.iterator(); iterator.hasNext();) {
@@ -114,7 +127,8 @@ public class TransformerProxy implements IClassTransformer {
 	}
 	
 	public TransformerProxy(ClassNode proxy) {
-		this.proxy = proxy;
+		this.proxy = new ClassNode();
+		proxy.accept(this.proxy);
 	}
 
 }

@@ -18,7 +18,7 @@ public class PotionSoulWithered extends AlchemyPotion {
 	}
 
 	public PotionSoulWithered() {
-		super("soul_withered", true, 0x000000);
+		super("soul_withered", true, 0x262626);
 	}
 	
 }

@@ -3,6 +3,7 @@ package baubles.api;
 import org.apache.commons.lang3.ArrayUtils;
 
 import index.alchemy.api.annotation.Lang;
+import net.minecraft.util.text.translation.I18n;
 
 @Lang
 public enum BaubleType {
@@ -21,6 +22,11 @@ public enum BaubleType {
 	}
 	
 	public static final String PREFIX = "bauble.type.";
+	
+	@Override
+	public String toString() {
+		return I18n.translateToLocal(PREFIX + name().toLowerCase());
+	}
 	
 	public boolean hasSlot(int slot) {
 		return ArrayUtils.contains(validSlots, slot); 

@@ -1,6 +1,7 @@
 package index.alchemy.api;
 
 import java.util.Map;
+import java.util.Objects;
 
 public interface ICache<K, V> {
 	
@@ -10,10 +11,22 @@ public interface ICache<K, V> {
 	
 	Map<K, V> getCacheMap();
 	
-	V get(K key);
+	default V get(K key) {
+		return getCacheMap().get(key);
+	}
 	
-	V add(K key, V val);
+	default V add(K key, V val) {
+		Map<K, V> cache = getCacheMap();
+		if (getMaxCache() > 0 && cache.size() > getMaxCache()) cache.clear();
+		return cache.put(key, val);
+	}
 	
-	V del(K key);
+	default V del(K key) {
+		return getCacheMap().remove(key);
+	}
+	
+	default boolean equals(K key, V val) {
+		return Objects.equals(get(key), val);
+	}
 
 }

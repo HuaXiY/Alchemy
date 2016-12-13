@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -112,6 +113,14 @@ public class InventoryHelper  {
 	
 	public static final boolean areItemsEqual(ItemStack a, ItemStack b) {
 		return a == null ? b == null : b != null && canMergeItemStack(a, b);
+	}
+	
+	public static final boolean areItemsMetaEqual(ItemStack a, ItemStack b) {
+		return a == null ? b == null : b != null && a.getItem() == b.getItem() && a.getMetadata() == b.getMetadata();
+	}
+	
+	public static final boolean isItem(ItemStack stack, Item item) {
+		return stack != null && stack.getItem() == item;
 	}
 	
 }

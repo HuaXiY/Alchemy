@@ -15,7 +15,7 @@ public class PotionDeadOrAlive extends AlchemyPotion {
 	}
 	
 	public PotionDeadOrAlive() {
-		super("dead_or_alive", false, 0x878787, true);
+		super("dead_or_alive", false, 0xFF0066, true);
 	}
 	
 }

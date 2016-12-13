@@ -7,6 +7,7 @@ import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.interacting.ModItems;
+import index.alchemy.item.AlchemyItemLoader;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.PotionTypes;
@@ -216,32 +217,32 @@ public class AlchemyPotionLoader extends PotionType {
 		registerItemPotionAndPutrid(PotionTypes.AWKWARD, false, true, 20 * 45, "feather_fall", "levitation",
 				getItemPredicate(Items.FEATHER), null, new Potion[]{ feather_fall }, new Potion[]{ MobEffects.LEVITATION });
 		
-		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 45, "hunger", 
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 45, "hunger",
 				getItemPredicate(Items.ROTTEN_FLESH), MobEffects.HUNGER);
 		
-		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "haste", 
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "haste",
 				getItemPredicate(Items.BLAZE_ROD), MobEffects.HASTE);
 		
-		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "resistance", 
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "resistance",
 				getItemPredicate(Items.GOLDEN_APPLE), MobEffects.RESISTANCE, MobEffects.ABSORPTION);
 		
-		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 45, "alacrity", 
+		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 45, "alacrity",
 				getItemPredicate(Items.DIAMOND), alacrity);
 		
-		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 3, "eternal", 
+		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 3, "eternal",
 				getItemPredicate(Items.DIAMOND), eternal);
 		
-		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "multiple_xp", 
+		registerItemPotion(PotionTypes.AWKWARD, true, true, 20 * 60 * 3, "multiple_xp",
 				getItemPredicate(Items.DIAMOND), multiple_xp);
 		
-		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "ignore", 
+		registerItemPotion(PotionTypes.AWKWARD, false, true, 20 * 60 * 3, "elapse",
 				getItemPredicate(Items.DIAMOND), elapse);
 
-		registerItemPotion(PotionTypes.AWKWARD, false, false, 1, "dead_or_alive", 
+		registerItemPotion(PotionTypes.AWKWARD, false, false, 1, "dead_or_alive",
 				getItemPredicate(Items.DIAMOND), dead_or_alive);
 		
-		registerItemPotion(PotionTypes.AWKWARD, false, false, 20 * 8, "witchcraft", 
-				getItemPredicate(Items.DIAMOND), witchcraft);
+		registerItemPotion(PotionTypes.AWKWARD, false, false, 20 * 8, "witchcraft",
+				getItemPredicate(AlchemyItemLoader.dush_witchcraft), witchcraft);
 		
 	}
 }

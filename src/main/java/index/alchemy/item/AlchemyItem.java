@@ -1,7 +1,5 @@
 package index.alchemy.item;
 
-import java.util.Random;
-
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyResourceLocation;
@@ -25,7 +23,7 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 		
 	}
 	
-	public static final CreativeTabs CREATIVE_TABS = new AlchemyCreativeTabs(AlchemyConstants.MOD_ID){
+	public static final CreativeTabs CREATIVE_TABS = new AlchemyCreativeTabs(AlchemyConstants.MOD_ID) {
 
 		@Override
 		public Item getTabIconItem() {
@@ -33,8 +31,6 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 		}
 		
 	};
-	
-	protected static final Random RANDOM = new Random();
 	
 	protected String name_color;
 	
@@ -54,6 +50,11 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 		return living instanceof EntityPlayer;
 	}
 	
+	@Override
+	public CreativeTabs getCreativeTab() {
+		return CREATIVE_TABS;
+	}
+	
 	public AlchemyItem(String name) {
 		this(name, null, null);
 	}
@@ -70,7 +71,7 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 		name_color = formatting == null ? "" : formatting.toString();
 		if (icon != null)
 			icon_name = new AlchemyResourceLocation(icon);
-		setCreativeTab(CREATIVE_TABS);
+		setCreativeTab(getCreativeTab());
 		setUnlocalizedName(name);
 		setRegistryName(name);
 		register();

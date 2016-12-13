@@ -1,9 +1,10 @@
 package index.alchemy.capability;
 
+import static java.lang.Math.min;
+
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import index.alchemy.api.IEventHandle;
-import index.alchemy.api.IPlayerTickable;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.inventory.InventoryBauble;
@@ -18,7 +19,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -27,11 +27,9 @@ import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.relauncher.Side;
 
 @InitInstance(AlchemyCapabilityLoader.TYPE)
-public class CapabilityBauble extends AlchemyCapability<InventoryBauble> implements IPlayerTickable, IEventHandle {
+public class CapabilityBauble extends AlchemyCapability<InventoryBauble> implements IEventHandle {
 	
 	public static final ResourceLocation RESOURCE = new AlchemyResourceLocation("bauble");
 	public static final String KEY_INVENTORY = "key.inventory";
@@ -39,20 +37,6 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@Override
 	public Class<InventoryBauble> getDataClass() {
 		return InventoryBauble.class;
-	}
-	
-	@Override
-	public Side getSide() {
-		return Side.SERVER;
-	}
-
-	@Override
-	public void onTick(EntityPlayer player, Phase phase) {
-		if (phase == Phase.END) {
-			InventoryBauble inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-			if (inventory != null)
-				while (inventory.update(false));
-		}
 	}
 	
 	@SubscribeEvent
@@ -63,13 +47,25 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingUpdate(LivingUpdateEvent event) {
-		IInventory inventory = event.getEntityLiving().getCapability(AlchemyCapabilityLoader.bauble, null);
-		if (inventory != null)
+		InventoryBauble inventory = event.getEntityLiving().getCapability(AlchemyCapabilityLoader.bauble, null);
+		if (inventory != null) {
 			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 				ItemStack item = inventory.getStackInSlot(i);
 				if (item != null && item.getItem() instanceof IBauble)
 					((IBauble) item.getItem()).onWornTick(item, event.getEntityLiving());
 			}
+			if (Always.isServer()) {
+				if (event.getEntityLiving().ticksExisted % 10 == 0)
+					for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
+						ItemStack item = inventory.getStackInSlot(i);
+						if (item != null && item.getItem() instanceof IBauble &&
+								((IBauble) item.getItem()).willAutoSync(item, event.getEntityLiving()) &&
+								inventory.getCache().equals(i, item.getTagCompound()))
+							inventory.setChanged(i, true);
+					}
+				inventory.updateAll();
+			}
+		}
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
@@ -113,11 +109,11 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 			inventory.updatePlayer((EntityPlayerMP) event.getEntityPlayer(), inventory.serializeNBT());
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void tooltipEvent(ItemTooltipEvent event) {
-		if (event.getItemStack()!=null && event.getItemStack().getItem() instanceof IBauble) {
+		if (event.getItemStack() != null && event.getItemStack().getItem() instanceof IBauble) {
 			BaubleType type = ((IBauble) event.getItemStack().getItem()).getBaubleType(event.getItemStack());
-			event.getToolTip().add(TextFormatting.GOLD + I18n.translateToLocal("name." + type.name().toLowerCase()));
+			event.getToolTip().add(min(event.getToolTip().size(), 1), TextFormatting.GOLD + type.toString());
 		}
 	}
 

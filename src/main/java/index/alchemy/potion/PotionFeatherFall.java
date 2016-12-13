@@ -18,7 +18,7 @@ public class PotionFeatherFall extends AlchemyPotion {
 	}
 	
 	public PotionFeatherFall() {
-		super("feather_fall", false, 0xFFFFFF);
+		super("feather_fall", false, 0xCCFFFF);
 	}
 
 }

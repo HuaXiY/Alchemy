@@ -2,9 +2,11 @@ package index.alchemy.core.asm.transformer;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +46,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyTransformerManager.class.getSimpleName());
 	
+	public static final Set<IClassTransformer> transformers = new HashSet<>();
 	public static final Map<String, List<IClassTransformer>> transformers_mapping = new HashMap<String, List<IClassTransformer>>() {
 		@Override
 		public List<IClassTransformer> get(Object key) {
@@ -58,7 +61,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			loadAllProvider();
 			loadAllTransform();
 		} catch (IOException e) {
-			AlchemyRuntimeException.onException(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -67,14 +70,15 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	@Unsafe(Unsafe.ASM_API)
 	private static void loadAllProvider() throws IOException {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
-		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_PACKAGE.substring(0, MOD_PACKAGE.length() - 1))) {
-			ClassReader reader = new ClassReader(info.getName());
-			ClassNode node = new ClassNode(ASM5);
-			reader.accept(node, 0);
-			loadHook(node);
-			loadProxy(node);
-			loadField(node);
-		}
+		for (ClassInfo info : path.getAllClasses())
+			if (info.getName().startsWith(MOD_PACKAGE)) {
+				ClassReader reader = new ClassReader(info.getName());
+				ClassNode node = new ClassNode(ASM5);
+				reader.accept(node, 0);
+				loadProxy(node);
+				loadField(node);
+				loadHook(node);
+			}
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
@@ -91,8 +95,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 									if (hook.disable().isEmpty() || !Boolean.getBoolean(hook.disable())) {
 										String args[] = hook.value().split("#");
 										if (args.length == 2)
-											transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, args[0], args[1],
-													hook.isStatic(), hook.type()));
+											transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, node.name,
+													args[0], args[1], hook.isStatic(), hook.type()));
 										else
 											AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
 									}
@@ -136,28 +140,36 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			if (Tool.isInstance(IAlchemyClassTransformer.class, clazz))
 				try {
 					IAlchemyClassTransformer transformer = (IAlchemyClassTransformer) clazz.newInstance();
-					transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
-				} catch (Exception e) { }
+					if (!transformer.disable())
+						transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 		}
 	}
-
+	
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if (debug_print)
 			if (transformedName.startsWith("index."))
 				logger.info("loading: " + transformedName);
-		if (transformers_mapping.containsKey(transformedName)) {
-			List<IClassTransformer> transformers = transformers_mapping.get(transformedName);
-			for (IClassTransformer transformer : transformers)
+		byte[] old = basicClass;
+		for (IClassTransformer transformer : transformers)
+			basicClass = transformer.transform(name, transformedName, basicClass);
+		if (transformers_mapping.containsKey(transformedName))
+			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
-		}
 		return basicClass;
 	}
 	
 	public static void loadAllTransformClass() {
 		for (String clazz : transformers_mapping.keySet())
-			Tool.forName(clazz, false);
+			try {
+				Class.forName(clazz, false, AlchemyTransformerManager.class.getClassLoader());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 	}
 	
 	public static void transform(String name) {

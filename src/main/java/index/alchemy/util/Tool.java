@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -23,18 +24,21 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyInitHook;
@@ -48,8 +52,86 @@ public class Tool {
 	}
 	
 	public static final void where() {
-        for (StackTraceElement s : getStackTrace())
-            System.err.println(s);
+		for (StackTraceElement s : getStackTrace())
+			System.err.println(s);
+	}
+	
+	public static <T> T cloneArray(T array) {
+		if (array == null || !array.getClass().isArray())
+			throw new IllegalArgumentException(toString(array));
+		if (array instanceof Object[])
+			return (T) ((Object[]) array).clone();
+		if (array instanceof byte[])
+			return (T) ((byte[]) array).clone();
+		if (array instanceof short[])
+			return (T) ((short[]) array).clone();
+		if (array instanceof int[])
+			return (T) ((int[]) array).clone();
+		if (array instanceof long[])
+			return (T) ((long[]) array).clone();
+		if (array instanceof char[])
+			return (T) ((char[]) array).clone();
+		if (array instanceof float[])
+			return (T) ((float[]) array).clone();
+		if (array instanceof double[])
+			return (T) ((double[]) array).clone();
+		if (array instanceof boolean[])
+			return (T) ((boolean[]) array).clone();
+		throw new AssertionError(toString(array));
+	}
+	
+	public static final int deepHashCode(@Nonnull Object obj) {
+		if (obj instanceof Object[])
+			return Arrays.deepHashCode((Object[]) obj);
+		if (obj instanceof byte[])
+			return Arrays.hashCode((byte[]) obj);
+		if (obj instanceof short[])
+			return Arrays.hashCode((short[]) obj);
+		if (obj instanceof int[])
+			return Arrays.hashCode((int[]) obj);
+		if (obj instanceof long[])
+			return Arrays.hashCode((long[]) obj);
+		if (obj instanceof char[])
+			return Arrays.hashCode((char[]) obj);
+		if (obj instanceof float[])
+			return Arrays.hashCode((float[]) obj);
+		if (obj instanceof double[])
+			return Arrays.hashCode((double[]) obj);
+		if (obj instanceof boolean[])
+			return Arrays.hashCode((boolean[]) obj);
+		return obj.hashCode();
+	}
+	
+	public static final boolean deepEquals(Object a, Object b) {
+		if (a == b)
+			return true;
+		if (a == null || b == null)
+			return false;
+		if (a.getClass().isArray() && b.getClass().isArray())
+			return deepArrayEquals((Object[]) a, (Object[]) b);
+		return a.equals(b);
+	}
+	
+	public static final boolean deepArrayEquals(Object a, Object b) {
+		if (a instanceof Object[] && b instanceof Object[])
+			return Arrays.deepEquals((Object[]) a, (Object[]) b);
+		if (a instanceof byte[] && b instanceof byte[])
+			return Arrays.equals((byte[]) a, (byte[]) b);
+		if (a instanceof short[] && b instanceof short[])
+			return Arrays.equals((short[]) a, (short[]) b);
+		if (a instanceof int[] && b instanceof int[])
+			return Arrays.equals((int[]) a, (int[]) b);
+		if (a instanceof long[] && b instanceof long[])
+			return Arrays.equals((long[]) a, (long[]) b);
+		if (a instanceof char[] && b instanceof char[])
+			return Arrays.equals((char[]) a, (char[]) b);
+		if (a instanceof float[] && b instanceof float[])
+			return Arrays.equals((float[]) a, (float[]) b);
+		if (a instanceof double[] && b instanceof double[])
+			return Arrays.equals((double[]) a, (double[]) b);
+		if (a instanceof boolean[] && b instanceof boolean[])
+			return Arrays.equals((boolean[]) a, (boolean[]) b);
+		return a.equals(b);
 	}
 	
 	public static final boolean equals(Object src, Object... objs) {
@@ -59,11 +141,47 @@ public class Tool {
 		return false;
 	}
 	
+	public static final String toString(Object obj) {
+		if (obj == null)
+			return "null";
+		Class clazz = obj.getClass();
+		if (!clazz.isArray())
+			return obj.toString();
+		if (clazz == byte[].class)
+			return Arrays.toString((byte[]) obj);
+		if (clazz == char[].class)
+			return Arrays.toString((char[]) obj);
+		if (clazz == double[].class)
+			return Arrays.toString((double[]) obj);
+		if (clazz == float[].class)
+			return Arrays.toString((float[]) obj);
+		if (clazz == int[].class)
+			return Arrays.toString((int[]) obj);
+		if (clazz == long[].class)
+			return Arrays.toString((long[]) obj);
+		if (clazz == short[].class)
+			return Arrays.toString((short[]) obj);
+		if (clazz == boolean[].class)
+			return Arrays.toString((boolean[]) obj);
+		return Arrays.deepToString((Object[]) obj);
+	}
+	
 	public static final String makeString(char c, int len) {
+		if (len < 1)
+			return "";
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < len; i++)
 			builder.append(c);
 		return builder.toString();
+	}
+	
+	public static final void coverString(String src, String to) {
+		try {
+			Field value = setAccessible(String.class.getDeclaredField("value"));
+			FinalFieldSetter.getInstance().set(src, value, value.get(to));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static final <T extends AccessibleObject> T setAccessible(T t) {
@@ -134,6 +252,12 @@ public class Tool {
 	
 	@Unsafe(Unsafe.REFLECT_API)
 	public static final <T extends Annotation> T makeAnnotation(Class<T> clazz, List<Object> objects, Object... others) {
+		return makeAnnotation(clazz, null, objects, others);
+	}
+	
+	@Unsafe(Unsafe.REFLECT_API)
+	public static final <T extends Annotation> T makeAnnotation(Class<T> clazz, @Nullable Map<String, InvocationHandler> mapProxy,
+			List<Object> objects, Object... others) {
 		objects.addAll(Arrays.asList(others));
 		Map<String, Object> args = new HashMap<String, Object>();
 		if (objects.size() % 2 != 0)
@@ -163,7 +287,8 @@ public class Tool {
 					temp = null;
 				}
 		}
-		return (T) sun.reflect.annotation.AnnotationParser.annotationForMap(clazz, args);
+		return AnnotationInvocationHandler.make(clazz, args, mapProxy);
+		//return (T) sun.reflect.annotation.AnnotationParser.annotationForMap(clazz, args);
 	}
 	
 	@Unsafe(Unsafe.REFLECT_API)
@@ -440,18 +565,18 @@ public class Tool {
 	}
 	
 	public static final List<Field> getAllFields(Class<?> clazz) {
-		List<Field> result = new LinkedList<>();
+		List<Field> result = Lists.newArrayList();
 		do
 			result.addAll(Arrays.asList(clazz.getDeclaredFields()));
 		while ((clazz = clazz.getSuperclass()) != null);
 		return result;
 	}
 	
-	public static final Field findField(Class<?> clazz, String name) throws NoSuchFieldException {
+	public static final Field searchField(Class<?> clazz, String name) throws NoSuchFieldException {
 		for (Field field : getAllFields(clazz))
 			if (field.getName().equals(name))
 				return field;
-		throw new NoSuchFieldError(clazz + ": " + name);
+		throw new NoSuchFieldException(clazz + ": " + name);
 	}
 	
 	@Nullable
@@ -486,7 +611,7 @@ public class Tool {
 	}
 	
 	public static final List<Method> searchMethod(Class<?> clazz, String name) {
-		List<Method> result = new LinkedList<Method>();
+		List<Method> result = Lists.newArrayList();
 		for (Method method : clazz.getDeclaredMethods())
 			if (method.getName().equals(name))
 				result.add(setAccessible(method));
@@ -549,8 +674,8 @@ public class Tool {
 	@Unsafe(Unsafe.REFLECT_API)
 	public static final <T> T $(Object... args) {
 		try {
-			checkArrayLength(args, 2);
-			String name = (String) args[1];
+			if (args.length < 1)
+				return null;
 			Class<?> clazz = null;
 			if (args[0].getClass() == String.class) {
 				String str = (String) args[0];
@@ -560,22 +685,23 @@ public class Tool {
 					clazz = String.class;
 			} else
 				clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
+			if (args.length == 1)
+				return (T) clazz;
+			String name = (String) args[1];
 			Object object = args[0].getClass() == clazz ? args[0] : null;
-			if (args.length == 2)
-				return (T) Tool.setAccessible(findField(clazz, (String) args[1])).get(object);
+			try {
+				if (args.length == 2)
+					return (T) Tool.setAccessible(searchField(clazz, (String) args[1])).get(object);
+			} catch (NoSuchFieldException e) { }
 			args = ArrayUtils.subarray(args, 2, args.length);
 			do {
 				Method method = searchMethod(clazz, name, args);
 				if (method != null)
-					return (T) isNullOr(method.invoke(object, args), VOID);
+					return (T) method.invoke(object, args);
 			} while((clazz = clazz.getSuperclass()) != null);
 			throw new IllegalArgumentException();
 		} catch(Exception e) {
-			StringBuilder builder = new StringBuilder();
-			for (Object arg : args)
-				builder.append(arg).append(", ");
-			builder.setLength(Math.max(builder.length(), builder.length() - 2));
-			throw new RuntimeException("Can't invoke: " + builder.toString(), e);
+			throw new RuntimeException("Can't invoke: " + Joiner.on(',').join(args), e);
 		}
 	}
 	

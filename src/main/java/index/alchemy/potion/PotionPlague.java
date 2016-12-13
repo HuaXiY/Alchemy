@@ -57,7 +57,7 @@ public class PotionPlague extends AlchemyPotion implements IEventHandle {
 	}
 	
 	public PotionPlague() {
-		super("plague", true, 0x000000);
+		super("plague", true, 0x003300);
 	}
 
 }

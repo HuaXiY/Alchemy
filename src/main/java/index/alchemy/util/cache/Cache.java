@@ -27,18 +27,4 @@ public abstract class Cache<K, V> implements ICache<K, V> {
 	
 	public abstract Map<K, V> getCacheMap();
 	
-	public V get(K key) {
-		return getCacheMap().get(key);
-	}
-	
-	public V add(K key, V val) {
-		Map<K, V> cache = getCacheMap();
-		if (max > 0 && cache.size() > max) cache.clear();
-		return cache.put(key, val);
-	}
-	
-	public V del(K key) {
-		return getCacheMap().remove(key);
-	}
-	
 }

@@ -12,7 +12,7 @@ public class PotionStable extends AlchemyPotion {
 	}
 
 	public PotionStable() {
-		super("stable", false, 0x0);
+		super("stable", false, 0x66FF99);
 	}
 
 }

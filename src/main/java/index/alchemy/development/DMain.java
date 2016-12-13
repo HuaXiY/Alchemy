@@ -63,13 +63,14 @@ public class DMain {
 	
 	public static void init(Object obj) {
 		AlchemyModLoader.checkState();
-		for (Method method : init_obj)
-			try {
-				method.invoke(null, obj);
-			} catch (Exception e) {
-				AlchemyModLoader.logger.warn("Catch a Exception in init(Object) method with class(" + method.getDeclaringClass().getName() + ")");
-				e.printStackTrace();
-			}
+		if (obj.getClass().getName().startsWith("index.alchemy."))
+			for (Method method : init_obj)
+				try {
+					method.invoke(null, obj);
+				} catch (Exception e) {
+					AlchemyModLoader.logger.warn("Catch a Exception in init(Object) method with class(" + method.getDeclaringClass().getName() + ")");
+					e.printStackTrace();
+				}
 	}
 	
 	public static void init() throws IOException {

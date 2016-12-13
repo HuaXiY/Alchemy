@@ -19,10 +19,6 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
         }
     };
 	
-	public PotionElapse() {
-		super("elapse", false, 0xFFFFFF);
-	}
-	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
 		if (event.getEntityLiving() instanceof EntityLiving && event.getEntityLiving().isNonBoss()
@@ -34,6 +30,10 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 			living.attackTarget = EntityAIFindEntityNearestHelper.<EntityLivingBase>findNearest(
 					(EntityLiving) living.attackTarget, type, NOT_ACTIVE);
 		}
+	}
+	
+	public PotionElapse() {
+		super("elapse", false, 0xFFCCFF);
 	}
 
 }

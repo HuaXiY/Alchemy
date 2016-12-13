@@ -1,6 +1,7 @@
 package index.alchemy.api;
 
 import index.alchemy.core.AlchemyInitHook;
+import net.minecraft.creativetab.CreativeTabs;
 
 public interface IRegister {
 	
@@ -9,5 +10,7 @@ public interface IRegister {
 	}
 	
 	default boolean shouldRegisterToGame() { return true; }
+	
+	default CreativeTabs getCreativeTab() { return null; }
 
 }

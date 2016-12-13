@@ -24,6 +24,8 @@ import static net.minecraft.util.math.MathHelper.*;
 @SideOnly(Side.CLIENT)
 public class RenderHelper {
 	
+	public static BlockFluidRender fluidRender = new BlockFluidRender(Minecraft.getMinecraft().getBlockColors());
+	
 	public static void renderItem(ItemStack item) {
 		Minecraft.getMinecraft().getRenderItem().renderItem(item, ItemCameraTransforms.TransformType.GROUND);
 	}
@@ -35,6 +37,15 @@ public class RenderHelper {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		BlockRendererDispatcher dispatcher = minecraft.getBlockRendererDispatcher();
 		dispatcher.renderBlock(state, pos, minecraft.theWorld, vertexbuffer);
+		tessellator.draw();
+	}
+	
+	public static void renderBlockFluid(IBlockState state, BlockPos pos, boolean renderSide[]) {
+		Tessellator tessellator = Tessellator.getInstance();
+		VertexBuffer vertexbuffer = tessellator.getBuffer();
+		vertexbuffer.begin(GL_QUADS, DefaultVertexFormats.BLOCK);
+		Minecraft minecraft = Minecraft.getMinecraft();
+		fluidRender.renderFluid(minecraft.theWorld, state, pos, vertexbuffer, renderSide);
 		tessellator.draw();
 	}
 	

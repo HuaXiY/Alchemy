@@ -9,4 +9,6 @@ public class AlchemyFieldAccess {
 	
 	public static IFieldAccess<Entity, Integer> test;
 	
+	//public static IFieldAccess<? extends IProjectile, EntityLivingBase> owner;
+	
 }

@@ -1,6 +1,7 @@
 package index.alchemy.client;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -46,12 +47,21 @@ public class TextureLoader {
 
 		return textureID;
 	}
+	
+	public static BufferedImage loadImage(byte data[]) throws IOException {
+		return ImageIO.read(new ByteArrayInputStream(data));
+	}
 
 	public static BufferedImage loadImage(File file) throws IOException {
 		return ImageIO.read(file);
 	}
 	
+	public static int loadTexture(byte data[]) throws IOException {
+		return loadTexture(loadImage(data));
+	}
+	
 	public static int loadTexture(File file) throws IOException {
 		return loadTexture(loadImage(file));
 	}
+	
 }

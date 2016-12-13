@@ -36,7 +36,7 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 			for (int i = 0; i < d6iaps.length; i++)
 				player.worldObj.spawnParticle(type, false, d6iaps[i].x, d6iaps[i].y, d6iaps[i].z,
 						d6iaps[i].ox, d6iaps[i].oy, d6iaps[i].oz, d6iaps[i].args);
-		}, 0);
+		}, 1);
 		return null;
 	}
 

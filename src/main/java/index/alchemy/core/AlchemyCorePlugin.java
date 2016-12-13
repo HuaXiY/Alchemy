@@ -58,7 +58,7 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 
 	@Override
 	public String getSetupClass() {
-		return getModContainerClass();
+		return "index.alchemy.core.AlchemySetup";
 	}
 
 	@Override

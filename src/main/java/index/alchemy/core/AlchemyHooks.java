@@ -75,7 +75,9 @@ public class AlchemyHooks {
 	@Hook(value = "net.minecraft.client.gui.inventory.GuiInventory#func_146976_a", type = Hook.Type.TAIL)
 	public static final void drawGuiContainerBackgroundLayer(GuiInventory gui, float partialTicks, int mouseX, int mouseY) {
 		HUDManager.bind(GuiContainer.INVENTORY_BACKGROUND);
-		gui.drawTexturedModalRect(gui.guiLeft + 76, gui.guiTop + 7, 7, 7, 18, 18 * 4);
+		gui.drawTexturedModalRect(gui.guiLeft + 76, gui.guiTop + 7, 7 + 17, 7, 1, 18 * 4);
+		gui.drawTexturedModalRect(gui.guiLeft + 76 + 1, gui.guiTop + 7, 7 + 1, 7, 18 - 2, 18 * 4);
+		gui.drawTexturedModalRect(gui.guiLeft + 76 + 17, gui.guiTop + 7, 7, 7, 1, 18 * 4);
 		for (int i = 0; i < 4; i++)
 			gui.drawTexturedModalRect(gui.guiLeft + 97 + i * 18, gui.guiTop + 61, 76, 61, 18, 18);
 	}
@@ -104,11 +106,11 @@ public class AlchemyHooks {
 	}
 	
 	@Hook(value = "net.minecraft.inventory.ContainerPlayer#<init>", type = Hook.Type.TAIL)
-	public static final void init_ContainerPlayer(ContainerPlayer container, InventoryPlayer playerInventory, boolean localWorld, EntityPlayer player) {
+	public static final void init_ContainerPlayer(ContainerPlayer container, InventoryPlayer inventory, boolean localWorld, EntityPlayer player) {
 		InventoryBauble baubles = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.HEAD,  4, 77, 8 + 0 * 18));
-		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.BODY,  5, 77, 8 + 1 * 18));
-		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.CHARM, 6, 77, 8 + 2 * 18));
+		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.HEAD,   4, 77, 8 + 0 * 18));
+		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.BODY,   5, 77, 8 + 1 * 18));
+		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.CHARM,  6, 77, 8 + 2 * 18));
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.AMULET, 0, 80 + 18 * 1, 8 + 3 * 18));
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.RING,   1, 80 + 18 * 2, 8 + 3 * 18));
 		container.addSlotToContainer(new InventoryBauble.SlotBauble(player, baubles, BaubleType.RING,   2, 80 + 18 * 3, 8 + 3 * 18));

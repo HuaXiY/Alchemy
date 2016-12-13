@@ -108,6 +108,15 @@ public class DLang {
 		save();
 	}
 	
+	public static String getName(String str) {
+		return getName(str, 0);
+	}
+	
+	public static String getName(String str, int offset) {
+		String temp[] = str.split("\\.");
+		return temp.length < offset + 1 ? "" : temp[temp.length - offset - 1];
+	}
+	
 	public static void init(Object obj) {
 		for (Class<?> supers : _funcMap.keySet())
 			if (Tool.isInstance(supers, obj.getClass()))
@@ -118,18 +127,10 @@ public class DLang {
 				}
 	}
 	
-	public static String getName(String str) {
-		return getName(str, 0);
-	}
-	
-	public static String getName(String str, int offset) {
-		String temp[] = str.split("\\.");
-		return temp.length < offset + 1 ? "" : temp[temp.length - offset - 1];
-	}
-	
 	public static void init(Item item) {
 		if (item instanceof ItemRecord) {
-			miscMap.put(((ItemRecord) item).getRecordNameLocal(), getName(Tool.<String>$(item, "displayName"), 1));
+			String key = Tool.<String>$(item, "displayName");
+			miscMap.put(key, getName(key, 1));
 		} else if (!(item instanceof ItemBlock))
 			itemMap.put(item.getUnlocalizedName() + ".name", getName(item.getUnlocalizedName()));
 	}

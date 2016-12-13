@@ -71,8 +71,6 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
 			@Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-		int i = getWaterLevel(world, pos, state);
-		
 		TileEntityCauldron cauldron = getTileEntityCauldron(world, pos);
 		
 		CauldronActivatedEvent event;
@@ -91,6 +89,7 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 				}
 			}
 		} else {
+			int i = getWaterLevel(world, pos, state);
 			Item item = heldItem.getItem();
 			if (item == ModItems.botania$waterRod) {
 				if (i > -1 && i < 3 && ManaItemHandler.requestManaExact(heldItem, player, ItemWaterRod.COST, true))
@@ -234,9 +233,8 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	
 	@Override
 	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
-		super.eventReceived(state, worldIn, pos, id, param);
 		TileEntity tileentity = worldIn.getTileEntity(pos);
-		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+		return tileentity == null ? super.eventReceived(state, worldIn, pos, id, param) : tileentity.receiveClientEvent(id, param);
 	}
 	
 	public PBlockCauldron() {

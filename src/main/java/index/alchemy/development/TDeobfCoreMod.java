@@ -1,7 +1,5 @@
 package index.alchemy.development;
 
-import static org.objectweb.asm.Opcodes.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,40 +20,11 @@ import org.objectweb.asm.MethodVisitor;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import static org.objectweb.asm.Opcodes.*;
+
 public class TDeobfCoreMod {
 	
 	public static final Map<String, IClassTransformer> ct_mapping = new HashMap<String, IClassTransformer>();
-	static {
-		ct_mapping.put("shadersmod/transform/SMCConfig.class", new IClassTransformer() {
-			@Override
-			public byte[] transform(String name, String transformedName, byte[] basicClass) {
-				final ClassReader cr = new ClassReader(basicClass);
-				final ClassWriter cw = new ClassWriter(0);
-				final ClassVisitor cv = new ClassVisitor(ASM5, cw) {
-					@Override
-					public MethodVisitor visitMethod(int access, String name, String desc, String signature,
-							String[] exceptions) {
-						if (name.equals("getNamer")) {
-							System.out.println(name + desc);
-							String cl = "shadersmod.transform.NamerSrg".replace('.', '/');
-							MethodVisitor mv = cw.visitMethod(access, name, desc, signature, exceptions);
-							mv.visitCode();
-							mv.visitTypeInsn(NEW, cl);  
-							mv.visitInsn(DUP);  
-							mv.visitMethodInsn(INVOKESPECIAL, cl, "<init>", "()V", false);
-							mv.visitInsn(ARETURN);
-							mv.visitMaxs(2, 1);
-				            mv.visitEnd();
-							return null;
-						}
-						return super.visitMethod(access, name, desc, signature, exceptions);
-					}
-				};
-				cr.accept(cv, 0);
-				return cw.toByteArray();
-			}
-		});
-	}
 	
 	public static class SrgMap {
 		
@@ -94,16 +63,16 @@ public class TDeobfCoreMod {
 		
 	}
 	
-	public static void deobf(File input, File output, File srg_mcp, File notch_mcp) throws IOException {
+	public static void deobf(File input, File output, File srg_mcp) throws IOException {
 		SrgMap srgmap = SrgMap.get(srg_mcp);
-		SrgMap notchmap = SrgMap.get(notch_mcp);
 		ZipInputStream zis = new ZipInputStream(new FileInputStream(input));
 		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
 		for (ZipEntry entry; (entry = zis.getNextEntry()) != null;) {
+			if (entry.isDirectory())
+				continue;
 			System.out.println("Copying: " + entry);
 			IClassTransformer ct = ct_mapping.get(entry.getName());
-			byte[] buffer = new byte[(int) entry.getSize()];
-			IOUtils.read(zis, buffer);
+			byte[] buffer = IOUtils.toByteArray(zis);
 			if (ct != null) {
 				System.out.println("ClassTransformer: " + entry.getName());
 				buffer = ct.transform("", "", buffer);
@@ -154,11 +123,11 @@ public class TDeobfCoreMod {
 	
 	public static void main(String[] args) throws IOException {
 		String inputDir = "D:/Forge-Alchemy-1.10/mods/";
-		String inputName = "ShadersMod-1-10-2.jar";
+		String inputName = "TTFR-1.10.2-1.5.2.jar";
 		String outputName = inputName.replace(".jar", "-dev.jar");
-		String srg_mcp = "C:/Users/93192/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20160822/1.10.2/srgs/srg-mcp.srg";
-		String notch_mcp = srg_mcp.replace("srg-mcp", "notch-mcp");
-		deobf(new File(inputDir, inputName), new File(inputDir, outputName), new File(srg_mcp), new File(notch_mcp));
+		String srg_mcp = "C:/Users/93192/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/20161111/1.10.2/srgs/srg-mcp.srg";
+		//String notch_mcp = srg_mcp.replace("srg-mcp", "notch-mcp");
+		deobf(new File(inputDir, inputName), new File(inputDir, outputName), new File(srg_mcp));
 	}
 
 }

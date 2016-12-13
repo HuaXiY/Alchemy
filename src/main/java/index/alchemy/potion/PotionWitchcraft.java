@@ -152,7 +152,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 		}
 	}
 	
-	public void updateTracker(final EntityLivingBase living) {
+	public void updateTracker(EntityLivingBase living) {
 		int id = living.getEntityData().getInteger(NBT_KEY_RENDER);
 		for (EntityPlayer player : ((WorldServer) living.worldObj).getEntityTracker().getTrackingPlayers(living))
 			updatePlayer((EntityPlayerMP) player, living, id);
@@ -170,7 +170,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 	}
 	
 	public PotionWitchcraft() {
-		super("witchcraft", true, 0XFFFFFF);
+		super("witchcraft", true, 0X996633);
 	}
 	
 }

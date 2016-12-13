@@ -37,7 +37,7 @@ import static org.objectweb.asm.Opcodes.*;
 public final class TransformerHook implements IClassTransformer {
 	
 	protected final MethodNode hookMethod;
-	protected final String owner, srgName;
+	protected final String hookSrc, owner, srgName;
 	protected final boolean isStatic;
 	protected final Hook.Type type;
 	
@@ -62,10 +62,11 @@ public final class TransformerHook implements IClassTransformer {
 							list.add(new VarInsnNode(ALOAD, 0));
 						for (int i = 0, offset = isStatic ? 0 : 1, len = args.length; i < len; i++)
 							list.add(new VarInsnNode(ASMHelper.getLoadOpcode(args[i]), i + offset));
-						list.add(new MethodInsnNode(INVOKESTATIC, AlchemyTransformerManager.ALCHEMY_HOOKS_DESC, hookMethod.name,
+						list.add(new MethodInsnNode(INVOKESTATIC, hookSrc, hookMethod.name,
 								hookMethod.desc, false));
 						if (Type.getReturnType(hookMethod.desc).equals(Type.getType(Hook.Result.class))) {
-							list.add(new FieldInsnNode(GETFIELD, AlchemyTransformerManager.HOOK_RESULT_DESC, "result", Type.getDescriptor(Object.class)));
+							list.add(new FieldInsnNode(GETFIELD, AlchemyTransformerManager.HOOK_RESULT_DESC, "result",
+									Type.getDescriptor(Object.class)));
 							if (returnOpcode != RETURN)
 								list.add(new InsnNode(DUP));
 							list.add(new FieldInsnNode(GETSTATIC, ASMHelper.getClassName(Tool.class), "VOID", Type.getDescriptor(Void.class)));
@@ -124,8 +125,9 @@ public final class TransformerHook implements IClassTransformer {
 	}
 
 	@Unsafe(Unsafe.REFLECT_API)
-	public TransformerHook(MethodNode hookMethod, String owner, String srgName, boolean isStatic, Hook.Type type) {
+	public TransformerHook(MethodNode hookMethod, String hookSrc, String owner, String srgName, boolean isStatic, Hook.Type type) {
 		this.hookMethod = hookMethod;
+		this.hookSrc = hookSrc;
 		this.owner = ASMHelper.getClassName(owner);
 		String desc = null, result = null;
 		Type args[] = Type.getArgumentTypes(hookMethod.desc);
@@ -135,7 +137,8 @@ public final class TransformerHook implements IClassTransformer {
 				builder.append(args[i].getDescriptor());
 			desc = srgName + builder.append(")").toString();
 			try {
-				for (Entry<String, String> entry : Tool.<Map<String, String>>$(FMLDeobfuscatingRemapper.INSTANCE, "getMethodMap", this.owner).entrySet())
+				for (Entry<String, String> entry : Tool.<Map<String, String>>$(FMLDeobfuscatingRemapper.INSTANCE, "getMethodMap",
+						this.owner).entrySet())
 					if (entry.getKey().startsWith(desc)) {
 						result = entry.getValue();
 						break;

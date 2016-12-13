@@ -1,30 +1,35 @@
 package index.alchemy.item;
 
-import java.util.List;
+import javax.annotation.Nullable;
 
+import index.alchemy.api.IAlchemyBrewingRecipe;
 import index.alchemy.api.annotation.Lang;
+import index.alchemy.util.Tool;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.common.brewing.IBrewingRecipe;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe {
+import static java.lang.Math.*;
+
+import java.util.List;
+
+public class ItemMagicSolvent extends AlchemyItemColor implements IAlchemyBrewingRecipe {
 	
 	protected int metadata;
 	protected Item material;
+	protected Type type;
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean advanced) {
-		tooltip.add(Type.get(item.getTagCompound()).getTextWithoutFormattingCodes());
-    }
+	public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean advanced) {
+		super.addInformation(item, player, tooltip, advanced);
+		Type type = Type.getType(item);
+		if (type != null)
+			tooltip.add(min(tooltip.size(), 1), type.getTextWithoutFormattingCodes());
+	}
 	
 	@Override
 	public boolean canUseItemStack(EntityLivingBase living, ItemStack item) {
@@ -32,18 +37,15 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 	}
 	
 	@Override
-	public boolean isInput(ItemStack input) {
-		return input.getItem() == Items.POTIONITEM && input.getMetadata() == 0;
-	}
-
-	@Override
 	public boolean isIngredient(ItemStack ingredient) {
 		return ingredient.getItem() == material && ingredient.getMetadata() == metadata;
 	}
 
 	@Override
-	public ItemStack getOutput(ItemStack input, ItemStack ingredient) {
-		return new ItemStack(this, 1, 0, Type.randomOutput());
+	public ItemStack getOutput() {
+		ItemStack result = new ItemStack(this);
+		result.setTagCompound(type.getNBT());
+		return result;
 	}
 	
 	@Lang
@@ -51,8 +53,8 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 		
 		NULL(TextFormatting.WHITE),
 		UNSTABLE(TextFormatting.GRAY),
-		POWERFUL(TextFormatting.BLUE),
 		BENIGN(TextFormatting.GREEN),
+		POWERFUL(TextFormatting.LIGHT_PURPLE),
 		WONDERFUL(TextFormatting.GOLD),
 		DANGEROUS(TextFormatting.RED);
 		
@@ -66,12 +68,12 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 		
 		private static final String EFFECT = "solvent_effect";
 		
-		public boolean has(Type type) {
-			return ordinal() == type.ordinal();
+		public boolean equals(Type type) {
+			return type != null && ordinal() == type.ordinal();
 		}
 		
 		public boolean has(NBTTagCompound nbt) {
-			return has(get(nbt));
+			return equals(getType(nbt));
 		}
 		
 		@Override
@@ -83,33 +85,37 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IBrewingRecipe
 			return formatting + toString();
 		}
 		
-		public static Type random() {
-			return values()[RANDOM.nextInt(values().length)];
-		}
-		
-		public static NBTTagCompound randomOutput() {
+		public NBTTagCompound getNBT() {
 			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setInteger(EFFECT, random().ordinal());
+			nbt.setInteger(EFFECT, ordinal());
 			return nbt;
 		}
 		
-		public static Type get(NBTTagCompound nbt) {
-			if (nbt == null) return NULL;
-			int id = nbt.getInteger(EFFECT);
-			for (Type type : values()) {
-				if (id == type.ordinal())
-					return type;
-			}
-			return NULL;
+		public static Type random() {
+			return values()[itemRand.nextInt(values().length)];
+		}
+		
+		public static NBTTagCompound randomOutput() {
+			return random().getNBT();
+		}
+		
+		@Nullable
+		public static Type getType(ItemStack item) {
+			return getType(item.getTagCompound());
+		}
+		
+		@Nullable
+		public static Type getType(NBTTagCompound nbt) {
+			return nbt != null && nbt.hasKey(EFFECT) ? Tool.getSafe(values(), nbt.getInteger(EFFECT), NULL) : null;
 		}
 		
 	}
 	
-	public ItemMagicSolvent(String name, int color, Item material) {
-		this(name, color, material, 0);
+	public ItemMagicSolvent(String name, int color, Type type, Item material) {
+		this(name, color, type, material, 0);
 	}
 	
-	public ItemMagicSolvent(String name, int color, Item material, int metadata) {
+	public ItemMagicSolvent(String name, int color, Type type, Item material, int metadata) {
 		super(name, "solvent_bottle", color);
 		this.material = material;
 		this.metadata = metadata;

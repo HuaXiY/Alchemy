@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Test
 @SideOnly(Side.CLIENT)
-@Init(state = ModState.PREINITIALIZED, enable = false)
+@Init(state = ModState.PREINITIALIZED, enable = true)
 public class RColorPicker {
 	
 	public static volatile float a, r, g, b;

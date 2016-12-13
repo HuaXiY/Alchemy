@@ -2,6 +2,9 @@ package index.alchemy.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
@@ -88,7 +91,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
 		modid = MOD_ID,
 		name = MOD_NAME,
 		version = MOD_VERSION,
-		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.2.2099,);after:*;"
+		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.2.2185,);after:*;"
 )
 public class AlchemyModLoader {
 	
@@ -224,6 +227,8 @@ public class AlchemyModLoader {
 	
 	public static final ASMClassLoader asm_loader = new ASMClassLoader();
 	
+	public static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+	
 	@Nullable
 	@Deprecated
 	@Instance(MOD_ID)
@@ -235,7 +240,7 @@ public class AlchemyModLoader {
 		return instance;
 	}
 	
-	public AlchemyModLoader() throws Exception {
+	public AlchemyModLoader() throws Throwable {
 		if (instance != null)
 			AlchemyRuntimeException.onException(new RuntimeException("Before this has been instantiate"));
 		else 
@@ -270,15 +275,15 @@ public class AlchemyModLoader {
 		}
 		
 	};
-	private static final List<Method> loading_list = new LinkedList<Method>();
-	private static final List<String> class_list = new LinkedList<String>();
+	private static final List<MethodHandle> loading_list = new LinkedList<>();
+	private static final List<String> class_list = new LinkedList<>();
 	
-	private static final Map<Class<? extends FMLEvent>, List<Consumer<? extends FMLEvent>>>
-			fml_event_callback_mapping = new HashMap<Class<? extends FMLEvent>, List<Consumer<? extends FMLEvent>>>() {
+	private static final Map<Class<? extends FMLEvent>, List<Consumer<FMLEvent>>>
+			fml_event_callback_mapping = new HashMap<Class<? extends FMLEvent>, List<Consumer<FMLEvent>>>() {
 		
 		@Override
-		public List<Consumer<? extends FMLEvent>> get(Object key) {
-			List<Consumer<? extends FMLEvent>> result = super.get(key);
+		public List<Consumer<FMLEvent>> get(Object key) {
+			List<Consumer<FMLEvent>> result = super.get(key);
 			if (result == null)
 				put((Class<? extends FMLEvent>) key, result = new LinkedList());
 			return result;
@@ -287,11 +292,11 @@ public class AlchemyModLoader {
 	};
 	
 	public static <T extends FMLEvent> void addFMLEventCallback(Class<T> clazz, Consumer<T> consumer) {
-		fml_event_callback_mapping.get(clazz).add(consumer);
+		fml_event_callback_mapping.get(clazz).add((Consumer<FMLEvent>) consumer);
 	}
 	
 	public static <T extends FMLEvent> void onFMLEvent(T event) {
-		((List<Consumer<T>>)(Object) fml_event_callback_mapping.get(event.getClass())).forEach(c -> c.accept(event));
+		fml_event_callback_mapping.get(event.getClass()).forEach(c -> c.accept(event));
 	}
 	
 	public static List<Class<?>> getInstance(String key) {
@@ -369,7 +374,7 @@ public class AlchemyModLoader {
 		return result;
 	}
 	
-	private static void bootstrap() throws Exception {
+	private static void bootstrap() throws Throwable {
 		AlchemyTransformerManager.loadAllTransformClass();
 		
 		try {
@@ -379,9 +384,7 @@ public class AlchemyModLoader {
 		
 		AlchemyDebug.start("bootstrap");
 		URL url = new File(mod_path).toURI().toURL();
-		class_list.addAll(findClassFromURL(url));
-		
-		AlchemyDLCLoader.setup();
+		class_list.addAll(0, findClassFromURL(url));
 		
 		Side side = Always.getSide();
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -395,7 +398,7 @@ public class AlchemyModLoader {
 				Loading loading = clazz.getAnnotation(Loading.class);
 				if (loading != null) {
 					logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
-					loading_list.add(clazz.getMethod("init", Class.class));
+					loading_list.add(lookup.findStatic(clazz, "init", MethodType.methodType(void.class, Class.class)));
 				}
 			} catch (ClassNotFoundException e) {
 				continue;
@@ -406,8 +409,8 @@ public class AlchemyModLoader {
 			try {
 				Class<?> clazz = Class.forName(name, false, loader);
 				logger.info(AlchemyModLoader.class.getName() + " Loading -> " + clazz);
-				for (Method method : loading_list)
-					method.invoke(null, clazz);
+				for (MethodHandle handle : loading_list)
+					handle.invoke(clazz);
 				Init init = clazz.getAnnotation(Init.class);
 				if (init != null && init.enable())
 					if (init.index() < 0)
@@ -457,14 +460,13 @@ public class AlchemyModLoader {
 	public static void init(Class<?> clazz) {
 		try {
 			logger.info("Starting init class: " + clazz.getName());
-			Method method = null;
 			try {
-				method = clazz.getMethod("init");
-			} catch (NoSuchMethodException e) {}
-			if (method != null)
-				method.invoke(null);
-			else
+				lookup.findStatic(clazz, "init", MethodType.methodType(void.class)).invoke();
+			} catch (NoSuchMethodException e) {
 				Tool.init(clazz);
+			} catch (Throwable t) {
+				throw new RuntimeException(t);
+			}
 			logger.info("Successful !");
 		} catch (Exception e) {
 			logger.error("Failed !");

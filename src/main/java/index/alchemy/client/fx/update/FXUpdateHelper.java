@@ -23,6 +23,7 @@ public class FXUpdateHelper {
 	private static final List<Function<int[], List<IFXUpdate>>> functions = new ArrayList<Function<int[], List<IFXUpdate>>>();
 	
 	public static void init(Class<?> clazz) {
+		AlchemyModLoader.checkState();
 		FX.UpdateProvider provider = clazz.getAnnotation(FX.UpdateProvider.class);
 		if (provider != null)
 			for (Method method : clazz.getMethods()) {

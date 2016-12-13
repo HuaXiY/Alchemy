@@ -4,8 +4,6 @@ import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntityArrow.PickupStatus;
 
 public class EntityHelper {
 	
@@ -21,13 +19,4 @@ public class EntityHelper {
 		return result;
 	}
 	
-	public static EntityArrow respawnArrow(EntityArrow arrow) {
-		EntityArrow result = clone(arrow);
-		result.pickupStatus = PickupStatus.CREATIVE_ONLY;
-		arrow.pickupStatus = PickupStatus.CREATIVE_ONLY;
-		result.shootingEntity = arrow.shootingEntity;
-		arrow.setDead();
-		return result;
-	}
-
 }

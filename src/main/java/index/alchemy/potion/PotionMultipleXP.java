@@ -16,7 +16,7 @@ public class PotionMultipleXP extends AlchemyPotion implements IEventHandle {
 	}
 	
 	public PotionMultipleXP() {
-		super("multiple_xp", false, 0x00FF7F);
+		super("multiple_xp", false, 0x00FFCC);
 	}
 
 }

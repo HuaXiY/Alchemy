@@ -21,31 +21,38 @@ public interface IBauble {
 	 * This method return the type of bauble this is. 
 	 * Type is used to determine the slots it can go into.
 	 */
-	public BaubleType getBaubleType(ItemStack itemstack);
+	BaubleType getBaubleType(ItemStack itemstack);
 	
 	/**
 	 * This method is called once per tick if the bauble is being worn by a living
 	 */
-	public default void onWornTick(ItemStack itemstack, EntityLivingBase living) { }
+	default void onWornTick(ItemStack itemstack, EntityLivingBase living) { }
 	
 	/**
 	 * This method is called when the bauble is equipped by a living
 	 */
-	public default void onEquipped(ItemStack itemstack, EntityLivingBase living) { }
+	default void onEquipped(ItemStack itemstack, EntityLivingBase living) { }
 	
 	/**
 	 * This method is called when the bauble is unequipped by a living
 	 */
-	public default void onUnequipped(ItemStack itemstack, EntityLivingBase living) { }
+	default void onUnequipped(ItemStack itemstack, EntityLivingBase living) { }
 
 	/**
 	 * can this bauble be placed in a bauble slot
 	 */
-	public default boolean canEquip(ItemStack itemstack, EntityLivingBase living) { return true; }
+	default boolean canEquip(ItemStack itemstack, EntityLivingBase living) { return true; }
 	
 	/**
 	 * Can this bauble be removed from a bauble slot
 	 */
-	public default boolean canUnequip(ItemStack itemstack, EntityLivingBase living) { return true; }
+	default boolean canUnequip(ItemStack itemstack, EntityLivingBase living) { return true; }
+	
+	/**
+	 * Will bauble automatically sync to client if a change is detected in its NBT or damage values?
+	 * Default is off, so override and set to true if you want to auto sync.
+	 * This sync is not instant, but occurs every 10 ticks (.5 seconds).
+	 */
+	default boolean willAutoSync(ItemStack itemstack, EntityLivingBase living) { return false; }
 	
 }

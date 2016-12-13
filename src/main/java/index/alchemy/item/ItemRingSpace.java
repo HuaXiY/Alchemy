@@ -7,12 +7,10 @@ import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
-import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IInventoryProvider;
-import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
@@ -44,7 +42,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;

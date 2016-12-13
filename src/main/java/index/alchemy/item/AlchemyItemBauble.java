@@ -13,6 +13,7 @@ import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.inventory.InventoryBauble;
 import index.alchemy.util.Always;
+import index.alchemy.util.InventoryHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -21,11 +22,15 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 
 public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment, IAlchemyRecipe {
 	
 	protected int alchemyTime = 20 * 30, alchemyColor = -1;
+	protected Fluid alchemyFluid = FluidRegistry.WATER;
 	protected final List<IMaterialConsumer> alchemyMaterials = new LinkedList<>();
 	
 	public void setAlchemyTime(int alchemyTime) {
@@ -41,11 +46,6 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		@Override
 		public BaubleType getBaubleType(ItemStack itemstack) {
 			return BaubleType.AMULET;
-		}
-		
-		@Override
-		public boolean canEquip(ItemStack item, EntityLivingBase player) {
-			return player.getCapability(AlchemyCapabilityLoader.bauble, null).getStackInSlot(0) == null;
 		}
 		
 		@Override
@@ -77,10 +77,9 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		@Override
 		public boolean canEquip(ItemStack item, EntityLivingBase player) {
 			IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-			return isOnly() ?
-				inventory.getStackInSlot(2) == null && (inventory.getStackInSlot(1) == null || inventory.getStackInSlot(1).getItem() != this) ||
-				inventory.getStackInSlot(1) == null && (inventory.getStackInSlot(2) == null || inventory.getStackInSlot(2).getItem() != this) : 
-				inventory.getStackInSlot(1) == null || inventory.getStackInSlot(2) == null;
+			return !isOnly() ||
+					!InventoryHelper.isItem(inventory.getStackInSlot(1), this) &&
+					!InventoryHelper.isItem(inventory.getStackInSlot(2), this);
 		}
 		
 		@Override
@@ -112,11 +111,6 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		@Override
 		public BaubleType getBaubleType(ItemStack itemstack) {
 			return BaubleType.BELT;
-		}
-		
-		@Override
-		public boolean canEquip(ItemStack item, EntityLivingBase player) {
-			return player.getCapability(AlchemyCapabilityLoader.bauble, null).getStackInSlot(3) == null;
 		}
 		
 		@Override
@@ -167,7 +161,12 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	}
 	
 	@Override
-	public ItemStack getAlchemyResult() {
+	public Fluid getAlchemyFluid() {
+		return alchemyFluid;
+	}
+	
+	@Override
+	public ItemStack getAlchemyResult(World world, BlockPos pos) {
 		return new ItemStack(this);
 	}
 	

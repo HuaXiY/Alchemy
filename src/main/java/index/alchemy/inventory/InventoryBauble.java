@@ -10,6 +10,7 @@ import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import baubles.api.cap.IBaublesItemHandler;
 import index.alchemy.api.AlchemyBaubles;
+import index.alchemy.api.ICache;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
@@ -18,6 +19,7 @@ import index.alchemy.network.MessageNBTUpdate;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
+import index.alchemy.util.cache.StdCache;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -88,24 +90,34 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	
 	protected EntityLivingBase living;
 	protected boolean init, blockEvents = true, changed[];
+	protected ICache<Integer, NBTTagCompound> cache = new StdCache<>();
 	
-	public InventoryBauble(final EntityLivingBase living) {
+	public InventoryBauble(EntityLivingBase living) {
 		super(AlchemyBaubles.getBaublesSize(), NAME, LIMIT);
 		this.living = living;
 		this.changed = new boolean[getSizeInventory()];
 	}
 	
-	public boolean update(boolean init) {
-		return Always.isServer() && (!init || hasItem()) && updateTracker(init ? serializeNBT() : getUpdateNBT());
+	public ICache<Integer, NBTTagCompound> getCache() {
+		return cache;
 	}
 	
-	public boolean updateTracker(NBTTagCompound data) {
+	public boolean update(boolean init) {
+		return Always.isServer() && updateTracker(init ? serializeNBT() : getUpdateNBT());
+	}
+	
+	public void updateAll() {
+		while (update(false));
+	}
+	
+	protected boolean updateTracker(NBTTagCompound data) {
 		if (data != null) {
 			AlchemyEventSystem.addDelayedRunnable(p -> {
 				for (EntityPlayer player : ((WorldServer) living.worldObj).getEntityTracker().getTrackingPlayers(living))
 					updatePlayer((EntityPlayerMP) player, data);
-				if (living instanceof EntityPlayerMP)
-					updatePlayer((EntityPlayerMP) living, data);
+				// Container#detectAndSendChanges auto sync
+				/* if (living instanceof EntityPlayerMP)
+					updatePlayer((EntityPlayerMP) living, data); */
 			}, 0);
 			return true;
 		}
@@ -119,16 +131,19 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	@Nullable
 	public NBTTagCompound getUpdateNBT() {
 		int index = ArrayUtils.indexOf(changed, true);
-		if (index == -1)
-			return null;
-		return getUpdateNBT(index);
+		return index == -1 ? null : getUpdateNBT(index);
 	}
 	
+	@Nullable
 	public NBTTagCompound getUpdateNBT(int index) {
-		NBTTagCompound nbt = new NBTTagCompound();
+		ItemStack item = getStackInSlot(index);
+		if (item == null)
+			return null;
+		NBTTagCompound nbt = new NBTTagCompound(), data = item.getTagCompound();
 		changed[index] = false;
 		nbt.setInteger(UPDATE_INDEX_NBT_KEY, index);
-		nbt.setTag(CONTENTS, NBTHelper.getNBTFormItemStack(getStackInSlot(index)));
+		nbt.setTag(CONTENTS, NBTHelper.getNBTFormItemStack(item));
+		getCache().add(index, data == null ? null : data.copy());
 		return nbt;
 	}
 	
@@ -150,7 +165,6 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		if (item != null) {
 			change(item, null);
 			setChanged(index, true);
-			update(false);
 		}
 		return item;
 	}
@@ -169,7 +183,7 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	public void setInventorySlotContents(int index, ItemStack item) {
 		ItemStack old = contents[index];
 		super.setInventorySlotContents(index, item);
-		if (!InventoryHelper.areItemsEqual(old, item)) {
+		if (!InventoryHelper.areItemsMetaEqual(old, item)) {
 			change(old, item);
 			setChanged(index, true);
 		}
@@ -215,7 +229,8 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		int size = AlchemyBaubles.getBaublesSize();
 		if (contents.length < size)
 			contents = ArrayUtils.addAll(contents, new ItemStack[size - contents.length]);
-		update(true);
+		if (living instanceof EntityPlayer)
+			update(true);
 		if (!init) {
 			setEventBlock(false);
 			init = true;
