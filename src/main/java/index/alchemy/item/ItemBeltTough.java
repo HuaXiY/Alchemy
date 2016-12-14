@@ -57,6 +57,7 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	public void onLivingDeath(LivingDeathEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
 		if (isEquipmented(living) && living.rand.nextInt((int) max(-living.getHealth(), 2)) == 0) {
+			System.out.println(-living.getHealth());
 			event.setCanceled(true);
 			living.setHealth(MIN_HEALTH);
 		}

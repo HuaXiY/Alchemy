@@ -33,6 +33,7 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
+import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraft.client.Minecraft;
@@ -267,10 +268,11 @@ public class AlchemyEventSystem implements IGuiHandler {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onClientTick(ClientTickEvent event) {
-		String flag = "12";
+		String flag = "16";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
+				removeInputHook(AlchemyItemLoader.ring_time);
 				//System.out.println(Minecraft.getMinecraft().thePlayer.getEntityData());
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);

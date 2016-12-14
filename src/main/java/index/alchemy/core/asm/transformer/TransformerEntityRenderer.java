@@ -16,9 +16,12 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.util.ASMHelper;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@SideOnly(Side.CLIENT)
 public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 
 	@Override

@@ -30,6 +30,7 @@ import org.objectweb.asm.Type;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -275,8 +276,8 @@ public class AlchemyModLoader {
 		}
 		
 	};
-	private static final List<MethodHandle> loading_list = new LinkedList<>();
-	private static final List<String> class_list = new LinkedList<>();
+	private static final List<MethodHandle> loading_list = Lists.newLinkedList();
+	private static final List<String> class_list = Lists.newLinkedList();
 	
 	private static final Map<Class<? extends FMLEvent>, List<Consumer<FMLEvent>>>
 			fml_event_callback_mapping = new HashMap<Class<? extends FMLEvent>, List<Consumer<FMLEvent>>>() {

@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 
+import index.alchemy.api.annotation.Listener;
 import index.alchemy.development.RColorPicker;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
@@ -28,9 +29,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Listener
 @SideOnly(Side.CLIENT)
 public class GuiWardrobe extends GuiScreen {
 	
@@ -227,6 +231,12 @@ public class GuiWardrobe extends GuiScreen {
 	public static final ResourceLocation BACKGROUND_TEXTURES = new ResourceLocation("skin:textures/gui_wardrobe.png");
 	
 	protected static EntityPlayer player;
+	
+	@SubscribeEvent
+	public static void onRenderLiving_Specials_Pre(RenderLivingEvent.Specials.Pre event) {
+		if (event.getEntity() == player)
+			event.setCanceled(true);
+	}
 	
 	public static void init() {
 		if (player == null)

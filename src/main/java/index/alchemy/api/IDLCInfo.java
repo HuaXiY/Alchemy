@@ -4,13 +4,13 @@ import java.io.File;
 import java.util.List;
 
 import index.alchemy.api.annotation.DLC;
-import net.minecraftforge.fml.common.DummyModContainer;
+import index.alchemy.core.AlchemyDLCLoader.DLCContainer;
 
 public interface IDLCInfo extends DLC {
 	
 	Class<?> getDLCMainClass();
 	
-	DummyModContainer getDLCContainer();
+	DLCContainer getDLCContainer();
 	
 	List<String> getDLCAllClass();
 	

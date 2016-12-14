@@ -17,10 +17,10 @@ import org.objectweb.asm.tree.TypeInsnNode;
 
 import index.alchemy.api.annotation.SideOnlyLambda;
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -29,11 +29,8 @@ import static index.alchemy.core.AlchemyConstants.*;
 
 public class TransformerSideLambda implements IClassTransformer {
 	
-	public static final String SIDE_ONLY_DESC = ASMHelper.getClassDesc("net.minecraftforge.fml.relauncher.SideOnly"),
-			SIDE_ONLY_LAMBDA_DESC = ASMHelper.getClassDesc("index.alchemy.api.annotation.SideOnlyLambda");
+	public static final String SIDE_ONLY_LAMBDA_ANNOTATION_DESC = ASMHelper.getClassDesc("index.alchemy.api.annotation.SideOnlyLambda");
 	
-	public static final Side runtime_side = FMLLaunchHandler.side();
-
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
@@ -55,16 +52,16 @@ public class TransformerSideLambda implements IClassTransformer {
 			MethodNode method = iterator.next();
 			Side side = null;
 			if (method.visibleAnnotations != null)
-				for (AnnotationNode ann : method.visibleAnnotations)
-					if (ann.desc.equals(SIDE_ONLY_DESC))
-						side = Tool.makeAnnotation(SideOnly.class, ann.values).value();
+				for (AnnotationNode annotation : method.visibleAnnotations)
+					if (annotation.desc.equals(AlchemyTransformerManager.SIDE_ONLY_ANNOTATION_DESC))
+						side = Tool.makeAnnotation(SideOnly.class, annotation.values).value();
 			for (Iterator<AbstractInsnNode> insnIterator = method.instructions.iterator(); insnIterator.hasNext(); flag--) {
 				AbstractInsnNode insn = insnIterator.next();
 				if (insn instanceof InvokeDynamicInsnNode) {
 					InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
 					Type type = Type.getReturnType(dynamic.desc);
 					types.add(type);
-					marks.add(side != null && side != runtime_side);
+					marks.add(side != null && side != AlchemyCorePlugin.runtimeSide());
 					flag = 3;
 				}
 				if (flag == 0 && !marks.getLast() && insn instanceof TypeInsnNode) {
@@ -72,8 +69,8 @@ public class TransformerSideLambda implements IClassTransformer {
 					if (Type.getType(ASMHelper.getClassDesc(type.desc)).equals(types.getLast()) &&
 							insn.visibleTypeAnnotations != null)
 						for (TypeAnnotationNode ann : insn.visibleTypeAnnotations)
-							if (ann.desc.equals(SIDE_ONLY_LAMBDA_DESC) &&
-									Tool.makeAnnotation(SideOnlyLambda.class, ann.values).value() != runtime_side)
+							if (ann.desc.equals(SIDE_ONLY_LAMBDA_ANNOTATION_DESC) &&
+									Tool.makeAnnotation(SideOnlyLambda.class, ann.values).value() != AlchemyCorePlugin.runtimeSide())
 								marks.set(marks.size() - 1, true);
 				}
 			}

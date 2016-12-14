@@ -11,9 +11,12 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import org.objectweb.asm.Type;
 
 import com.google.common.collect.Maps;
 
@@ -22,7 +25,7 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 	public final Class<? extends Annotation> type;
 	public final Map<String, Object> memberValues;
 	public final Map<String, InvocationHandler> memberProxys;
-	public final Method[] memberMethods;
+	public final Map<String, Method> memberMethods;
 	
 	protected AnnotationInvocationHandler(Class<?> clazz, @Nullable Map<String, Object> mapValue,
 			@Nullable Map<String, InvocationHandler> mapProxy) {
@@ -30,16 +33,35 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 		type = findAnnotationClass(clazz);
 		memberValues = mapValue == null ? Maps.newHashMap() : mapValue;
 		memberProxys = mapProxy == null ? Maps.newHashMap() : mapProxy;
-		memberMethods = AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
+		memberMethods = AccessController.doPrivileged(new PrivilegedAction<Map<String, Method>>() {
 
 			@Override
-			public Method[] run() {
+			public Map<String, Method> run() {
 				Method[] methods = AnnotationInvocationHandler.this.type.getDeclaredMethods();
-				AnnotationInvocationHandler.this.validateAnnotationMethods((Method[]) methods);
+				AnnotationInvocationHandler.this.validateAnnotationMethods(methods);
 				AccessibleObject.setAccessible(methods, true);
-				return methods;
+				return Arrays.stream(methods).collect(Maps::newHashMap, (map, method) -> map.put(method.getName(), method), Map::putAll);
 			}
 			
+		});
+		transformValue();
+	}
+	
+	protected void transformValue() {
+		memberValues.entrySet().forEach(e -> {
+			Method method = memberMethods.get(e.getKey());
+			if (method != null) {
+				Class<?> returnType = method.getReturnType();
+				if (returnType == Class.class)
+					if (e.getValue() instanceof Type)
+						e.setValue(Tool.forName(((Type) e).getClassName(), false));
+				else if (Tool.isInstance(Enum.class, returnType))
+					if (e.getValue() instanceof String[]) {
+						String args[] = (String[]) e.getValue();
+						if (args.length == 2)
+							e.setValue(Enum.valueOf(Tool.forName(ASMHelper.getClassSrcName(args[0]), true), args[1]));
+					}
+			}
 		});
 	}
 	
@@ -139,7 +161,7 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 			return true;
 		if (!type.isInstance(obj))
 			return false;
-		for (Method method : memberMethods) {
+		for (Method method : memberMethods.values()) {
 			String name = method.getName();
 			Object a = memberValues.get(name);
 			Object b = null;

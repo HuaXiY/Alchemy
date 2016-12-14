@@ -2,7 +2,6 @@ package index.alchemy.core.asm.transformer;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import com.google.common.collect.Sets;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -23,10 +23,12 @@ import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Proxy;
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static org.objectweb.asm.Opcodes.*;
 import static index.alchemy.core.AlchemyConstants.*;
@@ -42,11 +44,12 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			PROXY_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Proxy;",
 			FIELD_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field$Provider;",
 			FIELD_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field;",
-			FIELD_ACCESS_DESC = "Lindex/alchemy/api/IFieldAccess;";
+			FIELD_ACCESS_DESC = "Lindex/alchemy/api/IFieldAccess;",
+			SIDE_ONLY_ANNOTATION_DESC = "Lnet/minecraftforge/fml/relauncher/SideOnly;";
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyTransformerManager.class.getSimpleName());
 	
-	public static final Set<IClassTransformer> transformers = new HashSet<>();
+	public static final Set<IClassTransformer> transformers = Sets.newHashSet();
 	public static final Map<String, List<IClassTransformer>> transformers_mapping = new HashMap<String, List<IClassTransformer>>() {
 		@Override
 		public List<IClassTransformer> get(Object key) {
@@ -75,10 +78,23 @@ public class AlchemyTransformerManager implements IClassTransformer {
 				ClassReader reader = new ClassReader(info.getName());
 				ClassNode node = new ClassNode(ASM5);
 				reader.accept(node, 0);
-				loadProxy(node);
-				loadField(node);
-				loadHook(node);
+				if (checkSideOnly(node)) {
+					loadProxy(node);
+					loadField(node);
+					loadHook(node);
+				}
 			}
+	}
+	
+	@Unsafe(Unsafe.ASM_API)
+	private static void loadProxy(ClassNode node) throws IOException {
+		if (node.visibleAnnotations != null)
+			for (AnnotationNode ann : node.visibleAnnotations)
+				if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
+					Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
+					transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
+					break;
+				}
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
@@ -87,7 +103,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			for (AnnotationNode nann : node.visibleAnnotations)
 				if (nann.desc.equals(HOOK_PROVIDER_ANNOTATION_DESC)) {
 					for (MethodNode methodNode : node.methods)
-						if (methodNode.visibleAnnotations != null)
+						if (checkSideOnly(methodNode) && methodNode.visibleAnnotations != null)
 							for (AnnotationNode ann : methodNode.visibleAnnotations)
 								if (ann.desc.equals(HOOK_ANNOTATION_DESC)) {
 									Hook hook = Tool.makeAnnotation(Hook.class, ann.values,
@@ -106,23 +122,12 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadProxy(ClassNode node) throws IOException {
-		if (node.visibleAnnotations != null)
-			for (AnnotationNode ann : node.visibleAnnotations)
-				if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
-					Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
-					transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
-					break;
-				}
-	}
-	
-	@Unsafe(Unsafe.ASM_API)
 	private static void loadField(ClassNode node) throws IOException {
 		if (node.visibleAnnotations != null)
 			for (AnnotationNode nann : node.visibleAnnotations)
 				if (nann.desc.equals(FIELD_PROVIDER_ANNOTATION_DESC)) {
 					for (FieldNode fieldNode : node.fields)
-						if (fieldNode.desc.equals(FIELD_ACCESS_DESC)) {
+						if (checkSideOnly(fieldNode) && fieldNode.desc.equals(FIELD_ACCESS_DESC)) {
 							String generics[] = ASMHelper.getGenericType(ASMHelper.getGeneric(fieldNode.signature));
 							if (generics.length > 1)
 								transformers_mapping.get(ASMHelper.getClassName(generics[0]).replace("/", "."))
@@ -136,15 +141,20 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	private static void loadAllTransform() throws IOException {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
 		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_TRANSFORMER_PACKAGE.substring(0, MOD_TRANSFORMER_PACKAGE.length() - 1))) {
-			Class clazz = info.load();
-			if (Tool.isInstance(IAlchemyClassTransformer.class, clazz))
-				try {
-					IAlchemyClassTransformer transformer = (IAlchemyClassTransformer) clazz.newInstance();
-					if (!transformer.disable())
-						transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+			ClassReader reader = new ClassReader(info.getName());
+			ClassNode node = new ClassNode(ASM5);
+			reader.accept(node, 0);
+			if (checkSideOnly(node)) {
+				Class clazz = info.load();
+				if (Tool.isInstance(IAlchemyClassTransformer.class, clazz))
+					try {
+						IAlchemyClassTransformer transformer = (IAlchemyClassTransformer) clazz.newInstance();
+						if (!transformer.disable())
+							transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+			}
 		}
 	}
 	
@@ -161,6 +171,33 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
 		return basicClass;
+	}
+	
+	public static boolean checkSideOnly(ClassNode node) {
+		if (node.visibleAnnotations == null)
+			return true;
+		for (AnnotationNode annotation : node.visibleAnnotations)
+			if (annotation.desc.equals(SIDE_ONLY_ANNOTATION_DESC))
+				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyCorePlugin.runtimeSide();
+		return true;
+	}
+	
+	public static boolean checkSideOnly(MethodNode node) {
+		if (node.visibleAnnotations == null)
+			return true;
+		for (AnnotationNode annotation : node.visibleAnnotations)
+			if (annotation.desc.equals(SIDE_ONLY_ANNOTATION_DESC))
+				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyCorePlugin.runtimeSide();
+		return true;
+	}
+	
+	public static boolean checkSideOnly(FieldNode node) {
+		if (node.visibleAnnotations == null)
+			return true;
+		for (AnnotationNode annotation : node.visibleAnnotations)
+			if (annotation.desc.equals(SIDE_ONLY_ANNOTATION_DESC))
+				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyCorePlugin.runtimeSide();
+		return true;
 	}
 	
 	public static void loadAllTransformClass() {

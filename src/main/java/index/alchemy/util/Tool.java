@@ -692,6 +692,11 @@ public class Tool {
 			try {
 				if (args.length == 2)
 					return (T) Tool.setAccessible(searchField(clazz, (String) args[1])).get(object);
+				if (args.length == 3 && ((String) args[1]).endsWith("<")) {
+					Field field = Tool.setAccessible(searchField(clazz, ((String) args[1]).replace("<", "")));
+					field.set(object, args[2]);
+					return (T) args[2];
+				}
 			} catch (NoSuchFieldException e) { }
 			args = ArrayUtils.subarray(args, 2, args.length);
 			do {

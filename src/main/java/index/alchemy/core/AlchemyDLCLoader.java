@@ -26,14 +26,18 @@ import org.objectweb.asm.tree.ClassNode;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.Resources;
 
 import index.alchemy.api.IDLCInfo;
 import index.alchemy.api.annotation.DLC;
+import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Loading;
+import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.api.event.AlchemyLoadDLCEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Always;
@@ -44,30 +48,54 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.asm.transformers.ModAccessTransformer;
 import net.minecraftforge.fml.common.event.FMLEvent;
+import net.minecraftforge.fml.common.functions.ModIdFunction;
 
 import static index.alchemy.core.AlchemyConstants.*;
 import static index.alchemy.util.Tool.$;
 
 @Loading
+@Init(state = ModState.AVAILABLE)
 public class AlchemyDLCLoader {
 	
 	public static class DLCContainer extends DummyModContainer  {
 		
-		public final File source;
+		public final IDLCInfo info;
 		
-		public DLCContainer(File source, DLC dlc) {
+		public DLCContainer(IDLCInfo info) {
 			super(new ModMetadata());
 			ModMetadata metadata = getMetadata();
-			metadata.modId = MOD_ID + "_dlc_" + dlc.name();
-			metadata.name = dlc.name();
-			metadata.version = dlc.version();
-			metadata.description = dlc.description();
+			metadata.modId = MOD_ID + "_dlc_" + info.name();
+			metadata.name = MOD_NAME + " DLC " + info.name();
+			metadata.version = info.version();
+			metadata.description = info.description();
 			metadata.parent = MOD_ID;
-			this.source = source;
+			this.info = info;
+		}
+		
+		@Unsafe(Unsafe.REFLECT_API)
+		protected void injectLoader() {
+			List<ModContainer> mods = $(Loader.instance(), "mods");
+			$(Loader.instance(), "mods<", ImmutableList.builder().addAll(mods).add(this).build());
+			Map<String, ModContainer> namedMods = $(Loader.instance(), "namedMods");
+			$(Loader.instance(), "namedMods<", Maps.uniqueIndex(mods, new ModIdFunction()));
+			LoadController modController = $(Loader.instance(), "modController");
+			Multimap<String, ModState> modStates = $(modController, "modStates");
+			modStates.put(getModId(), ModState.AVAILABLE);
+			Map<String, String> modNames = $(modController, "modNames");
+			modNames.put(getModId(), getName());
+			List<ModContainer> activeModList = $(modController, "activeModList");
+			activeModList = Lists.newArrayList(activeModList);
+			activeModList.add(this);
+			$(modController, "activeModList<", activeModList);
+			ImmutableMap<String,EventBus> eventChannels = $(modController, "eventChannels");
+			$(modController, "eventChannels<", ImmutableMap.builder().putAll(eventChannels).put(getModId(), new EventBus()).build());
 		}
 		
 		@Override
@@ -77,18 +105,24 @@ public class AlchemyDLCLoader {
 		
 		@Override
 		public File getSource() {
-			return source;
+			return info.getDLCFile();
 		}
 
 		@Override
 		public Class<?> getCustomResourcePackClass() {
-			try {
-				return getSource().isDirectory() ?
-						Class.forName("net.minecraftforge.fml.client.FMLFolderResourcePack", true, getClass().getClassLoader()) :
-						Class.forName("net.minecraftforge.fml.client.FMLFileResourcePack", true, getClass().getClassLoader());
-			} catch (ClassNotFoundException e) {
-				return null;
-			}
+			return getSource().isDirectory() ?
+					Tool.forName("net.minecraftforge.fml.client.FMLFolderResourcePack", true) :
+					Tool.forName("net.minecraftforge.fml.client.FMLFileResourcePack", true);
+		}
+		
+		@Override
+		public String toString() {
+			return MOD_NAME + " DLC: " + info.name();
+		}
+		
+		@Override
+		public Disableable canBeDisabled() {
+			return Disableable.RESTART;
 		}
 
 	}
@@ -106,6 +140,14 @@ public class AlchemyDLCLoader {
 	
 	public static boolean isDLCLoaded(String name) {
 		return findDLC(name) != null;
+	}
+	
+	protected static void injectLoader() {
+		dlc_mapping.values().stream().map(IDLCInfo::getDLCContainer).forEach(DLCContainer::injectLoader);
+	}
+	
+	public static void init() {
+		injectLoader();
 	}
 	
 	public static void init(Class<?> clazz) throws IllegalAccessException, InstantiationException {
@@ -187,7 +229,7 @@ public class AlchemyDLCLoader {
 				List<String> classes = AlchemyModLoader.findClassFromURL(url);
 				AlchemyModLoader.addClass(classes);
 				AnnotationInvocationHandler invocationHandler = AnnotationInvocationHandler.asOneOfUs(dlc);
-				invocationHandler.memberValues.put("getDLCContainer", new DLCContainer(file, dlc));
+				invocationHandler.memberValues.put("getDLCContainer", new DLCContainer(dlc));
 				invocationHandler.memberValues.put("getDLCAllClass", ImmutableList.copyOf(classes));
 				invocationHandler.memberValues.put("getDLCFile", file);
 				file_mapping.put(dlc.name(), file);

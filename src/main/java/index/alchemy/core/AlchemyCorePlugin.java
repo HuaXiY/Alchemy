@@ -6,7 +6,9 @@ import java.util.Map;
 
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.Name;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
@@ -40,6 +42,12 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	
 	public static boolean isRuntimeDeobfuscationEnabled() {
 		return runtimeDeobfuscationEnabled;
+	}
+	
+	private static final Side side = FMLLaunchHandler.side();
+	
+	public static Side runtimeSide() {
+		return side;
 	}
 
 	@Override

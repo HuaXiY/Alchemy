@@ -69,6 +69,10 @@ public class ASMHelper {
 		return "L" + getClassName(clazz) + ";";
 	}
 	
+	public static final String getClassSrcName(String name) {
+		return getClassName(name).replace('/', '.');
+	}
+	
 	public static final boolean isOverOpcode(int opcode) {
 		return opcode >= IRETURN && opcode <= RETURN || opcode == ATHROW;
 	}
