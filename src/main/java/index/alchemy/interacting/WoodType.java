@@ -16,6 +16,7 @@ import com.google.common.collect.Maps;
 
 import index.alchemy.api.annotation.Init;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelBlock;
@@ -35,6 +36,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import static index.alchemy.util.Tool.$;
 
+@Beta
 @Init(state = ModState.INITIALIZED)
 public class WoodType {
 	

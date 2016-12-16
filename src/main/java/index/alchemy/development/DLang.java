@@ -17,6 +17,7 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
 import net.minecraft.block.Block;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
@@ -30,6 +31,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Alpha
 @DInit
 @SideOnly(Side.CLIENT)
 public class DLang {

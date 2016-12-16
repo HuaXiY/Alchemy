@@ -6,6 +6,7 @@ import index.alchemy.api.ICoolDown;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.potion.PotionAlacrity.MessageAlacrityCallback;
+import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
 
+@Omega
 public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetworkMessage.Server<MessageAlacrityCallback> {
 	
 	public static final int JUMP_AIR_CD = 20;

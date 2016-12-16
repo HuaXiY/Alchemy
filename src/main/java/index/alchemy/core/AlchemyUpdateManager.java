@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -27,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
 import biomesoplenty.api.item.BOPItems;
@@ -38,12 +38,14 @@ import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result.Build.Artifact;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 
 import static index.alchemy.core.AlchemyConstants.*;
 
+@Alpha
 public class AlchemyUpdateManager {
 	
 	private static class FileDownloadResponseHandler implements ResponseHandler<File> {
@@ -239,18 +241,18 @@ public class AlchemyUpdateManager {
 		}
 		
 		private static String makeTreeApi(Class<?> clazz) {
-			List<String> list = new LinkedList<String>();
+			List<String> list = Lists.newLinkedList();
 			for (Field field : clazz.getFields())
 				list.add(makeTreeApi(field));
 			return Joiner.on(',').join(list);
 		}
 		
 		private static String makeTreeApi(Field field) {
-			List<String> list = new LinkedList<String>();
+			List<String> list = Lists.newLinkedList();
 			if (Tool.isBasics(field.getType()))
 				return field.getName();
 			else {
-				List<String> args = new LinkedList<String>();
+				List<String> args = Lists.newLinkedList();
 				Class<?> clazz = field.getType();
 				for (Field f : clazz.isArray() ? clazz.getComponentType().getFields() : clazz.getFields())
 					args.add(makeTreeApi(f));

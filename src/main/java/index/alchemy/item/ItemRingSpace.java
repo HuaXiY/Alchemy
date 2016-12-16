@@ -26,6 +26,7 @@ import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
@@ -52,6 +53,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider<ItemStack>, IInputHandle, IGuiHandle, ICoolDown,
 	INetworkMessage.Server<MessageSpaceRingPickup> {
 	

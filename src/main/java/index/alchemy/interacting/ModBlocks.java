@@ -11,11 +11,13 @@ import index.alchemy.api.annotation.Source;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Init(state = ModState.PREINITIALIZED, index = -1)
 public class ModBlocks {
 	

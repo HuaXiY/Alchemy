@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.common.base.Predicate;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -11,6 +12,7 @@ import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.util.math.AxisAlignedBB;
 
+@Omega
 public class EntityAIFindEntityNearestHelper {
 	
 	public static AxisAlignedBB getTargetRange(EntityLiving source, double d) {

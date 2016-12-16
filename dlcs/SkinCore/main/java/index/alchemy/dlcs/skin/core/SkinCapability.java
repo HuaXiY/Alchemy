@@ -11,6 +11,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.dlcs.skin.core.BlockWardrobe.EnumPartType;
 import index.alchemy.dlcs.skin.core.SkinCore.UpdateSkinClient;
 import index.alchemy.network.AlchemyNetworkHandler;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -32,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Beta
 @Hook.Provider
 @InitInstance(AlchemyCapabilityLoader.TYPE)
 public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEventHandle {
@@ -39,8 +41,10 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	public static final ResourceLocation RESOURCE = new ResourceLocation("skin:info");
 	public static final String NBT_KEY_SKIN_DATA = "skin_data", NBT_KEY_SKIN_TYPE = "skin_type";
 	
+	public static final String SKIN_TYPES[] = { "default", "slim" };
+	
 	@SubscribeEvent
-	public void onAttachCapabilities_Entity(AttachCapabilitiesEvent<? extends EntityPlayer> event) {
+	public void onAttachCapabilities(AttachCapabilitiesEvent<? extends EntityPlayer> event) {
 		event.addCapability(RESOURCE, new SkinInfo(event.getObject()));
 	}
 	
@@ -133,13 +137,15 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	
 	@Hook("net.minecraft.world.World#func_180501_a")
 	public static Hook.Result setBlockState(World world, BlockPos pos, IBlockState newState, int flags) {
+		if ((flags & (1 << 6)) != 0)
+			return Hook.Result.VOID;
 		if (newState.getBlock() instanceof BlockWardrobe) {
 			if (newState.getValue(BlockWardrobe.PART) == EnumPartType.FOOT)
 				if (newState.getBlock().canPlaceBlockAt(world, pos))
 					world.setBlockState(pos.up(), newState.withProperty(BlockWardrobe.PART, BlockWardrobe.EnumPartType.HEAD), flags);
 				else
 					return Hook.Result.FALSE;
-		} else if ((flags & (1 << 6)) == 0) {
+		} else {
 			IBlockState oldState = world.getBlockState(pos);
 			if (oldState.getBlock() instanceof BlockWardrobe)
 				world.setBlockState(oldState.getValue(BlockWardrobe.PART) == EnumPartType.HEAD ? pos.down() : pos.up(),

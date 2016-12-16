@@ -12,9 +12,11 @@ import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Unsafe;
+import index.project.version.annotation.Omega;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 public class TransformerBootstrap implements IAlchemyClassTransformer {
 
 	// Why not set the timeout ?!

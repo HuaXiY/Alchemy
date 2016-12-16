@@ -18,9 +18,11 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Loading
 @Init(state = ModState.LOADED)
 public class AlchemyConfigLoader {

@@ -2,6 +2,7 @@ package index.alchemy.world;
 
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Alpha;
 
 import java.util.Random;
 
@@ -13,6 +14,7 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 
+@Alpha
 public class WorldGeneratorRedDragonNest extends AlchemyWorldGenerator {
 	
 	private Biome ocean = Biome.getBiome(0);
@@ -38,7 +40,7 @@ public class WorldGeneratorRedDragonNest extends AlchemyWorldGenerator {
 	private boolean should(World world, int x, int z, StructureBoundingBox box) {
 		for (int i = 0, xlen = box.getXSize(); i < xlen; i++) {
 			for (int k = 0, zlen = box.getZSize(); k < zlen; k++) {
-				if (world.getBlockState(new BlockPos(x + i, Always.SEA_LEVEL, z + k)).getBlock() != Blocks.WATER) 
+				if (world.getBlockState(new BlockPos(x + i, 62, z + k)).getBlock() != Blocks.WATER) 
 					return false;
 			}
 		}

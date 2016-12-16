@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import index.alchemy.api.annotation.Init;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Init(state = ModState.POSTINITIALIZED)
 public class Elemix {
 	

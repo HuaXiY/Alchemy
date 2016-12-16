@@ -3,6 +3,7 @@ package index.alchemy.potion;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.entity.AlchemyDamageSourceLoader;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntityZombie;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+@Omega
 public class PotionPlague extends AlchemyPotion implements IEventHandle {
 	
 	@Override

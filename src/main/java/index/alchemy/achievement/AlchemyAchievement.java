@@ -1,11 +1,13 @@
 package index.alchemy.achievement;
 
 import index.alchemy.api.IRegister;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 
+@Omega
 public class AlchemyAchievement extends Achievement implements IRegister {
 	
 	public AlchemyAchievement(String name, int column, int row, Item icon, Achievement parent) {

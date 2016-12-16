@@ -6,6 +6,7 @@ import java.util.Map;
 
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.Side;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions
 
 import static index.alchemy.core.AlchemyConstants.*;
 
+@Omega
 @Name(MOD_ID)
 @MCVersion(MC_VERSION)
 @SortingIndex(Integer.MAX_VALUE)

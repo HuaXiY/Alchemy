@@ -19,8 +19,8 @@ item.amulet_heal.name=生命吊坠
 item.amulet_purify.name=净化吊坠
 
 //blockMap
-tile.ice_temp.name=冰墙
-tile.ore_silver.name=ore_silver
+tile.null.name=null
+wardrobe.name=wardrobe
 
 //potionMap
 effect.feather_fall=feather_fall

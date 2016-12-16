@@ -2,12 +2,14 @@ package index.alchemy.potion;
 
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
+@Omega
 public class PotionDangerSense extends AlchemyPotion {
 	
 	public static final int RANGE = 32, OUT_OF_RANGE = 108;

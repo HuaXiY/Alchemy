@@ -5,6 +5,7 @@ import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyResourceLocation;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
@@ -13,6 +14,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class AlchemyItemRecord extends ItemRecord implements IRegister, IResourceLocation, IColorItem, IOreDictionary {
 	
 	public static final ResourceLocation ICON = new AlchemyResourceLocation("record");

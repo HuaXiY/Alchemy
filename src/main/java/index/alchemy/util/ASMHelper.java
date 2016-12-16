@@ -8,8 +8,11 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
+import index.project.version.annotation.Omega;
+
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 public class ASMHelper {
 	
 	public static final int getReturnOpcode(Type type) {

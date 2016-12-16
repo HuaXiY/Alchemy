@@ -1,7 +1,9 @@
 package index.alchemy.magic;
 
+import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLivingBase;
 
+@Alpha
 public class MagicTeleportRandom extends AlchemyMagic {
 	
 	protected int range = 100000;

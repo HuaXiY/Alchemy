@@ -1,9 +1,11 @@
 package index.alchemy.magic;
 
 import index.alchemy.api.IEntityLivingAction;
+import index.project.version.annotation.Alpha;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.INBTSerializable;
 
+@Alpha
 public abstract class AlchemyMagic implements IEntityLivingAction, INBTSerializable<NBTTagCompound> {
 	
 	public static final String NBT_KEY_STRENGTH = "strength";

@@ -5,6 +5,7 @@ import java.util.Random;
 import index.alchemy.api.IRegister;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyResourceLocation;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
@@ -12,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class AlchemyPotion extends Potion implements IRegister {
 	
 	protected static final Random RANDOM = new Random();

@@ -6,6 +6,7 @@ import index.alchemy.client.render.RenderHelper;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.tile.TileEntityCauldron.State;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Alpha;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static net.minecraft.client.renderer.GlStateManager.*;
 
+@Alpha
 @SideOnly(Side.CLIENT)
 @Render(TileEntityCauldron.class)
 public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEntityCauldron> {

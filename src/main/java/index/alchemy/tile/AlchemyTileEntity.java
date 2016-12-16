@@ -2,6 +2,7 @@ package index.alchemy.tile;
 
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.AABBHelper;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+@Omega
 public class AlchemyTileEntity extends TileEntity {
 	
 	@Override

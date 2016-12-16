@@ -1,6 +1,7 @@
 package index.alchemy.block;
 
 import index.alchemy.api.IColorBlock;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IBlockColor;
@@ -10,6 +11,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class AlchemyBlockColor extends AlchemyBlock implements IColorBlock {
 	
 	protected int color;

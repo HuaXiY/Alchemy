@@ -16,11 +16,13 @@ import org.objectweb.asm.tree.MethodNode;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Gamma;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Gamma
 public class TransformerDeobfuscating implements IClassTransformer {
 	
 	public final Map<String,Map<String,String>>

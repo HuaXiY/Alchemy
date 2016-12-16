@@ -8,6 +8,7 @@ import index.alchemy.api.IColorItem;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @SideOnly(Side.CLIENT)
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyColorLoader {

@@ -1,7 +1,9 @@
 package index.alchemy.potion;
 
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
 
+@Beta
 public class PotionFeatherFall extends AlchemyPotion {
 	
 	@Override

@@ -5,6 +5,7 @@ import java.util.UUID;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -17,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static java.lang.Math.*;
 
+@Omega
 public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 8;

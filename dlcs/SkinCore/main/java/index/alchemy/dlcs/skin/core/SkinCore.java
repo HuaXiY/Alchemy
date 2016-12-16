@@ -37,11 +37,13 @@ import index.alchemy.interacting.WoodType;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
 import io.netty.buffer.ByteBuf;
 
 import static index.alchemy.core.AlchemyConstants.*;
 import static index.alchemy.dlcs.skin.core.SkinCore.*;
 
+@Alpha
 @Init(state = ModState.INITIALIZED)
 @DLC(id = DLC_ID, mcVersion = MC_VERSION, name = DLC_NAME, version = DLC_VERSION)
 public class SkinCore {
@@ -171,7 +173,7 @@ public class SkinCore {
 			GameRegistry.addRecipe(new ItemStack(wardrobe), "BAB", "B B", "BAB", 'B', type.log, 'A', type.plank);
 			if (Always.isClient())
 				Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(wardrobe), 0,
-						new ModelResourceLocation(wardrobe.getRegistryName(), "facing=south,part=foot"));
+						new ModelResourceLocation(wardrobe.getRegistryName(), "facing=south,part=foot,rely=null"));
 		}
 		if (Always.isClient())
 			registerModelLoader();

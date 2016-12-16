@@ -14,6 +14,7 @@ import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.inventory.InventoryBauble;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -27,6 +28,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 
+@Omega
 public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment, IAlchemyRecipe {
 	
 	protected int alchemyTime = 20 * 30, alchemyColor = -1;

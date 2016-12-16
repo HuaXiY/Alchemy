@@ -3,6 +3,7 @@ package index.alchemy.client.fx;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.client.fx.update.FXUpdateHelper;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.util.EnumParticleTypes;
@@ -10,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @SideOnly(Side.CLIENT)
 public class FXWisp extends AlchemyFX {
 	

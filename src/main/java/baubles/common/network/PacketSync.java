@@ -3,9 +3,11 @@ package baubles.common.network;
 import index.alchemy.api.annotation.Message;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.network.MessageNBTUpdate;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 
+@Omega
 @Message(Side.CLIENT)
 public class PacketSync extends MessageNBTUpdate {
 	

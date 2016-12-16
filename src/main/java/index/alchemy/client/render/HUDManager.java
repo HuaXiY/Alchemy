@@ -10,6 +10,7 @@ import index.alchemy.api.annotation.Config;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static org.lwjgl.opengl.GL11.*;
 import static net.minecraft.client.renderer.GlStateManager.*;
 
+@Omega
 @SideOnly(Side.CLIENT)
 public class HUDManager {
 	

@@ -3,6 +3,7 @@ package index.alchemy.item;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyResourceLocation;
+import index.project.version.annotation.Omega;
 import index.alchemy.core.AlchemyConstants;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
+@Omega
 public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 	
 	public static abstract class AlchemyCreativeTabs extends CreativeTabs implements IRegister {

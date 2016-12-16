@@ -20,6 +20,7 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static org.objectweb.asm.Opcodes.*;
 import static index.alchemy.core.AlchemyConstants.*;
 
+@Omega
 public class TransformerSideLambda implements IClassTransformer {
 	
 	public static final String SIDE_ONLY_LAMBDA_ANNOTATION_DESC = ASMHelper.getClassDesc("index.alchemy.api.annotation.SideOnlyLambda");

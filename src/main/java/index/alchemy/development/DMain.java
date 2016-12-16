@@ -16,10 +16,12 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Alpha
 @Loading
 @SideOnly(Side.CLIENT)
 @Init(state = ModState.AVAILABLE)

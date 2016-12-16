@@ -7,6 +7,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.entity.AlchemyEntityManager;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.potion.PotionWitchcraft.MessageWitchcraftUpdate;
+import index.project.version.annotation.Beta;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -30,6 +31,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static org.lwjgl.opengl.GL11.*;
 
+@Beta
 public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INetworkMessage.Client<MessageWitchcraftUpdate> {
 	
 	public static final String NBT_KEY_RENDER = "wc_render";

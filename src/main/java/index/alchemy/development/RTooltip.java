@@ -6,6 +6,7 @@ import index.alchemy.api.IEventHandle;
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @SideOnly(Side.CLIENT)
 @Init(state = ModState.POSTINITIALIZED)
 public class RTooltip implements IEventHandle {

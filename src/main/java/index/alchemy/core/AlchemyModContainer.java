@@ -4,12 +4,14 @@ import java.util.Arrays;
 
 import com.google.common.eventbus.EventBus;
 
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.ModMetadata;
 
 import static index.alchemy.core.AlchemyConstants.*;
 
+@Omega
 public class AlchemyModContainer extends DummyModContainer  {
 	
 	public AlchemyModContainer() {

@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 
+@Omega
 public class SrgMap {
 	
 	public final Map<String, String>

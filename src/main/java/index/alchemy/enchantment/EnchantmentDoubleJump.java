@@ -3,6 +3,7 @@ package index.alchemy.enchantment;
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.api.IPlayerTickable;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnumEnchantmentType;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class EnchantmentDoubleJump extends AlchemyEnchantment implements IPlayerTickable {
 	
 	public static final String NBT_KEY_CD = "ench_double_jump";

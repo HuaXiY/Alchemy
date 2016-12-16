@@ -20,6 +20,9 @@ import org.objectweb.asm.Type;
 
 import com.google.common.collect.Maps;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class AnnotationInvocationHandler implements InvocationHandler {
 	
 	public final Class<? extends Annotation> type;

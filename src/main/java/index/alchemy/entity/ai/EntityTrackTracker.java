@@ -4,9 +4,11 @@ import static net.minecraft.util.math.MathHelper.*;
 
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 
+@Beta
 public class EntityTrackTracker {
 	
 	private ILocationProvider location;

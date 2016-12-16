@@ -4,6 +4,7 @@ import index.alchemy.api.IEventHandle;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.alchemy.potion.AlchemyPotion;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
@@ -12,6 +13,7 @@ import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Omega
 public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle {
 	
 	public static final float AMPLIFY = 0.2F;

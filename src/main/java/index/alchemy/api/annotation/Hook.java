@@ -13,7 +13,7 @@ public @interface Hook {
 	
 	class Result {
 		
-		public static final Result VOID = new Result(), NULL = new Result(null),
+		public static final Result VOID = new Result(), NULL = new Result(null), ZERO = new Result(0),
 				TRUE = new Result(Boolean.TRUE), FALSE = new Result(Boolean.FALSE);
 		
 		public final Object result;
@@ -22,7 +22,7 @@ public @interface Hook {
 			this.result = Tool.VOID;
 		}
 		
-		public Result(Object result) {
+		public <T> Result(T result) {
 			this.result = result;
 		}
 		

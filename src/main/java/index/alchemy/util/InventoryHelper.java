@@ -6,6 +6,7 @@ import java.util.Random;
 
 import javax.annotation.Nonnull;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,6 +17,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+@Omega
 public class InventoryHelper  {
 	
 	private static final Random RANDOM = new Random();

@@ -13,6 +13,7 @@ import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.potion.AlchemyPotion;
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -31,6 +32,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
 
+@Omega
 public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IEventHandle, INetworkMessage.Client<MessagePurifyCallback> {
 	
 	public static final int INTERVAL = 20 * 20, MAX_AIR = 300;

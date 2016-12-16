@@ -1,5 +1,8 @@
 package index.alchemy.core;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class AlchemyConstants {
 	
 	public static final String

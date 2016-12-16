@@ -2,8 +2,10 @@ package index.alchemy.magic;
 
 import index.alchemy.entity.ai.EntityTrackTracker;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLivingBase;
 
+@Alpha
 public class MagicReject extends AlchemyMagic {
 	
 	public MagicReject() {

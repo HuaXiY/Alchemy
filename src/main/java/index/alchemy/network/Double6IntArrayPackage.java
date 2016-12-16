@@ -1,5 +1,8 @@
 package index.alchemy.network;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class Double6IntArrayPackage {
 	
 	public double x, y, z, ox, oy, oz;

@@ -7,6 +7,7 @@ import index.alchemy.api.IInputHandle;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyModLoader;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiIngame;
@@ -23,6 +24,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static net.minecraft.util.math.MathHelper.*;
 import static java.lang.Math.*;
 
+@Omega
 public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputHandle, ICoolDown {
 	
 	public static final String NBT_KEY_CD = "cd_phase_shift", NBT_KEY_LAST = "last_phase_shift",

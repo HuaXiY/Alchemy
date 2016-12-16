@@ -1,5 +1,6 @@
 package index.alchemy.item;
 
+import index.project.version.annotation.Gamma;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -10,6 +11,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
+@Gamma
 public class ItemScrollTP extends ItemScroll {
 	public static final String SCROLL_TP = "scroll_tp";
 	public ItemScrollTP() {

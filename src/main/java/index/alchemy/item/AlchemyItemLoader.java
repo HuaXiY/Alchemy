@@ -3,9 +3,11 @@ package index.alchemy.item;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.item.ItemMagicSolvent.Type;
 import index.alchemy.sound.AlchemySoundLoader;
+import index.project.version.annotation.Omega;
 import net.minecraft.init.Items;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyItemLoader {
 	

@@ -8,7 +8,9 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.item.ItemScroll;
+import index.project.version.annotation.Omega;
 
+@Omega
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyAchievementLoader {
 	

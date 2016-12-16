@@ -2,16 +2,16 @@ package index.alchemy.api.event;
 
 import java.io.File;
 
-import index.alchemy.api.annotation.DLC;
+import index.alchemy.api.IDLCInfo;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
 public class AlchemyLoadDLCEvent extends Event {
 	
-	public final DLC dlc;
+	public final IDLCInfo dlc;
 	public final File file;
 	
-	public AlchemyLoadDLCEvent(DLC dlc, File file) {
+	public AlchemyLoadDLCEvent(IDLCInfo dlc, File file) {
 		this.dlc = dlc;
 		this.file = file;
 	}
@@ -19,7 +19,7 @@ public class AlchemyLoadDLCEvent extends Event {
 	@Cancelable
 	public static class Pre extends AlchemyLoadDLCEvent {
 
-		public Pre(DLC dlc, File file) {
+		public Pre(IDLCInfo dlc, File file) {
 			super(dlc, file);
 		}
 		
@@ -27,7 +27,7 @@ public class AlchemyLoadDLCEvent extends Event {
 	
 	public static class Post extends AlchemyLoadDLCEvent {
 
-		public Post(DLC dlc, File file) {
+		public Post(IDLCInfo dlc, File file) {
 			super(dlc, file);
 		}
 		

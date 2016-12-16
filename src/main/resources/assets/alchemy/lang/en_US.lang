@@ -19,8 +19,8 @@ item.amulet_heal.name=amulet_heal
 item.amulet_purify.name=amulet_purify
 
 //blockMap
-tile.ice_temp.name=ice_temp
-tile.ore_silver.name=ore_silver
+tile.null.name=null
+wardrobe.name=wardrobe
 
 //potionMap
 effect.feather_fall=feather_fall

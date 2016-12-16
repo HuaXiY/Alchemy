@@ -9,6 +9,8 @@ import java.util.Map;
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.AlchemyConstants;
+import index.project.version.annotation.Beta;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
@@ -32,71 +34,70 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import static java.lang.Math.*;
 
+@Omega
 public class Always {
 	
-	public static final int SEA_LEVEL = 62;
-	
-	private static final boolean isClient = Tool.forName("net.minecraft.client.Minecraft", false) != null;
+	private static boolean isClient = Tool.forName("net.minecraft.client.Minecraft", false) != null;
 	
 	public static final Map<Thread, Side> SIDE_MAPPING = new HashMap<Thread, Side>();
 	
-	public static boolean isAlchemyModLoaded() {
+	public static final boolean isAlchemyModLoaded() {
 		return Loader.isModLoaded(AlchemyConstants.MOD_ID);
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static boolean isPlaying() {
+	public static final boolean isPlaying() {
 		return Minecraft.getMinecraft().thePlayer != null;
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static long getClientWorldTime() {
+	public static final long getClientWorldTime() {
 		return Minecraft.getMinecraft().theWorld.getWorldTime();
 	}
 	
 	
-	public static boolean runOnClient() {
+	public static final boolean runOnClient() {
 		return isClient;
 	}
 	
-	public static void markSide(Side side) {
+	public static final void markSide(Side side) {
 		SIDE_MAPPING.put(Thread.currentThread(), side);
 	}
 	
-	public static Side getSide() {
+	public static final Side getSide() {
 		Side side = SIDE_MAPPING.get(Thread.currentThread());
 		if (side == null)
 			SIDE_MAPPING.put(Thread.currentThread(), side = FMLCommonHandler.instance().getEffectiveSide());
 		return side;
 	}
 	
-	public static boolean isServer() {
+	public static final boolean isServer() {
 		return getSide().isServer();
 	}
 	
-	public static boolean isClient() {
+	public static final boolean isClient() {
 		return getSide().isClient();
 	}
 	
-	public static ItemStack getEnchantmentBook(Enchantment enchantment) {
+	public static final ItemStack getEnchantmentBook(Enchantment enchantment) {
 		ItemStack book = new ItemStack(Items.BOOK);
 		Items.ENCHANTED_BOOK.addEnchantment(book, new EnchantmentData(enchantment, 1));
 		return book;
 	}
 	
-	public static double calculateTheStraightLineDistance(double x, double y, double z) {
+	public static final double calculateTheStraightLineDistance(double x, double y, double z) {
 		return x * x + y * y + z * z;
 	}
 	
-	public static Biome getCurrentBiome(EntityPlayer player) {
+	public static final Biome getCurrentBiome(EntityPlayer player) {
 		return getCurrentBiome(player.worldObj, (int) player.posX, (int) player.posZ);
 	}
 	
-	public static Biome getCurrentBiome(World world, int x, int z) {
+	public static final Biome getCurrentBiome(World world, int x, int z) {
 		return world.getBiomeForCoordsBody(new BlockPos(x, 0, z));
 	}
 	
-	public static IFuelHandler getFuelHandler(final ItemStack item, final int time) {
+	public static final IFuelHandler getFuelHandler(ItemStack item, int time) {
 		return new IFuelHandler() {
 			@Override
 			public int getBurnTime(ItemStack fuel) {
@@ -105,14 +106,14 @@ public class Always {
 		};
 	}
 	
-	public static List<IFuelHandler> getFuelHandlers(String material_str, int time) {
+	public static final List<IFuelHandler> getFuelHandlers(String material_str, int time) {
 		List<IFuelHandler> result = new LinkedList<IFuelHandler>();
 		for (ItemStack material : OreDictionary.getOres(material_str))
 			result.add(getFuelHandler(material, time));
 		return result;
 	}
 	
-	public static ILocationProvider generateLocationProvider(final Entity entity, final double offsetY) {
+	public static final ILocationProvider generateLocationProvider(Entity entity, double offsetY) {
 		return new ILocationProvider() {
 			@Override
 			public Vec3d getLocation() {
@@ -123,8 +124,8 @@ public class Always {
 		};
 	}
 	
-	public static ILocationProvider generateLocationProvider(BlockPos pos) {
-		final Vec3d vec3d = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+	public static final ILocationProvider generateLocationProvider(BlockPos pos) {
+		Vec3d vec3d = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
 		return new ILocationProvider() {
 			@Override
 			public Vec3d getLocation() {
@@ -133,18 +134,22 @@ public class Always {
 		};
 	}
 	
-	public static List<IMaterialConsumer> generateMaterialConsumers(Object... args) {
+	@Beta
+	public static final List<IMaterialConsumer> generateMaterialConsumers(Object... args) {
 		Tool.checkNull(args);
 		List<IMaterialConsumer> result = new LinkedList<>();
 		for (int i = 0, len = args.length + 1; i < len; i++) {
 			Object last = i > 0 ? args[i - 1] : null, obj = i == args.length ? null : args[i];
 			if (last != null && !(last instanceof ItemStack || last instanceof Number)) {
 				if (last instanceof Item)
-					result.add(generateMaterialConsumer(new ItemStack((Item) last, obj instanceof Number ? ((Number) obj).intValue() : 1)));
+					result.add(generateMaterialConsumer(new ItemStack((Item) last, obj instanceof Number ?
+							((Number) obj).intValue() : 1)));
 				else if (last instanceof Block)
-					result.add(generateMaterialConsumer(new ItemStack((Block) last, obj instanceof Number ? ((Number) obj).intValue() : 1)));
+					result.add(generateMaterialConsumer(new ItemStack((Block) last, obj instanceof Number ?
+							((Number) obj).intValue() : 1)));
 				else if (last instanceof String)
-					result.add(generateMaterialConsumer((String) last, obj instanceof Number ? ((Number) obj).intValue() : 1));
+					result.add(generateMaterialConsumer((String) last, obj instanceof Number ?
+							((Number) obj).intValue() : 1));
 				else
 					throw new IllegalArgumentException("Type mismatch, type: " + last.getClass().getName() + " , index: " + (i - 1));
 			}
@@ -154,7 +159,7 @@ public class Always {
 		return result;
 	}
 	
-	public static IMaterialConsumer generateMaterialConsumer(ItemStack material) {
+	public static final IMaterialConsumer generateMaterialConsumer(ItemStack material) {
 		return new IMaterialConsumer() {
 			@Override
 			public boolean treatmentMaterial(List<ItemStack> items) {
@@ -176,7 +181,7 @@ public class Always {
 		};
 	}
 	
-	public static IMaterialConsumer generateMaterialConsumer(String material_str, int size) {
+	public static final IMaterialConsumer generateMaterialConsumer(String material_str, int size) {
 		return new IMaterialConsumer() {
 			@Override
 			public boolean treatmentMaterial(List<ItemStack> items) {

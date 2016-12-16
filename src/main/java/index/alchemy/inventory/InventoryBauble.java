@@ -20,6 +20,7 @@ import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.cache.StdCache;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -34,6 +35,7 @@ import net.minecraftforge.common.capabilities.Capability;
 
 import static index.alchemy.core.AlchemyConstants.*;
 
+@Beta
 public class InventoryBauble extends AlchemyInventory implements IBaublesItemHandler {
 	
 	public static final int LIMIT = 1;
@@ -262,5 +264,5 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		this.changed[slot] = changed;
 		markDirty();
 	}
-
+	
 }

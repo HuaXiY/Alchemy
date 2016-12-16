@@ -1,12 +1,14 @@
 package index.alchemy.item;
 
 import index.alchemy.util.AABBHelper;
+import index.project.version.annotation.Gamma;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+@Gamma
 public class ItemScrollLightning extends ItemScroll {
 	public ItemScrollLightning() {
 		super("scroll_lightning", 30, 64, true, 1);

@@ -6,15 +6,19 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
+
 import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.project.version.annotation.Omega;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+@Omega
 public class AlchemyRegistry {
 	
-	private static final ArrayList<IAlchemyRecipe> ALCHEMY_LIST = new ArrayList<IAlchemyRecipe>();
+	private static final ArrayList<IAlchemyRecipe> ALCHEMY_LIST = Lists.newArrayList();
 	
 	public static void registerAlchemyRecipe(IAlchemyRecipe recipe) {
 		AlchemyModLoader.checkState();

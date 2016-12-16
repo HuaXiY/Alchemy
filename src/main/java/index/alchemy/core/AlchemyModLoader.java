@@ -47,6 +47,7 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.Mod;
@@ -87,6 +88,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
  * -----------------------------------------------
  */
 
+@Omega
 @Premise({ Baubles.MODID, BOP_ID })
 @Mod(
 		modid = MOD_ID,
@@ -94,7 +96,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
 		version = MOD_VERSION,
 		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.2.2185,);after:*;"
 )
-public class AlchemyModLoader {
+public final class AlchemyModLoader {
 	
 	public static final String REQUIRED_BEFORE = "required-before:", REQUIRED_AFTER = "required-after:";
 	
@@ -260,7 +262,7 @@ public class AlchemyModLoader {
 		public LinkedList<Class<?>> get(Object key) {
 			LinkedList<Class<?>> result = super.get(key);
 			if (result == null)
-				put((ModState) key, result = new LinkedList());
+				put((ModState) key, result = Lists.newLinkedList());
 			return result;
 		}
 		
@@ -271,7 +273,7 @@ public class AlchemyModLoader {
 		public LinkedList<Class<?>> get(Object key) {
 			LinkedList<Class<?>> result = super.get(key);
 			if (result == null)
-				put((String) key, result = new LinkedList());
+				put((String) key, result = Lists.newLinkedList());
 			return result;
 		}
 		
@@ -286,7 +288,7 @@ public class AlchemyModLoader {
 		public List<Consumer<FMLEvent>> get(Object key) {
 			List<Consumer<FMLEvent>> result = super.get(key);
 			if (result == null)
-				put((Class<? extends FMLEvent>) key, result = new LinkedList());
+				put((Class<? extends FMLEvent>) key, result = Lists.newLinkedList());
 			return result;
 		}
 		
@@ -366,7 +368,7 @@ public class AlchemyModLoader {
 	}
 	
 	public static List<String> findClassFromURL(URL url) throws Exception {
-		List<String> result = new LinkedList<String>();
+		List<String> result = Lists.newLinkedList();
 		ClassLoader loader = new URLClassLoader(new URL[]{ url }, null);
 		ClassPath path = ClassPath.from(loader);
 		for (ClassInfo info : path.getAllClasses())

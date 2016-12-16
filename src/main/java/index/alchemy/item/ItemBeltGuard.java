@@ -7,6 +7,7 @@ import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import index.alchemy.item.ItemBeltGuard.MessageGuardCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
 
+@Omega
 public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INetworkMessage.Client<MessageGuardCallback>, ICoolDown {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 6, RECOVERY_CD = 20 * 12, MAX_ABSORPTION = 20;

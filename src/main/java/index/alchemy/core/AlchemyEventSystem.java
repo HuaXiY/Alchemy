@@ -1,20 +1,21 @@
 package index.alchemy.core;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
@@ -23,12 +24,15 @@ import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
+import index.alchemy.api.ITileEntity;
+import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Render;
 import index.alchemy.api.annotation.Texture;
+import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -36,11 +40,14 @@ import index.alchemy.development.DMain;
 import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MouseHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
@@ -59,12 +66,15 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @Loading
+@Hook.Provider
 @Init(state = ModState.CONSTRUCTED)
-public class AlchemyEventSystem implements IGuiHandler {
+public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	private static AlchemyEventSystem instance;
 	
@@ -122,25 +132,22 @@ public class AlchemyEventSystem implements IGuiHandler {
 			ORE_GEN_BUS = new EventType[]{ EventType.ORE_GEN_BUS };
 	
 	private static final List<IPlayerTickable> 
-			server_tickable = new ArrayList<IPlayerTickable>(),
-			client_tickable = new ArrayList<IPlayerTickable>();
+			server_tickable = Lists.newArrayList(),
+			client_tickable = Lists.newArrayList();
 	
-	private static final Map<Side, List<IContinuedRunnable>> 
-			runnable_mapping = new HashMap<Side, List<IContinuedRunnable>>();
-	static {
-		for (Side side : Side.values())
-			runnable_mapping.put(side, Collections.synchronizedList(new LinkedList<IContinuedRunnable>()));
-	}
+	private static final Map<Side, List<IContinuedRunnable>> runnable_mapping = 
+			Arrays.stream(Side.values()).collect(() -> Maps.newEnumMap(Side.class),
+					(m, s) -> m.put(s, Collections.synchronizedList(Lists.newLinkedList())), Map::putAll);
 	
-	private static final List<IGuiHandle> gui_handle = new ArrayList<IGuiHandle>();
+	private static final List<IGuiHandle> gui_handle = Lists.newArrayList();
 	
-	private static final Set<Object> hook_input = new HashSet<Object>();
+	private static final Set<Object> hook_input = Sets.newHashSet();
 	
 	private static boolean hookInputState = false;
 	
-	private static final Set<String> texture_set = new HashSet<String>();
+	private static final Set<String> texture_set = Sets.newHashSet();
 	
-	private static final List<KeyBindingHandle> key_handle = new ArrayList<KeyBindingHandle>();
+	private static final List<KeyBindingHandle> key_handle = Lists.newArrayList();
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		AlchemyModLoader.checkState();
@@ -329,6 +336,13 @@ public class AlchemyEventSystem implements IGuiHandler {
 	}
 	
 	@SideOnly(Side.CLIENT)
+	public static void clearInputHook() {
+		hook_input.clear();
+		hookInputState = false;
+		KeyBinding.updateKeyBindState();
+	}
+	
+	@SideOnly(Side.CLIENT)
 	public static void registerInputHandle(IInputHandle handle) {
 		Class<?> clazz = handle.getClass();
 		for (KeyBinding binding : handle.getKeyBindings()) {
@@ -372,6 +386,40 @@ public class AlchemyEventSystem implements IGuiHandler {
 			event.setCanceled(true);
 	}
 	
+	public static final String KEY_DEBUG_DISABLE_HOOK = "key.debug_disable_hook";
+	
+	@Override
+	public KeyBinding[] getKeyBindings() {
+		return new KeyBinding[]{ new AlchemyKeyBinding(KEY_DEBUG_DISABLE_HOOK, Keyboard.KEY_ADD) };
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@KeyEvent(KEY_DEBUG_DISABLE_HOOK)
+	public void onKeyDebugDisableHookPressed(KeyBinding binding) {
+		if (GuiScreen.isAltKeyDown())
+			clearInputHook();
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.client.Minecraft#func_184124_aB", disable = "index.alchemy.asm.hook.disable_mouse_hook")
+	public static final Hook.Result runTickMouse(Minecraft minecraft) {
+		if (AlchemyEventSystem.isHookInput())
+			return Hook.Result.NULL;
+		else
+			return Hook.Result.VOID;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.util.MouseHelper#func_74374_c", disable = "index.alchemy.asm.hook.disable_mouse_hook")
+	public static final Hook.Result mouseXYChange(MouseHelper helper) {
+		if (AlchemyEventSystem.isHookInput()) {
+			Mouse.getDX();
+			Mouse.getDY();
+			return Hook.Result.NULL;
+		} else
+			return Hook.Result.VOID;
+	}
+	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void renderBar(RenderGameOverlayEvent.Pre event) {
@@ -396,6 +444,12 @@ public class AlchemyEventSystem implements IGuiHandler {
 			else if (type == EventType.ORE_GEN_BUS)
 				MinecraftForge.ORE_GEN_BUS.register(handle);
 		}
+	}
+	
+	public static void registerTileEntity(ITileEntity tile) {
+		try {
+			GameRegistry.registerTileEntity(tile.getTileEntityClass(), tile.getTileEntityName());
+		} catch (Exception e) { }
 	}
 	
 	public static void init() {

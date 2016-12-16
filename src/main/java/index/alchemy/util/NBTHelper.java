@@ -1,9 +1,11 @@
 package index.alchemy.util;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+@Omega
 public class NBTHelper {
 	
 	public static final NBTTagCompound getNBTFormItemStack(ItemStack item) {

@@ -6,10 +6,12 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryBauble;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyCapabilityLoader {
 	

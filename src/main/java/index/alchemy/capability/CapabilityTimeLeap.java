@@ -7,6 +7,7 @@ import index.alchemy.api.IEventHandle;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import index.alchemy.core.AlchemyResourceLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static java.lang.Math.*;
 
+@Omega
 @InitInstance(AlchemyCapabilityLoader.TYPE)
 public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implements IEventHandle {
 	

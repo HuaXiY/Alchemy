@@ -11,6 +11,7 @@ import index.alchemy.api.annotation.Config;
 import index.alchemy.config.AlchemyConfig;
 import index.alchemy.util.Tool;
 import index.alchemy.world.AlchemyWorldGenerator;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -25,6 +26,7 @@ import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Beta
 public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGenerator, IColorItem {
 	
 	@Config(handle = AlchemyConfig.HANDLE_INT_ARRAY, category = AlchemyWorldGenerator.CATEGORY_GENERATOR, comment = "Ore generation exception dimension ids.")

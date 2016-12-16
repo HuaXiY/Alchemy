@@ -18,10 +18,12 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Gamma;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Gamma
 public class TDeobfCoreMod {
 	
 	public static final Map<String, IClassTransformer> ct_mapping = new HashMap<String, IClassTransformer>();

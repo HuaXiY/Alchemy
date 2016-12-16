@@ -2,11 +2,13 @@ package index.alchemy.block;
 
 import index.alchemy.api.ITileEntity;
 import index.alchemy.tile.TileEntityIceTemp;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
+@Omega
 public class BlockIceTemp extends AlchemyBlock implements ITileEntity {
 	
 	@Override

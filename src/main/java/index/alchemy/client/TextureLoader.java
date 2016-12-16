@@ -11,9 +11,13 @@ import javax.imageio.ImageIO;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL12;
 
+import index.project.version.annotation.Omega;
+
 import static org.lwjgl.opengl.GL11.*;
 
+@Omega
 public class TextureLoader {
+	
 	private static final int BYTES_PER_PIXEL = 4;
 
 	public static int loadTexture(BufferedImage image) {

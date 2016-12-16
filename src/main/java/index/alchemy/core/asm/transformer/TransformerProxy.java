@@ -21,10 +21,12 @@ import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
 import index.alchemy.api.annotation.Unsafe;
+import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 public class TransformerProxy implements IClassTransformer {
 	
 	protected final ClassNode proxy;

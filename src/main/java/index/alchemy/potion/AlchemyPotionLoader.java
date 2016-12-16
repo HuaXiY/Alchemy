@@ -8,6 +8,7 @@ import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.interacting.ModItems;
 import index.alchemy.item.AlchemyItemLoader;
+import index.project.version.annotation.Omega;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.PotionTypes;
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 // This class is used to register the potion in the Minecraft.
 // Not guaranteed to work in another version, Field name and
 // position will change with the version.
+@Omega
 @Change("1.9.4")
 @Init(state = ModState.INITIALIZED)
 public class AlchemyPotionLoader extends PotionType {

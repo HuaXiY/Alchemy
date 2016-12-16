@@ -14,8 +14,8 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event.HasResult;
 
-@Cancelable
 @HasResult
+@Cancelable
 public class CauldronActivatedEvent extends BlockEvent {
 	
 	public final EntityPlayer player;

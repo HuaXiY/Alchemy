@@ -1,12 +1,14 @@
 package index.alchemy.container;
 
 import index.alchemy.inventory.InventoryItem;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+@Omega
 public class ContainerInventoryItem extends Container {
 	
 	private InventoryItem inventory;

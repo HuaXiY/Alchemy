@@ -1,5 +1,6 @@
 package index.alchemy.client.render;
 
+import index.project.version.annotation.Beta;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -11,6 +12,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Beta
 @SideOnly(Side.CLIENT)
 public class BlockFluidRender {
 	

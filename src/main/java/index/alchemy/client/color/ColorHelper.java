@@ -6,8 +6,10 @@ import static java.lang.Math.max;
 import java.awt.Color;
 import java.util.Iterator;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.client.renderer.GlStateManager;
 
+@Omega
 public class ColorHelper {
 	
 	public static Iterator<Color> argbStep(final Color start, final Color end, final int steps, final boolean keepA) {

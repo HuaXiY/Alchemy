@@ -1,8 +1,10 @@
 package baubles.common;
 
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.Instance;
 
+@Omega
 @Mod(
 		modid = Baubles.MODID, 
 		name = Baubles.MODNAME, 

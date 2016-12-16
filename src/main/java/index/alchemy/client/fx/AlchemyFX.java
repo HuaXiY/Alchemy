@@ -7,6 +7,7 @@ import java.util.List;
 
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -14,6 +15,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @SideOnly(Side.CLIENT)
 public abstract class AlchemyFX extends Particle {
 	

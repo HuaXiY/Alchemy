@@ -2,8 +2,10 @@ package index.alchemy.core;
 
 import java.util.Map;
 
+import index.project.version.annotation.Beta;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 
+@Beta
 public class AlchemySetup implements IFMLCallHook {
 
 	@Override

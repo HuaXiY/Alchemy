@@ -18,11 +18,13 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.util.ASMHelper;
+import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import static org.objectweb.asm.Opcodes.*;
 import static index.alchemy.core.AlchemyConstants.*;
 
+@Omega
 public class TransformerGenericEvent implements IClassTransformer {
 	
 	public static final String SUBSCRIBE_EVENT_ANNOTATION_DESC = "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;";

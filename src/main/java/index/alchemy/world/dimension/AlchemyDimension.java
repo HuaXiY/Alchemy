@@ -1,9 +1,11 @@
 package index.alchemy.world.dimension;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 
+@Omega
 public abstract class AlchemyDimension extends WorldProvider {
 	
 	protected double movement = 1;

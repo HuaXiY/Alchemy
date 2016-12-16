@@ -4,6 +4,7 @@ import com.google.common.base.Predicate;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.entity.ai.EntityAIFindEntityNearestHelper;
+import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,12 +12,15 @@ import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Alpha
 public class PotionElapse extends AlchemyPotion implements IEventHandle {
 	
 	public static final Predicate<EntityLivingBase> NOT_ACTIVE = new Predicate<EntityLivingBase>() {
+		
         public boolean apply(EntityLivingBase player) {
             return !player.isPotionActive(AlchemyPotionLoader.elapse);
         }
+        
     };
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)

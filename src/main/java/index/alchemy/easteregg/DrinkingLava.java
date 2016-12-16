@@ -2,6 +2,7 @@ package index.alchemy.easteregg;
 
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Proxy;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,6 +17,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
+@Beta
 @Hook.Provider
 @Proxy("net.minecraft.item.ItemBucket")
 public class DrinkingLava extends ItemBucket {

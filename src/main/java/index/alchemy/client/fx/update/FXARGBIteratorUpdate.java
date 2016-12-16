@@ -5,9 +5,11 @@ import java.util.Iterator;
 
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.client.fx.AlchemyFX;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class FXARGBIteratorUpdate implements IFXUpdate {
 	
 	protected Iterator<Color> iterator;

@@ -1,11 +1,13 @@
 package index.alchemy.item;
 
 import index.alchemy.util.AABBHelper;
+import index.project.version.annotation.Gamma;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+@Gamma
 public class ItemScrollBOOM extends ItemScroll {
 	public ItemScrollBOOM() {
 		super("scroll_boom", 30, 64, true, 1);

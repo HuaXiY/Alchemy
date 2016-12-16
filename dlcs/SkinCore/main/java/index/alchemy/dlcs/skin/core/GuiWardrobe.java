@@ -17,6 +17,7 @@ import index.alchemy.api.annotation.Listener;
 import index.alchemy.development.RColorPicker;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Beta;
 import javafx.scene.image.Image;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
@@ -29,11 +30,13 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Beta
 @Listener
 @SideOnly(Side.CLIENT)
 public class GuiWardrobe extends GuiScreen {
@@ -78,7 +81,9 @@ public class GuiWardrobe extends GuiScreen {
 					if (Tool.getSafe(list.skins, list.selectedId) != null)
 						list.update(list.skins.get(list.selectedId), Minecraft.getMinecraft().thePlayer, true);
 				} else if (id == 1) {
-					
+					if (++typeId >= SkinCapability.SKIN_TYPES.length)
+						typeId = 0;
+					list.type = displayString = SkinCapability.SKIN_TYPES[typeId];
 				}
 			}
 			return result;
@@ -295,9 +300,10 @@ public class GuiWardrobe extends GuiScreen {
 			};
 		}
 	
-	protected GuiSkinList list;
-	
 	{ init(); }
+	
+	protected GuiSkinList list;
+	protected int typeId;
 	
 	@Override
 	public void initGui() {
@@ -305,8 +311,10 @@ public class GuiWardrobe extends GuiScreen {
 		list.skins.add(list.new Entry("default"));
 		list.skins.addAll(getAllEntry());
 		buttonList.clear();
-		buttonList.add(new ButtonWardrobe(0, (width - 174) / 2 + 143, (height - 161) / 2 + 140, 30, 15, "应用"));
-		buttonList.add(new ButtonWardrobe(1, (width - 174) / 2 + 113, (height - 161) / 2 + 140, 30, 15, "default"));
+		buttonList.add(new ButtonWardrobe(0, (width - 174) / 2 + 143, (height - 161) / 2 + 140, 30, 15,
+				I18n.translateToLocal("skin.text.use")));
+		buttonList.add(new ButtonWardrobe(1, (width - 174) / 2 + 113, (height - 161) / 2 + 140, 30, 15,
+				SkinCapability.SKIN_TYPES[typeId]));
 	}
 	
 	@Override

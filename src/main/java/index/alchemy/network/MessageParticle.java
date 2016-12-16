@@ -2,6 +2,7 @@ package index.alchemy.network;
 
 import index.alchemy.api.annotation.Message;
 import index.alchemy.core.AlchemyEventSystem;
+import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @Message(Side.CLIENT)
 public class MessageParticle implements IMessage, IMessageHandler<MessageParticle, IMessage> {
 	

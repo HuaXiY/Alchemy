@@ -8,6 +8,7 @@ import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.block.AlchemyBlockSlab;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.SoundType;
@@ -29,6 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Beta
 public class AlchemyItemBlock extends ItemBlock implements IColorItem, IResourceLocation, IItemMeshProvider, IRegister {
 	
 	@SideOnly(Side.CLIENT)

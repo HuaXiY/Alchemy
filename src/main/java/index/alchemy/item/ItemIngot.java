@@ -2,7 +2,9 @@ package index.alchemy.item;
 
 import index.alchemy.api.IOreDictionary;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
 
+@Alpha
 public class ItemIngot extends AlchemyItemColor implements IOreDictionary {
 	
 	@Override

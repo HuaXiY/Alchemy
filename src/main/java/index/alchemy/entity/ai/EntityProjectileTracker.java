@@ -5,6 +5,9 @@ import net.minecraft.entity.IProjectile;
 
 import static net.minecraft.util.math.MathHelper.*;
 
+import index.project.version.annotation.Beta;
+
+@Beta
 public class EntityProjectileTracker {
 	
 	public static <T extends Entity & IProjectile> void track(T entity, Entity target) {

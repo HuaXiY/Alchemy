@@ -43,6 +43,8 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Always;
 import index.alchemy.util.AnnotationInvocationHandler;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
+import index.project.version.annotation.Beta;
 import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -60,10 +62,12 @@ import net.minecraftforge.fml.common.functions.ModIdFunction;
 import static index.alchemy.core.AlchemyConstants.*;
 import static index.alchemy.util.Tool.$;
 
+@Alpha
 @Loading
 @Init(state = ModState.AVAILABLE)
 public class AlchemyDLCLoader {
 	
+	@Beta
 	public static class DLCContainer extends DummyModContainer  {
 		
 		public final IDLCInfo info;

@@ -5,10 +5,12 @@ import index.alchemy.api.IInventoryProvider;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.inventory.AlchemyInventory;
+import index.project.version.annotation.Omega;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Omega
 @InitInstance(AlchemyCapabilityLoader.TYPE)
 public class CapabilityInventory extends AlchemyCapability<AlchemyInventory> implements IEventHandle {
 	

@@ -1,6 +1,7 @@
 package index.alchemy.client.render;
 
 import index.alchemy.client.color.ColorHelper;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
@@ -21,6 +22,7 @@ import java.awt.Color;
 import static org.lwjgl.opengl.GL11.*;
 import static net.minecraft.util.math.MathHelper.*;
 
+@Omega
 @SideOnly(Side.CLIENT)
 public class RenderHelper {
 	

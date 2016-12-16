@@ -3,11 +3,13 @@ package index.alchemy.command;
 import com.google.common.base.Joiner;
 
 import index.alchemy.core.AlchemyEventSystem;
+import index.project.version.annotation.Alpha;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.relauncher.Side;
 
+@Alpha
 public class CommandSRun extends AlchemyCommandServer {
 
 	@Override

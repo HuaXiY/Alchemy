@@ -29,11 +29,13 @@ import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.core.AlchemyHooks;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 public final class TransformerHook implements IClassTransformer {
 	
 	protected final MethodNode hookMethod;

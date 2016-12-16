@@ -1,11 +1,13 @@
 package index.alchemy.magic;
 
 import index.alchemy.util.Always;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
+@Beta
 public class MagicTeleportDirectional extends AlchemyMagic {
 	
 	public static final String NBT_KEY_DIM = "dim", NBT_KEY_X = "x", NBT_KEY_Y = "y", NBT_KEY_Z = "z";

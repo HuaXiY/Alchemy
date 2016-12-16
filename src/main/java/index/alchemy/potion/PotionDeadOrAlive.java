@@ -1,8 +1,10 @@
 package index.alchemy.potion;
 
 import index.alchemy.entity.AlchemyDamageSourceLoader;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
 
+@Beta
 public class PotionDeadOrAlive extends AlchemyPotion {
 	
 	@Override

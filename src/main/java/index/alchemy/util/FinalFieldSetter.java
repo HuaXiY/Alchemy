@@ -7,7 +7,8 @@ import javax.annotation.Nullable;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-
+import index.project.version.annotation.Omega;
+@Omega
 public final class FinalFieldSetter {
 
     private static final FinalFieldSetter INSTANCE;

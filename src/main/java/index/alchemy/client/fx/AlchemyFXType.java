@@ -15,6 +15,7 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.renderer.GlStateManager;
@@ -33,6 +34,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 // This class is used to register the EnumParticleTypes in the Minecraft.
 // Not guaranteed to work in another version, Field name and
 // position will change with the version.
+@Omega
 @Loading
 @Listener
 @Change("1.10")

@@ -1,7 +1,9 @@
 package index.alchemy.animation;
 
 import index.alchemy.api.ICycle;
+import index.project.version.annotation.Omega;
 
+@Omega
 public class StdCycle implements ICycle {
 	
 	/*

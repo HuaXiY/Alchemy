@@ -3,12 +3,14 @@ package index.alchemy.item;
 import index.alchemy.block.AlchemyBlockLoader;
 import index.alchemy.interacting.Elemix;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Gamma;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+@Gamma
 public class ItemScrollIceScreen extends ItemScroll {
 	public ItemScrollIceScreen() {
 		super("scroll_ice_screen", 0, 64, false, 1);

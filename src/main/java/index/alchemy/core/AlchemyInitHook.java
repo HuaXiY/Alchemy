@@ -23,6 +23,7 @@ import index.alchemy.item.AlchemyItemBlock;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -36,8 +37,10 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
 import net.minecraftforge.oredict.OreDictionary;
 
+@Omega
 public class AlchemyInitHook {
 	
+	@Omega
 	public static class InitHookEvent extends Event {
 		
 		public final Object init;
@@ -76,7 +79,7 @@ public class AlchemyInitHook {
 			init_impl((Impl) obj);
 		
 		if (obj instanceof ITileEntity)
-			GameRegistry.registerTileEntity(((ITileEntity) obj).getTileEntityClass(), ((ITileEntity) obj).getTileEntityName());
+			AlchemyEventSystem.registerTileEntity((ITileEntity) obj);
 		
 		if (obj instanceof IOreDictionary)
 			OreDictionary.registerOre(((IOreDictionary) obj).getNameInOreDictionary(), ((IOreDictionary) obj).getItemStackInOreDictionary());

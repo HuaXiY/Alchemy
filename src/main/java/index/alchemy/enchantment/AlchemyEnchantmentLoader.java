@@ -1,9 +1,11 @@
 package index.alchemy.enchantment;
 
 import index.alchemy.api.annotation.Init;
+import index.project.version.annotation.Omega;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyEnchantmentLoader {
 	

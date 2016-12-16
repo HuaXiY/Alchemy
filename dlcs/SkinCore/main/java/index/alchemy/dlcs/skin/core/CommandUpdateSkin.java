@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 
 import index.alchemy.command.AlchemyCommandClient;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -13,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 
+@Omega
 public class CommandUpdateSkin extends AlchemyCommandClient {
 
 	@Override

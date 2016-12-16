@@ -6,6 +6,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static net.minecraft.util.math.MathHelper.*;
 import static org.lwjgl.opengl.GL11.*;
 
+import index.project.version.annotation.Alpha;
+
+@Alpha
 @SideOnly(Side.CLIENT)
 public class MagicMatrix {
 	

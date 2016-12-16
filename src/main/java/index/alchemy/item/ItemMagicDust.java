@@ -2,6 +2,7 @@ package index.alchemy.item;
 
 import java.util.List;
 
+import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -9,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Alpha
 public class ItemMagicDust extends AlchemyItemColor {
 	
 	protected int metadata;

@@ -2,9 +2,11 @@ package index.alchemy.client.fx.update;
 
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.client.fx.AlchemyFX;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class FXBrightnessUpdate implements IFXUpdate {
 	
 	protected int brightness;

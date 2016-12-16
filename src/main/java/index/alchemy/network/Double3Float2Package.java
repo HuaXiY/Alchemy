@@ -1,5 +1,8 @@
 package index.alchemy.network;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class Double3Float2Package {
 	
 	public double x, y, z;

@@ -16,12 +16,14 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 public class AlchemyRuntimeException extends RuntimeException {
 	
 	@Config(category = "runtime", comment = "Serious exceptions are ignored in the game.")

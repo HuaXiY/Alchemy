@@ -4,7 +4,9 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Config.Handle.Type;
+import index.project.version.annotation.Omega;
 
+@Omega
 public class AlchemyConfig {
 	
 	public static final String HANDLE_INT_ARRAY = "int_array";

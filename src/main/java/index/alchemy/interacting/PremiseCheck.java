@@ -10,9 +10,11 @@ import index.alchemy.api.annotation.Premise;
 import index.alchemy.core.AlchemyDLCLoader;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Loading
 @Init(state = ModState.CONSTRUCTED)
 public class PremiseCheck {

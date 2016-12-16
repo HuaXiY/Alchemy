@@ -8,9 +8,11 @@ import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 
+@Omega
 @Loading
 public class AlchemyDimensionType {
 	

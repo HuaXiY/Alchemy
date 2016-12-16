@@ -1,8 +1,10 @@
 package index.alchemy.command;
 
 import index.alchemy.api.annotation.Init;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Omega
 @Init(state = ModState.INITIALIZED)
 public class AlchemyCommandLoader {
 	

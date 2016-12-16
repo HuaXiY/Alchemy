@@ -5,6 +5,7 @@ import java.util.RandomAccess;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -24,6 +25,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import static java.lang.Math.*;
 
+@Omega
 public abstract class AlchemyInventory implements ICapabilitySerializable, IInventory, IItemHandlerModifiable, RandomAccess {
 	
 	public static final int LIMIT = 64;

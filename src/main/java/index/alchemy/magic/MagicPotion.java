@@ -1,8 +1,10 @@
 package index.alchemy.magic;
 
+import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.PotionEffect;
 
+@Alpha
 public class MagicPotion extends AlchemyMagic {
 	
 	protected PotionEffect effect;

@@ -16,6 +16,7 @@ import index.alchemy.interacting.ModItems;
 import index.alchemy.tile.TileEntityCauldron;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -43,6 +44,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import vazkii.botania.api.mana.ManaItemHandler;
 import vazkii.botania.common.item.rod.ItemWaterRod;
 
+@Beta
 @Change("1.9.4")
 @Proxy("net.minecraft.block.BlockCauldron")
 public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMaterialContainer, IRegister {

@@ -2,11 +2,13 @@ package index.alchemy.capability;
 
 import index.alchemy.api.ICapability;
 import index.alchemy.api.IRegister;
+import index.project.version.annotation.Omega;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 
+@Omega
 public abstract class AlchemyCapability<T> implements ICapability<T>, IRegister {
 	
 	@Override

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nonnegative;
+
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.annotation.Config;
@@ -16,6 +18,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
@@ -31,27 +34,31 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @Loading
 @Init(state = ModState.PREINITIALIZED)
 public class AlchemyNetworkHandler {
 	
 	public static final String CATEGORY_NETWORK ="network";
 	
-	@Config(category = CATEGORY_NETWORK, comment = "Can hear the sound of the range.")
+	@Nonnegative
+	@Config(category = CATEGORY_NETWORK, comment = "Can hear the sound of the range.", min = 0)
 	private static int sound_range = 32;
 	
 	public static int getSoundRange() {
 		return sound_range;
 	}
 	
-	@Config(category = CATEGORY_NETWORK, comment = "Can see the particle of the range.")
+	@Nonnegative
+	@Config(category = CATEGORY_NETWORK, comment = "Can see the particle of the range.", min = 0)
 	private static int particle_range = 32;
 	
 	public static int getParticleRange() {
 		return particle_range;
 	}
 	
-	@Config(category = CATEGORY_NETWORK, comment = "Can receive the change of the tileentity of the range.")
+	@Nonnegative
+	@Config(category = CATEGORY_NETWORK, comment = "Can receive the change of the tileentity of the range.", min = 0)
 	private static int tileentity_update_range = 128;
 	
 	public static int getTileEntityUpdateRange() {

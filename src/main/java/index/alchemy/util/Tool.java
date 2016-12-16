@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.RegEx;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
@@ -44,7 +45,9 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.project.version.annotation.Omega;
 
+@Omega
 public class Tool {
 	
 	public static final StackTraceElement[] getStackTrace() {
@@ -193,7 +196,7 @@ public class Tool {
 		return AlchemyModLoader.random.nextInt(max - min + 1) + min;
 	}
 	
-	public static final String get(String str, String key) {
+	public static final String get(String str, @RegEx String key) {
 		Matcher matcher = Pattern.compile(key).matcher(str);
 		if (matcher.find())
 			return matcher.group(1);

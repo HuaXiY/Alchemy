@@ -2,9 +2,11 @@ package index.alchemy.client;
 
 import java.io.IOException;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.resources.IResourceManager;
 
+@Omega
 public class MemoryTexture implements ITextureObject {
 	
 	public final byte data[];

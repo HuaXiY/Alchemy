@@ -1,9 +1,11 @@
 package index.alchemy.magic;
 
 import index.alchemy.util.Always;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.effect.EntityLightningBolt;
 
+@Beta
 public class MagicLightning extends AlchemyMagic {
 	
 	@Override

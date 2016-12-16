@@ -1,13 +1,18 @@
 package index.alchemy.core;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import index.alchemy.core.debug.AlchemyRuntimeException;
+import javax.annotation.concurrent.ThreadSafe;
 
+import com.google.common.collect.Lists;
+
+import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.project.version.annotation.Omega;
+
+@Omega
+@ThreadSafe
 public final class AlchemyThreadManager {
 	
 	public static class OtherThreadThrowable extends Throwable {
@@ -44,7 +49,7 @@ public final class AlchemyThreadManager {
 	
 	private static int id;
 	private int index = -1, size = -1, min, max, listAddThreshold, warning, num, skipFlag;
-	private List<Threads> lt = new ArrayList<Threads>();
+	private List<Threads> lt = Lists.newArrayList();
 	private WriteLock lock = new ReentrantReadWriteLock().writeLock();
 
 	private final class Threads extends Thread {
@@ -57,7 +62,7 @@ public final class AlchemyThreadManager {
 
 		private int skip;
 		private boolean running = true;
-		private List<Runnable> list = new LinkedList<Runnable>();
+		private List<Runnable> list = Lists.newLinkedList();
 
 		@Override
 		public void run() {

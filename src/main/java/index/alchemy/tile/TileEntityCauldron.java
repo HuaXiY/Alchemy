@@ -28,6 +28,7 @@ import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityItem;
@@ -48,6 +49,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
+@Beta
 @FX.UpdateProvider
 public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	

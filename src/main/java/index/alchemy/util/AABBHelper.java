@@ -1,9 +1,11 @@
 package index.alchemy.util;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
+@Omega
 public class AABBHelper {
 	
 	public static final AxisAlignedBB getAABBFromEntity(Entity entity, double r) {

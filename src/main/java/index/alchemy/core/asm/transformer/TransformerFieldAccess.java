@@ -26,10 +26,12 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.FinalFieldSetter;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Alpha
 public class TransformerFieldAccess implements IClassTransformer {
 	
 	public static final String I_FIELD_ACCESS_DESC = Type.getInternalName(IFieldAccess.class);

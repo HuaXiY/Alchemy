@@ -3,10 +3,12 @@ package index.alchemy.magic;
 import index.alchemy.block.AlchemyBlockLoader;
 import index.alchemy.interacting.Elemix;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+@Beta
 public class MagicIceScreen extends AlchemyMagic {
 	
 	@Override

@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import index.alchemy.api.IAlchemyBrewingRecipe;
 import index.alchemy.api.annotation.Lang;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -17,6 +18,7 @@ import static java.lang.Math.*;
 
 import java.util.List;
 
+@Beta
 public class ItemMagicSolvent extends AlchemyItemColor implements IAlchemyBrewingRecipe {
 	
 	protected int metadata;

@@ -10,6 +10,7 @@ import index.alchemy.api.Time;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.util.AABBHelper;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.item.EntityItem;
@@ -21,6 +22,7 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.Vec3i;
 
+@Beta
 public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityItem>, Predicate<EntityItem> {
 	
 	protected static final String NBT_KEY_LAST_MEAL = "ai_last_meal";

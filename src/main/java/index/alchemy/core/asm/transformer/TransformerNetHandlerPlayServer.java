@@ -14,10 +14,12 @@ import index.alchemy.api.AlchemyBaubles;
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
+import index.project.version.annotation.Beta;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Beta
 public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer {
 
 	@Override

@@ -15,12 +15,14 @@ import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.util.ASMHelper;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 @SideOnly(Side.CLIENT)
 public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 

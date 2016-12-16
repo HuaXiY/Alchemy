@@ -3,7 +3,9 @@ package index.alchemy.util.cache;
 import java.util.Map;
 
 import index.alchemy.api.ICache;
+import index.project.version.annotation.Omega;
 
+@Omega
 public abstract class Cache<K, V> implements ICache<K, V> {
 	
 	private int max;

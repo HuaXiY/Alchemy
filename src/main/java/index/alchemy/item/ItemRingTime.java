@@ -35,6 +35,7 @@ import index.alchemy.network.Double6IntArrayPackage;
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -52,6 +53,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import static java.lang.Math.*;
 
+@Omega
 @FX.UpdateProvider
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	

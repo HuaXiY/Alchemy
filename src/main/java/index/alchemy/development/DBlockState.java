@@ -7,11 +7,13 @@ import index.alchemy.api.IResourceLocation;
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Alpha;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Alpha
 @DInit
 @SideOnly(Side.CLIENT)
 public class DBlockState {

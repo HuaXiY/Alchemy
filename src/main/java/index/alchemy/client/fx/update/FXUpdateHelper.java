@@ -15,7 +15,9 @@ import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 
+@Omega
 @Loading
 public class FXUpdateHelper {
 	

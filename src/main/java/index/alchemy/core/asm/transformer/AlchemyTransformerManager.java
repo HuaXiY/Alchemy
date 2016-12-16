@@ -27,12 +27,14 @@ import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static org.objectweb.asm.Opcodes.*;
 import static index.alchemy.core.AlchemyConstants.*;
 
+@Omega
 public class AlchemyTransformerManager implements IClassTransformer {
 	
 	public static final String 

@@ -1,8 +1,10 @@
 package index.alchemy.potion;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 
+@Omega
 public class PotionStable extends AlchemyPotion {
 	
 	@Override

@@ -4,6 +4,7 @@ import com.sun.javafx.application.LauncherImpl;
 
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Test;
+import index.project.version.annotation.Omega;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @Test
 @SideOnly(Side.CLIENT)
 @Init(state = ModState.PREINITIALIZED, enable = true)

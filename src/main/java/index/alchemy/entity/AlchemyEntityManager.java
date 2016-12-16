@@ -7,6 +7,7 @@ import java.util.List;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Beta;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,6 +16,7 @@ import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
+@Beta
 @Init(state = ModState.AVAILABLE)
 public class AlchemyEntityManager {
 	

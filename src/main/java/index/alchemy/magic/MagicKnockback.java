@@ -1,7 +1,9 @@
 package index.alchemy.magic;
 
+import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLivingBase;
 
+@Alpha
 public class MagicKnockback extends AlchemyMagic {
 
 	@Override

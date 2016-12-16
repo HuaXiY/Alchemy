@@ -3,6 +3,7 @@ package index.alchemy.item;
 import java.util.List;
 
 import index.alchemy.util.Always;
+import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -13,6 +14,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
+@Alpha
 public abstract class ItemScroll extends AlchemyItem {
 	
 	public static final String SCROOL_TYPE = "scroll_type", SCROOL_USE = "scroll_use";
