@@ -1,14 +1,12 @@
 package index.alchemy.dlcs.skin.core;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.command.CommandBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -168,13 +166,8 @@ public class SkinCore {
 	public static CommandBase update_skin = new CommandUpdateSkin();
 	
 	public static void init() {
-		for (WoodType type : WoodType.types) {
-			BlockWardrobe wardrobe = new BlockWardrobe(type);
-			GameRegistry.addRecipe(new ItemStack(wardrobe), "BAB", "B B", "BAB", 'B', type.log, 'A', type.plank);
-			if (Always.isClient())
-				Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(wardrobe), 0,
-						new ModelResourceLocation(wardrobe.getRegistryName(), "facing=south,part=foot,rely=null"));
-		}
+		WoodType.types.stream().map(BlockWardrobe::new).forEach(b ->
+				GameRegistry.addRecipe(new ItemStack(b), "BAB", "B B", "BAB", 'B', b.type.log, 'A', b.type.plank));
 		if (Always.isClient())
 			registerModelLoader();
 	}

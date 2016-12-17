@@ -121,7 +121,7 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	public static void updateCache(IBlockAccess world, BlockPos pos, IBlockState state) {
 		cacheWorld.set(world);
 		cachePos.set(pos);
-		cacheState.set(state);;
+		cacheState.set(state);
 	}
 	
 	public static void clearCache() {

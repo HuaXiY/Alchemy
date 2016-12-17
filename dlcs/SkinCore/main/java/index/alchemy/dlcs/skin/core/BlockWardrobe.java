@@ -2,9 +2,9 @@ package index.alchemy.dlcs.skin.core;
 
 import java.util.Random;
 
-import index.alchemy.api.ITileEntity;
 import index.alchemy.block.AlchemyBlock;
 import index.alchemy.interacting.WoodType;
+import index.alchemy.util.Always;
 import index.project.version.annotation.Beta;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
@@ -16,13 +16,14 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -37,7 +38,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Beta
-public class BlockWardrobe extends AlchemyBlock implements ITileEntity {
+public class BlockWardrobe extends AlchemyBlock {
 	
 	public static enum EnumPartType implements IStringSerializable {
 		HEAD,
@@ -54,9 +55,9 @@ public class BlockWardrobe extends AlchemyBlock implements ITileEntity {
 	}
 	
 	public static enum EnumRelyType implements IStringSerializable {
-		NULL,
 		LEFT,
-		RIGHT;
+		RIGHT,
+		@Deprecated NULL;
 
 		public String toString() {
 			return name().toLowerCase();
@@ -64,6 +65,14 @@ public class BlockWardrobe extends AlchemyBlock implements ITileEntity {
 
 		public String getName() {
 			return name().toLowerCase();
+		}
+		
+		public EnumRelyType getOpposite() {
+			if (this == LEFT)
+				return RIGHT;
+			if (this == RIGHT)
+				return LEFT;
+			return NULL;
 		}
 		
 	}
@@ -99,39 +108,73 @@ public class BlockWardrobe extends AlchemyBlock implements ITileEntity {
 	}
 	
 	@Override
-	public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
+	public IBlockState onBlockPlaced(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
 			int meta, EntityLivingBase placer) {
-		return getDefaultState()
-				.withProperty(FACING, placer.getHorizontalFacing().getOpposite())
-				.withProperty(RELY, EnumRelyType.NULL)
-				.withProperty(PART, EnumPartType.FOOT);
+		return updateFacing(world, pos, getDefaultState()
+				.withProperty(PART, EnumPartType.FOOT)
+				.withProperty(RELY, EnumRelyType.LEFT)
+				.withProperty(FACING, placer.getHorizontalFacing().getOpposite()));
+	}
+	
+	public static IBlockState updateFacing(World world, BlockPos pos, IBlockState state) {
+		EnumFacing facing = state.getValue(BlockWardrobe.FACING), temp = facing.rotateY();
+		IBlockState next = world.getBlockState(pos.offset(temp));
+		if (next.getBlock() == state.getBlock() && next.getValue(PART) == EnumPartType.FOOT
+				&& next.getValue(FACING) == facing && checkFacing(world, pos.offset(temp), next).getValue(RELY) == EnumRelyType.LEFT)
+			return state.withProperty(RELY, EnumRelyType.RIGHT);
+		temp = temp.getOpposite();
+		next = world.getBlockState(pos.offset(temp));
+		if (next.getBlock() == state.getBlock() && next.getValue(FACING) == facing) {
+			IBlockState next2 = world.getBlockState(pos.offset(temp, 2));
+			if (next2.getBlock() != next.getBlock() || next2.getValue(PART) != next.getValue(PART)
+					|| next2.getValue(FACING) != next.getValue(FACING) || next2.getValue(RELY) != EnumRelyType.RIGHT)
+				world.setBlockState(pos.offset(temp), next.withProperty(RELY, EnumRelyType.RIGHT), 3 | 1 << 6);
+		}
+		return state;
+	}
+	
+	public static IBlockState checkFacing(World world, BlockPos pos, IBlockState state) {
+		if (state.getValue(RELY) == EnumRelyType.RIGHT) {
+			EnumFacing temp = state.getValue(FACING).rotateY();
+			IBlockState next = world.getBlockState(pos.offset(temp));
+			if (next.getBlock() != state.getBlock() || next.getValue(PART) != EnumPartType.FOOT
+					|| next.getValue(FACING) != state.getValue(FACING) || next.getValue(RELY) != EnumRelyType.LEFT) {
+				IBlockState result = state.withProperty(RELY, EnumRelyType.LEFT);
+				world.setBlockState(pos, result, 3 | 1 << 6);
+				return result;
+			}
+		}
+		return state;
+	}
+	
+	@Override
+	public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+		if (state.getValue(PART) == EnumPartType.HEAD) {
+			IBlockState foot = world.getBlockState(pos.down());
+			if (foot.getBlock() == state.getBlock())
+				return foot.getActualState(world, pos.down()).withProperty(PART, EnumPartType.HEAD);
+		} else {
+			EnumFacing facing = state.getValue(FACING);
+			EnumRelyType relyType = state.getValue(RELY);
+			BlockPos next = pos.offset(relyType == EnumRelyType.LEFT ? facing.rotateYCCW() : facing.rotateY());
+			IBlockState nextState = world.getBlockState(next);
+			if (nextState.getBlock() == state.getBlock() && nextState.getValue(RELY).getOpposite() == relyType)
+				return state;
+		}
+		return state.withProperty(RELY, EnumRelyType.NULL);
 	}
 	
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return meta == 0 ? getDefaultState() : getBlockState().getBaseState()
+		return getBlockState().getBaseState()
 				.withProperty(PART, EnumPartType.values()[meta & 1])
-				.withProperty(FACING, EnumFacing.values()[Math.max(meta >> 1, 2)]);
+				.withProperty(RELY, EnumRelyType.values()[meta >> 1 & 1])
+				.withProperty(FACING, EnumFacing.values()[2 + (meta >> 2)]);
 	}
 	
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(PART).ordinal() | state.getValue(FACING).ordinal() << 1;
-	}
-	
-	@Override
-	public String getTileEntityName() {
-		return "skin_wardrobe";
-	}
-	
-	@Override
-	public Class<? extends TileEntity> getTileEntityClass() {
-		return TileWardrobe.class;
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new TileWardrobe();
+		return state.getValue(PART).ordinal() | state.getValue(RELY).ordinal() << 1 | state.getValue(FACING).ordinal() - 2 << 2;
 	}
 	
 	@Override
@@ -164,21 +207,18 @@ public class BlockWardrobe extends AlchemyBlock implements ITileEntity {
 	public BlockWardrobe(WoodType type) {
 		super(getRegistryName(type), Material.WOOD);
 		this.type = type;
-		//setRegistryName(name);
 		setDefaultState(getDefaultState()
 				.withProperty(FACING, EnumFacing.SOUTH)
 				.withProperty(PART, EnumPartType.FOOT)
-				.withProperty(RELY, EnumRelyType.NULL));
-		//ItemBlock item = new ItemBlock(this);
-		//item.setCreativeTab(CreativeTabs.DECORATIONS);
-		//item.setRegistryName(getRegistryName());
-		//GameRegistry.register(this);
-		//GameRegistry.register(item);
+				.withProperty(RELY, EnumRelyType.LEFT));
+		if (Always.isClient())
+			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(this), 0,
+					new ModelResourceLocation(getRegistryName(), "facing=south,part=foot,rely=null"));
 	}
 	
 	@Override
 	public String getUnlocalizedName() {
-		return "wardrobe";
+		return "tile.wardrobe";
 	}
 	
 	@Override
@@ -242,10 +282,7 @@ public class BlockWardrobe extends AlchemyBlock implements ITileEntity {
 	
 	@Override
 	public SoundType getSoundType(IBlockState state, World world, BlockPos pos, Entity entity) {
-		try {
-			SkinCapability.updateCache(world, pos, type.logState);
-			return type.logState.getBlock().getSoundType(type.logState, world, pos, entity);
-		} finally { SkinCapability.clearCache(); }
+		return type.logState.getBlock().getSoundType(type.logState, world, pos, entity);
 	}
 	
 	@Override
