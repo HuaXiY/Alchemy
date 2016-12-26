@@ -1,13 +1,12 @@
 package index.alchemy.item;
 
-import static java.lang.Math.*;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
 import index.alchemy.api.ICoolDown;
+import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IInventoryProvider;
@@ -16,6 +15,7 @@ import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.render.HUDManager;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.interacting.ModItems;
 import index.alchemy.inventory.AlchemyInventory;
@@ -34,32 +34,31 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.ContainerChest;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.AchievementList;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static java.lang.Math.*;
+
 @Omega
-public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider<ItemStack>, IInputHandle, IGuiHandle, ICoolDown,
-	INetworkMessage.Server<MessageSpaceRingPickup> {
+public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider<ItemStack>, IInputHandle, IGuiHandle,
+	IEventHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
 	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
-	public static final String NBT_KEY_CD = "cd_ring_space",
-			KEY_DESCRIPTION_OPEN = "key.space_ring_open", KEY_DESCRIPTION_PICKUP = "key.space_ring_pickup";
+	public static final String NBT_KEY_CD = "cd_ring_space", KEY_DESCRIPTION_OPEN = "key.space_ring_open";
+	
+	public static final ItemRingSpace type = null;
 	
 	@Override
 	public InventoryItem initInventory() {
@@ -85,55 +84,21 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 					for (EntityItem entity : player.worldObj.getEntitiesWithinAABB(EntityItem.class,
 							player.getEntityBoundingBox().expand(5D, 5D, 5D)))
 						if (!entity.isDead)
-				        	   onCollideWithPlayer(entity, player);
+							entity.onCollideWithPlayer(player);
 			}
 	}
 	
-	private void onCollideWithPlayer(EntityItem entity, EntityPlayer player) {
-		if (entity.delayBeforeCanPickup > 0)
-			return;
-        ItemStack itemstack = entity.getEntityItem();
-        int i = itemstack.stackSize;
-
-        int hook = ForgeEventFactory.onItemPickup(entity, player, itemstack);
-        if (hook < 0)
-        	return;
-        
-        if ((entity.getOwner() == null || entity.lifespan - entity.getAge() <= 200 ||
-        		entity.getOwner().equals(player.getName())) && (hook == 1 || i <= 0 || player.inventory.addItemStackToInventory(itemstack))) {
-        	if (itemstack.getItem() == Item.getItemFromBlock(Blocks.LOG))
-            	player.addStat(AchievementList.MINE_WOOD);
-
-            if (itemstack.getItem() == Item.getItemFromBlock(Blocks.LOG2))
-            	player.addStat(AchievementList.MINE_WOOD);
-
-            if (itemstack.getItem() == Items.LEATHER)
-            	player.addStat(AchievementList.KILL_COW);
-
-            if (itemstack.getItem() == Items.DIAMOND)
-            	player.addStat(AchievementList.DIAMONDS);
-
-            if (itemstack.getItem() == Items.BLAZE_ROD)
-            	player.addStat(AchievementList.BLAZE_ROD);
-
-            if (itemstack.getItem() == Items.DIAMOND && entity.getThrower() != null) {
-                EntityPlayer entityplayer = entity.worldObj.getPlayerEntityByName(entity.getThrower());
-                if (entityplayer != null && entityplayer != player)
-                	entityplayer.addStat(AchievementList.DIAMONDS_TO_YOU);
-            }
-
-            FMLCommonHandler.instance().firePlayerItemPickupEvent(player, entity);
-            if (!entity.isSilent())
-            	entity.worldObj.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ITEM_PICKUP,
-            			SoundCategory.PLAYERS, 0.2F, ((entity.rand.nextFloat() - entity.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-
-            player.onItemPickup(entity, i);
-            
-            if (itemstack.stackSize <= 0)
-            	entity.setDead();
-
-            player.addStat(StatList.getObjectsPickedUpStats(itemstack.getItem()), i);
-        }
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onEnderTeleport(EnderTeleportEvent event) {
+		EntityLivingBase target = event.getEntityLiving();
+		for (EntityLivingBase living : target.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
+				AABBHelper.getAABBFromEntity(target, 5)))
+			if (target != living && isEquipmented(living)) {
+				event.setCanceled(true);
+				return;
+			}
+		if (isEquipmented(target))
+			event.setAttackDamage(0);
 	}
 	
 	@Override
@@ -141,8 +106,9 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 	public KeyBinding[] getKeyBindings() {
 		AlchemyModLoader.checkState();
 		return new KeyBinding[] {
-				new AlchemyKeyBinding(KEY_DESCRIPTION_OPEN, Keyboard.KEY_R),
-				new AlchemyKeyBinding(KEY_DESCRIPTION_PICKUP, Keyboard.KEY_C)
+				key_binding_1,
+				key_binding_2,
+				new AlchemyKeyBinding(KEY_DESCRIPTION_OPEN, Keyboard.KEY_R)
 		};
 	}
 	
@@ -154,21 +120,30 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@KeyEvent(KEY_DESCRIPTION_PICKUP)
+	@KeyEvent({ KEY_RING_1, KEY_RING_2 })
 	public void onKeyPickupPressed(KeyBinding binding) {
-		if (isCDOver()) {
-			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageSpaceRingPickup());
-			restartCD();
-		} else
-			HUDManager.setSnake(this);
+		if (shouldHandleInput(binding))
+			if (isCDOver()) {
+				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageSpaceRingPickup());
+				restartCD();
+			} else
+				HUDManager.setSnake(this);
 	}
 	
-	public static class MessageSpaceRingPickup implements IMessage {
+	public static class MessageSpaceRingPickup implements IMessage, IMessageHandler<MessageSpaceRingPickup, IMessage> {
+		
 		@Override
-		public void fromBytes(ByteBuf buf) {}
+		public void fromBytes(ByteBuf buf) { }
 
 		@Override
-		public void toBytes(ByteBuf buf) {}
+		public void toBytes(ByteBuf buf) { }
+		
+		@Override
+		public IMessage onMessage(MessageSpaceRingPickup message, MessageContext ctx) {
+			AlchemyEventSystem.addDelayedRunnable(p -> type.pickup(ctx.getServerHandler().playerEntity), 0);
+			return null;
+		}
+		
 	}
 	
 	@Override
@@ -176,28 +151,26 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		return MessageSpaceRingPickup.class;
 	}
 	
-	@Override
-	public IMessage onMessage(MessageSpaceRingPickup message, MessageContext ctx) {
-		pickup(ctx.getServerHandler().playerEntity);
-		return null;
-	}
-	
 	public void pickup(EntityPlayer player) {
 		AlchemyInventory inventory = getInventory(getFormLiving(player));
 		if (inventory == null)
 			return;
 		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
-		List<Double6IntArrayPackage> d6iap = new LinkedList<Double6IntArrayPackage>(); 
+		List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>(); 
 		for (EntityItem entity : list) {
 			inventory.mergeItemStack(entity.getEntityItem());
 			if (entity.getEntityItem().stackSize < 1) {
-				d6iap.add(new Double6IntArrayPackage(entity.posX, entity.posY, entity.posZ, 0, 0, 0));
+				for (int i = 0; i < 4; i++)
+					d6iaps.add(new Double6IntArrayPackage(
+							entity.posX + entity.rand.nextGaussian() * .3,
+							entity.posY + entity.rand.nextGaussian() * .3,
+							entity.posZ + entity.rand.nextGaussian() * .3, 0, 0, 0));
 				entity.setDead();
 			}
 		}
 		if (list.size() > 0) {
 			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.PORTAL, AABBHelper.getAABBFromEntity(player,
-					AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iap);
+					AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
 		}
 	}
 	

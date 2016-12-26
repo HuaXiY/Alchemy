@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
 import index.project.version.annotation.Omega;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
@@ -17,13 +18,14 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 @Omega
 public class SkinInfo implements ICapabilityProvider, ICapabilitySerializable {
 	
-	public final Map<MinecraftProfileTexture.Type, ResourceLocation> skin_mapping = Maps.newEnumMap(MinecraftProfileTexture.Type.class);
-	
 	public byte skin_data[];
 	
 	public String skin_type;
 	
-	public final EntityPlayer player;
+	public transient final EntityPlayer player;
+	
+	public transient final Map<MinecraftProfileTexture.Type, ResourceLocation>
+			skin_mapping = Maps.newEnumMap(MinecraftProfileTexture.Type.class);
 	
 	public SkinInfo(EntityPlayer player) {
 		this.player = player;
@@ -37,6 +39,10 @@ public class SkinInfo implements ICapabilityProvider, ICapabilitySerializable {
 	@Override
 	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
 		return hasCapability(capability, facing) ? (T) this : null;
+	}
+	
+	public void copy(EntityLivingBase living) {
+		living.getCapability(SkinCore.skin_info, null).deserializeNBT(serializeNBT());
 	}
 
 	@Override

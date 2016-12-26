@@ -16,13 +16,11 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import static java.lang.Math.*;
-
 @Omega
 public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 8;
-	public static final float BALANCE_COEFFICIENT = 0.4F, MIN_HEALTH = 0.01F;;
+	public static final float BALANCE_COEFFICIENT = 0.4F, TRIGGER_PROBABILITY = 0.5F, MIN_HEALTH = 2F;
 	
 	public static final AttributeModifier KNOCKBACK_RESISTANCE =  
 			new AttributeModifier(UUID.fromString("1434a694-1beb-4825-854b-72303432eed3"), "belt_tough_bonus", 1D, 0);
@@ -58,10 +56,9 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingDeath(LivingDeathEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
-		if (isEquipmented(living) && living.rand.nextInt((int) max(-living.getHealth(), 2)) == 0) {
-			System.out.println(-living.getHealth());
+		if (Always.isServer() && isEquipmented(living) && living.rand.nextFloat() > TRIGGER_PROBABILITY) {
 			event.setCanceled(true);
-			living.setHealth(MIN_HEALTH);
+			living.heal(MIN_HEALTH);
 		}
 	}
 

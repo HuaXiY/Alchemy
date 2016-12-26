@@ -12,7 +12,7 @@ public class StdCycle implements ICycle {
 	 * if (rotation) if (cycle % 2 == 0): min -> max, else: max -> min
 	 */
 	protected float min, max, dif;
-	protected int lenght, now = -1, cycles;
+	protected int lenght = 1, now = -1, cycles;
 	protected boolean loop, rotation;
 	
 	public StdCycle setMin(float min) {

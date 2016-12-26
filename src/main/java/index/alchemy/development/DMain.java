@@ -22,9 +22,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Alpha
-@Loading
+//@Loading
 @SideOnly(Side.CLIENT)
-@Init(state = ModState.AVAILABLE)
+//@Init(state = ModState.AVAILABLE)
 public class DMain {
 	
 	public static final String

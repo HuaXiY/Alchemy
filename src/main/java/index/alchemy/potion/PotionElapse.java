@@ -1,6 +1,6 @@
 package index.alchemy.potion;
 
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.entity.ai.EntityAIFindEntityNearestHelper;
@@ -15,13 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Alpha
 public class PotionElapse extends AlchemyPotion implements IEventHandle {
 	
-	public static final Predicate<EntityLivingBase> NOT_ACTIVE = new Predicate<EntityLivingBase>() {
-		
-        public boolean apply(EntityLivingBase player) {
-            return !player.isPotionActive(AlchemyPotionLoader.elapse);
-        }
-        
-    };
+	public static final Predicate<EntityLivingBase> NOT_ACTIVE = l -> !l.isPotionActive(AlchemyPotionLoader.elapse);
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
@@ -32,7 +26,8 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 			Class<EntityLivingBase> type = (Class<EntityLivingBase>) 
 					(event.getEntityLiving() instanceof EntityPlayer ? EntityPlayer.class : event.getEntityLiving().getClass());
 			living.attackTarget = EntityAIFindEntityNearestHelper.<EntityLivingBase>findNearest(
-					(EntityLiving) living.attackTarget, type, NOT_ACTIVE);
+					(EntityLiving) living.attackTarget, type, null, NOT_ACTIVE
+					.and(l -> EntityAIFindEntityNearestHelper.isSuitableLivingTarget(living, l)));
 		}
 	}
 	

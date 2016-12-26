@@ -9,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.capabilities.Capability;
@@ -127,24 +126,21 @@ public class SkinCore {
 				
 				@Override
 				public void run() {
-					World world = Minecraft.getMinecraft().theWorld;
-					if (world != null) {
-						Entity entity = world.getEntityByID(message.id);
-						if (entity == null && message.id == Integer.MAX_VALUE - 10)
-							entity = GuiWardrobe.player;
-						if (entity != null) {
-							SkinInfo info = entity.getCapability(SkinCore.skin_info, null);
-							if (info != null) {
-								ResourceLocation skin = new ResourceLocation("skin:" + entity.getName());
-								Minecraft.getMinecraft().getTextureManager().deleteTexture(skin);
-								if (message.data.length > 0) {
-									Minecraft.getMinecraft().getTextureManager().loadTexture(skin, new MemoryTexture(message.data));
-									info.skin_mapping.put(Type.SKIN, skin);
-									info.skin_type = message.type;
-								} else {
-									info.skin_mapping.put(Type.SKIN, null);
-									info.skin_type = null;
-								}
+					Entity entity = Always.findEntityFormClientWorld(message.id);
+					if (entity == null && message.id == Integer.MAX_VALUE - 10)
+						entity = GuiWardrobe.player;
+					if (entity != null) {
+						SkinInfo info = entity.getCapability(SkinCore.skin_info, null);
+						if (info != null) {
+							ResourceLocation skin = new ResourceLocation("skin:" + entity.getName());
+							Minecraft.getMinecraft().getTextureManager().deleteTexture(skin);
+							if (message.data.length > 0) {
+								Minecraft.getMinecraft().getTextureManager().loadTexture(skin, new MemoryTexture(message.data));
+								info.skin_mapping.put(Type.SKIN, skin);
+								info.skin_type = message.type;
+							} else {
+								info.skin_mapping.put(Type.SKIN, null);
+								info.skin_type = null;
 							}
 						}
 					}

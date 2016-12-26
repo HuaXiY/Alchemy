@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
+
 import index.alchemy.animation.StdCycle;
 import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.IFXUpdate;
@@ -38,6 +40,7 @@ import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -61,7 +64,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	@FX.UpdateMethod(FX_KEY_GATHER)
 	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
-		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
+		List<IFXUpdate> result = Lists.newLinkedList();
 		int i = 1, 
 			max_age = Tool.getSafe(args, i++, 1),
 			scale = Tool.getSafe(args, i++, 1);
@@ -78,7 +81,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	@FX.UpdateMethod(FX_KEY_HOVER)
 	public static List<IFXUpdate> getFXUpdateHover(int[] args) {
-		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
+		List<IFXUpdate> result = Lists.newLinkedList();
 		int i = 1, 
 			max_age = Tool.getSafe(args, i++, 1),
 			scale = Tool.getSafe(args, i++, 1),
@@ -94,7 +97,8 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	public static final int CONTAINER_MAX_ITEM = 6;
 	
 	protected static final int
-			UPDATE_STATE_ID = 0;
+			UPDATE_STATE = 0,
+			UPDATE_FLUID = 1;
 	
 	protected static final String 
 			NBT_KEY_CONTAINER = "container",
@@ -227,6 +231,17 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	@Override
 	public void update() {
 		if (Always.isServer()) {
+			if (worldObj.getWorldTime() % 5 == 0 && worldObj.isRainingAt(pos.up())) {
+				int level = getLevel();
+				if (level < 3 && level > -1) {
+					if (tank.getFluid() == null) {
+						tank.setFluid(new FluidStack(FluidRegistry.WATER, 0));
+						updateTracker();
+					}
+					tank.getFluid().amount = Math.min(tank.getFluid().amount + (int) worldObj.getRainStrength(1), tank.getCapacity());
+					updateFluidAmount();
+				}
+			}
 			List<EntityItem> entitys = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).setMaxY(pos.getY() + .35));
 			for (EntityItem entity : entitys) {
 				ItemStack item = entity.getEntityItem();
@@ -278,6 +293,9 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			if (flag)
 				updateTracker();
 		} else {
+			if (tank.getFluid() != null && tank.getFluid().getFluid() == FluidRegistry.LAVA && worldObj.isRainingAt(pos.up()))
+				worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+							pos.getX() + random.nextDouble(), pos.getY() + 1, pos.getZ() + random.nextDouble(), 0, 0, 0);
 			if (recipe != null) {
 				if (worldObj.getWorldTime() % 3 == 0)
 					worldObj.spawnParticle(FXWisp.Info.type, false,
@@ -299,15 +317,24 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	public void checkStateChange(State state) {
 		if (this.state != state) {
 			this.state = state;
-			worldObj.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_STATE_ID, state.ordinal());
+			worldObj.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_STATE, state.ordinal());
 		}
+	}
+	
+	public void updateFluidAmount() {
+		int amount = getTank().getFluid() == null ? 0 : getTank().getFluid().amount;
+		worldObj.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_FLUID, amount);
 	}
 	
 	@Override
 	public boolean receiveClientEvent(int id, int type) {
 		switch (id) {
-			case UPDATE_STATE_ID:
+			case UPDATE_STATE:
 				state = Tool.getSafe(State.values(), type, state);
+				return true;
+			case UPDATE_FLUID:
+				if (getTank().getFluid() != null)
+					getTank().getFluid().amount = type;
 				return true;
 			default:
 				return super.receiveClientEvent(id, type);

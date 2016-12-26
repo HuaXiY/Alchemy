@@ -139,6 +139,8 @@ public class AlchemyInitHook {
 			
 		}
 		
+		Tool.setType(obj.getClass(), obj);
+		
 		push_event(obj);
 		
 	}

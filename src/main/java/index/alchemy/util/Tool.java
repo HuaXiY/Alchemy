@@ -59,7 +59,7 @@ public class Tool {
 			System.err.println(s);
 	}
 	
-	public static <T> T cloneArray(T array) {
+	public static final <T> T cloneArray(T array) {
 		if (array == null || !array.getClass().isArray())
 			throw new IllegalArgumentException(toString(array));
 		if (array instanceof Object[])
@@ -243,14 +243,20 @@ public class Tool {
 			AlchemyInitHook.init(instance);
 	}
 	
-	@Nullable
 	public static final <T> T instance(Class<T> clazz) {
 		try {
 			return (T) setAccessible(clazz.getDeclaredConstructor()).newInstance();
 		} catch (Exception e) {
-			AlchemyRuntimeException.onException(e);
+			throw new RuntimeException(e);
 		}
-		return null;
+	}
+	
+	public static final <T> T instance(Class<T> clazz, Object obj) {
+		try {
+			return (T) setAccessible(clazz.getDeclaredConstructor(obj.getClass())).newInstance(obj);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Unsafe(Unsafe.REFLECT_API)
@@ -316,18 +322,10 @@ public class Tool {
 	public static final void setType(Class<?> clazz, Object obj) {
 		// Initialize this class, the initialization process will assign fields to null
 		load(clazz);
-		Field field = null;
 		try {
-			field = clazz.getDeclaredField("type");
-		} catch (Exception e) {
-			AlchemyModLoader.logger.warn("Can't find Field(type) in: " + clazz.getName());
-		}
-		if (field != null)
-			try {
-				FinalFieldSetter.getInstance().setStatic(field, obj);
-			} catch (Exception e) {
-				AlchemyRuntimeException.onException(e);
-			}
+			Field field = clazz.getDeclaredField("type");
+			FinalFieldSetter.getInstance().setStatic(field, obj);
+		} catch (Exception e) { }
 	}
 	
 	public static final void checkInvokePermissions(int deep, Class<?> clazz) {
@@ -402,6 +400,13 @@ public class Tool {
 		for (Object obj : args)
 			if (obj == null)
 				AlchemyRuntimeException.onException(new NullPointerException());
+	}
+	
+	public static final boolean nonNull(Object... args) {
+		for (Object obj : args)
+			if (obj == null)
+				return false;
+		return true;
 	}
 	
 	public static final void checkArrayLength(Object array, int length) {
@@ -683,7 +688,7 @@ public class Tool {
 			if (args[0].getClass() == String.class) {
 				String str = (String) args[0];
 				if (str.startsWith("L"))
-					clazz = Tool.forName(str.substring(1), false);
+					clazz = forName(str.substring(1), false);
 				if (clazz == null)
 					clazz = String.class;
 			} else
@@ -694,9 +699,9 @@ public class Tool {
 			Object object = args[0].getClass() == clazz ? args[0] : null;
 			try {
 				if (args.length == 2)
-					return (T) Tool.setAccessible(searchField(clazz, (String) args[1])).get(object);
+					return (T) setAccessible(searchField(clazz, (String) args[1])).get(object);
 				if (args.length == 3 && ((String) args[1]).endsWith("<")) {
-					Field field = Tool.setAccessible(searchField(clazz, ((String) args[1]).replace("<", "")));
+					Field field = setAccessible(searchField(clazz, ((String) args[1]).replace("<", "")));
 					field.set(object, args[2]);
 					return (T) args[2];
 				}

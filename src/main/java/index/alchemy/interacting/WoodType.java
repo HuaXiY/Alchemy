@@ -59,19 +59,29 @@ public class WoodType {
 	
 	public final ItemStack log, plank;
 	public final IBlockState logState, plankState;
+	public final boolean special;
 	
-	public WoodType(ItemStack log, ItemStack plank, IBlockState logState, IBlockState plankState) {
+	public boolean isSpecial() {
+		return special;
+	}
+	
+	public WoodType(ItemStack log, ItemStack plank, IBlockState logState, IBlockState plankState, boolean special) {
 		this.log = log;
 		this.plank = plank;
 		this.logState = logState;
 		this.plankState = plankState;
+		this.special = special;
+	}
+	
+	@Override
+	public String toString() {
+		ResourceLocation locationLog = log.getItem().getRegistryName(), locationPlank = plank.getItem().getRegistryName();
+		return locationLog.getResourceDomain() + "_T_" + locationLog.getResourcePath() + "_T_" + log.getMetadata() + "_T_"
+				+ locationPlank.getResourceDomain() + "_T_" + locationPlank.getResourcePath() + "_T_" + plank.getMetadata();
 	}
 	
 	public static final BiFunction<String, String, String> conversion = (s, r) -> {
-		WoodType type = types.stream().filter(w -> {
-			ResourceLocation location = w.log.getItem().getRegistryName();
-			return r.equals(location.getResourceDomain() + "_T_" + location.getResourcePath() + "_T_" + w.log.getMetadata());
-		}).findFirst().orElse(null);
+		WoodType type = types.stream().filter(t -> t.toString().equals(r)).findFirst().orElse(null);
 		if (type != null) {
 			String textures[] = getTexture(type);
 			return s.replace("blocks/log_oak", textures[0])
@@ -111,7 +121,7 @@ public class WoodType {
 											inputs.add(item);
 											break;
 										}
-									} else if (Tool.isInstance(List.class, list.get(0).getClass())) {
+									} else if (list.size() > 0 && List.class.isInstance(list.get(0))) {
 										List list1 = (List) list.get(0);
 										for (Object obj : list1)
 											if (obj.getClass() == ItemStack.class) {
@@ -133,10 +143,28 @@ public class WoodType {
 						IBlockState logState = log.getStateFromMeta(input.getMetadata()),
 								plankState = plank.getStateFromMeta(output.getMetadata());
 						if (logState != null && plankState != null)
-							types.add(new WoodType(input, output, logState, plankState));
+							types.add(new WoodType(input, output, logState, plankState, false));
 					}
 				}
 		}
+		
+		// Botania - living wood
+		
+		addWoodType(ModItems.botania$livingwood_log, ModItems.botania$livingwood_plank,
+				ModBlocks.botania$livingwood_log, ModBlocks.botania$livingwood_plank, true);
+		addWoodType(ModItems.botania$livingwood_log, ModItems.botania$livingwood_plank_mossy,
+				ModBlocks.botania$livingwood_log, ModBlocks.botania$livingwood_plank_mossy, true);
+		addWoodType(ModItems.botania$livingwood_log, ModItems.botania$livingwood_plank_framed,
+				ModBlocks.botania$livingwood_log, ModBlocks.botania$livingwood_plank_framed, true);
+		addWoodType(ModItems.botania$livingwood_log, ModItems.botania$livingwood_plank_framed_pattern,
+				ModBlocks.botania$livingwood_log, ModBlocks.botania$livingwood_plank_framed_pattern, true);
+		addWoodType(ModItems.botania$livingwood_log, ModItems.botania$livingwood_plank_glimmering,
+				ModBlocks.botania$livingwood_log, ModBlocks.botania$livingwood_plank_glimmering, true);
+	}
+	
+	public static void addWoodType(ItemStack log, ItemStack plank, IBlockState logState, IBlockState plankState, boolean special) {
+		if (Tool.nonNull(log, plank, logState, plankState))
+			types.add(new WoodType(log, plank, logState, plankState, special));
 	}
 	
 	public static boolean isOre(ItemStack item, String ore) {

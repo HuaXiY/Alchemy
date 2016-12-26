@@ -46,6 +46,18 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 		return runtimeDeobfuscationEnabled;
 	}
 	
+	private static File minecraftDir;
+	
+	public static File getMinecraftDir() {
+		return minecraftDir;
+	}
+	
+	@Override
+	public void injectData(Map<String, Object> data) {
+		runtimeDeobfuscationEnabled = (boolean) data.get("runtimeDeobfuscationEnabled");
+		minecraftDir = (File) data.get("mcLocation");
+	}
+	
 	private static final Side side = FMLLaunchHandler.side();
 	
 	public static Side runtimeSide() {
@@ -69,11 +81,6 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	@Override
 	public String getSetupClass() {
 		return "index.alchemy.core.AlchemySetup";
-	}
-
-	@Override
-	public void injectData(Map<String, Object> data) {
-		runtimeDeobfuscationEnabled = (Boolean) data.get("runtimeDeobfuscationEnabled");
 	}
 
 	@Override

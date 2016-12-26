@@ -26,7 +26,7 @@ public class ItemRingBlessing extends AlchemyItemRing implements IEventHandle {
 	}
 
 	public ItemRingBlessing() {
-		super("ring_blessing", 0x6ACCA9);
+		super("ring_blessing", 0x7E23D4);
 	}
 
 }

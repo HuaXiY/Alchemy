@@ -25,6 +25,7 @@ public class PureDamageEvent extends LivingEvent {
 	public PureDamageEvent(EntityLivingBase entity, Type type, float amount) {
 		super(entity);
 		this.type = type;
+		this.amount = amount;
 	}
 
 }

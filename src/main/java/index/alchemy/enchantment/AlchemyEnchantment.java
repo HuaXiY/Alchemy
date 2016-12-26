@@ -1,5 +1,7 @@
 package index.alchemy.enchantment;
 
+import java.util.Random;
+
 import index.alchemy.api.IRegister;
 import index.project.version.annotation.Omega;
 import net.minecraft.enchantment.Enchantment;
@@ -8,6 +10,8 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 
 @Omega
 public class AlchemyEnchantment extends Enchantment implements IRegister {
+	
+	protected static final Random random = new Random();
 	
 	public static final EntityEquipmentSlot[] 
 			SLOT_ARMOR = new EntityEquipmentSlot[]{

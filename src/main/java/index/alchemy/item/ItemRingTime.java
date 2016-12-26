@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
+import com.google.common.collect.Lists;
 
 import index.alchemy.animation.StdCycle;
 import index.alchemy.api.ICoolDown;
@@ -17,7 +17,6 @@ import index.alchemy.api.annotation.KeyEvent;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot.TimeNode;
-import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.color.ColorHelper;
 import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.fx.update.FXARGBIteratorUpdate;
@@ -45,6 +44,7 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -58,13 +58,15 @@ import static java.lang.Math.*;
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
 	public static final int USE_CD = 20 * 20, REPAIR_INTERVAL = 20 * 10;
-	public static final String NBT_KEY_CD = "cd_ring_time", KEY_DESCRIPTION = "key.time_ring_leap", FX_KEY_GATHER = "ring_time_gather";
+	public static final String NBT_KEY_CD = "cd_ring_time", FX_KEY_GATHER = "ring_time_gather";
 	
 	public static final ItemStack mending_book = Always.getEnchantmentBook(Enchantments.MENDING);
 	
+	public static final ItemRingTime type = null;
+	
 	@FX.UpdateMethod(FX_KEY_GATHER)
 	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
-		List<IFXUpdate> result = new LinkedList<IFXUpdate>();
+		List<IFXUpdate> result = Lists.newLinkedList();
 		int i = 1, 
 			max_age = Tool.getSafe(args, i++, 120),
 			scale = Tool.getSafe(args, i++, 100);
@@ -106,22 +108,24 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	public KeyBinding[] getKeyBindings() {
 		AlchemyModLoader.checkState();
 		return new KeyBinding[] {
-				new AlchemyKeyBinding(KEY_DESCRIPTION, Keyboard.KEY_V)
+				key_binding_1,
+				key_binding_2
 		};
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@KeyEvent(KEY_DESCRIPTION)
+	@KeyEvent({ KEY_RING_1, KEY_RING_2 })
 	public void onKeyTimeLeapPressed(KeyBinding binding) {
-		if (isCDOver()) {
-			AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
-			Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
-			timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
-		} else
-			HUDManager.setSnake(this);
+		if (shouldHandleInput(binding))
+			if (isCDOver()) {
+				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
+				Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+				timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
+			} else
+				HUDManager.setSnake(this);
 	}
 	
-	public static class MessageTimeLeap implements IMessage {
+	public static class MessageTimeLeap implements IMessage, IMessageHandler<MessageTimeLeap, IMessage> {
 		
 		@Override
 		public void fromBytes(ByteBuf buf) { }
@@ -129,17 +133,17 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 		@Override
 		public void toBytes(ByteBuf buf) { }
 		
+		@Override
+		public IMessage onMessage(MessageTimeLeap message, MessageContext ctx) {
+			type.timeLeapOnServer(ctx.getServerHandler().playerEntity);
+			return null;
+		}
+		
 	}
 	
 	@Override
 	public Class<MessageTimeLeap> getServerMessageClass() {
 		return MessageTimeLeap.class;
-	}
-	
-	@Override
-	public IMessage onMessage(MessageTimeLeap message, MessageContext ctx) {
-		timeLeapOnServer(ctx.getServerHandler().playerEntity);
-		return null;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -178,9 +182,9 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 				int update[] = FXUpdateHelper.getIntArrayByArgs(FX_KEY_GATHER, 240, 200);
 				for (int i = 0; i < 3; i++)
 					d6iaps.add(new Double6IntArrayPackage(
-							player.posX + 6 - player.worldObj.rand.nextFloat() * 12,
-							player.posY + 6 - player.worldObj.rand.nextFloat() * 12,
-							player.posZ + 6 - player.worldObj.rand.nextFloat() * 12, 0, 0, 0, update));
+							player.posX + player.worldObj.rand.nextGaussian() * 6,
+							player.posY + player.worldObj.rand.nextGaussian() * 6,
+							player.posZ + player.worldObj.rand.nextGaussian() * 6, 0, 0, 0, update));
 				AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
 						AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
 				boolean result = false;

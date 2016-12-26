@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,6 +25,8 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	public static final int JUMP_AIR_CD = 20;
 	public static final double JUMP_V = 1.8, JUMP_V_Y = 1.2, JUMP_V_XZ = 4.2;
 	public static final String NBT_KEY_CD = "potion_alacrity";
+	
+	public static final PotionAlacrity type = null;
 	
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -41,23 +44,25 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 		}
 	}
 	
-	public static class MessageAlacrityCallback implements IMessage {
+	public static class MessageAlacrityCallback implements IMessage, IMessageHandler<MessageAlacrityCallback, IMessage> {
+		
 		@Override
-		public void fromBytes(ByteBuf buf) {}
+		public void fromBytes(ByteBuf buf) { }
 
 		@Override
-		public void toBytes(ByteBuf buf) {}
+		public void toBytes(ByteBuf buf) { }
+		
+		@Override
+		public IMessage onMessage(MessageAlacrityCallback message, MessageContext ctx) {
+			type.callback(ctx.getServerHandler().playerEntity);
+			return null;
+		}
+		
 	}
 	
 	@Override
 	public Class<MessageAlacrityCallback> getServerMessageClass() {
 		return MessageAlacrityCallback.class;
-	}
-	
-	@Override
-	public IMessage onMessage(MessageAlacrityCallback message, MessageContext ctx) {
-		callback(ctx.getServerHandler().playerEntity);
-		return null;
 	}
 	
 	public void callback(EntityPlayer player) {

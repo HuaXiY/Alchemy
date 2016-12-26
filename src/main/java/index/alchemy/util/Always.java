@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.AlchemyConstants;
@@ -55,7 +57,6 @@ public class Always {
 		return Minecraft.getMinecraft().theWorld.getWorldTime();
 	}
 	
-	
 	public static final boolean runOnClient() {
 		return isClient;
 	}
@@ -87,6 +88,15 @@ public class Always {
 	
 	public static final double calculateTheStraightLineDistance(double x, double y, double z) {
 		return x * x + y * y + z * z;
+	}
+	
+	@Nullable
+	@SideOnly(Side.CLIENT)
+	public static final Entity findEntityFormClientWorld(int id) {
+		World world = Minecraft.getMinecraft().theWorld;
+		if (world != null)
+			return world.getEntityByID(id);
+		return null;
 	}
 	
 	public static final Biome getCurrentBiome(EntityPlayer player) {

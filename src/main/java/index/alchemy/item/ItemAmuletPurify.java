@@ -1,16 +1,17 @@
 package index.alchemy.item;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.alchemy.item.ItemAmuletPurify.MessagePurifyCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double6IntArrayPackage;
-import index.alchemy.potion.AlchemyPotion;
 import index.alchemy.util.AABBHelper;
 import index.alchemy.util.Always;
 import index.project.version.annotation.Omega;
@@ -19,13 +20,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -38,17 +40,19 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	public static final int INTERVAL = 20 * 20, MAX_AIR = 300;
 	public static final String NBT_KEY_CD = "amulet_purify";
 	
+	public static final ItemAmuletPurify type = null;
+	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Always.isServer()) {
+		if (Always.isServer())
 			if (living.ticksExisted - living.getEntityData().getInteger(NBT_KEY_CD) > INTERVAL) {
-				List<PotionEffect> effects = new LinkedList<PotionEffect>();
-				for (PotionEffect effect : living.getActivePotionEffects())
-					if (effect.getPotion().isBadEffect())
-						effects.add(effect);
-				if (effects.size() > 0) {
-					for (PotionEffect effect : effects)
-						living.removePotionEffect(effect.getPotion());
+				boolean flag = false;
+				for (Iterator<PotionEffect> iterator = living.getActivePotionEffects().iterator(); iterator.hasNext();)
+					if (iterator.next().getPotion().isBadEffect()) {
+						flag = true;
+						iterator.remove();
+					}
+				if (flag) {
 					List<Double6IntArrayPackage> d6iap = new LinkedList<Double6IntArrayPackage>();
 					for (int i = 0; i < 9; i++)
 						d6iap.add(new Double6IntArrayPackage(living.posX - 1 + living.rand.nextDouble() * 2, living.posY + 1,
@@ -60,36 +64,34 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 						AlchemyNetworkHandler.network_wrapper.sendTo(new MessagePurifyCallback(), (EntityPlayerMP) living);
 				}
 			}
-			if (living.isInWater()) {
-				living.addPotionEffect(new PotionEffect(MobEffects.WATER_BREATHING, AlchemyPotion.NOT_FLASHING_TIME));
-				living.setAir(MAX_AIR);
-			}
-		}
+		living.setAir(MAX_AIR);
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onEntityJoinWorld(EntityJoinWorldEvent event) {
 		event.getEntity().getEntityData().removeTag(NBT_KEY_CD);
 	}
 	
-	public static class MessagePurifyCallback implements IMessage {
+	public static class MessagePurifyCallback implements IMessage, IMessageHandler<MessagePurifyCallback, IMessage> {
+		
 		@Override
-		public void fromBytes(ByteBuf buf) {}
+		public void fromBytes(ByteBuf buf) { }
 
 		@Override
-		public void toBytes(ByteBuf buf) {}
+		public void toBytes(ByteBuf buf) { }
+		
+		@Override
+		@SideOnly(Side.CLIENT)
+		public IMessage onMessage(MessagePurifyCallback message, MessageContext ctx) {
+			AlchemyEventSystem.addDelayedRunnable(p -> type.restartCD(), 0);
+			return null;
+		}
+		
 	}
 	
 	@Override
 	public Class<MessagePurifyCallback> getClientMessageClass() {
 		return MessagePurifyCallback.class;
-	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IMessage onMessage(MessagePurifyCallback message, MessageContext ctx) {
-		restartCD();
-		return null;
 	}
 	
 	@Override

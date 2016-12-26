@@ -18,7 +18,7 @@ public class FXWisp extends AlchemyFX {
 	@Texture({
 		"alchemy:particle/wisp"
 	})
-	@FX(name = "wisp", ignoreRange = false)
+	@FX(name = "wisp", ignoreRange = true)
 	public static class Info {
 		
 		public static final EnumParticleTypes type = null;

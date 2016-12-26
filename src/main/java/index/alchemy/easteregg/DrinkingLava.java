@@ -57,7 +57,6 @@ public class DrinkingLava extends ItemBucket {
 	public static Hook.Result onItemUseFinish(ItemBucket item, ItemStack stack, World world, EntityLivingBase living) {
 		living.attackEntityFrom(DamageSource.lava, 10);
 		living.setFire(30);
-		living.setDead();
 		return new Hook.Result(new ItemStack(Items.BUCKET));
 	}
 	

@@ -3,7 +3,6 @@ package index.alchemy.dlcs.skin.core;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -12,6 +11,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.interacting.WoodType;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Alpha;
@@ -45,14 +45,14 @@ public class WardrobeModelLoader implements ICustomModelLoader {
 	{
 		try {
 			Class clazz = $("Lnet.minecraftforge.client.model.ModelLoader$WeightedRandomModel");
-			weighted = MethodHandles.publicLookup().unreflectConstructor(
+			weighted = AlchemyModLoader.lookup.unreflectConstructor(
 					Tool.setAccessible(clazz.getDeclaredConstructor(ResourceLocation.class, VariantList.class)));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		try {
 			Class clazz = $("Lnet.minecraftforge.client.model.ModelLoader$VanillaModelWrapper");
-			wrapper = MethodHandles.publicLookup().unreflectConstructor(
+			wrapper = AlchemyModLoader.lookup.unreflectConstructor(
 					Tool.setAccessible(clazz.getDeclaredConstructor(ModelLoader.class, ResourceLocation.class,
 					ModelBlock.class, boolean.class, ModelBlockAnimation.class)));
 		} catch (Exception e) {
@@ -104,7 +104,7 @@ public class WardrobeModelLoader implements ICustomModelLoader {
 						.getResource(new ResourceLocation("skin:models/wardrobe_" + rely + "_" + name + ".json"))) {
 				String json = Joiner.on('\n').join(IOUtils.readLines(resource.getInputStream(), Charsets.UTF_8));
 				try (Reader reader = new StringReader(WoodType.conversion.apply(json, Tool.get(
-						modelLocation.getResourcePath(), "_(.*?_T_.*?_T_[0-9]*)")))) {
+						modelLocation.getResourcePath(), "_(.*?_T_.*?_T_[0-9]*_T_.*?_T_.*?_T_[0-9]*)")))) {
 					ModelBlock modelBlock = ModelBlock.deserialize(reader);
 					return modelLocation.getVariant().equals("inventory") ? new ItemLayerModel(modelBlock) : 
 						(IModel) wrapper.invoke((Object)

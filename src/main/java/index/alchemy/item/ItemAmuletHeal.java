@@ -2,13 +2,10 @@ package index.alchemy.item;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
-import index.alchemy.potion.AlchemyPotion;
-import index.alchemy.util.Always;
 import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -20,16 +17,19 @@ public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle {
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		if (Always.isServer() && living.fire > 0) {
-			living.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, AlchemyPotion.NOT_FLASHING_TIME));
-			living.fire = 0;
-		}
+		living.fire = 0;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onLivingHeal(LivingHealEvent event) {
-		if (Always.isServer() && isEquipmented(event.getEntityLiving()))
+		if (isEquipmented(event.getEntityLiving()))
 			event.setAmount(event.getAmount() * (1 + AMPLIFY));
+	}
+	
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onLivingAttack(LivingAttackEvent event) {
+		if (isEquipmented(event.getEntityLiving()) && event.getSource().isFireDamage())
+			event.setCanceled(true);
 	}
 
 	public ItemAmuletHeal() {

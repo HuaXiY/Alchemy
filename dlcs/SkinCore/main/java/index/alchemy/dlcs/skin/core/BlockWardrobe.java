@@ -5,8 +5,9 @@ import java.util.Random;
 import index.alchemy.block.AlchemyBlock;
 import index.alchemy.interacting.WoodType;
 import index.alchemy.util.Always;
+import index.alchemy.util.BlockContainerAccess;
+import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Beta;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -28,7 +29,6 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
@@ -190,22 +190,14 @@ public class BlockWardrobe extends AlchemyBlock {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 		Minecraft.getMinecraft().displayGuiScreen(new GuiWardrobe());
 		return true;
 	}
 	
-	public static String getRegistryName(WoodType type) {
-		ResourceLocation location = type.log.getItem().getRegistryName();
-		String name = "wardrobe_" + location.getResourceDomain() + "_T_" + location.getResourcePath() + "_T_" + type.log.getMetadata();
-		while (Block.getBlockFromName("skin:" + name) != null)
-			name += "_F";
-		return name;
-	}
-	
 	public BlockWardrobe(WoodType type) {
-		super(getRegistryName(type), Material.WOOD);
+		super("wardrobe_" + type.toString(), Material.WOOD);
 		this.type = type;
 		setDefaultState(getDefaultState()
 				.withProperty(FACING, EnumFacing.SOUTH)
@@ -236,6 +228,14 @@ public class BlockWardrobe extends AlchemyBlock {
 	}
 	
 	@Override
+	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+		return Math.max(type.logState.getBlock().getLightValue(type.logState,
+				new BlockContainerAccess(world, pos, type.logState), pos), 
+				type.plankState.getBlock().getLightValue(type.plankState,
+				new BlockContainerAccess(world, pos, type.plankState), pos));
+	}
+	
+	@Override
 	public Material getMaterial(IBlockState state) {
 		return type.logState.getMaterial();
 	}
@@ -251,13 +251,13 @@ public class BlockWardrobe extends AlchemyBlock {
 	}
 	
 	@Override
-	public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos) {
-		return type.logState.getBlockHardness(worldIn, pos);
+	public float getBlockHardness(IBlockState blockState, World world, BlockPos pos) {
+		return type.logState.getBlockHardness(world, pos);
 	}
 	
 	@Override
-	public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World worldIn, BlockPos pos) {
-		return type.logState.getPlayerRelativeBlockHardness(player, worldIn, pos);
+	public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
+		return type.logState.getPlayerRelativeBlockHardness(player, world, pos);
 	}
 	
 	@Override
@@ -298,20 +298,16 @@ public class BlockWardrobe extends AlchemyBlock {
 		} finally { SkinCapability.clearCache(); }
 	}
 	
+	@Alpha
 	@Override
 	public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		try {
-			SkinCapability.updateCache(world, pos, type.logState);
-			return type.logState.getBlock().getFlammability(world, pos, face);
-		} finally { SkinCapability.clearCache(); }
+		return type.logState.getBlock().getFlammability(new BlockContainerAccess(world, pos, type.logState), pos, face);
 	}
 	
+	@Alpha
 	@Override
 	public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, EnumFacing face) {
-		try {
-			SkinCapability.updateCache(world, pos, type.logState);
-			return type.logState.getBlock().getFireSpreadSpeed(world, pos, face);
-		} finally { SkinCapability.clearCache(); }
+		return type.logState.getBlock().getFireSpreadSpeed(new BlockContainerAccess(world, pos, type.logState), pos, face);
 	}
 	
 	@Override

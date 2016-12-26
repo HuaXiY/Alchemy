@@ -70,6 +70,7 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 		super.breakBlock(world, pos, state);
 	}
 	
+	@Beta
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
 			@Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -184,16 +185,7 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	}
 	
 	@Override
-	public void fillWithRain(World world, BlockPos pos) {
-		if (world.rand.nextInt(20) == 1) {
-			float f = world.getBiome(pos).getFloatTemperature(pos);
-			if (world.getBiomeProvider().getTemperatureAtHeight(f, pos.getY()) >= 0.15F) {
-				int level = getWaterLevel(world, pos, null);
-				if (level < 3 && level > -1)
-					setWaterLevel(world, pos, null, level + 1);
-			}
-		}
-	}
+	public void fillWithRain(World world, BlockPos pos) { }
 
 	@Override
 	public Boolean isEntityInsideMaterial(IBlockAccess world, BlockPos pos, IBlockState state, Entity entity,
@@ -217,8 +209,8 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	@Override
 	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
 		if (world.getTileEntity(pos) instanceof TileEntityCauldron) {
-			TileEntityCauldron te = getTileEntityCauldron(world, pos);
-			IBlockState liquid = te == null ? null : te.getLiquid();
+			TileEntityCauldron cauldron = getTileEntityCauldron(world, pos);
+			IBlockState liquid = cauldron == null ? null : cauldron.getLiquid();
 			return liquid == null ? super.getLightValue(state, world, pos) : liquid.getLightValue();
 		} return super.getLightValue(state, world, pos);
 	}

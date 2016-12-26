@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.StampedLock;
+
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
@@ -37,8 +41,8 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.development.DMain;
-import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.util.Always;
+import index.alchemy.util.Counter;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
@@ -72,12 +76,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Omega
 @Loading
+@ThreadSafe
 @Hook.Provider
 @Init(state = ModState.CONSTRUCTED)
 public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
+	@Nullable
+	@Deprecated
 	private static AlchemyEventSystem instance;
 	
+	@Nullable
 	public static AlchemyEventSystem getInstance() {
 		return instance;
 	}
@@ -135,19 +143,32 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			server_tickable = Lists.newArrayList(),
 			client_tickable = Lists.newArrayList();
 	
-	private static final Map<Side, List<IContinuedRunnable>> runnable_mapping = 
-			Arrays.stream(Side.values()).collect(() -> Maps.newEnumMap(Side.class),
-					(m, s) -> m.put(s, Collections.synchronizedList(Lists.newLinkedList())), Map::putAll);
+	private static final Map<Side, List<IContinuedRunnable>>
+			runnable_mapping = makeSyncRunnableMapping(),
+			runnable_mapping_buffer = makeSyncRunnableMapping();
+	
+	private static final Map<Side, Phase>
+			phase_mapping = Arrays.stream(Side.values()).collect(() -> Maps.newEnumMap(Side.class),
+					(m, s) -> m.put(s, Phase.START), Map::putAll);
+	
+	private static StampedLock runnable_mapping_lock = new StampedLock();
+	
+	private static volatile boolean runnable_mapping_flag = false;
 	
 	private static final List<IGuiHandle> gui_handle = Lists.newArrayList();
 	
 	private static final Set<Object> hook_input = Sets.newHashSet();
 	
-	private static boolean hookInputState = false;
+	private static volatile boolean hookInputState = false;
 	
 	private static final Set<String> texture_set = Sets.newHashSet();
 	
 	private static final List<KeyBindingHandle> key_handle = Lists.newArrayList();
+	
+	public static Map<Side, List<IContinuedRunnable>> makeSyncRunnableMapping() {
+		return Arrays.stream(Side.values()).collect(() -> Maps.newEnumMap(Side.class),
+				(m, s) -> m.put(s, Collections.synchronizedList(Lists.newLinkedList())), Map::putAll);
+	}
 	
 	public static void registerPlayerTickable(IPlayerTickable tickable) {
 		AlchemyModLoader.checkState();
@@ -215,7 +236,9 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	public static void addDelayedRunnable(Side side, IPhaseRunnable runnable, int tick) {
 		addContinuedRunnable(side, new IContinuedRunnable() {
+			
 			int c_tick = tick;
+			
 			@Override
 			public boolean run(Phase phase) {
 				if (c_tick < 1 || phase == Phase.START && --c_tick < 1) {
@@ -224,6 +247,28 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 				}
 				return false;
 			}
+			
+		});
+	}
+	
+	public static void addCounterRunnable(IPhaseRunnable runnable, Counter counter, int total) {
+		addCounterRunnable(Always.getSide(), runnable, counter, total);
+	}
+	
+	public static void addCounterRunnable(Side side, IPhaseRunnable runnable, Counter counter, int total) {
+		addContinuedRunnable(side, new IContinuedRunnable() {
+			
+			int count = -1;
+			
+			@Override
+			public boolean run(Phase phase) {
+				if (counter.getAsBoolean() && ++count < total) {
+					runnable.run(phase);
+					return false;
+				}
+				return count >= total;
+			}
+			
 		});
 	}
 	
@@ -233,12 +278,15 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	public static void addContinuedRunnable(Side side, IIndexRunnable runnable, int tick) {
 		addContinuedRunnable(side, new IContinuedRunnable() {
+			
 			int c_tick = tick;
+			
 			@Override
 			public boolean run(Phase phase) {
 				runnable.run(tick - c_tick, phase);
 				return c_tick < 1 || phase == Phase.START && --c_tick < 1;
 			}
+			
 		});
 	}
 	
@@ -247,17 +295,40 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static void addContinuedRunnable(Side side, IContinuedRunnable runnable) {
-		runnable_mapping.get(side).add(runnable);
+		long stamp = runnable_mapping_lock.readLock();
+		(runnable_mapping_flag ? runnable_mapping_buffer : runnable_mapping).get(side).add(runnable);
+		runnable_mapping_lock.unlockRead(stamp);
 	}
 	
 	public static void onRunnableTick(Side side, Phase phase) {
+		updatePhase(side, phase);
 		List<IContinuedRunnable> list = runnable_mapping.get(side);
+		long stamp;
 		synchronized (list) {
+			stamp = runnable_mapping_lock.writeLock();
+			runnable_mapping_flag = true;
+			runnable_mapping_lock.unlockWrite(stamp);
+			List<IContinuedRunnable> buffer = runnable_mapping_buffer.get(side);
+			synchronized (buffer) {
+				list.addAll(buffer);
+				buffer.clear();
+			}
 			Iterator<IContinuedRunnable> iterator = list.iterator();
 			while (iterator.hasNext())
 				if (iterator.next().run(phase))
 					iterator.remove();
+			stamp = runnable_mapping_lock.writeLock();
+			runnable_mapping_flag = false;
+			runnable_mapping_lock.unlockWrite(stamp);
 		}
+	}
+	
+	public static void updatePhase(Side side, Phase phase) {
+		phase_mapping.put(side, phase);
+	}
+	
+	public static Phase getPhase() {
+		return phase_mapping.get(Always.getSide());
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -279,7 +350,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
-				removeInputHook(AlchemyItemLoader.ring_time);
+				//removeInputHook(AlchemyItemLoader.ring_time);
 				//System.out.println(Minecraft.getMinecraft().thePlayer.getEntityData());
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);

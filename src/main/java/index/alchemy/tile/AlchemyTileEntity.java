@@ -1,5 +1,7 @@
 package index.alchemy.tile;
 
+import java.util.Random;
+
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.AABBHelper;
 import index.project.version.annotation.Omega;
@@ -14,6 +16,8 @@ import net.minecraft.world.World;
 
 @Omega
 public class AlchemyTileEntity extends TileEntity {
+	
+	public static final Random random = new Random(); 
 	
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {

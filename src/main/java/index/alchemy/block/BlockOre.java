@@ -74,7 +74,7 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 
 	@Override
 	public int getExpDrop(IBlockState state, IBlockAccess world, BlockPos pos, int fortune) {
-		return max_xp == 0 ? 0 : min_xp + RANDOM.nextInt(max_xp + fortune);
+		return max_xp == 0 ? 0 : min_xp + random.nextInt(max_xp + fortune);
 	}
 	
 	@Override

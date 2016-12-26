@@ -9,7 +9,7 @@ public class PotionDeadOrAlive extends AlchemyPotion {
 	
 	@Override
 	public void performEffect(EntityLivingBase living, int level) {
-		float f = RANDOM.nextFloat() * living.getMaxHealth() * 2 - living.getMaxHealth();
+		float f = random.nextFloat() * living.getMaxHealth() * 2 - living.getMaxHealth();
 		if (f > 0)
 			living.heal(f);
 		else 

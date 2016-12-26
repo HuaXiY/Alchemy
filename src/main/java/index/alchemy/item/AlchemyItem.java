@@ -1,5 +1,7 @@
 package index.alchemy.item;
 
+import java.util.Random;
+
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyResourceLocation;
@@ -15,6 +17,8 @@ import net.minecraft.util.text.TextFormatting;
 
 @Omega
 public class AlchemyItem extends Item implements IResourceLocation, IRegister {
+	
+	protected static final Random random = new Random();
 	
 	public static abstract class AlchemyCreativeTabs extends CreativeTabs implements IRegister {
 		

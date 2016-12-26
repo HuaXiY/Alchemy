@@ -6,14 +6,13 @@ import index.alchemy.api.annotation.Message;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.inventory.InventoryBauble;
+import index.alchemy.util.Always;
 import index.alchemy.util.NBTHelper;
 import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -46,10 +45,7 @@ public class MessageNBTUpdate implements IMessage, IMessageHandler<MessageNBTUpd
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(final MessageNBTUpdate message, MessageContext ctx) {
 		AlchemyEventSystem.addDelayedRunnable(p -> {
-			World world = Minecraft.getMinecraft().theWorld;
-			if (world == null)
-				return;
-			Entity entity = world.getEntityByID(message.id);
+			Entity entity = Always.findEntityFormClientWorld(message.id);
 			if (entity != null)
 				switch (message.type) {
 					case ENTITY_BAUBLE_DATA:

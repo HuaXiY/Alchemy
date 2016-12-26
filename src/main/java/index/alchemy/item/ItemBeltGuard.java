@@ -3,6 +3,7 @@ package index.alchemy.item;
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.INetworkMessage;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import index.alchemy.item.ItemBeltGuard.MessageGuardCallback;
 import index.alchemy.network.AlchemyNetworkHandler;
@@ -14,14 +15,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -48,12 +49,11 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingAttack(LivingAttackEvent event) {
-		if (Always.isServer() && event.getSource().getSourceOfDamage() instanceof EntityArrow
-				&& isEquipmented(event.getEntityLiving()) && isCDOver(event.getEntityLiving())) {
+		if (Always.isServer() && isEquipmented(event.getEntityLiving()) && isCDOver(event.getEntityLiving())) {
 			event.setCanceled(true);
 			EntityLivingBase living = event.getEntityLiving();
 			living.getCombatTracker().lastDamageTime = living.ticksExisted;
-			if (living instanceof EntityPlayerMP)
+			if (!(living instanceof FakePlayer))
 				AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(-1), (EntityPlayerMP) living);
 		}
 	}
@@ -65,12 +65,12 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 					(EntityLivingBase) event.getSource().getEntity() : null;
 			if (isEquipmented(living) && !(living instanceof EntityPlayer && ((EntityPlayer) living).isCreative())) {
 				living.getCombatTracker().lastDamageTime = living.ticksExisted;
-				if (living instanceof EntityPlayerMP)
+				if (!(living instanceof FakePlayer))
 					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(-1), (EntityPlayerMP) living);
 			}
 			if (attacker != null && isEquipmented(attacker)) {
 				attacker.setLastAttacker(living);
-				if (attacker instanceof EntityPlayerMP)
+				if (!(living instanceof FakePlayer))
 					AlchemyNetworkHandler.network_wrapper.sendTo(new MessageGuardCallback(living.getEntityId()), (EntityPlayerMP) attacker);
 			}
 		}
@@ -78,11 +78,11 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public void onLivingHurt(LivingHurtEvent event) {
-		if (Always.isServer() && isEquipmented(event.getEntityLiving()) && event.getEntityLiving().getAbsorptionAmount() > 0F)
+		if (isEquipmented(event.getEntityLiving()) && event.getEntityLiving().getAbsorptionAmount() > 0F)
 			event.setAmount(event.getAmount() * (1 - DECREASE_COEFFICIENT * event.getEntityLiving().getAbsorptionAmount()));
 	}
 	
-	public static class MessageGuardCallback implements IMessage {
+	public static class MessageGuardCallback implements IMessage, IMessageHandler<MessageGuardCallback, IMessage> {
 		
 		public int lastAttackerId = -1;
 		
@@ -101,29 +101,29 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 		public void toBytes(ByteBuf buf) {
 			buf.writeInt(lastAttackerId);
 		}
+		
+		@Override
+		@SideOnly(Side.CLIENT)
+		public IMessage onMessage(MessageGuardCallback message, MessageContext ctx) {
+			AlchemyEventSystem.addDelayedRunnable(p -> {
+				EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+				if (message.lastAttackerId > -1) {
+					Entity attacker = Always.findEntityFormClientWorld(message.lastAttackerId);
+					if (attacker != null)
+						player.setLastAttacker(attacker);
+					else
+						player.setLastAttacker(player);
+				} else
+					player.getCombatTracker().lastDamageTime = player.ticksExisted;
+			}, 0);
+			return null;
+		}
+		
 	}
 	
 	@Override
 	public Class<MessageGuardCallback> getClientMessageClass() {
 		return MessageGuardCallback.class;
-	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IMessage onMessage(MessageGuardCallback message, MessageContext ctx) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		if (message.lastAttackerId > -1) {
-			World world = Minecraft.getMinecraft().theWorld;
-			if (world != null) {
-				Entity lastAttacker;
-				if ((lastAttacker = world.getEntityByID(message.lastAttackerId)) != null)
-					player.setLastAttacker(lastAttacker);
-				else
-					player.setLastAttacker(player);
-			}
-		} else
-			player.getCombatTracker().lastDamageTime = player.ticksExisted;
-		return null;
 	}
 	
 	@Override

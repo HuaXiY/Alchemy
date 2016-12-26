@@ -16,11 +16,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Omega
 public class AlchemyPotion extends Potion implements IRegister {
 	
-	protected static final Random RANDOM = new Random();
+	protected static final Random random = new Random();
 	
 	public static final ResourceLocation RESOURCE_LOCATION = new AlchemyResourceLocation("potion");
 	
-	public static final int NOT_FLASHING_TIME = 20 * 12;
+	public static final int NOT_FLASHING_TIME = 20 * 13 - 1;
 	
 	private static int current_id = -1;
 	

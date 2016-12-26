@@ -80,11 +80,11 @@ import static index.alchemy.core.AlchemyModLoader.*;
 
 /* 
  * -----------------------------------------------
- *	  __	__	  ___  _   _  ____  __  __  _  _ 
+ *    __    __    ___  _   _  ____  __  __  _  _ 
  *   /__\  (  )  / __)( )_( )( ___)(  \/  )( \/ )
- *  /(__)\  )(__( (__  ) _ (  )__)  )	 (  \  / 
+ *  /(__)\  )(__( (__  ) _ (  )__)  )    (  \  / 
  * (__)(__)(____)\___)(_) (_)(____)(_/\/\_) (__) 
- *											     
+ *                                                 
  * -----------------------------------------------
  */
 
@@ -94,7 +94,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
 		modid = MOD_ID,
 		name = MOD_NAME,
 		version = MOD_VERSION,
-		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.2.2185,);after:*;"
+		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.3.2185,);after:*;"
 )
 public final class AlchemyModLoader {
 	
@@ -139,7 +139,7 @@ public final class AlchemyModLoader {
 		private ASMClassLoader() {
 			super(ASMClassLoader.class.getClassLoader());
 		}
-
+		
 		public Class<?> define(String name, byte[] data) {
 			return defineClass(name, data, 0, data.length);
 		}
@@ -171,7 +171,7 @@ public final class AlchemyModLoader {
 			String handleDesc = Type.getMethodDescriptor(callback);
 
 			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
-			cw.visitSource("AlchemyModLoader.java:133", "invoke: " + instType + handleName + handleDesc);
+			cw.visitSource("AlchemyModLoader.java:159", "invoke: " + instType + handleName + handleDesc);
 			{
 				if (!isStatic)
 					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
@@ -214,8 +214,8 @@ public final class AlchemyModLoader {
 			cw.visitEnd();
 			
 			try {
-				Class<?> ret = define(name, cw.toByteArray());
 				info("Define", name);
+				Class<?> ret = define(name, cw.toByteArray());
 				if (isStatic)
 					result = (Function) ret.newInstance();
 				else
@@ -355,10 +355,10 @@ public final class AlchemyModLoader {
 	}
 	
 	static {
-		is_modding = AlchemyModLoader.class.getResource("/alchemy.info").getProtocol().equals("file");
+		is_modding = !AlchemyCorePlugin.isRuntimeDeobfuscationEnabled();
 		mod_path = AlchemyModLoader.class.getProtectionDomain().getCodeSource().getLocation().getPath()
-				.replace(AlchemyModLoader.class.getName().replace('.', '/') + ".class", "");
-		mc_dir = System.getProperty("user.dir").replace('\\', '/');
+				.replace(ASMHelper.getClassName(AlchemyModLoader.class) + ".class", "");
+		mc_dir = AlchemyCorePlugin.getMinecraftDir().getPath();
 		
 		enable_test = Boolean.getBoolean("index.alchemy.enable_test");
 		logger.info("Test mode state: " + enable_test);
@@ -430,6 +430,7 @@ public final class AlchemyModLoader {
 				continue;
 			}
 		}
+		
 		AlchemyDebug.end("bootstrap");
 		log_stack.clear();
 		
@@ -457,7 +458,7 @@ public final class AlchemyModLoader {
 				init(clazz);
 		}
 		ProgressManager.pop(bar);
-		logger.info("************************************   " + state_str + "  END	************************************");
+		logger.info("************************************   " + state_str + "  END    ************************************");
 	}
 	
 	public static void init(Class<?> clazz) {

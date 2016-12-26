@@ -70,14 +70,13 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 					((IBauble) item.getItem()).onWornTick(item, event.getEntityLiving());
 			}
 			if (Always.isServer()) {
-				if (event.getEntityLiving().ticksExisted % 10 == 0)
-					for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
-						ItemStack item = inventory.getStackInSlot(i);
-						if (item != null && item.getItem() instanceof IBauble &&
-								((IBauble) item.getItem()).willAutoSync(item, event.getEntityLiving()) &&
-								inventory.getCache().equals(i, item.getTagCompound()))
-							inventory.setChanged(i, true);
-					}
+				for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
+					ItemStack item = inventory.getStackInSlot(i);
+					if (item != null && item.getItem() instanceof IBauble &&
+							((IBauble) item.getItem()).willAutoSync(item, event.getEntityLiving()) &&
+							inventory.getCache().equals(i, item.getTagCompound()))
+						inventory.setChanged(i, true);
+				}
 				inventory.updateAll();
 			}
 		}
@@ -86,7 +85,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingDrops(LivingDropsEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
-		if (Always.isServer() && !(living instanceof EntityPlayer)) {
+		if (!(living instanceof EntityPlayer)) {
 			IInventory inventory = living.getCapability(AlchemyCapabilityLoader.bauble, null);
 			if (inventory == null)
 				return;
@@ -101,7 +100,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onPlayerDrops(PlayerDropsEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
-		if (Always.isServer() && !player.worldObj.getGameRules().getBoolean("keepInventory")) {
+		if (!player.worldObj.getGameRules().getBoolean("keepInventory")) {
 			IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 			if (inventory != null)
 				for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {

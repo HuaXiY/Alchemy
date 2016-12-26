@@ -18,6 +18,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -80,19 +81,19 @@ public class AlchemyNetworkHandler {
 		AlchemyInitHook.push_event(clazz);
 	}
 	
-	public static void registerMessage(INetworkMessage<IMessage> handle) {
+	public static void registerMessage(INetworkMessage handle) {
 		if (handle instanceof INetworkMessage.Client)
-			registerMessage((INetworkMessage.Client<IMessage>) handle);
+			registerMessage((INetworkMessage.Client) handle);
 		if (handle instanceof INetworkMessage.Server)
-			registerMessage((INetworkMessage.Server<IMessage>) handle);
+			registerMessage((INetworkMessage.Server) handle);
 	}
 	
-	public static void registerMessage(INetworkMessage.Client<IMessage> handle) {
-		network_wrapper.registerMessage(handle, handle.getClientMessageClass(), next(), Side.CLIENT);
+	public static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(INetworkMessage.Client<T> handle) {
+		network_wrapper.registerMessage(Tool.instance(handle.getClientMessageClass()), handle.getClientMessageClass(), next(), Side.CLIENT);
 	}
 	
-	public static void registerMessage(INetworkMessage.Server<IMessage> handle) {
-		network_wrapper.registerMessage(handle, handle.getServerMessageClass(), next(), Side.SERVER);
+	public static <T extends IMessage & IMessageHandler<T, IMessage>> void registerMessage(INetworkMessage.Server<T> handle) {
+		network_wrapper.registerMessage(Tool.instance(handle.getServerMessageClass()), handle.getServerMessageClass(), next(), Side.SERVER);
 	}
 	
 	@SideOnly(Side.CLIENT)

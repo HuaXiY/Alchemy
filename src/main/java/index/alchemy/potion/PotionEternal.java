@@ -1,6 +1,7 @@
 package index.alchemy.potion;
 
 import index.alchemy.api.IEventHandle;
+import index.alchemy.util.Always;
 import index.project.version.annotation.Omega;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -13,7 +14,7 @@ public class PotionEternal extends AlchemyPotion implements IEventHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingDeath(LivingDeathEvent event) {
-		if (event.getEntityLiving().isPotionActive(this)) {
+		if (Always.isServer() && event.getEntityLiving().isPotionActive(this)) {
 			event.setCanceled(true);
 			event.getEntityLiving().setHealth(MIN_HEALTH);
 		}

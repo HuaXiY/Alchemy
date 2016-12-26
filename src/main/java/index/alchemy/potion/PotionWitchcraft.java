@@ -7,6 +7,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.entity.AlchemyEntityManager;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.potion.PotionWitchcraft.MessageWitchcraftUpdate;
+import index.alchemy.util.Always;
 import index.project.version.annotation.Beta;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -17,7 +18,6 @@ import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
@@ -25,6 +25,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -91,7 +92,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 		}
 	}
 	
-	public static class MessageWitchcraftUpdate implements IMessage {
+	public static class MessageWitchcraftUpdate implements IMessage, IMessageHandler<MessageWitchcraftUpdate, IMessage> {
 		
 		public int id, render_id;
 		
@@ -100,7 +101,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 			this.render_id = render_id;
 		}
 		
-		public MessageWitchcraftUpdate() {}
+		public MessageWitchcraftUpdate() { }
 
 		@Override
 		public void fromBytes(ByteBuf buf) {
@@ -114,24 +115,23 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 			buf.writeInt(render_id);
 		}
 		
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IMessage onMessage(MessageWitchcraftUpdate message, MessageContext ctx) {
-		World world = Minecraft.getMinecraft().theWorld;
-		if (world != null) {
-			Entity entity = world.getEntityByID(message.id);
-			if (entity != null) {
-				entity.getEntityData().setInteger(NBT_KEY_RENDER, message.render_id);
-				if (entity == Minecraft.getMinecraft().thePlayer)
-					if (message.render_id != 0)
-						AlchemyEventSystem.addInputHook(this);
-					else 
-						AlchemyEventSystem.removeInputHook(this);
-			}
+		@Override
+		@SideOnly(Side.CLIENT)
+		public IMessage onMessage(MessageWitchcraftUpdate message, MessageContext ctx) {
+			AlchemyEventSystem.addDelayedRunnable(p -> {
+				Entity entity = Always.findEntityFormClientWorld(message.id);
+				if (entity != null) {
+					entity.getEntityData().setInteger(NBT_KEY_RENDER, message.render_id);
+					if (entity == Minecraft.getMinecraft().thePlayer)
+						if (message.render_id != 0)
+							AlchemyEventSystem.addInputHook(this);
+						else 
+							AlchemyEventSystem.removeInputHook(this);
+				}
+			}, 0);
+			return null;
 		}
-		return null;
+		
 	}
 
 	@Override

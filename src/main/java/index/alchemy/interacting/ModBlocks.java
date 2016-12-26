@@ -29,6 +29,8 @@ public class ModBlocks {
 
 	}
 	
+	//  Biomes O' Plenty
+	
 	@Deprecated
 	@Source("biomesoplenty.api.block.BOPBlocks")
 	public static final Block
@@ -85,6 +87,20 @@ public class ModBlocks {
 			bop$flower_icy_iris = null,
 			bop$flower_rose = null;
 	
+	//  Botania
+	
+	@Source("vazkii.botania.common.block.ModBlocks")
+	public static final Block
+			botania$livingwood = null;
+	
+	@BlockTransform("botania$livingwood")
+	public static final IBlockState
+			botania$livingwood_log = null,
+			botania$livingwood_plank = null,
+			botania$livingwood_plank_mossy = null,
+			botania$livingwood_plank_framed = null,
+			botania$livingwood_plank_framed_pattern = null,
+			botania$livingwood_plank_glimmering = null;
 	
 	public static void init() throws Exception {
 		AlchemyModLoader.checkInvokePermissions();

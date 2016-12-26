@@ -71,6 +71,8 @@ public class HUDManager {
 		enableAlpha();
 		int i = -1;
 		for (ICoolDown cd : cool_downs) {
+			if (cd.isCDOver())
+				continue;
 			float cd_per = Math.min((float) cd.getResidualCD() / cd.getMaxCD(), 1);
 			if (cd_per <= 0)
 				continue;

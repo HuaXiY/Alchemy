@@ -42,8 +42,8 @@ public class ModItems {
 			bop$gem_ruby = null,								//  红宝石 ---- 生命
 			bop$gem_peridot = null,								//  橄榄石 ---- 坚韧
 			bop$gem_topaz = null,								//  黄玉 ---- 守护
-			bop$gem_tanzanite = null,							//  坦桑石 ---- 同化
-			bop$gem_malachite = null,							//  孔雀石 ---- 祝福
+			bop$gem_tanzanite = null,							//  坦桑石 ---- 祝福
+			bop$gem_malachite = null,							//  孔雀石 ---- 生灵
 			bop$gem_sapphire = null,							//  蓝宝石  ---- 净化
 			bop$gem_amber = null;								//  琥珀  ---- 时间
 	
@@ -96,6 +96,20 @@ public class ModItems {
 	@Source("vazkii.botania.common.item.ModItems")
 	public static final Item
 			botania$waterRod = null;
+	
+	@Deprecated
+	@Source("vazkii.botania.common.block.ModBlocks")
+	public static final Item
+			botania$livingwood = null;
+	
+	@ItemTransform("botania$livingwood")
+	public static final ItemStack
+			botania$livingwood_log = null,
+			botania$livingwood_plank = null,
+			botania$livingwood_plank_mossy = null,
+			botania$livingwood_plank_framed = null,
+			botania$livingwood_plank_framed_pattern = null,
+			botania$livingwood_plank_glimmering = null;
 	
 	public static void init() throws Exception {
 		AlchemyModLoader.checkInvokePermissions();

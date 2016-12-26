@@ -1,9 +1,12 @@
 package index.alchemy.item;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nullable;
+
+import org.lwjgl.input.Keyboard;
+
+import com.google.common.collect.Lists;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
@@ -11,10 +14,13 @@ import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.IBaubleEquipment;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.capability.AlchemyCapabilityLoader;
+import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.inventory.InventoryBauble;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import index.project.version.annotation.Omega;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -27,13 +33,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Omega
 public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBauble, IBaubleEquipment, IAlchemyRecipe {
 	
 	protected int alchemyTime = 20 * 30, alchemyColor = -1;
 	protected Fluid alchemyFluid = FluidRegistry.WATER;
-	protected final List<IMaterialConsumer> alchemyMaterials = new LinkedList<>();
+	protected final List<IMaterialConsumer> alchemyMaterials = Lists.newArrayList();
 	
 	public void setAlchemyTime(int alchemyTime) {
 		this.alchemyTime = alchemyTime;
@@ -71,6 +79,25 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	
 	public static class AlchemyItemRing extends AlchemyItemBauble {
 		
+		public static final String KEY_RING_1 = "key.ring.1", KEY_RING_2 = "key.ring.2";
+		public static final AlchemyKeyBinding
+				key_binding_1 = new AlchemyKeyBinding(KEY_RING_1, Keyboard.KEY_C),
+				key_binding_2 = new AlchemyKeyBinding(KEY_RING_2, Keyboard.KEY_V);
+		
+		public boolean isOnly() {
+			return true;
+		}
+		
+		@SideOnly(Side.CLIENT)
+		public boolean shouldHandleInput(KeyBinding binding) {
+			IInventory inventory = Minecraft.getMinecraft().thePlayer.getCapability(AlchemyCapabilityLoader.bauble, null);
+			if (binding == key_binding_1)
+				return InventoryHelper.isItem(inventory.getStackInSlot(1), this);
+			if (binding == key_binding_2)
+				return InventoryHelper.isItem(inventory.getStackInSlot(2), this);
+			return true;
+		}
+		
 		@Override
 		public BaubleType getBaubleType(ItemStack itemstack) {
 			return BaubleType.RING;
@@ -100,10 +127,6 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		public AlchemyItemRing(String name, int color) {
 			super(name, "ring", color);
-		}
-		
-		public boolean isOnly() {
-			return true;
 		}
 		
 	}

@@ -59,4 +59,12 @@ public class AlchemyHooks {
 		wolf.tasks.addTask(3, new EntityAIEatMeat(wolf));
 	}
 	
+//	@Hook("net.minecraft.pathfinding.WalkNodeProcessor#getPathNodeTypeRaw")
+//	public static final Hook.Result getPathNodeTypeRaw(WalkNodeProcessor processor, IBlockAccess access, int x, int y, int z) {
+//		IBlockState state = access.getBlockState(new BlockPos(x, y, z));
+//		if (state.getMaterial() == Material.WOOD && state.getBlock() instanceof BlockFenceGate)
+//			return new Hook.Result(state.getValue(BlockFenceGate.OPEN) ? PathNodeType.DOOR_OPEN : PathNodeType.DOOR_WOOD_CLOSED);
+//		return Hook.Result.VOID;
+//	}
+	
 }

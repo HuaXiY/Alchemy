@@ -1,5 +1,7 @@
 package index.alchemy.magic;
 
+import java.util.Random;
+
 import index.alchemy.api.IEntityLivingAction;
 import index.project.version.annotation.Alpha;
 import net.minecraft.nbt.NBTTagCompound;
@@ -7,6 +9,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 @Alpha
 public abstract class AlchemyMagic implements IEntityLivingAction, INBTSerializable<NBTTagCompound> {
+	
+	protected static final Random random = new Random();
 	
 	public static final String NBT_KEY_STRENGTH = "strength";
 	

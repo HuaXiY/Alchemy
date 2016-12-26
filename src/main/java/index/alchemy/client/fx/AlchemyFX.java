@@ -2,15 +2,21 @@ package index.alchemy.client.fx;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+
+import com.google.common.collect.Lists;
 
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.util.Always;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -19,15 +25,43 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public abstract class AlchemyFX extends Particle {
 	
+	protected static final Random random = new Random();
+	
 	protected int brightness = -1;
 	protected boolean transparent;
-	protected final List<IFXUpdate> update_list = new LinkedList<IFXUpdate>();
+	protected Entity posSource;
+	protected final List<IFXUpdate> update_list = Lists.newArrayList();
 	
 	protected AlchemyFX(World world, double vX, double vY, double vZ, double posX, double posY, double posZ) {
 		super(world, posX, posY, posZ);
 		motionX = vX;
 		motionY = vY;
 		motionZ = vZ;
+	}
+	
+	@Override
+	public void renderParticle(VertexBuffer worldRenderer, Entity entity, float partialTicks, float rotationX,
+			float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+		if (posSource != null) {
+			float 
+				posX = (float) (posSource.prevPosX + (posSource.posX - posSource.prevPosX) * partialTicks),
+				posY = (float) (posSource.prevPosY + (posSource.posY - posSource.prevPosY) * partialTicks),
+				posZ = (float) (posSource.prevPosZ + (posSource.posZ - posSource.prevPosZ) * partialTicks);
+			this.posX += posX;
+			this.posY += posY;
+			this.posZ += posZ;
+			this.prevPosX += posX;
+			this.prevPosY += posY;
+			this.prevPosZ += posZ;
+			super.renderParticle(worldRenderer, entity, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+			this.posX -= posX;
+			this.posY -= posY;
+			this.posZ -= posZ;
+			this.prevPosX -= posX;
+			this.prevPosY -= posY;
+			this.prevPosZ -= posZ;
+		} else
+			super.renderParticle(worldRenderer, entity, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
 	
 	public <T extends AlchemyFX> T addFXUpdate(IFXUpdate... updates) {
@@ -52,12 +86,24 @@ public abstract class AlchemyFX extends Particle {
 		return (T) this;
 	}
 	
+	public void setPosX(double posX) {
+		this.posX = posX;
+	}
+	
 	public double getPosX() {
 		return posX;
 	}
 	
+	public void setPosY(double posY) {
+		this.posY = posY;
+	}
+	
 	public double getPosY() {
 		return posY;
+	}
+	
+	public void setPosZ(double posZ) {
+		this.posZ = posZ;
 	}
 	
 	public double getPosZ() {
@@ -121,6 +167,21 @@ public abstract class AlchemyFX extends Particle {
 		resetPositionToBB();
 	}
 	
+	public double getDistanceSq(Vec3d vec3d) {
+		return getDistanceSq(vec3d.xCoord, vec3d.yCoord, vec3d.zCoord);
+	}
+	
+	public double getDistanceSq(double x, double y, double z) {
+		double d0 = posX - x;
+		double d1 = posY - y;
+		double d2 = posZ - z;
+		return d0 * d0 + d1 * d1 + d2 * d2;
+	}
+
+	public double getDistanceSq(BlockPos pos) {
+		return pos.distanceSq(posX, posY, posZ);
+	}
+	
 	public void setBrightness(int brightness) {
 		this.brightness = brightness;
 	}
@@ -136,6 +197,14 @@ public abstract class AlchemyFX extends Particle {
 	@Override
 	public boolean isTransparent() {
 		return transparent;
+	}
+	
+	public void setPosSource(Entity posSource) {
+		this.posSource = posSource;
+	}
+	
+	public Entity getPosSource() {
+		return posSource;
 	}
 	
 	@Override

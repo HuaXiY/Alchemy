@@ -49,6 +49,11 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	}
 	
 	@SubscribeEvent
+	public void onPlayer_Clone(PlayerEvent.Clone event) {
+		event.getOriginal().getCapability(SkinCore.skin_info, null).copy(event.getEntityPlayer());
+	}
+	
+	@SubscribeEvent
 	public void onPlayer_StartTracking(PlayerEvent.StartTracking event) {
 		SkinInfo info = event.getTarget().getCapability(SkinCore.skin_info, null);
 		if (info != null && info.skin_data != null && info.skin_type != null)

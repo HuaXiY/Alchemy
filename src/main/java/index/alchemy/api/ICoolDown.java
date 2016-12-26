@@ -24,5 +24,5 @@ public interface ICoolDown {
 	
 	@SideOnly(Side.CLIENT)
 	default void renderCD(int x, int y, int w, int h) { }
-
+	
 }

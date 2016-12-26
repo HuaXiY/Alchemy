@@ -16,7 +16,7 @@ import net.minecraft.util.ResourceLocation;
 @Omega
 public class AlchemyBlock extends Block implements IResourceLocation, IRegister {
 	
-	protected static final Random RANDOM = new Random();
+	protected static final Random random = new Random();
 	
 	protected ResourceLocation icon_name;
 	

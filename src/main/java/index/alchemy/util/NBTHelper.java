@@ -8,6 +8,13 @@ import net.minecraft.nbt.NBTTagList;
 @Omega
 public class NBTHelper {
 	
+	public static final NBTTagCompound getOrSetNBT(ItemStack item) {
+		NBTTagCompound nbt = item.getTagCompound();
+		if (nbt == null)
+			item.setTagCompound(nbt = new NBTTagCompound());
+		return nbt;
+	}
+	
 	public static final NBTTagCompound getNBTFormItemStack(ItemStack item) {
 		NBTTagCompound nbt = new NBTTagCompound();
 		if (item == null)

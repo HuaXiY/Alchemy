@@ -48,6 +48,7 @@ public class AlchemyDamageSource extends DamageSource implements IRegister {
 	public static Hook.Result onLivingHurt(EntityLivingBase entity, DamageSource src, float amount) {
 		if (src instanceof AlchemyDamageSource && ((AlchemyDamageSource) src).isPureDamage()) {
 			PureDamageEvent event = new PureDamageEvent(entity, PureDamageEvent.Type.ATTACK, amount);
+			MinecraftForge.EVENT_BUS.post(event);
 			return MinecraftForge.EVENT_BUS.post(event) ? Hook.Result.ZERO : new Hook.Result(event.getAmount());
 		}
 		return Hook.Result.VOID;

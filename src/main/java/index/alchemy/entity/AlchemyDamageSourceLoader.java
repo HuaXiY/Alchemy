@@ -12,6 +12,7 @@ public class AlchemyDamageSourceLoader {
 	public static final DamageSource
 			soul_withred = new AlchemyDamageSource("soul_withred").setPureDamage().setMagicDamage().setDamageBypassesArmor(),
 			dead_magic = new AlchemyDamageSource("dead_magic").setMagicDamage().setDamageBypassesArmor(),
-			plague = new AlchemyDamageSource("plague").setMagicDamage().setDamageBypassesArmor();
+			plague = new AlchemyDamageSource("plague").setPureDamage().setMagicDamage().setDamageBypassesArmor(),
+			alive_power = new AlchemyDamageSource("alive_power").setPureDamage().setMagicDamage().setDamageBypassesArmor();
 	
 }

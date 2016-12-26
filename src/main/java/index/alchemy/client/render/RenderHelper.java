@@ -5,6 +5,8 @@ import index.project.version.annotation.Omega;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
@@ -24,7 +26,7 @@ import static net.minecraft.util.math.MathHelper.*;
 
 @Omega
 @SideOnly(Side.CLIENT)
-public class RenderHelper {
+public class RenderHelper extends GlStateManager {
 	
 	public static BlockFluidRender fluidRender = new BlockFluidRender(Minecraft.getMinecraft().getBlockColors());
 	
@@ -95,6 +97,10 @@ public class RenderHelper {
 		for (int arg : args)
 			glDisable(arg);
 	}
+	
+	public static class Lighting extends net.minecraft.client.renderer.RenderHelper { }
+	
+	public static class OpenGL extends OpenGlHelper { }
 	
 	public static class Draw2D {
 		

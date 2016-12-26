@@ -121,7 +121,7 @@ public class DLang {
 	
 	public static void init(Object obj) {
 		for (Class<?> supers : _funcMap.keySet())
-			if (Tool.isInstance(supers, obj.getClass()))
+			if (supers.isInstance(obj))
 				try {
 					_funcMap.get(supers).invoke(null, obj);
 				} catch (Exception e) {
