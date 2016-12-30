@@ -96,7 +96,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 	
 	public void updateAccessField(String clazzName, FieldNode field, String desc) {
 		try {
-			FinalFieldSetter.getInstance().setStatic(Tool.forName(owner, true).getDeclaredField(field.name),
+			FinalFieldSetter.instance().setStatic(Tool.forName(owner, true).getDeclaredField(field.name),
 					createAccess(clazzName, field, desc, false));
 		} catch (Exception e) {
 			AlchemyRuntimeException.onException(e);

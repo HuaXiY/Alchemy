@@ -15,7 +15,7 @@ public class AlchemyConstants {
 		DEV_VERSION = "@DEV_VERSION@",
 		AUTHORLIST[] = { "Mickeyxiami" },
 		MOD_PACKAGE = "index.alchemy.",
-		MOD_TRANSFORMER_PACKAGE = "index.alchemy.core.",
+		MOD_TRANSFORMER_PACKAGE = "index.alchemy.core.asm.",
 		MC_VERSION = "1.10.2",
 		E_MAIL = "931920447@qq.com",
 		BOP_ID = "BiomesOPlenty",

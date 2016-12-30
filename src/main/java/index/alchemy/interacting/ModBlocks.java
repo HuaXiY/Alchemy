@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
+import javax.annotation.Nullable;
+
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Source;
 import index.alchemy.core.AlchemyModLoader;
@@ -89,10 +91,12 @@ public class ModBlocks {
 	
 	//  Botania
 	
+	@Nullable
 	@Source("vazkii.botania.common.block.ModBlocks")
 	public static final Block
 			botania$livingwood = null;
 	
+	@Nullable
 	@BlockTransform("botania$livingwood")
 	public static final IBlockState
 			botania$livingwood_log = null,
@@ -112,7 +116,7 @@ public class ModBlocks {
 				Class<?> clazz = Tool.forName(source.value(), true);
 				if (clazz != null) {
 					Object obj = clazz.getField(field.getName().replaceAll(".*\\$", "")).get(null);
-					FinalFieldSetter.getInstance().setStatic(field, obj);
+					FinalFieldSetter.instance().setStatic(field, obj);
 				}
 			}
 		}
@@ -127,7 +131,8 @@ public class ModBlocks {
 					block = (Block) ModBlocks.class.getField(last).get(null);
 					index = 0;
 				}
-				FinalFieldSetter.getInstance().setStatic(field, block.getStateFromMeta(index++));
+				if (block != null)
+					FinalFieldSetter.instance().setStatic(field, block.getStateFromMeta(index++));
 			}
 		}
 		

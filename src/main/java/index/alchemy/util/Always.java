@@ -39,6 +39,8 @@ import static java.lang.Math.*;
 @Omega
 public class Always {
 	
+	public static int maxHeight = 256;
+	
 	private static boolean isClient = Tool.forName("net.minecraft.client.Minecraft", false) != null;
 	
 	public static final Map<Thread, Side> SIDE_MAPPING = new HashMap<Thread, Side>();

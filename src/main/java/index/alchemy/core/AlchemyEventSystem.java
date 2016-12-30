@@ -46,6 +46,7 @@ import index.alchemy.util.Counter;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
@@ -76,6 +77,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Omega
 @Loading
+@Listener
 @ThreadSafe
 @Hook.Provider
 @Init(state = ModState.CONSTRUCTED)
@@ -86,7 +88,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	private static AlchemyEventSystem instance;
 	
 	@Nullable
-	public static AlchemyEventSystem getInstance() {
+	public static AlchemyEventSystem instance() {
 		return instance;
 	}
 	
@@ -181,8 +183,8 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
-	public void onPlayerTick(PlayerTickEvent event) {
-		String flag = "66";
+	public static void onPlayerTick(PlayerTickEvent event) {
+		String flag = "85";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -204,10 +206,21 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 				}*/
 				//System.out.println(Tool.get(Names.Name.class, 1, Tool.get(Names.class, 3)));
 			}
-			System.setProperty("index.alchemy.runtime.debug.player", flag);
+			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
-//			EntityPlayer player = event.player;
+			EntityPlayer player = event.player;
+//			WorldServer world = DimensionManager.getWorld(1);
+//			System.out.println(world);
+//			if (world != null)
+//				world.getDefaultTeleporter().placeInExistingPortal(player, player.rotationYaw);
+//			player.changeDimension(1);
+//			Entity entity = Tool.$("Lcom.brandon3055.draconicevolution.entity.EntityChaosGuardian", "new", player.worldObj);
+//			entity.posX = player.posX;
+//			entity.posY = player.posY - 8;
+//			entity.posZ = player.posZ;
+//			player.worldObj.spawnEntityInWorld(entity);
+			
 //			List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>();
 //			int update[] = FXUpdateHelper.getIntArrayByArgs(TileEntityCauldron.FX_KEY_GATHER, 360, 300);
 //			for (int i = 0; i < 1; i++)
@@ -224,7 +237,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			//event.player.changeDimension(0);
 			//System.out.println(DimensionManager.getWorld(1).getDefaultTeleporter().placeInExistingPortal(event.player, event.player.rotationYaw));
 			//new MagicTeleportDirectional(1).apply(null, event.player, 1);
-			//System.setProperty("index.alchemy.runtime.debug.player", flag);
+			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		for (IPlayerTickable tickable : event.side.isServer() ? server_tickable : client_tickable)
 			tickable.onTick(event.player, event.phase);
@@ -332,11 +345,13 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
-	public void onServerTick(ServerTickEvent event) {
+	public static void onServerTick(ServerTickEvent event) {
 		String flag = "6";
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
+				
+				//System.out.println(Biome.getIdForBiome(AlchemyBiomeLoader.dragon_island));
 			}
 			System.setProperty("index.alchemy.runtime.debug.server", flag);
 		}
@@ -345,11 +360,12 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
-	public void onClientTick(ClientTickEvent event) {
-		String flag = "16";
+	public static void onClientTick(ClientTickEvent event) {
+		String flag = "20";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
+				Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
 				//removeInputHook(AlchemyItemLoader.ring_time);
 				//System.out.println(Minecraft.getMinecraft().thePlayer.getEntityData());
 			}
@@ -359,7 +375,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	@SubscribeEvent
-	public void onInitHook(InitHookEvent event) {
+	public static void onInitHook(InitHookEvent event) {
 		AlchemyModLoader.info(event.init.getClass(), event.init);
 		if (AlchemyModLoader.enable_dmain)
 			DMain.init(event.init);
@@ -441,7 +457,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onKeyInput(KeyInputEvent event) {
+	public static void onKeyInput(KeyInputEvent event) {
 		if (hookInputState)
 			KeyBinding.unPressAllKeys();
 		else 
@@ -452,7 +468,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onMouseInput(MouseEvent event) {
+	public static void onMouseInput(MouseEvent event) {
 		if (hookInputState)
 			event.setCanceled(true);
 	}
@@ -493,14 +509,14 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void renderBar(RenderGameOverlayEvent.Pre event) {
+	public static void renderBar(RenderGameOverlayEvent.Pre event) {
 		if (event.getType() == ElementType.ALL)
 			HUDManager.render();
 	}
 	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void onTextureStitch_Pre(TextureStitchEvent.Pre event) {
+	public static void onTextureStitch_Pre(TextureStitchEvent.Pre event) {
 		for (String res : texture_set)
 			event.getMap().registerSprite(new ResourceLocation(res));
 	}
@@ -559,8 +575,9 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		}
 	}
 	
-	private AlchemyEventSystem() {
-		MinecraftForge.EVENT_BUS.register(this);
+	public AlchemyEventSystem() {
+		AlchemyModLoader.checkInvokePermissions();
+		AlchemyModLoader.checkState();
 		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyConstants.MOD_ID, this);
 	}
 

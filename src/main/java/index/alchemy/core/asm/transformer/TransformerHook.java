@@ -26,7 +26,6 @@ import org.objectweb.asm.tree.VarInsnNode;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
-import index.alchemy.core.AlchemyHooks;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
@@ -53,7 +52,7 @@ public final class TransformerHook implements IClassTransformer {
 		for (MethodNode method : node.methods)
 			if (method.name.equals(srgName) && checkMethodNode(method)) {
 				AlchemyTransformerManager.transform("<hook>" + name + "|" + transformedName + "#" + srgName + method.desc + "\n->  " +
-						AlchemyHooks.class.getName() + "#" + hookMethod.name + hookMethod.desc);
+						ASMHelper.getClassName(hookSrc) + "#" + hookMethod.name + hookMethod.desc);
 				Type args[] = Type.getArgumentTypes(method.desc), returnType = Type.getReturnType(method.desc);
 				int returnOpcode = ASMHelper.getReturnOpcode(returnType);
 				insn_node: for (Iterator<AbstractInsnNode> iterator = method.instructions.iterator(); iterator.hasNext();) {

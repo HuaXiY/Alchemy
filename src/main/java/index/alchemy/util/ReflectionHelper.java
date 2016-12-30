@@ -3,8 +3,9 @@ package index.alchemy.util;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 import index.project.version.annotation.Beta;
 
@@ -32,7 +33,7 @@ public class ReflectionHelper {
 	public static final void resetReflection() {
 		for(Field f : (Field[]) invoke(getMethod(Class.class, "getDeclaredFields0", boolean.class), sun.reflect.Reflection.class, false))
 			if (f.getType() == Map.class)
-				set(setAccessible(f), sun.reflect.Reflection.class, new HashMap<>());
+				set(setAccessible(f), sun.reflect.Reflection.class, Maps.newHashMap());
 	}
 	
 	public static final boolean canSetAccessible() {

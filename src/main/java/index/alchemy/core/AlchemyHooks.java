@@ -1,9 +1,17 @@
 package index.alchemy.core;
 
+import java.util.Arrays;
+
+import javax.annotation.Nullable;
+
 import baubles.client.BaublesRenderLayer;
+import biomesoplenty.api.biome.BOPBiomes;
 import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.entity.ai.EntityAIEatMeat;
+import index.alchemy.util.Tool;
+import index.alchemy.world.biome.AlchemyBiomeLoader;
+import index.project.version.annotation.Gamma;
 import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -14,6 +22,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -66,5 +76,41 @@ public class AlchemyHooks {
 //			return new Hook.Result(state.getValue(BlockFenceGate.OPEN) ? PathNodeType.DOOR_OPEN : PathNodeType.DOOR_WOOD_CLOSED);
 //		return Hook.Result.VOID;
 //	}
+	
+	// Biome-Debug, will remove
+	
+	@Gamma
+	public static Biome getBiome(int x, int y) {
+		return Tool.isNullOr(Biome.getBiome(x % 20 + y / 20), BOPBiomes.flower_island.get());
+	}
+	
+	@Gamma
+	public static Biome getBiome() {
+		return AlchemyBiomeLoader.dragon_island;
+	}
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
+	public static final Hook.Result getBiomes(BiomeProvider provider, @Nullable Biome[] oldBiomeList,
+			int x, int z, int width, int depth, boolean cacheFlag) {
+		Biome result[] = new Biome[width * depth];
+		Arrays.fill(result, getBiome());
+		return new Hook.Result(result);
+	}
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
+	public static final Hook.Result getBiome(BiomeProvider provider, BlockPos pos, Biome defaultBiome) {
+		return new Hook.Result(getBiome());
+	}
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomesForGeneration")
+	public static final Hook.Result getBiomesForGeneration(BiomeProvider provider, Biome[] biomes,
+			int x, int z, int width, int height) {
+		Biome result[] = new Biome[width * height];
+		Arrays.fill(result, getBiome());
+		return new Hook.Result(result);
+	}
 	
 }

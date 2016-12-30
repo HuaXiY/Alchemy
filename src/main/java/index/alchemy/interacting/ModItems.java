@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
+import javax.annotation.Nullable;
+
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Source;
 import index.alchemy.core.AlchemyModLoader;
@@ -93,15 +95,18 @@ public class ModItems {
 	
 	//  Botania
 	
+	@Nullable
 	@Source("vazkii.botania.common.item.ModItems")
 	public static final Item
 			botania$waterRod = null;
 	
+	@Nullable
 	@Deprecated
 	@Source("vazkii.botania.common.block.ModBlocks")
 	public static final Item
 			botania$livingwood = null;
 	
+	@Nullable
 	@ItemTransform("botania$livingwood")
 	public static final ItemStack
 			botania$livingwood_log = null,
@@ -121,7 +126,7 @@ public class ModItems {
 				Class<?> clazz = Tool.forName(source.value(), true);
 				if (clazz != null) {
 					Object obj = clazz.getField(field.getName().replaceAll(".*\\$", "")).get(null);
-					FinalFieldSetter.getInstance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
+					FinalFieldSetter.instance().setStatic(field, obj instanceof Block ? Item.getItemFromBlock((Block) obj) : obj);
 				}
 			}
 		}
@@ -136,7 +141,8 @@ public class ModItems {
 					item = (Item) ModItems.class.getField(last).get(null);
 					index = 0;
 				}
-				FinalFieldSetter.getInstance().setStatic(field, new ItemStack(item, 1, index++));
+				if (item != null)
+					FinalFieldSetter.instance().setStatic(field, new ItemStack(item, 1, index++));
 			}
 		}
 		

@@ -13,6 +13,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -181,7 +182,7 @@ public class Tool {
 	public static final void coverString(String src, String to) {
 		try {
 			Field value = setAccessible(String.class.getDeclaredField("value"));
-			FinalFieldSetter.getInstance().set(src, value, value.get(to));
+			FinalFieldSetter.instance().set(src, value, value.get(to));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -324,7 +325,7 @@ public class Tool {
 		load(clazz);
 		try {
 			Field field = clazz.getDeclaredField("type");
-			FinalFieldSetter.getInstance().setStatic(field, obj);
+			FinalFieldSetter.instance().setStatic(field, obj);
 		} catch (Exception e) { }
 	}
 	
@@ -707,6 +708,19 @@ public class Tool {
 				}
 			} catch (NoSuchFieldException e) { }
 			args = ArrayUtils.subarray(args, 2, args.length);
+			if (name.equals("new")) {
+				method_forEach:
+				for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
+					Class<?> now_args[] = constructor.getParameterTypes();
+					if (now_args.length == args.length) {
+						for (int i = 0; i < args.length; i++)
+							if (!isInstance(now_args[i], args[i].getClass()))
+								continue method_forEach;
+						setAccessible(constructor);
+						return (T) constructor.newInstance(args);
+					}
+				}
+			}
 			do {
 				Method method = searchMethod(clazz, name, args);
 				if (method != null)
