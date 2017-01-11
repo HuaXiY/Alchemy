@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	
 	public static final int RECOVERY_INTERVAL = 20 * 8;
-	public static final float BALANCE_COEFFICIENT = 0.4F, TRIGGER_PROBABILITY = 0.5F, MIN_HEALTH = 2F;
+	public static final float BALANCE_COEFFICIENT = 0.6F, TRIGGER_PROBABILITY = 1 / 3F, MIN_HEALTH = 4F;
 	
 	public static final AttributeModifier KNOCKBACK_RESISTANCE =  
 			new AttributeModifier(UUID.fromString("1434a694-1beb-4825-854b-72303432eed3"), "belt_tough_bonus", 1D, 0);
@@ -58,7 +58,7 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 		EntityLivingBase living = event.getEntityLiving();
 		if (Always.isServer() && isEquipmented(living) && living.rand.nextFloat() > TRIGGER_PROBABILITY) {
 			event.setCanceled(true);
-			living.heal(MIN_HEALTH);
+			living.setHealth(MIN_HEALTH);
 		}
 	}
 

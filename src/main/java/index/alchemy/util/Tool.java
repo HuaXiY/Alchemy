@@ -414,6 +414,11 @@ public class Tool {
 		if (Array.getLength(array) < length)
 			AlchemyRuntimeException.onException(new ArrayIndexOutOfBoundsException(length));
 	}
+	
+	public static final boolean checkDir(String path) {
+		File file = new File(path);
+		return file.isDirectory() || file.mkdirs();
+	}
 
 	@Nullable
 	public static final PrintWriter getPrintWriter(String path) {
@@ -677,7 +682,7 @@ public class Tool {
 		return result;
 	}
 	
-	public static final Void VOID = instance(Void.class);
+	public static final Void VOID = null;//instance(Void.class);
 	
 	@Nullable
 	@Unsafe(Unsafe.REFLECT_API)

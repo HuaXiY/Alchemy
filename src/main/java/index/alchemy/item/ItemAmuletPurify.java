@@ -37,7 +37,7 @@ import static java.lang.Math.*;
 @Omega
 public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IEventHandle, INetworkMessage.Client<MessagePurifyCallback> {
 	
-	public static final int INTERVAL = 20 * 20, MAX_AIR = 300;
+	public static final int INTERVAL = 20 * 16, MAX_AIR = 300;
 	public static final String NBT_KEY_CD = "amulet_purify";
 	
 	public static final ItemAmuletPurify type = null;

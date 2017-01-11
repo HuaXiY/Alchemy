@@ -32,8 +32,8 @@ import static java.lang.Math.*;
 @Omega
 public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INetworkMessage.Client<MessageGuardCallback>, ICoolDown {
 	
-	public static final int RECOVERY_INTERVAL = 20 * 6, RECOVERY_CD = 20 * 12, MAX_ABSORPTION = 20;
-	public static final float DECREASE_COEFFICIENT = 0.01F;
+	public static final int RECOVERY_INTERVAL = 20 * 4, RECOVERY_CD = 20 * 8, MAX_ABSORPTION = 20;
+	public static final float DECREASE_COEFFICIENT = 0.02F;
 	
 	public boolean isCDOver(EntityLivingBase living) {
 		return living.ticksExisted - living.getLastAttackerTime() > RECOVERY_CD

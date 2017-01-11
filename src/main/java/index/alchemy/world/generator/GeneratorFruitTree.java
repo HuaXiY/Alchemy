@@ -22,11 +22,17 @@ public class GeneratorFruitTree extends GeneratorTreeBase {
 	public static class Builder extends GeneratorTreeBase.InnerBuilder<Builder, GeneratorFruitTree>
 			implements IGeneratorBuilder<GeneratorFruitTree> {
 		
+		protected int minAge, maxAge;
 		protected BiFunction<IBlockState, Integer, IBlockState> fruitAgeHandler;
 		
+		public Builder minAge(int a) { minAge = a; return self(); }
+		public Builder maxAge(int a) { maxAge = a; return self(); }
 		public Builder fruitAgeHandler(BiFunction<IBlockState, Integer, IBlockState> a) { fruitAgeHandler = a; return self(); }
 		
 		public Builder() {
+			minAge = 0;
+			maxAge = 0;
+			fruitAgeHandler = (state, age) -> state;
 			amountPerChunk = 1.0F;
 			minHeight = 2;
 			maxHeight = 6;
@@ -43,16 +49,19 @@ public class GeneratorFruitTree extends GeneratorTreeBase {
 		@Override
 		public GeneratorFruitTree create() {
 			return new GeneratorFruitTree(amountPerChunk, placeOn, replace, log, leaves, vine, hanging,
-					trunkFruit, altLeaves, minHeight, maxHeight, fruitAgeHandler);
+					trunkFruit, altLeaves, minHeight, maxHeight, minAge, maxAge, fruitAgeHandler);
 		}
 	}
 	
+	protected int minAge, maxAge;
 	protected BiFunction<IBlockState, Integer, IBlockState> fruitAgeHandler;
 	
 	public GeneratorFruitTree(float amountPerChunk, IBlockPosQuery placeOn, IBlockPosQuery replace, IBlockState log, IBlockState leaves,
 			IBlockState vine, IBlockState hanging, IBlockState trunkFruit, IBlockState altLeaves, int minHeight, int maxHeight,
-			BiFunction<IBlockState, Integer, IBlockState> fruitAgeHandler) {
+			int minAge, int maxAge, BiFunction<IBlockState, Integer, IBlockState> fruitAgeHandler) {
 		super(amountPerChunk, placeOn, replace, log, leaves, vine, hanging, trunkFruit, altLeaves, minHeight, maxHeight);
+		this.minAge = minAge;
+		this.maxAge = maxAge;
 		this.fruitAgeHandler = fruitAgeHandler;
 	}
 
@@ -91,7 +100,7 @@ public class GeneratorFruitTree extends GeneratorTreeBase {
 						for (EnumFacing facing : EnumFacing.Plane.HORIZONTAL)
 							if (random.nextInt(4 - i) == 0) {
 								EnumFacing opposite = facing.getOpposite();
-								generateTrunkFruit(world, random.nextInt(3), pos.add(opposite.getFrontOffsetX(),
+								generateTrunkFruit(world, minAge + random.nextInt(maxAge - minAge), pos.add(opposite.getFrontOffsetX(),
 										0, opposite.getFrontOffsetZ()), opposite);
 							}
 		}

@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
@@ -26,10 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
-import biomesoplenty.api.item.BOPItems;
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Config.Handle.Type;
 import index.alchemy.core.AlchemyUpdateManager.JenkinsCI.Result;
@@ -135,15 +133,12 @@ public class AlchemyUpdateManager {
 		@Nullable
 		public static VersionInfo formBuild(Build build, @Nullable String dlcName, String versionType, String jarType) {
 			VersionInfo info = null;
-			for (Artifact artifact : build.artifacts) {
+			for (Artifact artifact : build.artifacts)
 				try {
 					info = new VersionInfo(artifact.relativePath, build.url);
 					if (info.dlcName.equals(dlcName) && info.versionType.equals(versionType) && info.jarType.equals(jarType))
 						return info;
-				} catch (Exception e) {
-					// Ignore
-				}
-			}
+				} catch (Exception e) { }
 			return null;
 		}
 		
@@ -171,13 +166,13 @@ public class AlchemyUpdateManager {
 				
 				public static final class ChangeSet {
 					
-					public static final class item {
+					public static final class Item {
 						
 						public String msg;
 						
 					}
 					
-					public item items[];
+					public Item items[];
 					
 				}
 				
@@ -194,7 +189,7 @@ public class AlchemyUpdateManager {
 		
 		public static final String HANDLE_JENKINS_CI = "JenkinsCI", SUCCESS = "SUCCESS", UNIVERSAL = "universal", SEPARATOT = "://";
 		
-		public static final Class TYPES[] = {String.class, String.class};
+		public static final Class TYPES[] = { String.class, String.class };
 		
 		public static final String tree_api = makeTreeApi(Result.class);
 		
@@ -241,29 +236,17 @@ public class AlchemyUpdateManager {
 		}
 		
 		private static String makeTreeApi(Class<?> clazz) {
-			List<String> list = Lists.newLinkedList();
-			for (Field field : clazz.getFields())
-				list.add(makeTreeApi(field));
-			return Joiner.on(',').join(list);
+			return Joiner.on(',').join(Arrays.stream(clazz.getFields()).map(JenkinsCI::makeTreeApi).toArray());
 		}
 		
 		private static String makeTreeApi(Field field) {
-			List<String> list = Lists.newLinkedList();
-			if (Tool.isBasics(field.getType()))
-				return field.getName();
-			else {
-				List<String> args = Lists.newLinkedList();
-				Class<?> clazz = field.getType();
-				for (Field f : clazz.isArray() ? clazz.getComponentType().getFields() : clazz.getFields())
-					args.add(makeTreeApi(f));
-				return merge(field.getName(), args);
-			}
+			return Tool.isBasics(field.getType()) ? field.getName() :
+				merge(field.getName(), Arrays.stream((field.getType().isArray() ? field.getType().getComponentType() :
+					field.getType()).getFields()).map(JenkinsCI::makeTreeApi).toArray());
 		}
 		
-		public static String merge(String root, List<String> args) {
-			StringBuilder builder = new StringBuilder(root).append('[');
-			Joiner.on(',').skipNulls().appendTo(builder, args);
-			return builder.append(']').toString();
+		public static String merge(String root, Object args[]) {
+			return root + '[' + Joiner.on(',').skipNulls().join(args) + ']';
 		}
 		
 		@Nullable
@@ -286,13 +269,10 @@ public class AlchemyUpdateManager {
 			URI uri = getVersionInfoURI(job);
 			if (uri != null) {
 				HttpGet httpGet = new HttpGet(uri);
-				CloseableHttpClient httpclient = HttpClients.createDefault();
-				CloseableHttpResponse response = httpclient.execute(httpGet);
-				try {
+				try(CloseableHttpClient httpClient = HttpClients.createDefault();
+					CloseableHttpResponse response = httpClient.execute(httpGet)) {
 					if (response.getStatusLine().getStatusCode() == 200)
 						return EntityUtils.toString(response.getEntity());
-				} finally {
-					IOUtils.closeQuietly(httpclient);
 				}
 			}
 			return null;
@@ -301,9 +281,7 @@ public class AlchemyUpdateManager {
 		@Nullable
 		public Result getVersionInfoResult(String job) throws Exception {
 			String json = getVersionInfoJson(job);
-			if (json != null)
-				return new Gson().fromJson(json, Result.class);
-			return null;
+			return json != null ? new Gson().fromJson(json, Result.class) : null;
 		}
 		
 	}
@@ -326,6 +304,7 @@ public class AlchemyUpdateManager {
 		return null;
 	}
 	
+	@Alpha
 	public static void invoke(String job, String now_version, @Nullable String dlcName, File file) {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
@@ -367,6 +346,7 @@ public class AlchemyUpdateManager {
 			update(info, file);
 	}
 	
+	@Alpha
 	@Nullable
 	public static File update(VersionInfo info, File file) {
 		AlchemyModLoader.checkInvokePermissions();
@@ -382,14 +362,11 @@ public class AlchemyUpdateManager {
 			return null;
 		}
 		
-		CloseableHttpClient httpclient = HttpClients.custom().setRedirectStrategy(new LaxRedirectStrategy()).build();
-		try {
-			 result = httpclient.execute(new HttpGet(uri), new FileDownloadResponseHandler(
+		try(CloseableHttpClient httpclient = HttpClients.custom().setRedirectStrategy(new LaxRedirectStrategy()).build()) {
+			result = httpclient.execute(new HttpGet(uri), new FileDownloadResponseHandler(
 					new File(file.getPath(), Tool.get(info.relativePath, ".*/(.*)"))));
 		} catch (IOException e) {
 			logger.warn("AlchemyUpdateManager.update() -> download failed", e);
-		} finally {
-			IOUtils.closeQuietly(httpclient);new BOPItems();
 		}
 		
 		if (info.isDLC) {
@@ -397,6 +374,7 @@ public class AlchemyUpdateManager {
 		} else {
 			file.deleteOnExit();
 			AlchemyModLoader.restart();
+			// TODO classloader inject
 		}
 		
 		return result;

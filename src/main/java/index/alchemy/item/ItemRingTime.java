@@ -57,7 +57,7 @@ import static java.lang.Math.*;
 @FX.UpdateProvider
 public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetworkMessage.Server<MessageTimeLeap>, ICoolDown {
 	
-	public static final int USE_CD = 20 * 20, REPAIR_INTERVAL = 20 * 10;
+	public static final int USE_CD = 20 * 18, REPAIR_INTERVAL = 20 * 10;
 	public static final String NBT_KEY_CD = "cd_ring_time", FX_KEY_GATHER = "ring_time_gather";
 	
 	public static final ItemStack mending_book = Always.getEnchantmentBook(Enchantments.MENDING);
@@ -67,7 +67,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@FX.UpdateMethod(FX_KEY_GATHER)
 	public static List<IFXUpdate> getFXUpdateGather(int[] args) {
 		List<IFXUpdate> result = Lists.newLinkedList();
-		int i = 1, 
+		int i = 1,
 			max_age = Tool.getSafe(args, i++, 120),
 			scale = Tool.getSafe(args, i++, 100);
 		result.add(new FXAgeUpdate(max_age));
@@ -119,7 +119,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 		if (shouldHandleInput(binding))
 			if (isCDOver()) {
 				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
-				Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+				restartCD();
 				timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
 			} else
 				HUDManager.setSnake(this);

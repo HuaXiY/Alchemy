@@ -23,7 +23,7 @@ import static java.lang.Math.*;
 public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetworkMessage.Server<MessageAlacrityCallback> {
 	
 	public static final int JUMP_AIR_CD = 20;
-	public static final double JUMP_V = 1.8, JUMP_V_Y = 1.2, JUMP_V_XZ = 4.2;
+	public static final double JUMP_V = 1.8, JUMP_V_Y = 1.2, JUMP_V_XZ = 4.5;
 	public static final String NBT_KEY_CD = "potion_alacrity";
 	
 	public static final PotionAlacrity type = null;

@@ -16,6 +16,7 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.util.ASMHelper;
 import index.project.version.annotation.Omega;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -29,6 +30,7 @@ public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		if (true) return basicClass;
 		String srgMethodName = "func_175068_a"/* renderWorldPass */, srgFieldName = "field_175078_W"/* debugView */,
 				clazzName = ASMHelper.getClassName(transformedName);
 		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {

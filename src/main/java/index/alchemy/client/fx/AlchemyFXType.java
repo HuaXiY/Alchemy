@@ -49,18 +49,20 @@ public class AlchemyFXType {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderWorldLast(RenderWorldLastEvent event) {
-    	Minecraft mc = Minecraft.getMinecraft();
-    	float partialTicks = event.getPartialTicks();
-    	GlStateManager.enableFog();
-    	mc.entityRenderer.enableLightmap();
-        mc.mcProfiler.endStartSection("litParticles");
-        mc.effectRenderer.renderLitParticles(mc.thePlayer, partialTicks);
-        RenderHelper.disableStandardItemLighting();
-        mc.entityRenderer.setupFog(0, partialTicks);
-        mc.mcProfiler.endStartSection("particles");
-        mc.effectRenderer.renderParticles(mc.thePlayer, partialTicks);
-        mc.entityRenderer.disableLightmap();
-        GlStateManager.disableFog();
+    	if (true) return;
+    	// optifine
+//    	Minecraft mc = Minecraft.getMinecraft();
+//    	float partialTicks = event.getPartialTicks();
+//    	GlStateManager.enableFog();
+//    	mc.entityRenderer.enableLightmap();
+//        mc.mcProfiler.endStartSection("litParticles");
+//        mc.effectRenderer.renderLitParticles(mc.thePlayer, partialTicks);
+//        RenderHelper.disableStandardItemLighting();
+//        mc.entityRenderer.setupFog(0, partialTicks);
+//        mc.mcProfiler.endStartSection("particles");
+//        mc.effectRenderer.renderParticles(mc.thePlayer, partialTicks);
+//        mc.entityRenderer.disableLightmap();
+//        GlStateManager.disableFog();
     }
 	
 	@Nullable

@@ -1,6 +1,7 @@
 package index.alchemy.core;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -86,13 +87,18 @@ public class AlchemyHooks {
 	
 	@Gamma
 	public static Biome getBiome() {
-		return AlchemyBiomeLoader.dragon_island;
+		return /*BOPBiomes.flower_island.get();*/AlchemyBiomeLoader.dragon_island;
 	}
+	
+	@Gamma
+	static boolean debug_biome_flag;
 	
 	@Gamma
 	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
 	public static final Hook.Result getBiomes(BiomeProvider provider, @Nullable Biome[] oldBiomeList,
 			int x, int z, int width, int depth, boolean cacheFlag) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
 		Biome result[] = new Biome[width * depth];
 		Arrays.fill(result, getBiome());
 		return new Hook.Result(result);
@@ -101,6 +107,8 @@ public class AlchemyHooks {
 	@Gamma
 	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
 	public static final Hook.Result getBiome(BiomeProvider provider, BlockPos pos, Biome defaultBiome) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
 		return new Hook.Result(getBiome());
 	}
 	
@@ -108,9 +116,20 @@ public class AlchemyHooks {
 	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomesForGeneration")
 	public static final Hook.Result getBiomesForGeneration(BiomeProvider provider, Biome[] biomes,
 			int x, int z, int width, int height) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
 		Biome result[] = new Biome[width * height];
 		Arrays.fill(result, getBiome());
 		return new Hook.Result(result);
+	}
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#areBiomesViable")
+	public static final Hook.Result areBiomesViable(BiomeProvider provider, int x, int z, int radius, List<Biome> allowed) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
+		Biome biome = getBiome();
+		return allowed.stream().filter(b -> b != biome).count() > 0 ? Hook.Result.FALSE : Hook.Result.TRUE;
 	}
 	
 }

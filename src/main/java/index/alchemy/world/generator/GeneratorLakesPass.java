@@ -19,9 +19,13 @@ import net.minecraft.world.biome.Biome;
 @Generator(identifier = "lakes_pass", builder = GeneratorLakesPass.Builder.class)
 public class GeneratorLakesPass extends BOPGeneratorBase {
 	
-	protected static final IBlockState AIR = Blocks.AIR.getDefaultState(), MUD = BOPBlocks.mud.getDefaultState();
+	protected static final IBlockState
+			AIR = Blocks.AIR.getDefaultState(),
+			MUD = BOPBlocks.mud.getDefaultState(),
+			WATER = Blocks.WATER.getDefaultState();
 	
-	public static class Builder extends BOPGeneratorBase.InnerBuilder<Builder, GeneratorLakesPass> implements IGeneratorBuilder<GeneratorLakesPass> {
+	public static class Builder extends BOPGeneratorBase.InnerBuilder<Builder, GeneratorLakesPass>
+			implements IGeneratorBuilder<GeneratorLakesPass> {
 		
 		protected int minHeight, maxHeight;
 		protected Biome biome;
@@ -85,7 +89,7 @@ public class GeneratorLakesPass extends BOPGeneratorBase {
 					}
 					if (state == AIR)
 						continue;
-					if (state.getMaterial() == Material.WATER)
+					if (state == WATER)
 						water = true;
 					else if (water) {
 						world.setBlockState(now, MUD, 2);
@@ -93,7 +97,7 @@ public class GeneratorLakesPass extends BOPGeneratorBase {
 					} else if (state == biome.fillerBlock) {
 						if (prev == AIR || prev.getMaterial() != Material.GRASS && prev.getMaterial() != Material.GROUND)
 							world.setBlockState(now, biome.topBlock, 2);
-					} else if (state.getMaterial() == Material.ROCK)
+					} else if (state.getMaterial() == Material.ROCK && y < minHeight)
 						break;
 					prev = state;
 				}

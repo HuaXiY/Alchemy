@@ -67,8 +67,8 @@ import static java.lang.Math.*;
 public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEventHandle, ICoolDown,
 		INetworkMessage.Server<MessageAlivePower> {
 	
-	public static final int USE_CD = 20 * 30, RADIUS = 12, EFFECT_RANDE = 5;
-	public static final float MAX_POWER = 40;
+	public static final int USE_CD = 20 * 15, RADIUS = 16, EFFECT_RANDE = 8;
+	public static final float MAX_POWER = 40, DECREASE_COEFFICIENT = 0.01F;
 	public static final String NBT_KEY_CD = "cd_ring_alive", NBT_KEY_ALIVE_POWER = "alive_power",
 			FX_KEY_FOLLOW = "ring_alive_follow", FX_KEY_RIST = "ring_alive_rise";
 	
@@ -120,7 +120,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 				result.add(new FXARGBUpdate(0xFF6ACCA9));
 				result.add(new FXScaleUpdate(new StdCycle().setLenght(max_age).setMin(scale / 1000F).setMax(scale / 100F)));
 				result.add(new FXPosClearUpdate());
-				result.add(new FXPosUpdate(-.0, 0, 1.2));
+				result.add(new FXPosUpdate(0, 0, 1.2));
 				result.add(new FXPosSourceUpdate(entity));
 				result.add(new FXMotionUpdate(
 						new StdCycle().setLoop(true).setRotation(true).setLenght(max_age / 3).setMin(-.2F).setMax(.2F),
@@ -147,11 +147,10 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 				onAlivePowerEffectiveLiving(living, power);
 				List<Double6IntArrayPackage> d6iaps = Lists.newLinkedList();
 				int update[] = FXUpdateHelper.getIntArrayByArgs(FX_KEY_RIST, living.getEntityId());
-				for (int i = 0; i < 1; i++)
-					d6iaps.add(new Double6IntArrayPackage(
-							living.posX + living.width / 2,
-							living.posY,
-							living.posZ + living.width / 2, 0, 0, 0, update));
+				d6iaps.add(new Double6IntArrayPackage(
+						living.posX + living.width / 2,
+						living.posY,
+						living.posZ + living.width / 2, 0, 0, 0, update));
 				IPhaseRunnable runnable = p -> AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
 						AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iaps);
 				runnable.run(AlchemyEventSystem.getPhase());
@@ -163,6 +162,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
+		alive_power.set(item, MAX_POWER);
 		if (Always.isServer() && living.ticksExisted % 5 == 0 && living.getHealth() < living.getMaxHealth() && alive_power.get(item) >= 1) {
 			living.heal(1);
 			alive_power.set(item, alive_power.get(item) - 1);
@@ -176,7 +176,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 			if (!living.isEntityUndead()) {
 				EntityLivingBase target = EntityAIFindEntityNearestHelper.findNearest(living,
 						EntityLivingBase.class, AABBHelper.getAABBFromEntity(living, RADIUS), this::isEquipmented);
-				float power = living.getMaxHealth() / 10;
+				float power = living.getMaxHealth() / 5;
 				if (target != null && power > 0) {
 					ItemStack alive = getFormLiving(target);
 					alive_power.set(alive, min(alive_power.get(alive) + power, MAX_POWER));
@@ -200,12 +200,9 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 			EntityLivingBase living = event.getEntityLiving();
 			EntityDamageSource source = (EntityDamageSource) event.getSource();
 			if (source.getEntity() instanceof EntityLivingBase && ((EntityLivingBase) source.getEntity()).isEntityUndead()) {
-			ItemStack alive = getFormLiving(living);
-				if (alive != null) {
-					float power = alive_power.get(alive), amount = event.getAmount(), consume = Math.min(alive_power.get(alive), amount / 2);
-					event.setAmount(event.getAmount() - consume * 2);
-					alive_power.set(alive, alive_power.get(alive) - consume);
-				}
+				ItemStack alive = getFormLiving(living);
+				if (alive != null)
+					event.setAmount(event.getAmount() * (1 - alive_power.get(alive) * DECREASE_COEFFICIENT));
 			}
 		}
 	}
@@ -226,7 +223,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 		if (shouldHandleInput(binding))
 			if (isCDOver()) {
 				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageAlivePower());
-				Minecraft.getMinecraft().thePlayer.getEntityData().setInteger(NBT_KEY_CD, Minecraft.getMinecraft().thePlayer.ticksExisted);
+				restartCD();
 			} else
 				HUDManager.setSnake(this);
 	}

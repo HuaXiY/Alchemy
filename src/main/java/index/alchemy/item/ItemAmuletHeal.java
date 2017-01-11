@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Omega
 public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle {
 	
-	public static final float AMPLIFY = 0.2F;
+	public static final float AMPLIFY = 0.5F;
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {

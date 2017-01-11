@@ -1,5 +1,6 @@
 package index.alchemy.core.asm.transformer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -172,6 +174,14 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
+		if (transformedName.endsWith(".ItemBucket")) {
+			Tool.dumpClass(basicClass, "D:/ItemBucket.bytecode");
+			try {
+				Files.write(basicClass, new File("D:/ItemBucket.class"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		return basicClass;
 	}
 	

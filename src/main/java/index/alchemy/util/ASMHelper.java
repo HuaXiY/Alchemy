@@ -6,7 +6,11 @@ import javax.annotation.Nullable;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 
 import index.project.version.annotation.Omega;
 
@@ -53,6 +57,44 @@ public class ASMHelper {
 			default:
 				return ALOAD;
 		}
+	}
+	
+	public static final int getStoreOpcode(Type type) {
+		switch (type.getSort()) {
+			case Type.BYTE:
+			case Type.SHORT:
+			case Type.INT:
+			case Type.BOOLEAN:
+				return ISTORE;
+			case Type.LONG:
+				return LSTORE;
+			case Type.FLOAT:
+				return FSTORE;
+			case Type.DOUBLE:
+				return DSTORE;
+			default:
+				return ASTORE;
+		}
+	}
+	
+	public static final int getStackFrameLength(Type type) {
+		switch (type.getSort()) {
+			case Type.LONG:
+			case Type.DOUBLE:
+				return 2;
+			default:
+				return 1;
+		}
+	}
+	
+	public static final AbstractInsnNode getIntNode(int value) {
+		if (value <= 5 && -1 <= value)
+			return new InsnNode(ICONST_M1 + value + 1);
+		if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
+			return new IntInsnNode(BIPUSH, value);
+		if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
+			return new IntInsnNode(SIPUSH, value);
+		return new LdcInsnNode(value);
 	}
 	
 	public static final String getClassName(Class<?> clazz) {

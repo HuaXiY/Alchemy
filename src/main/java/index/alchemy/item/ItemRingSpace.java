@@ -37,10 +37,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -99,6 +101,12 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 			}
 		if (isEquipmented(target))
 			event.setAttackDamage(0);
+	}
+	
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onLivingAttack(LivingAttackEvent event) {
+		if (event.getSource() == DamageSource.outOfWorld && isEquipmented(event.getEntityLiving()))
+			event.setCanceled(true);
 	}
 	
 	@Override

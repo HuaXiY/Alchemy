@@ -115,7 +115,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 				desc = ASMHelper.getClassName(clazzName), type = ASMHelper.getClassName(fieldDesc);
 
 		cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, nameDesc, null, "java/lang/Object", new String[]{ I_FIELD_ACCESS_DESC });
-		cw.visitSource("TransformerFieldAccess.java:104", "invoke: " + clazzName + "." + field.name);
+		cw.visitSource("TransformerFieldAccess.java:108", "invoke: " + clazzName + "." + field.name);
 		{
 			mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", "()V", null, null);
 			mv.visitCode();

@@ -8,7 +8,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
 @FunctionalInterface
 public interface IGenTerrainBlocks {
 	
-	void genTerrainBlocks(World worldIn, Random rand, ChunkPrimer chunkPrimerIn, int x, int z, double noiseVal);
+	void genTerrainBlocks(World world, Random rand, ChunkPrimer chunkPrimer, int cx, int cz, double noiseVal);
 	
 	abstract class InnerBuilder<T extends InnerBuilder<T, G>, G extends IGenTerrainBlocks> {
 		

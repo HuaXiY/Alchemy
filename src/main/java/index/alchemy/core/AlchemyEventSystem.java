@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.StampedLock;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -46,7 +45,6 @@ import index.alchemy.util.Counter;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
@@ -153,10 +151,6 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			phase_mapping = Arrays.stream(Side.values()).collect(() -> Maps.newEnumMap(Side.class),
 					(m, s) -> m.put(s, Phase.START), Map::putAll);
 	
-	private static StampedLock runnable_mapping_lock = new StampedLock();
-	
-	private static volatile boolean runnable_mapping_flag = false;
-	
 	private static final List<IGuiHandle> gui_handle = Lists.newArrayList();
 	
 	private static final Set<Object> hook_input = Sets.newHashSet();
@@ -184,10 +178,11 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onPlayerTick(PlayerTickEvent event) {
-		String flag = "85";
+		String flag = "6";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
+				//registerEventHandle(new RTest());
 				//System.out.println(((ItemRingSpace)AlchemyItemLoader.ring_space).getInventory(AlchemyItemLoader.ring_space.getFormLiving(Minecraft.getMinecraft().thePlayer)));;
 				//Minecraft.getMinecraft().thePlayer.playSound(AlchemySoundLoader.record_re_awake, 1, 1);
 				//BiomesOPlenty.proxy.spawnParticle(BOPParticleTypes.PLAYER_TRAIL, player.posX + offsetX, ((int)player.posY) + groundYOffset + 0.01, player.posZ + offsetZ, "dev_trail");
@@ -210,6 +205,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			EntityPlayer player = event.player;
+			//player.changeDimension(10);
 //			WorldServer world = DimensionManager.getWorld(1);
 //			System.out.println(world);
 //			if (world != null)
@@ -308,32 +304,16 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static void addContinuedRunnable(Side side, IContinuedRunnable runnable) {
-		long stamp = runnable_mapping_lock.readLock();
-		(runnable_mapping_flag ? runnable_mapping_buffer : runnable_mapping).get(side).add(runnable);
-		runnable_mapping_lock.unlockRead(stamp);
+		runnable_mapping_buffer.get(side).add(runnable);
 	}
 	
 	public static void onRunnableTick(Side side, Phase phase) {
 		updatePhase(side, phase);
 		List<IContinuedRunnable> list = runnable_mapping.get(side);
-		long stamp;
-		synchronized (list) {
-			stamp = runnable_mapping_lock.writeLock();
-			runnable_mapping_flag = true;
-			runnable_mapping_lock.unlockWrite(stamp);
-			List<IContinuedRunnable> buffer = runnable_mapping_buffer.get(side);
-			synchronized (buffer) {
-				list.addAll(buffer);
-				buffer.clear();
-			}
-			Iterator<IContinuedRunnable> iterator = list.iterator();
-			while (iterator.hasNext())
-				if (iterator.next().run(phase))
-					iterator.remove();
-			stamp = runnable_mapping_lock.writeLock();
-			runnable_mapping_flag = false;
-			runnable_mapping_lock.unlockWrite(stamp);
-		}
+		list.addAll(runnable_mapping_buffer.get(side));
+		for (Iterator<IContinuedRunnable> iterator = list.iterator(); iterator.hasNext();)
+			if (iterator.next().run(phase))
+				iterator.remove();
 	}
 	
 	public static void updatePhase(Side side, Phase phase) {
@@ -365,7 +345,6 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
-				Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
 				//removeInputHook(AlchemyItemLoader.ring_time);
 				//System.out.println(Minecraft.getMinecraft().thePlayer.getEntityData());
 			}
@@ -460,7 +439,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	public static void onKeyInput(KeyInputEvent event) {
 		if (hookInputState)
 			KeyBinding.unPressAllKeys();
-		else 
+		else
 			for (KeyBindingHandle handle : key_handle)
 				if (Keyboard.isKeyDown(handle.getBinding().getKeyCode()))
 					handle.handle();
@@ -550,7 +529,8 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		if (Always.isClient()) {
 			Listener listener = clazz.getAnnotation(Listener.class);
 			if (listener != null)
-				MinecraftForge.EVENT_BUS.register(clazz);
+				for (Listener.Type type : listener.value())
+					type.getEventBus().register(clazz);
 			Texture texture = clazz.getAnnotation(Texture.class);
 			if (texture != null)
 				if (texture.value() != null)
@@ -578,6 +558,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	public AlchemyEventSystem() {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
+		registerInputHandle(this);
 		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyConstants.MOD_ID, this);
 	}
 

@@ -52,7 +52,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
@@ -96,7 +95,14 @@ import static index.alchemy.core.AlchemyModLoader.*;
 		version = MOD_VERSION,
 		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.3.2185,);after:*;"
 )
-public final class AlchemyModLoader {
+public enum AlchemyModLoader {
+	
+	INSTANCE;
+	
+	@Mod.InstanceFactory
+	public static AlchemyModLoader instance() {
+		return INSTANCE;
+	}
 	
 	public static final String REQUIRED_BEFORE = "required-before:", REQUIRED_AFTER = "required-after:";
 	
@@ -232,28 +238,6 @@ public final class AlchemyModLoader {
 	
 	public static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 	
-	@Nullable
-	@Deprecated
-	@Instance(MOD_ID)
-	private static AlchemyModLoader instance;
-	
-	public static Object instance() {
-		if (instance == null)
-			AlchemyRuntimeException.onException(new NullPointerException(AlchemyModLoader.class.getName() + ".instance"));
-		return instance;
-	}
-	
-	public AlchemyModLoader() throws Throwable {
-		if (instance != null)
-			AlchemyRuntimeException.onException(new RuntimeException("Before this has been instantiate"));
-		else 
-			try {
-				bootstrap();
-			} catch (Exception e) {
-				AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e));
-			}
-	}
-	
 	public static final String mc_dir, mod_path;
 	public static final boolean is_modding, enable_test, enable_dmain;
 	private static final Map<ModState, LinkedList<Class<?>>> init_map = new LinkedHashMap<ModState, LinkedList<Class<?>>>() {
@@ -355,6 +339,8 @@ public final class AlchemyModLoader {
 	}
 	
 	static {
+		logger.info("maxDirectMemory: " + sun.misc.VM.maxDirectMemory());
+		
 		is_modding = !AlchemyCorePlugin.isRuntimeDeobfuscationEnabled();
 		mod_path = AlchemyModLoader.class.getProtectionDomain().getCodeSource().getLocation().getPath()
 				.replace(ASMHelper.getClassName(AlchemyModLoader.class) + ".class", "");
@@ -378,6 +364,7 @@ public final class AlchemyModLoader {
 	}
 	
 	private static void bootstrap() throws Throwable {
+		checkInvokePermissions();
 		AlchemyTransformerManager.loadAllTransformClass();
 		
 		try {
@@ -481,6 +468,11 @@ public final class AlchemyModLoader {
 	
 	@EventHandler
 	public void onFMLConstruction(FMLConstructionEvent event) {
+		try {
+			bootstrap();
+		} catch (Throwable e) {
+			AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e));
+		}
 		init(ModState.CONSTRUCTED);
 		onFMLEvent(event);
 	}
