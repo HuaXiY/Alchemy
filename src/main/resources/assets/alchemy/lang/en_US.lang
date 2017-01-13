@@ -20,7 +20,7 @@ item.amulet_purify.name=amulet_purify
 
 //blockMap
 tile.null.name=null
-wardrobe.name=wardrobe
+tile.wardrobe.name=wardrobe
 
 //potionMap
 effect.feather_fall=feather_fall

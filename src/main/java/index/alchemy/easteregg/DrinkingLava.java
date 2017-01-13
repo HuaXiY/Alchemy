@@ -1,5 +1,6 @@
 package index.alchemy.easteregg;
 
+import index.alchemy.achievement.AlchemyAchievementLoader;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Proxy;
 import index.project.version.annotation.Beta;
@@ -22,10 +23,11 @@ import net.minecraft.world.World;
 @Proxy("net.minecraft.item.ItemBucket")
 public class DrinkingLava extends ItemBucket {
 	
-	public DrinkingLava(Block containedBlockIn) {
+	// No use, just to compile
+	private DrinkingLava(Block containedBlockIn) {
 		super(containedBlockIn);
 	}
-
+	
 	@Hook("net.minecraft.item.ItemBucket#func_77659_a")
 	public static Hook.Result onItemRightClick(ItemBucket item, ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
 		if (item == Items.LAVA_BUCKET) {
@@ -49,15 +51,22 @@ public class DrinkingLava extends ItemBucket {
 	}
 	
 	@Override
-	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving) {
-		return super.onItemUseFinish(stack, worldIn, entityLiving);
+	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase living) {
+		return super.onItemUseFinish(stack, worldIn, living);
 	}
 	
 	@Hook("net.minecraft.item.ItemBucket#func_77654_b")
 	public static Hook.Result onItemUseFinish(ItemBucket item, ItemStack stack, World world, EntityLivingBase living) {
-		living.attackEntityFrom(DamageSource.lava, 10);
-		living.setFire(30);
-		return new Hook.Result(new ItemStack(Items.BUCKET));
+		if (item == Items.LAVA_BUCKET) {
+			living.attackEntityFrom(DamageSource.lava, 10);
+			living.setFire(30);
+			if (living instanceof EntityPlayer) {
+				EntityPlayer player = (EntityPlayer) living;
+				player.addStat(AlchemyAchievementLoader.tasty_lava);
+			}
+			return new Hook.Result(new ItemStack(Items.BUCKET));
+		} else
+			return Hook.Result.VOID;
 	}
 	
 	@Override
@@ -67,7 +76,7 @@ public class DrinkingLava extends ItemBucket {
 	
 	@Hook("net.minecraft.item.ItemBucket#func_77626_a")
 	public static Hook.Result getMaxItemUseDuration(ItemBucket item, ItemStack stack) {
-		return new Hook.Result(32);
+		return item == Items.LAVA_BUCKET ? new Hook.Result(32) : Hook.Result.VOID;
 	}
 
 }

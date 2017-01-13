@@ -20,7 +20,7 @@ item.amulet_purify.name=净化吊坠
 
 //blockMap
 tile.null.name=null
-wardrobe.name=wardrobe
+tile.wardrobe.name=wardrobe
 
 //potionMap
 effect.feather_fall=feather_fall
@@ -51,6 +51,12 @@ death.attack.plague=%1$s
 
 //inventoryMap
 inventory.ring_space=ring_space
+
+//achievementMap
+achievement.delicious_dirt=美味的泥土
+achievement.tasty_lava=可口的岩浆
+achievement.delicious_dirt.desc=美味的泥土
+achievement.tasty_lava.desc=可口的岩浆
 
 //miscMap
 bauble.type.amulet=饰品 (护身符)

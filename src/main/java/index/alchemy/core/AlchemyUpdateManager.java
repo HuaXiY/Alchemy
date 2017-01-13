@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import javax.annotation.Nullable;
+import javax.jws.WebMethod;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -265,6 +266,7 @@ public class AlchemyUpdateManager {
 		}
 		
 		@Nullable
+		@WebMethod
 		public String getVersionInfoJson(String job) throws Exception {
 			URI uri = getVersionInfoURI(job);
 			if (uri != null) {
@@ -348,6 +350,7 @@ public class AlchemyUpdateManager {
 	
 	@Alpha
 	@Nullable
+	@WebMethod
 	public static File update(VersionInfo info, File file) {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
