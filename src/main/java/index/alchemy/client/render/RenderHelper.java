@@ -28,6 +28,8 @@ import static net.minecraft.util.math.MathHelper.*;
 @SideOnly(Side.CLIENT)
 public class RenderHelper extends GlStateManager {
 	
+	private RenderHelper() { }
+	
 	public static BlockFluidRender fluidRender = new BlockFluidRender(Minecraft.getMinecraft().getBlockColors());
 	
 	public static void renderItem(ItemStack item) {
@@ -98,7 +100,11 @@ public class RenderHelper extends GlStateManager {
 			glDisable(arg);
 	}
 	
-	public static class Lighting extends net.minecraft.client.renderer.RenderHelper { }
+	public static class Lighting extends net.minecraft.client.renderer.RenderHelper {
+		
+		private Lighting() { }
+		
+	}
 	
 	public static class OpenGL extends OpenGlHelper { }
 	
