@@ -10,7 +10,7 @@ import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.ITileEntity;
 import index.alchemy.api.annotation.Change;
-import index.alchemy.api.annotation.Proxy;
+import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.event.CauldronActivatedEvent;
 import index.alchemy.interacting.ModItems;
 import index.alchemy.tile.TileEntityCauldron;
@@ -46,7 +46,7 @@ import vazkii.botania.common.item.rod.ItemWaterRod;
 
 @Beta
 @Change("1.9.4")
-@Proxy("net.minecraft.block.BlockCauldron")
+@Patch("net.minecraft.block.BlockCauldron")
 public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMaterialContainer, IRegister {
 	
 	@Override

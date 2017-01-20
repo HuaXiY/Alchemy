@@ -83,7 +83,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
  *   /__\  (  )  / __)( )_( )( ___)(  \/  )( \/ )
  *  /(__)\  )(__( (__  ) _ (  )__)  )    (  \  / 
  * (__)(__)(____)\___)(_) (_)(____)(_/\/\_) (__) 
- *                                                 
+ *                                               
  * -----------------------------------------------
  */
 
@@ -138,6 +138,7 @@ public enum AlchemyModLoader {
 		private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Function.class.getDeclaredMethods()[1]);
 		
 		private static int id = -1;
+		
 		public static synchronized int nextId() {
 			return ++id;
 		}
@@ -167,7 +168,7 @@ public enum AlchemyModLoader {
 			
 			ClassWriter cw = new ClassWriter(0);
 			MethodVisitor mv;
-
+			
 			boolean isStatic = Modifier.isStatic(callback.getModifiers());
 			String name = getUniqueName(callback);
 			String desc = name.replace('.',  '/');
@@ -175,7 +176,7 @@ public enum AlchemyModLoader {
 			String callType = Type.getInternalName(callback.getParameterTypes()[0]);
 			String handleName = callback.getName();
 			String handleDesc = Type.getMethodDescriptor(callback);
-
+			
 			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
 			cw.visitSource("AlchemyModLoader.java:159", "invoke: " + instType + handleName + handleDesc);
 			{
@@ -226,9 +227,7 @@ public enum AlchemyModLoader {
 					result = (Function) ret.newInstance();
 				else
 					result = (Function) ret.getConstructor(Object.class).newInstance(target);
-			} catch(Exception e) {
-				AlchemyRuntimeException.onException(e);
-			}
+			} catch(Exception e) { AlchemyRuntimeException.onException(e); }
 			return result;
 		}
 		
@@ -283,7 +282,7 @@ public enum AlchemyModLoader {
 	}
 	
 	public static <T extends FMLEvent> void onFMLEvent(T event) {
-		fml_event_callback_mapping.get(event.getClass()).forEach(c -> c.accept(event));
+		fml_event_callback_mapping.get(event.getClass()).forEach(c -> c.accept(event)); 
 	}
 	
 	public static List<Class<?>> getInstance(String key) {
@@ -339,7 +338,7 @@ public enum AlchemyModLoader {
 	}
 	
 	static {
-		logger.info("maxDirectMemory: " + sun.misc.VM.maxDirectMemory());
+		logger.info("Max Direct Memory: " + sun.misc.VM.maxDirectMemory());
 		
 		is_modding = !AlchemyCorePlugin.isRuntimeDeobfuscationEnabled();
 		mod_path = AlchemyModLoader.class.getProtectionDomain().getCodeSource().getLocation().getPath()
@@ -371,6 +370,10 @@ public enum AlchemyModLoader {
 			for (String line : Tool.read(AlchemyModLoader.class.getResourceAsStream("/ascii_art.txt")).split("\n"))
 				logger.info(line);
 		} catch (Exception e) {}
+		
+//		System.out.println("#############################");
+//		System.out.println(Tool.forName("toughasnails.temperature.TemperatureDebugger$Modifier", true));
+//		System.out.println("#############################");
 		
 		AlchemyDebug.start("bootstrap");
 		URL url = new File(mod_path).toURI().toURL();
@@ -468,11 +471,7 @@ public enum AlchemyModLoader {
 	
 	@EventHandler
 	public void onFMLConstruction(FMLConstructionEvent event) {
-		try {
-			bootstrap();
-		} catch (Throwable e) {
-			AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e));
-		}
+		try { bootstrap(); } catch (Throwable e) { throw new RuntimeException("Can't bootstrap !!!", e); }
 		init(ModState.CONSTRUCTED);
 		onFMLEvent(event);
 	}

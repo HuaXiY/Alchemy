@@ -2,7 +2,7 @@ package index.alchemy.easteregg;
 
 import index.alchemy.achievement.AlchemyAchievementLoader;
 import index.alchemy.api.annotation.Hook;
-import index.alchemy.api.annotation.Proxy;
+import index.alchemy.api.annotation.Patch;
 import index.project.version.annotation.Beta;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,14 +20,16 @@ import net.minecraft.world.World;
 
 @Beta
 @Hook.Provider
-@Proxy("net.minecraft.item.ItemBucket")
+@Patch("net.minecraft.item.ItemBucket")
 public class DrinkingLava extends ItemBucket {
 	
 	// No use, just to compile
+	@Patch.Exception
 	private DrinkingLava(Block containedBlockIn) {
 		super(containedBlockIn);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemBucket#func_77659_a")
 	public static Hook.Result onItemRightClick(ItemBucket item, ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
 		if (item == Items.LAVA_BUCKET) {
@@ -45,6 +47,7 @@ public class DrinkingLava extends ItemBucket {
 		return super.getItemUseAction(stack);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemBucket#func_77661_b")
 	public static Hook.Result getItemUseAction(ItemBucket item, ItemStack stack) {
 		return item == Items.LAVA_BUCKET ? new Hook.Result(EnumAction.DRINK) : Hook.Result.VOID;
@@ -55,6 +58,7 @@ public class DrinkingLava extends ItemBucket {
 		return super.onItemUseFinish(stack, worldIn, living);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemBucket#func_77654_b")
 	public static Hook.Result onItemUseFinish(ItemBucket item, ItemStack stack, World world, EntityLivingBase living) {
 		if (item == Items.LAVA_BUCKET) {
@@ -74,6 +78,7 @@ public class DrinkingLava extends ItemBucket {
 		return super.getMaxItemUseDuration(stack);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemBucket#func_77626_a")
 	public static Hook.Result getMaxItemUseDuration(ItemBucket item, ItemStack stack) {
 		return item == Items.LAVA_BUCKET ? new Hook.Result(32) : Hook.Result.VOID;

@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
@@ -259,9 +258,7 @@ public class AlchemyDLCLoader {
 		List<IDLCInfo> result = Lists.newLinkedList();
 		IDLCInfo dlc;
 		if (file.isDirectory()) {
-			List<URL> list = new LinkedList<URL>();
-			Tool.getAllURL(file, list);
-			for (URL url : list)
+			for (URL url : Tool.getAllURL(file, Lists.newLinkedList()))
 				if (url.getFile().endsWith(".class") && (dlc = checkClassIsDLC(url.openStream())) != null)
 					result.add(dlc);
 		} else {
@@ -271,7 +268,7 @@ public class AlchemyDLCLoader {
 					result.add(dlc);
 		}
 		if (result.size() > 1)
-			AlchemyRuntimeException.onException(new RuntimeException("This file has multiple DLC"));
+			AlchemyRuntimeException.onException(new RuntimeException("This file(" + file + ") has multiple DLC"));
 		return Tool.getSafe(result, 0);
 	}
 	
@@ -286,22 +283,13 @@ public class AlchemyDLCLoader {
 					if (DESCRIPTOR.equals(annotation.desc))
 						return Tool.makeAnnotation(IDLCInfo.class, makeHandlerMapping(node.name.replace('/', '.')), annotation.values,
 								"forgeVersion", "*", "description", "");
-		} finally {
-			IOUtils.closeQuietly(input);
-		}
+		} finally { IOUtils.closeQuietly(input); }
 		return null;
 	}
 	
 	protected static Map<String, InvocationHandler> makeHandlerMapping(String mainClass) {
 		Map<String, InvocationHandler> result = Maps.newHashMap();
-		result.put("getDLCMainClass", new InvocationHandler() {
-			
-			@Override
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				return Tool.forName(mainClass, false);
-			}
-			
-		});
+		result.put("getDLCMainClass", (proxy, method, args) -> Tool.forName(mainClass, false));
 		return result;
 	}
 	

@@ -103,7 +103,7 @@ public final class TransformerHook implements IClassTransformer {
 								for (int i = 0, offset = isStatic ? 0 : 1, len = args.length; i < len;
 										offset += ASMHelper.getStackFrameLength(args[i]), i++) {
 									list.add(new InsnNode(DUP));
-									list.add(ASMHelper.getIntNode(offset));
+									list.add(ASMHelper.getIntNode(i));
 									list.add(new MethodInsnNode(INVOKESTATIC, ASMHelper.getClassName(Integer.class), "valueOf",
 											Type.getMethodDescriptor(Type.getType(Integer.class), Type.INT_TYPE), false));
 									list.add(new MethodInsnNode(INVOKEINTERFACE, ASMHelper.getClassName(Map.class), "get",

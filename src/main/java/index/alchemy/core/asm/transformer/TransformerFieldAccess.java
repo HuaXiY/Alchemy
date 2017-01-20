@@ -14,6 +14,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -62,13 +63,14 @@ public class TransformerFieldAccess implements IClassTransformer {
 		AlchemyTransformerManager.transform("<access>" + name + "|" + transformedName + "#" + accessField.name + " : " + accessField.signature +
 				 "\n->  " + AlchemyFieldAccess.class.getName() + "#" + accessField.name + " : " + accessField.signature);
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(0);
+		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		String signature = ASMHelper.getGenericType(ASMHelper.getGeneric(accessField.signature))[1];
 		if (signature.isEmpty())
 			signature = "Ljava/lang/Object;";
 		String desc = ASMHelper.removeGeneric(signature);
+		node.fields.removeIf(f -> f.name.equals(accessField.name));
 		node.fields.add(new FieldNode(ACC_PUBLIC, accessField.name, desc, signature, null));
 		callback_mapping.get(transformedName).add(() -> updateAccessField(transformedName, accessField, desc));
 		MethodNode clinit = null;
@@ -77,12 +79,15 @@ public class TransformerFieldAccess implements IClassTransformer {
 				clinit = method;
 				break;
 			}
-		if (clinit == null)
+		boolean flag = clinit == null;
+		if (flag)
 			node.methods.add(clinit = new MethodNode(0, "<clinit>", "()V", null, null));
 		InsnList list = new InsnList();
 		list.add(new LdcInsnNode(transformedName));
 		list.add(new MethodInsnNode(INVOKESTATIC, "index/alchemy/core/asm/transformer/TransformerFieldAccess",
 				"callback", "(Ljava/lang/String;)V", false));
+		if (flag)
+			list.add(new InsnNode(RETURN));
 		clinit.instructions.insert(list);
 		node.accept(writer);
 		return writer.toByteArray();
@@ -98,9 +103,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 		try {
 			FinalFieldSetter.instance().setStatic(Tool.forName(owner, true).getDeclaredField(field.name),
 					createAccess(clazzName, field, desc, false));
-		} catch (Exception e) {
-			AlchemyRuntimeException.onException(e);
-		}
+		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 	}
 	
 	@Nullable
@@ -115,7 +118,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 				desc = ASMHelper.getClassName(clazzName), type = ASMHelper.getClassName(fieldDesc);
 
 		cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, nameDesc, null, "java/lang/Object", new String[]{ I_FIELD_ACCESS_DESC });
-		cw.visitSource("TransformerFieldAccess.java:108", "invoke: " + clazzName + "." + field.name);
+		cw.visitSource("TransformerFieldAccess.java:107", "invoke: " + clazzName + "." + field.name);
 		{
 			mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", "()V", null, null);
 			mv.visitCode();

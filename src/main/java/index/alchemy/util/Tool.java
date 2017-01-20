@@ -517,28 +517,30 @@ public class Tool {
 		}
 	}
 	
-	public static final void getAllFile(File f, List<String> list){
+	public static final List<String> getAllFile(File f, List<String> list){
 		if (f.exists())
 			if (f.isDirectory()) {
 				File fa[] = f.listFiles();
 				if (fa == null)
-					return;
+					return list;
 				for (File ft : fa)
 					getAllFile(ft, list);
 			} else
 				list.add(f.getPath());
+		return list;
 	}
 	
-	public static final void getAllURL(File f, List<URL> list) throws MalformedURLException {
+	public static final List<URL> getAllURL(File f, List<URL> list) throws MalformedURLException {
 		if (f.exists())
 			if (f.isDirectory()) {
 				File fa[] = f.listFiles();
 				if (fa == null)
-					return;
+					return list;
 				for (File ft : fa)
 					getAllURL(ft, list);
 			} else
 				list.add(f.toURI().toURL());
+		return list;
 	}
 	
 	public static final <T> T isNullOr(T t, T or) {

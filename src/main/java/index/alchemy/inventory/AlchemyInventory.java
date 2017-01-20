@@ -1,6 +1,8 @@
 package index.alchemy.inventory;
 
+import java.util.Arrays;
 import java.util.RandomAccess;
+import java.util.stream.Stream;
 
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.util.InventoryHelper;
@@ -290,6 +292,10 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IInve
 			if (item.stackSize < 1)
 				return;
 		}
+	}
+	
+	public Stream<ItemStack> stream() {
+		return Arrays.stream(contents);
 	}
 	
 }

@@ -238,7 +238,7 @@ artifacts {
 }
 
 dependencies {
-    compile fileTree(dir: 'mods', include: ['*.lib.jar'])
+    compile fileTree(dir: 'mods', include: ['*.jar'])
 }
 
 processResources

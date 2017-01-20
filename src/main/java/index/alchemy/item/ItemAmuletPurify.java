@@ -6,6 +6,7 @@ import java.util.List;
 
 import index.alchemy.api.ICoolDown;
 import index.alchemy.api.IEventHandle;
+import index.alchemy.api.IItemTemperature;
 import index.alchemy.api.INetworkMessage;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
@@ -23,6 +24,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -35,9 +37,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static java.lang.Math.*;
 
 @Omega
-public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IEventHandle, INetworkMessage.Client<MessagePurifyCallback> {
+public class ItemAmuletPurify extends AlchemyItemAmulet implements IEventHandle, INetworkMessage.Client<MessagePurifyCallback>,
+		IItemTemperature, ICoolDown {
 	
 	public static final int INTERVAL = 20 * 16, MAX_AIR = 300;
+	public static final float TEMPERATURE_RATE = 100F, TEMPERATURE_TARGET = -4F;
 	public static final String NBT_KEY_CD = "amulet_purify";
 	
 	public static final ItemAmuletPurify type = null;
@@ -92,6 +96,16 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements ICoolDown, IE
 	@Override
 	public Class<MessagePurifyCallback> getClientMessageClass() {
 		return MessagePurifyCallback.class;
+	}
+	
+	@Override
+	public float modifyChangeRate(World world, EntityPlayer player, float changeRate, int trend) {
+		return trend > 0 ? changeRate + TEMPERATURE_RATE : changeRate;
+	}
+
+	@Override
+	public float modifyTarget(World world, EntityPlayer player, float temperature) {
+		return temperature + TEMPERATURE_TARGET;
 	}
 	
 	@Override

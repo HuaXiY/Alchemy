@@ -49,7 +49,7 @@ public class DLang {
 		for (Field field : DLang.class.getDeclaredFields())
 			if (field.getType() == Map.class)
 				try {
-					FinalFieldSetter.getInstance().setStatic(field, new LinkedHashMap<>());
+					FinalFieldSetter.instance().setStatic(field, new LinkedHashMap<>());
 				} catch (Exception e) {
 					AlchemyRuntimeException.onException(e);
 				}

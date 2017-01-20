@@ -117,14 +117,13 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	protected FluidTank tank = new FluidTank(Fluid.BUCKET_VOLUME) {
 		
-		{
-			setTileEntity(TileEntityCauldron.this);
-		}
+		{ setTileEntity(TileEntityCauldron.this); }
 		
-		public Fluid getFluidType() {
+		private Fluid getFluidType() {
 			return getFluid() != null ? getFluid().getFluid() : null;
 		}
 		
+		@Override
 		public void setFluid(FluidStack stack) {
 			Fluid fluid = getFluidType();
 			super.setFluid(stack);
@@ -141,6 +140,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			return result;
 		}
 		
+		@Override
 		public FluidStack drainInternal(int maxDrain, boolean doDrain) {
 			Fluid fluid = getFluidType();
 			FluidStack result = super.drainInternal(maxDrain, doDrain);
@@ -149,7 +149,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			return result;
 		};
 		
-		public void update() {
+		private void update() {
 			if (worldObj != null && pos != null) {
 				worldObj.checkLight(pos);
 				worldObj.updateComparatorOutputLevel(pos, Blocks.CAULDRON);

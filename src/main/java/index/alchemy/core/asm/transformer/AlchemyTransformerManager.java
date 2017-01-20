@@ -23,7 +23,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Hook;
-import index.alchemy.api.annotation.Proxy;
+import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -45,7 +45,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			HOOK_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook$Provider;",
 			HOOK_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook;",
 			HOOK_RESULT_DESC = "index/alchemy/api/annotation/Hook$Result",
-			PROXY_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Proxy;",
+			PATCH_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch;",
+			PATCH_EXCEPTION_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch$Exception;",
 			FIELD_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field$Provider;",
 			FIELD_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field;",
 			FIELD_ACCESS_DESC = "Lindex/alchemy/api/IFieldAccess;",
@@ -83,7 +84,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 				ClassNode node = new ClassNode(ASM5);
 				reader.accept(node, 0);
 				if (checkSideOnly(node)) {
-					loadProxy(node);
+					loadPatch(node);
 					loadField(node);
 					loadHook(node);
 				}
@@ -91,12 +92,12 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadProxy(ClassNode node) throws IOException {
+	private static void loadPatch(ClassNode node) throws IOException {
 		if (node.visibleAnnotations != null)
 			for (AnnotationNode ann : node.visibleAnnotations)
-				if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
-					Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
-					transformers_mapping.get(proxy.value()).add(new TransformerProxy(node));
+				if (ann.desc.equals(PATCH_ANNOTATION_DESC)) {
+					Patch patch = Tool.makeAnnotation(Patch.class, ann.values);
+					transformers_mapping.get(patch.value()).add(new TransformerPatch(node));
 					break;
 				}
 	}
@@ -174,10 +175,11 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
-		if (transformedName.endsWith(".ItemBucket")) {
-			Tool.dumpClass(basicClass, "D:/ItemBucket.bytecode");
+		if (transformedName.equals("net.minecraft.item.ItemFood")) {
+			Tool.dumpClass(basicClass, "D:/ItemFood.bytecode");
+			Tool.printClass(basicClass);
 			try {
-				Files.write(basicClass, new File("D:/ItemBucket.class"));
+				Files.write(basicClass, new File("D:/ItemFood.class"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

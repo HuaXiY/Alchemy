@@ -19,7 +19,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static org.lwjgl.opengl.GL11.*;
-import static net.minecraft.client.renderer.GlStateManager.*;
 
 @Omega
 @SideOnly(Side.CLIENT)
@@ -68,7 +67,7 @@ public class HUDManager {
 	
 	public static void renderCD() {
 		GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
-		enableAlpha();
+		RenderHelper.enableAlpha();
 		int i = -1;
 		for (ICoolDown cd : cool_downs) {
 			if (cd.isCDOver())
@@ -84,13 +83,13 @@ public class HUDManager {
 				sy = Tool.getRandom(-SNAKE, SNAKE);
 			}
 			
-			pushMatrix();
-			translate(sx, sy, 0);
-			scale(2F, 2F, 1F);
+			RenderHelper.pushMatrix();
+			RenderHelper.translate(sx, sy, 0);
+			RenderHelper.scale(2F, 2F, 1F);
 			glEnable(GL_COLOR_ARRAY);
 			bind(GuiContainer.INVENTORY_BACKGROUND);
 			gui.drawTexturedModalRect(x / 2, y / 2, 141, 166, MC_BG_TEXTURE_SIZE, MC_BG_TEXTURE_SIZE);
-			scale(0.5F, 0.5F, 1F);
+			RenderHelper.scale(0.5F, 0.5F, 1F);
 			
 			bind(CD_BG);
 			int id = cd.getRenderID();
@@ -101,9 +100,9 @@ public class HUDManager {
 			glDisable(GL_COLOR_ARRAY);
 			int cd_per_len = (int) ((CD_SIZE - INTERVAL * 2) * cd_per);
 			gui.drawRect(x + INTERVAL, y + (CD_SIZE - INTERVAL * 2 - cd_per_len) + INTERVAL, x + CD_SIZE - INTERVAL, y + CD_SIZE - INTERVAL, 0x99000000);
-			popMatrix();
+			RenderHelper.popMatrix();
 		}
-		disableAlpha();
+		RenderHelper.disableAlpha();
 	}
 	
 	public static int getCDXStart(int i) {

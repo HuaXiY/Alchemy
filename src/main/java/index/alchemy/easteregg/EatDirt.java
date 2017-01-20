@@ -5,7 +5,7 @@ import com.google.common.base.Function;
 import index.alchemy.achievement.AlchemyAchievementLoader;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Init;
-import index.alchemy.api.annotation.Proxy;
+import index.alchemy.api.annotation.Patch;
 import index.alchemy.util.Always;
 import index.project.version.annotation.Beta;
 import net.minecraft.block.Block;
@@ -31,16 +31,19 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 @Beta
 @Hook.Provider
 @Init(state = ModState.POSTINITIALIZED)
-@Proxy("net.minecraft.item.ItemMultiTexture")
+@Patch("net.minecraft.item.ItemMultiTexture")
 public class EatDirt extends ItemMultiTexture {
 	
 	// No use, just to compile
+	@Patch.Exception
 	private EatDirt(Block block, Block block2, Function<ItemStack, String> nameFunction) {
 		super(block, block2, nameFunction);
 	}
 	
+	@Patch.Exception
 	private static Item dirt;
-
+	
+	@Patch.Exception
 	public static void init() {
 		dirt = Item.getItemFromBlock(Blocks.DIRT);
 	}
@@ -50,6 +53,7 @@ public class EatDirt extends ItemMultiTexture {
 		return super.onItemRightClick(item, world, player, hand);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemMultiTexture#func_77659_a")
 	public static Hook.Result onItemRightClick(ItemMultiTexture item, ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
 		if (item == dirt) {
@@ -67,6 +71,7 @@ public class EatDirt extends ItemMultiTexture {
 		return super.getItemUseAction(stack);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemMultiTexture#func_77661_b")
 	public static Hook.Result getItemUseAction(ItemMultiTexture item, ItemStack stack) {
 		return item == dirt ? new Hook.Result(EnumAction.EAT) : Hook.Result.VOID;
@@ -77,6 +82,7 @@ public class EatDirt extends ItemMultiTexture {
 		return super.onItemUseFinish(stack, world, living);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemMultiTexture#func_77654_b")
 	public static Hook.Result onItemUseFinish(ItemMultiTexture item, ItemStack stack, World world, EntityLivingBase living) {
 		if (item == dirt) {
@@ -101,6 +107,7 @@ public class EatDirt extends ItemMultiTexture {
 		return super.getMaxItemUseDuration(stack);
 	}
 	
+	@Patch.Exception
 	@Hook("net.minecraft.item.ItemMultiTexture#func_77626_a")
 	public static Hook.Result getMaxItemUseDuration(ItemMultiTexture item, ItemStack stack) {
 		return item == dirt ? new Hook.Result(32) : Hook.Result.VOID;

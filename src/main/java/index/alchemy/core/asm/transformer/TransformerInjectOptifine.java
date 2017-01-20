@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.io.IOUtils;
 
+import com.google.common.base.Joiner;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -42,17 +43,18 @@ public class TransformerInjectOptifine implements IClassTransformer {
 	}
 	
 	@Nullable
-	public static void tryInject(ClassLoader classLoader) {
-		if (classLoader instanceof LaunchClassLoader)
-			try {
-				List<IClassTransformer> transformers = $(classLoader, "transformers");
-				transformers.add(0, new TransformerInjectOptifine(classLoader));
-			} catch (Exception e) { e.printStackTrace(); }
+	public static void tryInject(LaunchClassLoader classLoader) {
+		try {
+			List<IClassTransformer> transformers = $(classLoader, "transformers");
+			transformers.remove(1);
+			transformers.add(0, new TransformerInjectOptifine(classLoader));
+			AlchemyTransformerManager.logger.info(Joiner.on('\n').appendTo(new StringBuilder("Transformers: \n"), transformers).toString());
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		if (name.startsWith("net.minecraft.")) {
+		if (!name.startsWith("net.minecraftforge.")) {
 			ZipEntry entry = jar.getEntry(name.replace(".", "/") + ".class");
 			if (entry != null)
 				try {

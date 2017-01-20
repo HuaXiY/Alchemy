@@ -34,8 +34,6 @@ public @interface Hook {
 			if (stackContext == null)
 				stackContext = Maps.newHashMap();
 			stackContext.put(index++, obj);
-			if (obj instanceof Double || obj instanceof Long)
-				index++;
 			return this;
 		}
 		

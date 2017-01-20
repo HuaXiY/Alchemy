@@ -91,6 +91,7 @@ public class BiomeGenDragonIsland extends AlchemyBiome {
 		
 		clearWeights();
 		
+		// lake
 		terrainGenerators.put("lake", new GenTerrainLakes.Builder()
 				.minHeight(50)
 				.maxHeight(80)
@@ -99,7 +100,7 @@ public class BiomeGenDragonIsland extends AlchemyBiome {
 				.create()
 		);
 		
-		// lake
+		// lake pass
 		addGenerator("lake_pass", GeneratorStage.SAND, new GeneratorLakesPass.Builder()
 			.minHeight(45)
 			.maxHeight(80)

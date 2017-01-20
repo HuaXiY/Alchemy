@@ -178,7 +178,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onPlayerTick(PlayerTickEvent event) {
-		String flag = "6";
+		String flag = "92";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -204,7 +204,22 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
-			EntityPlayer player = event.player;
+//			EntityPlayer player = event.player;
+//			Item item = player.getHeldItemMainhand().getItem();
+//			if (item instanceof IItemThirst) {
+//				((IItemThirst) item).setThirst(2);
+//				((IItemThirst) item).setHydration(4);
+//			}
+//			for (int i = 0; i < 200; i++) {
+//				EntityChicken chicken = new EntityChicken(player.worldObj);
+//				chicken.setPosition(player.posX, player.posY, player.posZ);
+//				player.worldObj.spawnEntityInWorld(chicken);
+//			}
+			
+//			player.worldObj.getEntitiesWithinAABB(EntityChicken.class, AABBHelper.getAABBFromEntity(player, 128))
+//				.forEach(EntityLivingBase::onKillCommand);
+			//System.out.println(Tool.<List<String>>$(FMLCommonHandler.instance(), "brandingsNoMC"));
+				
 			//player.changeDimension(10);
 //			WorldServer world = DimensionManager.getWorld(1);
 //			System.out.println(world);

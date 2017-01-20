@@ -26,6 +26,7 @@ public class FinalFieldSetter {
 
     @Unsafe(Unsafe.UNSAFE_API)
     public void setStatic(Field field, Object value) throws Exception {
+    	unsafe.ensureClassInitialized(field.getDeclaringClass());
         unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), value);
     }
     

@@ -55,19 +55,23 @@ public class AlchemyPotionLoader extends PotionType {
 	
 	public static Predicate<ItemStack> getItemPredicate(final Item item, final int metadata) {
 		return new Predicate<ItemStack>() {
+			
 			@Override
 			public boolean apply(ItemStack input) {
 				return input.getItem() == item && input.getMetadata() == metadata;
 			}
+			
 		};
 	}
 	
 	public static Predicate<ItemStack> getItemPredicate(final ItemStack item) {
 		return new Predicate<ItemStack>() {
+			
 			@Override
 			public boolean apply(ItemStack input) {
 				return ItemStack.areItemsEqual(input, item);
 			}
+			
 		};
 	}
 	
