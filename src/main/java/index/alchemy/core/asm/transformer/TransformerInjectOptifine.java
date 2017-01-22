@@ -29,19 +29,6 @@ public class TransformerInjectOptifine implements IClassTransformer {
 	
 	protected JarFile jar;
 	
-	protected TransformerInjectOptifine(ClassLoader classloader) throws IOException, URISyntaxException {
-		ClassPath path = ClassPath.from(classloader);
-		for (ClassInfo info : path.getTopLevelClasses("optifine"))
-			if (info.getSimpleName().equals("OptiFineClassTransformer")) {
-				Class<?> optifine = info.load();
-				URL url = optifine.getProtectionDomain().getCodeSource().getLocation();
-				if (url.getFile().endsWith(".jar"))
-					jar = new JarFile(new File(url.toURI()));
-			}
-		if (jar == null)
-			throw new RuntimeException("Can't find Optifine jar file !");
-	}
-	
 	@Nullable
 	public static void tryInject(LaunchClassLoader classLoader) {
 		try {
@@ -62,6 +49,19 @@ public class TransformerInjectOptifine implements IClassTransformer {
 				} catch (IOException e) { e.printStackTrace(); }
 		}
 		return basicClass;
+	}
+	
+	protected TransformerInjectOptifine(ClassLoader classloader) throws IOException, URISyntaxException {
+		ClassPath path = ClassPath.from(classloader);
+		for (ClassInfo info : path.getTopLevelClasses("optifine"))
+			if (info.getSimpleName().equals("OptiFineClassTransformer")) {
+				Class<?> optifine = info.load();
+				URL url = optifine.getProtectionDomain().getCodeSource().getLocation();
+				if (url.getFile().endsWith(".jar"))
+					jar = new JarFile(new File(url.toURI()));
+			}
+		if (jar == null)
+			throw new RuntimeException("Can't find Optifine jar file !");
 	}
 
 }

@@ -16,13 +16,13 @@ public class LocalTexture implements ITextureObject {
 	public LocalTexture(File file) {
 		this.file = file;
 	}
-
+	
 	@Override
 	public void setBlurMipmap(boolean blurIn, boolean mipmapIn) { }
-
+	
 	@Override
 	public void restoreLastBlurMipmap() { }
-
+	
 	@Override
 	public void loadTexture(IResourceManager resourceManager) throws IOException {
 		try {
@@ -31,10 +31,10 @@ public class LocalTexture implements ITextureObject {
 			id = -1;
 		}
 	}
-
+	
 	@Override
 	public int getGlTextureId() {
 		return id;
 	}
-
+	
 }

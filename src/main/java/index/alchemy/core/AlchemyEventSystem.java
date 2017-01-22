@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -79,15 +78,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @ThreadSafe
 @Hook.Provider
 @Init(state = ModState.CONSTRUCTED)
-public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
+public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
-	@Nullable
-	@Deprecated
-	private static AlchemyEventSystem instance;
+	INSTANCE;
 	
-	@Nullable
 	public static AlchemyEventSystem instance() {
-		return instance;
+		return INSTANCE;
 	}
 	
 	public static enum EventType {
@@ -470,6 +466,7 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	public static final String KEY_DEBUG_DISABLE_HOOK = "key.debug_disable_hook";
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public KeyBinding[] getKeyBindings() {
 		return new KeyBinding[]{ new AlchemyKeyBinding(KEY_DEBUG_DISABLE_HOOK, Keyboard.KEY_ADD) };
 	}
@@ -536,7 +533,8 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
-		instance = new AlchemyEventSystem();
+		AlchemyInitHook.init(instance());
+		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyConstants.MOD_ID, instance());
 	}
 	
 	public static void init(Class<?> clazz) {
@@ -570,11 +568,4 @@ public class AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		}
 	}
 	
-	public AlchemyEventSystem() {
-		AlchemyModLoader.checkInvokePermissions();
-		AlchemyModLoader.checkState();
-		registerInputHandle(this);
-		NetworkRegistry.INSTANCE.registerGuiHandler(AlchemyConstants.MOD_ID, this);
-	}
-
 }

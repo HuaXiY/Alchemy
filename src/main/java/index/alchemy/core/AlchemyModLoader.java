@@ -371,10 +371,6 @@ public enum AlchemyModLoader {
 				logger.info(line);
 		} catch (Exception e) {}
 		
-//		System.out.println("#############################");
-//		System.out.println(Tool.forName("toughasnails.temperature.TemperatureDebugger$Modifier", true));
-//		System.out.println("#############################");
-		
 		AlchemyDebug.start("bootstrap");
 		URL url = new File(mod_path).toURI().toURL();
 		class_list.addAll(0, findClassFromURL(url));

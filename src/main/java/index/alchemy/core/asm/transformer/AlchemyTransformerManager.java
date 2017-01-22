@@ -1,6 +1,5 @@
 package index.alchemy.core.asm.transformer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,7 +16,6 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -175,15 +173,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
-		if (transformedName.equals("net.minecraft.item.ItemFood")) {
-			Tool.dumpClass(basicClass, "D:/ItemFood.bytecode");
-			Tool.printClass(basicClass);
-			try {
-				Files.write(basicClass, new File("D:/ItemFood.class"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		if (transformedName.equals("index.alchemy.item.ItemRingAlive"))
+			Tool.dumpClass(basicClass, "D:/ItemRingAlive.bytecode");
 		return basicClass;
 	}
 	

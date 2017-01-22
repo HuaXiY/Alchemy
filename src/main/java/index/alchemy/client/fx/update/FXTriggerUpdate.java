@@ -12,19 +12,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Omega
 public class FXTriggerUpdate implements IFXUpdate {
 	
+	@SideOnly(Side.CLIENT)
 	public Predicate<AlchemyFX> trigger;
 	
+	@SideOnly(Side.CLIENT)
 	public FXTriggerUpdate(Predicate<AlchemyFX> trigger) {
 		this.trigger = trigger;
 	}
 	
 	@SafeVarargs
+	@SideOnly(Side.CLIENT)
 	public FXTriggerUpdate(Predicate<AlchemyFX>... triggers) {
 		for (Predicate<AlchemyFX> trigger : triggers)
 			this.trigger = this.trigger == null ? trigger : this.trigger.and(trigger);
 	}
 	
 	@SafeVarargs
+	@SideOnly(Side.CLIENT)
 	public FXTriggerUpdate(Consumer<AlchemyFX> consumer, Predicate<AlchemyFX>... triggers) {
 		this(triggers);
 		Predicate<AlchemyFX> trigger = fx -> {

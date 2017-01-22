@@ -261,13 +261,15 @@ public class Tool {
 	}
 	
 	@Unsafe(Unsafe.REFLECT_API)
-	public static final <T extends Annotation> T makeAnnotation(Class<T> clazz, List<Object> objects, Object... others) {
+	public static final <T extends Annotation> T makeAnnotation(Class<T> clazz, @Nullable List<Object> objects, Object... others) {
 		return makeAnnotation(clazz, null, objects, others);
 	}
 	
 	@Unsafe(Unsafe.REFLECT_API)
 	public static final <T extends Annotation> T makeAnnotation(Class<T> clazz, @Nullable Map<String, InvocationHandler> mapProxy,
-			List<Object> objects, Object... others) {
+			@Nullable List<Object> objects, Object... others) {
+		if (objects == null)
+			objects = Lists.newLinkedList();
 		objects.addAll(Arrays.asList(others));
 		Map<String, Object> args = new HashMap<String, Object>();
 		if (objects.size() % 2 != 0)
@@ -279,7 +281,7 @@ public class Tool {
 					if (obj instanceof String)
 						temp = (String) obj;
 					else
-						AlchemyRuntimeException.onException(new RuntimeException("object is not a string"));
+						AlchemyRuntimeException.onException(new RuntimeException("object is not a string: " + obj.getClass()));
 				else {
 					if (!args.containsKey(temp)) {
 						try {

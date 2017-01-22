@@ -1,6 +1,8 @@
 package index.alchemy.item;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 
@@ -15,6 +17,7 @@ import index.alchemy.api.INetworkMessage;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.KeyEvent;
+import index.alchemy.api.annotation.SideOnlyLambda;
 import index.alchemy.client.fx.AlchemyFX;
 import index.alchemy.client.fx.FXWisp;
 import index.alchemy.client.fx.update.FXARGBUpdate;
@@ -100,7 +103,8 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 				result.add(new FXAgeUpdate(20 * 6));
 				result.add(new FXARGBUpdate(0xFF6ACCA9));
 				result.add(new FXTowUpdate(location, .25));
-				result.add(new FXTriggerUpdate(AlchemyFX::setExpired, fx -> fx.getDistanceSq(location.getLocation()) < .1));
+				result.add(new FXTriggerUpdate((@SideOnlyLambda(Side.CLIENT) Consumer<AlchemyFX>) AlchemyFX::setExpired,
+						(@SideOnlyLambda(Side.CLIENT) Predicate<AlchemyFX>) fx -> fx.getDistanceSq(location.getLocation()) < .1));
 			}
 		}
 		return result;

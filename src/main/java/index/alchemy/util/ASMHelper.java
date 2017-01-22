@@ -1,6 +1,7 @@
 package index.alchemy.util;
 
 import java.io.IOException;
+import java.util.ListIterator;
 
 import javax.annotation.Nullable;
 
@@ -8,10 +9,20 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
+import com.google.common.base.Objects;
+
+import index.alchemy.api.annotation.Unsafe;
+import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Omega;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -169,6 +180,84 @@ public class ASMHelper {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+	public static final boolean corresponding(FieldNode field, String owner, FieldInsnNode fieldInsn) {
+		return Objects.equal(field.name, fieldInsn.name)
+				&& Objects.equal(field.desc, fieldInsn.desc)
+				&& Objects.equal(owner, fieldInsn.owner);
+	}
+	
+	public static final boolean corresponding(MethodNode method, String owner, MethodInsnNode methodInsn) {
+		return Objects.equal(method.name, methodInsn.name)
+				&& Objects.equal(method.desc, methodInsn.desc)
+				&& Objects.equal(owner, methodInsn.owner);
+	}
+	
+	public static final void removeInvoke(ListIterator<AbstractInsnNode> iterator) {
+		int offset = getStackFrameOffset(iterator.previous());
+		iterator.remove();
+		while (offset != 0) {
+			if (!iterator.hasPrevious())
+				throw new RuntimeException("Unable to get the previous node.");
+			AbstractInsnNode prev = iterator.previous();
+			offset += getStackFrameOffset(prev);
+			iterator.remove();
+		}
+	}
+	
+	@Alpha
+	@Unsafe(Unsafe.ASM_API)
+	public static final int getStackFrameOffset(AbstractInsnNode insn) {
+		int opcode = insn.getOpcode();
+		if (insn instanceof InsnNode) {
+			if (opcode == NOP)
+				return 0;
+			if (opcode < ILOAD)
+				return 1;
+			if (opcode < ISTORE)
+				return 0;
+			if (opcode < POP)
+				return -2;
+			// Bugs may occur: POP2
+			if (opcode < DUP)
+				return -1;
+			// Bugs may occur: DUP2, DUP2_X1， DUP2_X2
+			if (opcode < SWAP)
+				return 1;
+			if (opcode == SWAP)
+				return 0;
+			if (opcode < IINC)
+				return -1;
+			if (opcode < LCMP)
+				return 0;
+			if (opcode < IFEQ)
+				return -1;
+		} else if (insn instanceof MethodInsnNode) {
+			MethodInsnNode method = (MethodInsnNode) insn;
+			return -Type.getArgumentTypes(method.desc).length + (opcode == INVOKESTATIC ? 0 : -1) +
+					(Type.getReturnType(method.desc) == Type.VOID_TYPE ? 0 : 1);
+		} else if (insn instanceof FieldInsnNode)
+			switch (opcode) {
+				case GETSTATIC:
+					return 1;
+				case PUTSTATIC:
+					return -1;
+				case GETFIELD:
+					return 0;
+				case PUTFIELD:
+					return -2;
+			}
+		else if (insn instanceof VarInsnNode)
+			return opcode > SALOAD ? -1 : 1;
+		else if (insn instanceof LdcInsnNode)
+			return 1;
+		else if (insn instanceof IntInsnNode)
+			return 1;
+		else if (insn instanceof TypeInsnNode)
+			if (opcode == NEW)
+				return 1;
+		return 0;
 	}
 	
 }

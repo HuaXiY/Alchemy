@@ -80,6 +80,8 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 	public static class AlchemyItemRing extends AlchemyItemBauble {
 		
 		public static final String KEY_RING_1 = "key.ring.1", KEY_RING_2 = "key.ring.2";
+		
+		@SideOnly(Side.CLIENT)
 		public static final AlchemyKeyBinding
 				key_binding_1 = new AlchemyKeyBinding(KEY_RING_1, Keyboard.KEY_C),
 				key_binding_2 = new AlchemyKeyBinding(KEY_RING_2, Keyboard.KEY_V);

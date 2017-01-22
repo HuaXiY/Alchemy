@@ -19,16 +19,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.awt.Color;
-
 import static org.lwjgl.opengl.GL11.*;
 import static net.minecraft.util.math.MathHelper.*;
 
 @Omega
 @SideOnly(Side.CLIENT)
 public class RenderHelper extends GlStateManager {
-	
-	private RenderHelper() { super(); }
 	
 	public static BlockFluidRender fluidRender = new BlockFluidRender(Minecraft.getMinecraft().getBlockColors());
 	
@@ -86,7 +82,7 @@ public class RenderHelper extends GlStateManager {
 		);
 	}
 	
-	public static void setColor(Color color) {
+	public static void setColor(java.awt.Color color) {
 		ColorHelper.setColor(color);
 	}
 	

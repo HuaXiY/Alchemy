@@ -66,7 +66,8 @@ public class TransformerSideLambda implements IClassTransformer {
 					marks.add(side != null && side != AlchemyCorePlugin.runtimeSide());
 					flag = 3;
 				}
-				if (flag == 0 && !marks.getLast() && insn instanceof TypeInsnNode) {
+				if (flag > -1 && !marks.getLast() && insn instanceof TypeInsnNode) {
+					flag = -1;
 					TypeInsnNode type = (TypeInsnNode) insn;
 					if (Type.getType(ASMHelper.getClassDesc(type.desc)).equals(types.getLast()) &&
 							insn.visibleTypeAnnotations != null)
@@ -77,12 +78,14 @@ public class TransformerSideLambda implements IClassTransformer {
 				}
 			}
 		}
+		if (marks.isEmpty())
+			return basicClass;
 		reader = new ClassReader(basicClass);
 		node = new ClassNode(ASM5);
 		reader.accept(node, 0);
-		for (Iterator<MethodNode> iterator = node.methods.iterator(); iterator.hasNext();) {
+		for (Iterator<MethodNode> iterator = node.methods.iterator(); !marks.isEmpty() && iterator.hasNext();) {
 			MethodNode method = iterator.next();
-			if (!marks.isEmpty() && method.name.startsWith("lambda$") && (method.access & ACC_SYNTHETIC) != 0) {
+			if (method.name.startsWith("lambda$") && (method.access & ACC_SYNTHETIC) != 0) {
 				if (marks.getFirst())
 					iterator.remove();
 				types.removeFirst();
