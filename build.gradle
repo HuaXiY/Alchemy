@@ -20,7 +20,7 @@ configurations {
     ecj
 }
 dependencies {
-    ecj 'org.eclipse.jdt.core.compiler:ecj:+'
+    ecj 'org.eclipse.jdt.core.compiler:ecj:4.6.1'
 }
 
 def jdt = configurations.ecj.asPath
