@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.RegEx;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -543,6 +544,10 @@ public class Tool {
 			} else
 				list.add(f.toURI().toURL());
 		return list;
+	}
+	
+	public static final byte[] getClassByteArray(ClassLoader loader, String name) throws IOException {
+		return IOUtils.toByteArray(loader.getResourceAsStream(name.replace('.', '/') + ".class"));
 	}
 	
 	public static final <T> T isNullOr(T t, T or) {

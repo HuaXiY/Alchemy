@@ -15,16 +15,20 @@ public class AlchemySetup implements IFMLCallHook {
 	@Override
 	public Void call() throws Exception {
 		AlchemyDLCLoader.setup();
-		return Tool.VOID;
-	}
-
-	@Override
-	public void injectData(Map<String, Object> data) {
-		LaunchClassLoader loader = (LaunchClassLoader) data.get("classLoader");
+		LaunchClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
+		loader.addTransformerExclusion("javafx.");
 		TransformerSide.tryInject(loader);
 		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled())
 			if (AlchemyCorePlugin.runtimeSide().isClient())
 				TransformerInjectOptifine.tryInject(loader);
+		return Tool.VOID;
+	}
+
+	@Override
+	public void injectData(Map<String, Object> data) { }
+	
+	public static void checkInvokePermissions() {
+		Tool.checkInvokePermissions(3, AlchemySetup.class);
 	}
 
 }

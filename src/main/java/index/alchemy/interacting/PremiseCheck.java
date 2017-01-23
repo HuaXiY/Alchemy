@@ -11,7 +11,6 @@ import index.alchemy.core.AlchemyDLCLoader;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Omega;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 
 @Omega
@@ -31,9 +30,9 @@ public class PremiseCheck {
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
-		for (String modid : premises)
-			if (!Loader.isModLoaded(modid) && !AlchemyDLCLoader.isDLCLoaded(modid))
-				onMiss(modid);
+		for (String premise : premises)
+			if (!AlchemyModLoader.isModLoaded(premise) && !AlchemyDLCLoader.isDLCLoaded(premise))
+				onMiss(premise);
 	}
 	
 	public static void onMiss(String modid) {

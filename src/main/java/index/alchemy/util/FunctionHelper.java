@@ -27,11 +27,22 @@ public interface FunctionHelper {
 		return (b, a) -> consumer.accept(a, b);
 	}
 	
+	public static Runnable link(Runnable... runnables) {
+		return () -> {
+			for (Runnable runnable : runnables)
+				runnable.run();
+		};
+	}
+	
 	public static <T> Consumer<T> link(Consumer<T>... consumers) {
 		return t -> {
 			for (Consumer<T> consumer : consumers)
 				consumer.accept(t);
 		};
+	}
+	
+	public static <A> Runnable link(Supplier<A> supplier, Consumer<A> consumer) {
+		return () -> consumer.accept(supplier.get());
 	}
 	
 	public static <A, B> Consumer<A> link1(Function<A, B> function, Consumer<B> consumer) {
@@ -48,6 +59,10 @@ public interface FunctionHelper {
 	
 	public static <A, B> Supplier<B> link1(Supplier<A> supplier, Function<A, B> function) {
 		return () -> function.apply(supplier.get());
+	}
+	
+	public static Runnable onException(Runnable runnable, Consumer<Throwable> handle) {
+		return () -> { try { runnable.run(); } catch (Throwable t) { handle.accept(t); } };
 	}
 	
 }

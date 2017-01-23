@@ -43,10 +43,8 @@ public class TransformerSideLambda implements IClassTransformer {
 		int flag = -1;
 		ClassReader reader;
 		try {
-			reader = new ClassReader(transformedName);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+			reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), transformedName));
+		} catch (IOException e) { throw new RuntimeException(e); }
 		ClassWriter writer = new ClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);

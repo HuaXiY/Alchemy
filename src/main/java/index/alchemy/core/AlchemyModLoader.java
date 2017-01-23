@@ -49,9 +49,11 @@ import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.ProgressManager;
 import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
@@ -93,7 +95,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
 		modid = MOD_ID,
 		name = MOD_NAME,
 		version = MOD_VERSION,
-		dependencies = REQUIRED_AFTER + BOP_ID + ";" + REQUIRED_AFTER + "Forge@[12.18.3.2185,);after:*;"
+		dependencies = REQUIRED_AFTER + BOP_ID + "@[5.0.0,);" + REQUIRED_AFTER + "Forge@[12.18.3.2185,);after:*;"
 )
 public enum AlchemyModLoader {
 	
@@ -321,6 +323,15 @@ public enum AlchemyModLoader {
 	
 	public static void checkInvokePermissions() {
 		Tool.checkInvokePermissions(3, AlchemyModLoader.class);
+	}
+	
+	public static boolean isModLoaded(String modid) {
+		for (ModContainer modContainer : Loader.instance().getModList()) {
+			System.out.println(" *** : " + modContainer.getModId());
+			if (modContainer.getModId().equals(modid))
+				return true;
+		}
+		return false;
 	}
 	
 	public static void restart() {

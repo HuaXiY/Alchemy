@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -26,6 +27,7 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.ReflectionHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -64,6 +66,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	};
 	static {
 		try {
+			ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyCorePlugin.getLaunchClassLoader());
 			loadAllProvider();
 			loadAllTransform();
 		} catch (IOException e) {
@@ -78,7 +81,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
 		for (ClassInfo info : path.getAllClasses())
 			if (info.getName().startsWith(MOD_PACKAGE)) {
-				ClassReader reader = new ClassReader(info.getName());
+				ClassReader reader = new ClassReader(info.url().openStream());
 				ClassNode node = new ClassNode(ASM5);
 				reader.accept(node, 0);
 				if (checkSideOnly(node)) {
@@ -144,7 +147,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	private static void loadAllTransform() throws IOException {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
 		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_TRANSFORMER_PACKAGE.substring(0, MOD_TRANSFORMER_PACKAGE.length() - 1))) {
-			ClassReader reader = new ClassReader(info.getName());
+			ClassReader reader = new ClassReader(info.url().openStream());
 			ClassNode node = new ClassNode(ASM5);
 			reader.accept(node, 0);
 			if (checkSideOnly(node)) {
@@ -153,7 +156,10 @@ public class AlchemyTransformerManager implements IClassTransformer {
 					try {
 						IAlchemyClassTransformer transformer = (IAlchemyClassTransformer) clazz.newInstance();
 						if (!transformer.disable())
-							transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
+							if (transformer.getTransformerClassName() == null)
+								transformers.add(transformer);
+							else
+								transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
@@ -165,8 +171,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if (debug_print)
-			if (transformedName.startsWith("index."))
-				logger.info("loading: " + transformedName);
+			logger.info("loading: " + transformedName);
 		byte[] old = basicClass;
 		for (IClassTransformer transformer : transformers)
 			basicClass = transformer.transform(name, transformedName, basicClass);

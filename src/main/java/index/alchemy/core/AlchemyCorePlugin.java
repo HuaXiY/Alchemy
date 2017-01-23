@@ -3,10 +3,17 @@ package index.alchemy.core;
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
+import java.util.Set;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraftforge.fml.relauncher.CoreModManager;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.Side;
@@ -16,6 +23,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 import static index.alchemy.core.AlchemyConstants.*;
+import static index.alchemy.util.Tool.$;
 
 @Omega
 @Name(MOD_ID)
@@ -26,37 +34,38 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	
 	static {
 		String libs = System.getProperty("index.alchemy.runtime.lib.ext");
-		if (libs != null)
-			for (String lib : libs.split(";"))
-				addRuntimeExtLibFromJRE(lib);
+		if (libs != null) {
+			Set<String> libSet = Sets.newHashSet(Splitter.on(';').split(libs));
+			libSet.add("jfxrt");
+			libSet.forEach(AlchemyCorePlugin::addRuntimeExtLibFromJRE);
+		}
 	}
 	
 	public static void addRuntimeExtLibFromJRE(String name) {
 		try {
 			URL url = new File(System.getProperty("java.home") + "/lib/ext/" + name + ".jar").toURI().toURL();
-			Tool.addURLToClassLoader(AlchemyCorePlugin.class.getClassLoader(), url);
+			Tool.addURLToClassLoader(getLaunchClassLoader(), url);
 		} catch (Exception e) {
 			AlchemyRuntimeException.onException(e);
 		}
 	}
 	
-	private static boolean runtimeDeobfuscationEnabled;
+	private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.deobf.disable");
 	
 	public static boolean isRuntimeDeobfuscationEnabled() {
 		return runtimeDeobfuscationEnabled;
 	}
 	
-	private static File minecraftDir;
-	
 	public static File getMinecraftDir() {
-		return minecraftDir;
+		return $(CoreModManager.class, "mcDir");
+	}
+	
+	public static LaunchClassLoader getLaunchClassLoader() {
+		return Launch.classLoader;
 	}
 	
 	@Override
-	public void injectData(Map<String, Object> data) {
-		runtimeDeobfuscationEnabled = (boolean) data.get("runtimeDeobfuscationEnabled");
-		minecraftDir = (File) data.get("mcLocation");
-	}
+	public void injectData(Map<String, Object> data) { }
 	
 	private static final Side side = FMLLaunchHandler.side();
 	

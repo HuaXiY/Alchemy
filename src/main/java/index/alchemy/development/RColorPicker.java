@@ -1,11 +1,9 @@
 package index.alchemy.development;
 
-import com.sun.javafx.application.LauncherImpl;
-
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Test;
+import index.alchemy.util.JFXHelper;
 import index.project.version.annotation.Omega;
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ColorPicker;
@@ -16,11 +14,13 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Omega
 @Test
+@Omega
 @SideOnly(Side.CLIENT)
 @Init(state = ModState.PREINITIALIZED, enable = true)
 public class RColorPicker {
+	
+	public static final ColorPicker color_picker = new ColorPicker();
 	
 	public static volatile float a, r, g, b;
 	
@@ -29,26 +29,12 @@ public class RColorPicker {
 	}
 	
 	public static Color getColor() {
-		return $App.color_picker.getValue();
+		return color_picker.getValue();
 	}
 	
 	public static void init() {
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				LauncherImpl.launchApplication($App.class, new String[0]);
-			}
-			
-		}).start();
-	}
-
-	public static class $App extends Application {
-		
-		public static final ColorPicker color_picker = new ColorPicker();
-		
-		@Override
-		public void start(Stage stage) {
+		JFXHelper.runLater(() -> {
+			Stage stage = new Stage();
 			stage.setTitle("ColorPicker");
 			Scene scene = new Scene(new HBox(20), 240, 30);
 			HBox box = (HBox) scene.getRoot();
@@ -67,8 +53,7 @@ public class RColorPicker {
 			box.getChildren().addAll(color_picker);
 			stage.setScene(scene);
 			stage.show();
-		}
-		
+		});
 	}
 	
 }

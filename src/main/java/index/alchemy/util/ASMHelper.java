@@ -22,6 +22,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.google.common.base.Objects;
 
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.AlchemyCorePlugin;
 import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Omega;
 
@@ -172,7 +173,7 @@ public class ASMHelper {
 			return null;
 		else {
 			try {
-				ClassReader reader = new ClassReader(node.superName);
+				ClassReader reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), node.superName));
 				ClassNode result = new ClassNode();
 				reader.accept(result, 0);
 				return result;

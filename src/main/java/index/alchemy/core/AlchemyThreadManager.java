@@ -127,4 +127,10 @@ public final class AlchemyThreadManager {
 		lock.unlock();
 	}
 	
+	public static Thread runOnNewThread(Runnable runnable) {
+		Thread thread = new Thread(runnable);
+		thread.start();
+		return thread;
+	}
+	
 }

@@ -69,19 +69,21 @@ minecraft {
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
-
+	
     options.encoding = 'utf-8'
     options.fork = true
     doFirst {
         options.forkOptions.with {
             executable = 'java'
-            def source = new java.util.TreeSet(sourceSets.main.compileClasspath.getFiles())
-            sourceSets.main.compileClasspath = new org.gradle.api.internal.file.UnionFileCollection(source)
-            def toSort = { f -> f.toString().contains("forgeSrc-") ? -1 : 0 }
-            source.sort{ a, b -> toSort(a) - toSort(b) }
+            def lib = new java.util.TreeSet(sourceSets.main.compileClasspath.getFiles())
+            sourceSets.main.compileClasspath = new org.gradle.api.internal.file.UnionFileCollection(lib)
+            def toSort = { it.toString().contains("forgeSrc-") ? -1 : 0 }
+            lib.sort { a, b -> toSort(a) - toSort(b) }
             println "Main Compile Class Path: "
             sourceSets.main.compileClasspath.each { File f -> println f }
-			println jdt
+			source = sourceSets.main.java.exclude { it.getFile().toString().replace("\\", ".").replace("/", ".").contains("index.alchemy.core.run") }
+			source.each { f -> println f }
+			println "JDT-ECJ lib path: " + jdt
             jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
         }
     }
@@ -122,11 +124,10 @@ task dlc {
             doFirst {
                 options.forkOptions.with {
                     executable = 'java'
-                    def source = new java.util.TreeSet(classpath.getFiles())
-                    classpath = new org.gradle.api.internal.file.UnionFileCollection(source)
-                    def toSort = { f -> f.toString().contains("forgeSrc-") ? -1 : 0 }
-                    source.sort{ a, b -> toSort(a) - toSort(b) }
-					classpath.each { File f -> println f }
+                    def lib = new java.util.TreeSet(classpath.getFiles())
+                    classpath = new org.gradle.api.internal.file.UnionFileCollection(lib)
+                    def toSort = { it.toString().contains("forgeSrc-") ? -1 : 0 }
+                    lib.sort { a, b -> toSort(a) - toSort(b) }
                     jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
                 }
              }
