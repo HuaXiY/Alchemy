@@ -25,6 +25,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
@@ -217,9 +218,7 @@ public final class TransformerHook implements IClassTransformer {
 						result = entry.getValue();
 						break;
 					}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 		}
 		this.srgName = Tool.isNullOr(result, srgName);
 		this.isStatic = isStatic;

@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.RandomAccess;
 import java.util.stream.Stream;
 
+import index.alchemy.api.IItemHandlerModifiableInventory;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
 import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -22,13 +22,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import static java.lang.Math.*;
 
 @Omega
-public abstract class AlchemyInventory implements ICapabilitySerializable, IInventory, IItemHandlerModifiable, RandomAccess {
+public abstract class AlchemyInventory implements ICapabilitySerializable, IItemHandlerModifiableInventory, RandomAccess {
 	
 	public static final int LIMIT = 64;
 	public static final String CONTENTS = "contents";
@@ -187,12 +186,7 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IInve
 	public int getSizeInventory() {
 		return contents.length;
 	}
-
-	@Override
-	public ItemStack getStackInSlot(int index) {
-		return contents[index];
-	}
-
+	
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
 		markDirty();
@@ -209,6 +203,11 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IInve
 	public void setInventorySlotContents(int index, ItemStack item) {
 		markDirty();
 		contents[index] = item;
+	}
+	
+	@Override
+	public ItemStack getInventorySlotContents(int index) {
+		return contents[index];
 	}
 
 	@Override

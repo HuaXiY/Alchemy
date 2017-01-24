@@ -9,6 +9,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
@@ -239,8 +240,9 @@ public enum AlchemyModLoader {
 	
 	public static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 	
-	public static final String mc_dir, mod_path;
+	public static final String mc_dir;
 	public static final boolean is_modding, enable_test, enable_dmain;
+	public static final File mod_path;
 	private static final Map<ModState, LinkedList<Class<?>>> init_map = new LinkedHashMap<ModState, LinkedList<Class<?>>>() {
 		
 		@Override
@@ -326,11 +328,9 @@ public enum AlchemyModLoader {
 	}
 	
 	public static boolean isModLoaded(String modid) {
-		for (ModContainer modContainer : Loader.instance().getModList()) {
-			System.out.println(" *** : " + modContainer.getModId());
+		for (ModContainer modContainer : Loader.instance().getModList())
 			if (modContainer.getModId().equals(modid))
 				return true;
-		}
 		return false;
 	}
 	
@@ -352,9 +352,23 @@ public enum AlchemyModLoader {
 		logger.info("Max Direct Memory: " + sun.misc.VM.maxDirectMemory());
 		
 		is_modding = !AlchemyCorePlugin.isRuntimeDeobfuscationEnabled();
-		mod_path = AlchemyModLoader.class.getProtectionDomain().getCodeSource().getLocation().getPath()
-				.replace(ASMHelper.getClassName(AlchemyModLoader.class) + ".class", "");
 		mc_dir = AlchemyCorePlugin.getMinecraftDir().getPath();
+		try {
+			String offset = AlchemyModLoader.class.getName().replace('.', '/') + ".class";
+			URL src = AlchemyModLoader.class.getResource("/" + offset);
+			if (src.getProtocol().equals("jar"))
+				mod_path = new File(((JarURLConnection) src.openConnection()).getJarFileURL().getFile());
+			else if (src.getProtocol().equals("file"))
+				mod_path = new File(src.getFile().replace(offset, ""));
+			else {
+				mod_path = null;
+				throw new NullPointerException("mod_path");
+			}
+		} catch (Exception e) {
+			AlchemyRuntimeException.onException(e);
+			throw new RuntimeException(e);
+		}
+		logger.info("Mod path: " + mod_path);
 		
 		enable_test = Boolean.getBoolean("index.alchemy.enable_test");
 		logger.info("Test mode state: " + enable_test);
@@ -380,14 +394,13 @@ public enum AlchemyModLoader {
 		try {
 			for (String line : Tool.read(AlchemyModLoader.class.getResourceAsStream("/ascii_art.txt")).split("\n"))
 				logger.info(line);
-		} catch (Exception e) {}
+		} catch (Exception e) { }
 		
 		AlchemyDebug.start("bootstrap");
-		URL url = new File(mod_path).toURI().toURL();
-		class_list.addAll(0, findClassFromURL(url));
+		class_list.addAll(0, findClassFromURL(mod_path.toURI().toURL()));
 		
 		Side side = Always.getSide();
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		ClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
 		
 		for (String name : class_list) {
 			try {
@@ -432,7 +445,7 @@ public enum AlchemyModLoader {
 		log_stack.clear();
 		
 		init(ModState.LOADED);
-		AlchemyUpdateManager.invoke(MOD_ID, DEV_VERSION, null, new File(mod_path));
+		AlchemyUpdateManager.invoke(MOD_ID, DEV_VERSION, null, new File(mod_path.toURI()));
 	}
 	
 	public static String format(String src, String max) {
@@ -471,14 +484,13 @@ public enum AlchemyModLoader {
 			logger.info("Successful !");
 		} catch (Exception e) {
 			logger.error("Failed !");
-			init(ModState.ERRORED);
 			AlchemyRuntimeException.onException(e);
 		}
 	}
 	
 	@EventHandler
 	public void onFMLConstruction(FMLConstructionEvent event) {
-		try { bootstrap(); } catch (Throwable e) { throw new RuntimeException("Can't bootstrap !!!", e); }
+		try { bootstrap(); } catch (Throwable e) { AlchemyRuntimeException.onException(new RuntimeException("Can't bootstrap !!!", e)); }
 		init(ModState.CONSTRUCTED);
 		onFMLEvent(event);
 	}

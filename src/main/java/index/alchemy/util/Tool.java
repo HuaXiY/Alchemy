@@ -181,12 +181,7 @@ public class Tool {
 	}
 	
 	public static final void coverString(String src, String to) {
-		try {
-			Field value = setAccessible(String.class.getDeclaredField("value"));
-			FinalFieldSetter.instance().set(src, value, value.get(to));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		$(src, "value<<", $(to, "value"));
 	}
 	
 	public static final <T extends AccessibleObject> T setAccessible(T t) {
@@ -232,11 +227,7 @@ public class Tool {
 	}
 	
 	public static final void load(Class<?> clazz) {
-		try {
-			Class.forName(clazz.getName());
-		} catch (ClassNotFoundException e) {
-			AlchemyRuntimeException.onException(e);
-		}
+		ReflectionHelper.getUnsafe().ensureClassInitialized(clazz);
 	}
 	
 	public static final void init(Class<?> clazz) {
@@ -245,20 +236,19 @@ public class Tool {
 			AlchemyInitHook.init(instance);
 	}
 	
+	@Nullable
 	public static final <T> T instance(Class<T> clazz) {
 		try {
 			return (T) setAccessible(clazz.getDeclaredConstructor()).newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
+		return null;
 	}
 	
 	public static final <T> T instance(Class<T> clazz, Object obj) {
 		try {
 			return (T) setAccessible(clazz.getDeclaredConstructor(obj.getClass())).newInstance(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
+		return null;
 	}
 	
 	@Unsafe(Unsafe.REFLECT_API)
@@ -326,10 +316,7 @@ public class Tool {
 	public static final void setType(Class<?> clazz, Object obj) {
 		// Initialize this class, the initialization process will assign fields to null
 		load(clazz);
-		try {
-			Field field = clazz.getDeclaredField("type");
-			FinalFieldSetter.instance().setStatic(field, obj);
-		} catch (Exception e) { }
+		try { $(clazz, "type<<", obj); } catch (Exception e) { }
 	}
 	
 	public static final void checkInvokePermissions(int deep, Class<?> clazz) {
@@ -716,8 +703,16 @@ public class Tool {
 				if (args.length == 2)
 					return (T) setAccessible(searchField(clazz, (String) args[1])).get(object);
 				if (args.length == 3 && ((String) args[1]).endsWith("<")) {
-					Field field = setAccessible(searchField(clazz, ((String) args[1]).replace("<", "")));
-					field.set(object, args[2]);
+					Field field = setAccessible(((String) args[1]).endsWith("<<") ?
+							clazz.getDeclaredField(((String) args[1]).replace("<", "")) :
+								searchField(clazz, ((String) args[1]).replace("<", "")));
+					if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
+						if (object == null)
+							FinalFieldSetter.instance().setStatic(field, args[2]);
+						else
+							FinalFieldSetter.instance().set(object, field, args[2]);
+					else
+						field.set(object, args[2]);
 					return (T) args[2];
 				}
 			} catch (NoSuchFieldException e) { }

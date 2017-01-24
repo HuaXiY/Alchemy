@@ -39,8 +39,14 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
 import net.minecraftforge.oredict.OreDictionary;
 
+import static index.alchemy.util.Tool.$;
+
+import java.util.function.Consumer;
+
 @Omega
 public class AlchemyInitHook {
+	
+	static { $(IRegister.class, "impl<", (Consumer<IRegister>) AlchemyInitHook::init); }
 	
 	@Omega
 	public static class InitHookEvent extends Event {

@@ -1,12 +1,16 @@
 package index.alchemy.api;
 
-import index.alchemy.core.AlchemyInitHook;
+import java.util.function.Consumer;
+
 import net.minecraft.creativetab.CreativeTabs;
 
 public interface IRegister {
 	
+	Consumer<IRegister> impl = null;
+	
 	default void register() {
-		AlchemyInitHook.init(this);
+		if (impl != null)
+			impl.accept(this);
 	}
 	
 	default boolean shouldRegisterToGame() { return true; }

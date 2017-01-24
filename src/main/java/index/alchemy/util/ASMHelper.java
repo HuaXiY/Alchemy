@@ -162,25 +162,20 @@ public class ASMHelper {
 			ClassNode result = new ClassNode();
 			reader.accept(result, 0);
 			return getSuperClassNode(result);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		} catch (IOException e) { return null; }
 	}
 	
 	@Nullable
 	public static final ClassNode getSuperClassNode(ClassNode node) {
 		if (node.superName == null || node.superName.isEmpty())
 			return null;
-		else {
+		else
 			try {
 				ClassReader reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), node.superName));
 				ClassNode result = new ClassNode();
 				reader.accept(result, 0);
 				return result;
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
+			} catch (IOException e) { return null; }
 	}
 	
 	public static final boolean corresponding(FieldNode field, String owner, FieldInsnNode fieldInsn) {

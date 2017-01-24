@@ -25,12 +25,11 @@ import index.alchemy.core.AlchemyFieldAccess;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
-import index.alchemy.util.FinalFieldSetter;
-import index.alchemy.util.Tool;
 import index.project.version.annotation.Alpha;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import static org.objectweb.asm.Opcodes.*;
+import static index.alchemy.util.Tool.$;
 
 @Alpha
 public class TransformerFieldAccess implements IClassTransformer {
@@ -100,10 +99,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 	}
 	
 	public void updateAccessField(String clazzName, FieldNode field, String desc) {
-		try {
-			FinalFieldSetter.instance().setStatic(Tool.forName(owner, true).getDeclaredField(field.name),
-					createAccess(clazzName, field, desc, false));
-		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
+		$("L" + owner, field.name + "<", createAccess(clazzName, field, desc, false));
 	}
 	
 	@Nullable

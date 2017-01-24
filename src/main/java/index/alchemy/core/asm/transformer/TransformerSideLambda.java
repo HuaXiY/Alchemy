@@ -18,6 +18,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import index.alchemy.api.annotation.SideOnlyLambda;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
@@ -41,10 +42,10 @@ public class TransformerSideLambda implements IClassTransformer {
 		LinkedList<Type> types = new LinkedList<>();
 		LinkedList<Boolean> marks = new LinkedList<>();
 		int flag = -1;
-		ClassReader reader;
+		ClassReader reader = null;
 		try {
 			reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), transformedName));
-		} catch (IOException e) { throw new RuntimeException(e); }
+		} catch (IOException e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 		ClassWriter writer = new ClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);

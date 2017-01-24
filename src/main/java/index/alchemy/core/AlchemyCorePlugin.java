@@ -2,6 +2,7 @@ package index.alchemy.core;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,12 +34,10 @@ import static index.alchemy.util.Tool.$;
 public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	
 	static {
-		String libs = System.getProperty("index.alchemy.runtime.lib.ext");
-		if (libs != null) {
-			Set<String> libSet = Sets.newHashSet(Splitter.on(';').split(libs));
-			libSet.add("jfxrt");
-			libSet.forEach(AlchemyCorePlugin::addRuntimeExtLibFromJRE);
-		}
+		System.out.println(Arrays.deepToString(getLaunchClassLoader().getURLs()));
+		Set<String> libs = Sets.newHashSet(Splitter.on(';').split(Tool.isEmptyOr(System.getProperty("index.alchemy.runtime.lib.ext"), "")));
+		libs.add("jfxrt");
+		libs.forEach(AlchemyCorePlugin::addRuntimeExtLibFromJRE);
 	}
 	
 	public static void addRuntimeExtLibFromJRE(String name) {

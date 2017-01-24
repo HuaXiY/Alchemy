@@ -10,8 +10,6 @@ import index.alchemy.api.annotation.Hook.Type;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.DynamicNumber;
-import index.alchemy.util.FinalFieldSetter;
-import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
@@ -20,6 +18,8 @@ import toughasnails.temperature.TemperatureDebugger;
 import toughasnails.temperature.TemperatureTrend;
 import toughasnails.temperature.modifier.ArmorModifier;
 import toughasnails.temperature.modifier.TemperatureModifier;
+
+import static index.alchemy.util.Tool.$;
 
 @Hook.Provider
 @Field.Provider
@@ -32,10 +32,10 @@ public class ExArmorModifier {
 	@Hook(value = "toughasnails.temperature.TemperatureDebugger$Modifier#<clinit>", type = Type.TAIL, isStatic = true)
 	public static void clinit() {
 		try {
-			FinalFieldSetter.instance().setStatic(Tool.searchField(ExArmorModifier.class, "BAUBLE_TARGET"),
+			$(ExArmorModifier.class, "BAUBLE_TARGET<",
 					EnumHelper.addEnum(TemperatureDebugger.Modifier.class, "BAUBLE_TARGET",
 					new Class<?>[]{ String.class, TemperatureDebugger.ModifierType.class }, "Bauble", TemperatureDebugger.ModifierType.TARGET));
-			FinalFieldSetter.instance().setStatic(Tool.searchField(ExArmorModifier.class, "BAUBLE_RATE"),
+			$(ExArmorModifier.class, "BAUBLE_RATE<",
 					EnumHelper.addEnum(TemperatureDebugger.Modifier.class, "BAUBLE_RATE",
 					new Class<?>[]{ String.class, TemperatureDebugger.ModifierType.class }, "Bauble", TemperatureDebugger.ModifierType.RATE));
 		} catch (Exception e) {

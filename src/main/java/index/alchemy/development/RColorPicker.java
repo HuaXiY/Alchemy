@@ -20,7 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.PREINITIALIZED, enable = true)
 public class RColorPicker {
 	
-	public static final ColorPicker color_picker = new ColorPicker();
+	public static ColorPicker color_picker;
 	
 	public static volatile float a, r, g, b;
 	
@@ -39,9 +39,8 @@ public class RColorPicker {
 			Scene scene = new Scene(new HBox(20), 240, 30);
 			HBox box = (HBox) scene.getRoot();
 			box.setPadding(new Insets(5, 5, 5, 5));		
-
+			color_picker = new ColorPicker();
 			color_picker.setValue(Color.CORAL);
-			
 			color_picker.setOnAction(e -> {
 				Color color = color_picker.getValue();
 				a = 1 - (float) color.getOpacity();
@@ -49,7 +48,6 @@ public class RColorPicker {
 				g = (float) color.getGreen();
 				b = (float) color.getBlue();
 			});
-
 			box.getChildren().addAll(color_picker);
 			stage.setScene(scene);
 			stage.show();

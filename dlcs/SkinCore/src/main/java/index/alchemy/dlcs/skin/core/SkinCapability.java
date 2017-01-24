@@ -45,7 +45,6 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	
 	@SubscribeEvent
 	public void onAttachCapabilities(AttachCapabilitiesEvent<? extends EntityPlayer> event) {
-		if (event.getObject() instanceof EntityPlayer)
 		event.addCapability(RESOURCE, new SkinInfo(event.getObject()));
 	}
 	

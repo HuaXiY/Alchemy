@@ -6,18 +6,13 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.annotation.Change;
 import index.alchemy.api.annotation.Config;
-import index.alchemy.api.annotation.SideOnlyLambda;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyConstants;
-import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,39 +24,32 @@ public class AlchemyRuntimeException extends RuntimeException {
 	@Config(category = "runtime", comment = "Serious exceptions are ignored in the game.")
 	private static boolean ignore_serious_exceptions = false;
 	
-	private AlchemyRuntimeException(Throwable t) {
-		super(t);
-	}
+	private AlchemyRuntimeException(Throwable t) { super(t); }
 	
 	public static void onException(Throwable t) throws RuntimeException {
 		if (t instanceof AlchemyRuntimeException)
 			return;
 		
-		AlchemyRuntimeException e = new AlchemyRuntimeException(t);
+		AlchemyRuntimeException ex = new AlchemyRuntimeException(t);
 		
-		String error = getStringFormThrowable(e);
+		String error = getStringFormThrowable(ex);
 		
 		AlchemyModLoader.logger.error(error);
 		
 		if (ignore_serious_exceptions)
 			return;
 		
-		for (StackTraceElement element : e.getStackTrace())
+		for (StackTraceElement element : ex.getStackTrace())
 			try {
 				Class<?> clazz = Class.forName(element.getClassName());
 				for (Method method : Tool.searchMethod(clazz, element.getMethodName()))
 					if (checkAnnotation(clazz, method))
 						break;
-			} catch (ClassNotFoundException ex) {
-				continue;
-			}
+			} catch (ClassNotFoundException e) { continue; }
 		
-		if (Always.runOnClient())
-			AlchemyEventSystem.addDelayedRunnable((@SideOnlyLambda(Side.CLIENT) IPhaseRunnable)
-					p -> Minecraft.getMinecraft().displayGuiScreen(new GuiAlchemyRuntimeError(e, error)), 0);
-		else
-			throw e;
+		JFXDialog.showThrowable(ex);
 		
+		throw ex;
 	}
 	
 	public static String getStringFormThrowable(Throwable t) {
@@ -113,8 +101,8 @@ public class AlchemyRuntimeException extends RuntimeException {
 		public void initGui() {
 			super.initGui();
 			buttonList.clear();
-			buttonList.add(new GuiButton(0, width / 2 - 200, height - 20, "复制"));
-			buttonList.add(new GuiButton(0, width / 2, height - 20, "上传"));
+			buttonList.add(new GuiButton(0, width / 2 - 200, height - 20, "copy"));
+			buttonList.add(new GuiButton(0, width / 2, height - 20, "upload"));
 		}
 
 		@Override

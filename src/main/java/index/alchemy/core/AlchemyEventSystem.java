@@ -320,8 +320,11 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	public static void onRunnableTick(Side side, Phase phase) {
 		updatePhase(side, phase);
-		List<IContinuedRunnable> list = runnable_mapping.get(side);
-		list.addAll(runnable_mapping_buffer.get(side));
+		List<IContinuedRunnable> list = runnable_mapping.get(side), buffer = runnable_mapping_buffer.get(side);
+		synchronized (buffer) {
+			list.addAll(buffer);
+			buffer.clear();
+		}
 		for (Iterator<IContinuedRunnable> iterator = list.iterator(); iterator.hasNext();)
 			if (iterator.next().run(phase))
 				iterator.remove();
@@ -341,8 +344,6 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
-				
-				//System.out.println(Biome.getIdForBiome(AlchemyBiomeLoader.dragon_island));
 			}
 			System.setProperty("index.alchemy.runtime.debug.server", flag);
 		}
@@ -352,12 +353,10 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onClientTick(ClientTickEvent event) {
-		String flag = "20";
+		String flag = "22";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
-				//removeInputHook(AlchemyItemLoader.ring_time);
-				//System.out.println(Minecraft.getMinecraft().thePlayer.getEntityData());
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);
 		}

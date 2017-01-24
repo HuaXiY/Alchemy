@@ -1,6 +1,5 @@
 package index.alchemy.core.asm.transformer;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,15 +68,13 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyCorePlugin.getLaunchClassLoader());
 			loadAllProvider();
 			loadAllTransform();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 	}
 	
 	public static final boolean debug_print = Boolean.getBoolean("index.alchemy.core.asm.classloader.at.debug.print");
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadAllProvider() throws IOException {
+	private static void loadAllProvider() throws Exception {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
 		for (ClassInfo info : path.getAllClasses())
 			if (info.getName().startsWith(MOD_PACKAGE)) {
@@ -93,7 +90,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadPatch(ClassNode node) throws IOException {
+	private static void loadPatch(ClassNode node) throws Exception {
 		if (node.visibleAnnotations != null)
 			for (AnnotationNode ann : node.visibleAnnotations)
 				if (ann.desc.equals(PATCH_ANNOTATION_DESC)) {
@@ -104,7 +101,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadHook(ClassNode node) throws IOException {
+	private static void loadHook(ClassNode node) throws Exception {
 		if (node.visibleAnnotations != null)
 			for (AnnotationNode nann : node.visibleAnnotations)
 				if (nann.desc.equals(HOOK_PROVIDER_ANNOTATION_DESC)) {
@@ -128,7 +125,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadField(ClassNode node) throws IOException {
+	private static void loadField(ClassNode node) throws Exception {
 		if (node.visibleAnnotations != null)
 			for (AnnotationNode nann : node.visibleAnnotations)
 				if (nann.desc.equals(FIELD_PROVIDER_ANNOTATION_DESC)) {
@@ -144,7 +141,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadAllTransform() throws IOException {
+	private static void loadAllTransform() throws Exception {
 		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
 		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_TRANSFORMER_PACKAGE.substring(0, MOD_TRANSFORMER_PACKAGE.length() - 1))) {
 			ClassReader reader = new ClassReader(info.url().openStream());
@@ -214,9 +211,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		for (String clazz : transformers_mapping.keySet())
 			try {
 				Class.forName(clazz, false, AlchemyTransformerManager.class.getClassLoader());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 	}
 	
 	public static void transform(String name) {
