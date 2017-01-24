@@ -13,8 +13,7 @@ Organizer:
   </ul>
 Member:
   <ul>
-    <li><a href="https://github.com/Tinkle01">@Tinkle01</a></li>
-    <li><a href="https://github.com/ci010">@CI010</a></li>
+    <li><a href="https://github.com/Mrkwtkr">@Mrkwtkr</a></li>
   </ul>
 <hr>
 Minecraft version: 1.10.2<br>
