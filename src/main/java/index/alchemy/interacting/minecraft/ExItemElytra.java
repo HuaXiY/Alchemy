@@ -20,7 +20,6 @@ import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
 import net.minecraft.client.renderer.entity.layers.LayerCape;
 import net.minecraft.client.renderer.entity.layers.LayerElytra;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.init.Items;
@@ -91,32 +90,24 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 		
 		private void updateElytra() {
 			boolean flag = getFlag(7);
-	        if (flag && !onGround && !isRiding()) {
-	            ItemStack item = getFormLiving0(this);
-	            if (item != null && ItemElytra.isBroken(item)) {
-	                flag = true;
-	                if (!worldObj.isRemote && (ticksElytraFlying + 1) % 20 == 0)
-	                    item.damageItem(1, this);
-	            } else
-	                flag = false;
-	        } else
-	            flag = false;
-	        if (!worldObj.isRemote)
-	        	setFlag(7, flag);
+			if (flag && !onGround && !isRiding()) {
+				ItemStack item = getFormLiving0(this);
+				if (item != null && ItemElytra.isBroken(item)) {
+					flag = true;
+					if (!worldObj.isRemote && (ticksElytraFlying + 1) % 20 == 0)
+						item.damageItem(1, this);
+				} else
+					flag = false;
+			} else
+				flag = false;
+			if (!worldObj.isRemote)
+				setFlag(7, flag);
 		}
 		
 	}
 	
 	@Hook.Provider
 	public static class HookServer {
-		
-		@Hook("net.minecraft.entity.Entity#func_70052_a")
-		public static void setFlag(Entity entity, int id, boolean flag) {
-		}
-		
-		@Hook("net.minecraft.entity.Entity#func_70083_f")
-		public static void getFlag(Entity entity, int id) {
-		}
 		
 		@Hook("net.minecraft.network.NetHandlerPlayServer#func_147357_a")
 		public static Hook.Result processEntityAction(NetHandlerPlayServer handler, CPacketEntityAction action) {
@@ -126,10 +117,10 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 				if (!handler.playerEntity.onGround && handler.playerEntity.motionY < 0.0D &&
 						!handler.playerEntity.isElytraFlying() && !handler.playerEntity.isInWater()) {
 					ItemStack item = getFormLiving0(handler.playerEntity);
-	                if (item != null && ItemElytra.isBroken(item))
-	                    handler.playerEntity.setElytraFlying();
-	            } else
-	            	handler.playerEntity.clearElytraFlying();
+					if (item != null && ItemElytra.isBroken(item))
+						handler.playerEntity.setElytraFlying();
+				} else
+					handler.playerEntity.clearElytraFlying();
 				return Hook.Result.NULL;
 			}
 			return Hook.Result.VOID;
@@ -153,7 +144,7 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 						player.motionY < 0.0D && !player.isElytraFlying() && !player.capabilities.isFlying)
 					if (ItemElytra.isBroken(item)) {
 						System.out.println("send");
-		            	player.connection.sendPacket(new CPacketEntityAction(player, CPacketEntityAction.Action.START_FALL_FLYING));
+						player.connection.sendPacket(new CPacketEntityAction(player, CPacketEntityAction.Action.START_FALL_FLYING));
 					}
 			}
 			HookClient.flag = flag;
@@ -178,25 +169,25 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 			if (item != null) {
 				{
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		            GlStateManager.enableBlend();
+					GlStateManager.enableBlend();
 
-		            if (player.isPlayerInfoSet() && player.getLocationElytra() != null)
-		            	layer.renderPlayer.bindTexture(player.getLocationElytra());
-		            else if (player.hasPlayerInfo() && player.getLocationCape() != null && player.isWearing(EnumPlayerModelParts.CAPE))
-		            	layer.renderPlayer.bindTexture(player.getLocationCape());
-		            else
-		            	layer.renderPlayer.bindTexture(LayerElytra.TEXTURE_ELYTRA);
+					if (player.isPlayerInfoSet() && player.getLocationElytra() != null)
+						layer.renderPlayer.bindTexture(player.getLocationElytra());
+					else if (player.hasPlayerInfo() && player.getLocationCape() != null && player.isWearing(EnumPlayerModelParts.CAPE))
+						layer.renderPlayer.bindTexture(player.getLocationCape());
+					else
+						layer.renderPlayer.bindTexture(LayerElytra.TEXTURE_ELYTRA);
 
-		            GlStateManager.pushMatrix();
-		            GlStateManager.translate(0.0F, 0.0F, 0.125F);
-		            layer.modelElytra.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
-		            layer.modelElytra.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+					GlStateManager.pushMatrix();
+					GlStateManager.translate(0.0F, 0.0F, 0.125F);
+					layer.modelElytra.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
+					layer.modelElytra.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
 
-		            if (item.isItemEnchanted())
-		                LayerArmorBase.renderEnchantedGlint(layer.renderPlayer, player, layer.modelElytra, limbSwing, limbSwingAmount,
-		                		partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+					if (item.isItemEnchanted())
+						LayerArmorBase.renderEnchantedGlint(layer.renderPlayer, player, layer.modelElytra, limbSwing, limbSwingAmount,
+								partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
 
-		            GlStateManager.popMatrix();
+					GlStateManager.popMatrix();
 				}
 				return Hook.Result.NULL;
 			}
