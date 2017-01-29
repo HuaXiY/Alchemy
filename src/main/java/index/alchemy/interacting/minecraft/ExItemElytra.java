@@ -34,7 +34,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Hook.Provider
 @Patch("net.minecraft.item.ItemElytra")
 public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipment {
 
@@ -142,10 +141,8 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 			if (item != null) {
 				if (flag && jump.getKeyConflictContext().isActive() && !HookClient.flag &&
 						player.motionY < 0.0D && !player.isElytraFlying() && !player.capabilities.isFlying)
-					if (ItemElytra.isBroken(item)) {
-						System.out.println("send");
+					if (ItemElytra.isBroken(item))
 						player.connection.sendPacket(new CPacketEntityAction(player, CPacketEntityAction.Action.START_FALL_FLYING));
-					}
 			}
 			HookClient.flag = flag;
 		}
