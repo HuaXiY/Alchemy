@@ -1,0 +1,20 @@
+#index.alchemy.interacting.WoodType
+public net.minecraftforge.client.model.ModelLoader$VanillaLoader
+
+#index.alchemy.interacting.WoodType
+public net.minecraftforge.client.model.ModelLoader$VanillaLoader getLoader()Lnet/minecraftforge/client/model/ModelLoader;
+
+#index.alchemy.interacting.WoodType
+public net.minecraftforge.client.model.ModelLoader getModelBlockDefinition(Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/ModelBlockDefinition;
+
+#index.alchemy.interacting.WoodType
+public-d net.minecraftforge.client.model.ModelLoader func_177586_a(Lnet/minecraft/util/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/ModelBlockDefinition;
+
+#?
+public net.minecraftforge.client.model.ModelLoader$WeightedRandomModel
+
+#?
+public net.minecraftforge.client.model.ModelLoader$VanillaModelWrapper
+
+#?
+public net.minecraftforge.client.model.animation.ModelBlockAnimation defaultModelBlockAnimation

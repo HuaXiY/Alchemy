@@ -14,7 +14,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 
 import index.alchemy.api.annotation.Listener;
-import index.alchemy.development.RColorPicker;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Beta;
@@ -124,7 +123,7 @@ public class GuiWardrobe extends GuiScreen {
 			@Override
 			public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected) {
 				String str = fontRendererObj.listFormattedStringToWidth(name, listWidth).get(0);
-				fontRendererObj.drawStringWithShadow(str, x + listWidth / 2 - fontRendererObj.getStringWidth(str) / 2, y + 1, RColorPicker.getRGB());//0x93573F);
+				fontRendererObj.drawStringWithShadow(str, x + listWidth / 2 - fontRendererObj.getStringWidth(str) / 2, y + 1, 0xEEEEEE);
 				x += listWidth / 2;
 				listWidth = fontRendererObj.getStringWidth(str);
 				x -= listWidth / 2 + 1;

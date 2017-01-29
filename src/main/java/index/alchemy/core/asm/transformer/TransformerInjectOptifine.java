@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.io.IOUtils;
 
-import com.google.common.base.Joiner;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -35,7 +34,6 @@ public class TransformerInjectOptifine implements IClassTransformer {
 			List<IClassTransformer> transformers = $(classLoader, "transformers");
 			transformers.remove(1);
 			transformers.add(0, new TransformerInjectOptifine(classLoader));
-			AlchemyTransformerManager.logger.info(Joiner.on('\n').appendTo(new StringBuilder("Transformers: \n"), transformers).toString());
 		} catch (Exception e) { e.printStackTrace(); }
 	}
 

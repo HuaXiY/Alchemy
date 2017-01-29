@@ -3,7 +3,6 @@ package index.alchemy.core.debug;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.util.JFXHelper;
 import index.project.version.annotation.Alpha;
 import javafx.scene.control.Alert;
@@ -15,12 +14,16 @@ import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 @Alpha
-@Unsafe(Unsafe.JAVAFX_API)
 public class JFXDialog {
 	
 	public static void showThrowable(Throwable ex) { showThrowable(ex, null, null); }
 	
+	public static void showThrowableAndWait(Throwable ex, String title, String str) {
+		JFXHelper.runAndWait(getShowAlertRunnable(ex, title, str));
+	}
+	
 	public static void showThrowable(Throwable ex, String title, String str) {
+		
 		JFXHelper.runLater(getShowAlertRunnable(ex, title, str));
 	}
 	

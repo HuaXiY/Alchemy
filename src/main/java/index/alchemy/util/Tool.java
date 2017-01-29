@@ -35,7 +35,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.RegEx;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -48,6 +47,7 @@ import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Omega;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 
 @Omega
 public class Tool {
@@ -533,8 +533,9 @@ public class Tool {
 		return list;
 	}
 	
-	public static final byte[] getClassByteArray(ClassLoader loader, String name) throws IOException {
-		return IOUtils.toByteArray(loader.getResourceAsStream(name.replace('.', '/') + ".class"));
+	@Nullable
+	public static final byte[] getClassByteArray(LaunchClassLoader loader, String name) throws IOException {
+		return loader.getClassBytes(name.replace('/', '.'));
 	}
 	
 	public static final <T> T isNullOr(T t, T or) {
@@ -678,7 +679,7 @@ public class Tool {
 		return result;
 	}
 	
-	public static final Void VOID = null;//instance(Void.class);
+	public static final Void VOID = instance(Void.class);
 	
 	@Nullable
 	@Unsafe(Unsafe.REFLECT_API)

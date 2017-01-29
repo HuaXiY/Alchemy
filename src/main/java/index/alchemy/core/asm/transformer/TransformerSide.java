@@ -19,6 +19,7 @@ import org.objectweb.asm.tree.MethodNode;
 import com.google.common.collect.Lists;
 
 import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -36,7 +37,7 @@ public class TransformerSide extends SideTransformer {
 	public final IClassTransformer parent;
 	
 	@Nullable
-	public static void tryInject(LaunchClassLoader classLoader) {
+	public static void inject(LaunchClassLoader classLoader) {
 		try {
 			List<IClassTransformer> transformers = $(classLoader, "transformers");
 			transformers.forEach(t -> {
@@ -46,7 +47,7 @@ public class TransformerSide extends SideTransformer {
 						$(t, "parent<", new TransformerSide(parent));
 				}
 			});
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 	}
 	
 	@Override

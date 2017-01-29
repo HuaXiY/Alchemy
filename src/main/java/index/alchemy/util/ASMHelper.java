@@ -158,7 +158,7 @@ public class ASMHelper {
 	@Nullable
 	public static final ClassNode getSuperClassNode(String name) {
 		try {
-			ClassReader reader = new ClassReader(name);
+			ClassReader reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), name));
 			ClassNode result = new ClassNode();
 			reader.accept(result, 0);
 			return getSuperClassNode(result);

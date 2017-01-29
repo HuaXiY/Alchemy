@@ -20,8 +20,6 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.MultiANewArrayInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.project.version.annotation.Omega;
@@ -118,7 +116,6 @@ public class TransformerPatch implements IClassTransformer {
 			AbstractInsnNode insn = iterator.next();
 			if (insn instanceof FieldInsnNode) {
 				FieldInsnNode field = (FieldInsnNode) insn;
-				field.desc = field.desc.replace(patchName, clazzName);
 				field.owner = field.owner.replace(patchName, clazzName);
 			} else if (insn instanceof LdcInsnNode) {
 				LdcInsnNode ldc = (LdcInsnNode) insn;
@@ -126,14 +123,7 @@ public class TransformerPatch implements IClassTransformer {
 					ldc.cst = ((String) ldc.cst).replace(patchName, clazzName);
 			} else if (insn instanceof MethodInsnNode) {
 				MethodInsnNode method = (MethodInsnNode) insn;
-				method.desc = method.desc.replace(patchName, clazzName);
 				method.owner = method.owner.replace(patchName, clazzName);
-			} else if (insn instanceof TypeInsnNode) {
-				TypeInsnNode type = (TypeInsnNode) insn;
-				type.desc = type.desc.replace(patchName, clazzName);
-			} else if (insn instanceof MultiANewArrayInsnNode) {
-				MultiANewArrayInsnNode multiANewArray = (MultiANewArrayInsnNode) insn;
-				multiANewArray.desc = multiANewArray.desc.replace(patchName, clazzName);
 			} else if (insn instanceof InvokeDynamicInsnNode) {
 				InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
 				for (int i = 0; i < dynamic.bsmArgs.length; i++)

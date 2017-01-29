@@ -1,7 +1,6 @@
 package index.alchemy.core.asm.transformer;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +14,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -24,6 +24,7 @@ import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemySetup;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.ReflectionHelper;
@@ -59,19 +60,22 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		public List<IClassTransformer> get(Object key) {
 			List<IClassTransformer> result = super.get(key);
 			if (result == null)
-				put((String) key, result = new LinkedList());
+				put((String) key, result = Lists.newLinkedList());
 			return result;
 		}
 	};
-	static {
+	
+	static { ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyCorePlugin.getLaunchClassLoader()); }
+	
+	public static void setup() {
+		AlchemySetup.checkInvokePermissions();
 		try {
-			ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyCorePlugin.getLaunchClassLoader());
 			loadAllProvider();
 			loadAllTransform();
 		} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 	}
 	
-	public static final boolean debug_print = Boolean.getBoolean("index.alchemy.core.asm.classloader.at.debug.print");
+	public static final boolean debug_print = Boolean.getBoolean("index.alchemy.core.asm.classloader.debug");
 	
 	@Unsafe(Unsafe.ASM_API)
 	private static void loadAllProvider() throws Exception {
@@ -175,8 +179,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
-		if (transformedName.equals("index.alchemy.item.ItemRingAlive"))
-			Tool.dumpClass(basicClass, "D:/ItemRingAlive.bytecode");
+		if (transformedName.endsWith("EntityLivingBase"))
+			Tool.dumpClass(basicClass, "D:/EntityLivingBase.bytecode");
 		return basicClass;
 	}
 	

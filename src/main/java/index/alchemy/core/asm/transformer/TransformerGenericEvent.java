@@ -17,6 +17,8 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -52,13 +54,16 @@ public class TransformerGenericEvent implements IClassTransformer {
 									!ASMHelper.isPrimaryClass(clazz)) {
 								flag = true;
 								String new_generic = "";
-								ClassNode super_class = ASMHelper.getSuperClassNode(clazz);
+								Class<?> super_class = null;
+								try {
+									super_class = AlchemyCorePlugin.getLaunchClassLoader().loadClass(clazz.replace('/', '.'));
+								} catch (ClassNotFoundException e) { AlchemyRuntimeException.onException(e); }
 								do 
-									if (ASMHelper.isPrimaryClass(super_class.name)) {
-										new_generic = "<L" + super_class.name + ";>";
+									if (ASMHelper.isPrimaryClass(super_class.getName())) {
+										new_generic = "<L" + super_class.getName().replace('.', '/') + ";>";
 										break;
 									}
-								while ((super_class = ASMHelper.getSuperClassNode(super_class)) != null);
+								while ((super_class = super_class.getSuperclass()) != null);
 								method.signature = method.signature.replace(generic, new_generic);
 								for (LocalVariableNode localVar : method.localVariables)
 									if (localVar.signature != null)

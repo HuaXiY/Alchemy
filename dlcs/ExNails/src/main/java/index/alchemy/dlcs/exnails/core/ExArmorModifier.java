@@ -32,10 +32,10 @@ public class ExArmorModifier {
 	@Hook(value = "toughasnails.temperature.TemperatureDebugger$Modifier#<clinit>", type = Type.TAIL, isStatic = true)
 	public static void clinit() {
 		try {
-			$(ExArmorModifier.class, "BAUBLE_TARGET<",
+			$(ExArmorModifier.class, "BAUBLE_TARGET<<",
 					EnumHelper.addEnum(TemperatureDebugger.Modifier.class, "BAUBLE_TARGET",
 					new Class<?>[]{ String.class, TemperatureDebugger.ModifierType.class }, "Bauble", TemperatureDebugger.ModifierType.TARGET));
-			$(ExArmorModifier.class, "BAUBLE_RATE<",
+			$(ExArmorModifier.class, "BAUBLE_RATE<<",
 					EnumHelper.addEnum(TemperatureDebugger.Modifier.class, "BAUBLE_RATE",
 					new Class<?>[]{ String.class, TemperatureDebugger.ModifierType.class }, "Bauble", TemperatureDebugger.ModifierType.RATE));
 		} catch (Exception e) {

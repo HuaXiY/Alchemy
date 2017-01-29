@@ -191,6 +191,11 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		}
 	}
 	
+	@Nullable
+	public ItemStack getItemStackFromSlot(BaubleType type) {
+		return getInventorySlotContents(type.getValidSlots()[0]);
+	}
+	
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer living) {
 		return this.living == living;

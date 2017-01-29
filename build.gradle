@@ -16,21 +16,17 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
 apply plugin: 'java'
 
+apply from: 'ast.gradle'
+
 configurations {
     ecj
 }
 dependencies {
     ecj 'org.eclipse.jdt.core.compiler:ecj:4.6.1'
+	compile fileTree(dir: 'mods', include: ['*.jar'])
 }
 
 def jdt = configurations.ecj.asPath
-
-/*
-// for people who want stable - not yet functional for MC 1.8.8 - we require the forgegradle 2.1 snapshot
-plugins {
-    id "net.minecraftforge.gradle.forge" version "2.0.2"
-}
-*/
 
 ext.configFile = file "build.properties"
 
@@ -66,10 +62,43 @@ minecraft {
     
 }
 
+recompileMc {
+	doFirst {
+		def at = file("src/main/resources/META-INF/forge.at")
+		def lines = com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(new FileInputStream(at)))
+		def mapping = VERConsts['getMapping'](lines)
+		mapping.values().forEach { it.forEach { println it } }
+		def input = getInSources()
+		def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${input.path}"))
+		def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${input.path}".replace(".jar", "-fixed.jar")))
+		def result = new java.util.LinkedList()
+		for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
+			zos.putNextEntry(entry)
+			if (entry.name.endsWith(".java")) {
+				def name = entry.name.replace('/', '.').replace(".java", "")
+				org.apache.commons.io.IOUtils.write(VERConsts['doAccessTransformer'](
+						com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(zis)), name, mapping, result),
+						zos, "utf-8")
+			} else {
+				org.apache.commons.io.IOUtils.copy(zis, zos)
+			}
+		}
+		zis.close()
+		zos.finish()
+		zos.close()
+		def flag
+		mapping.values().forEach { it.stream().filter { !result.contains(it) && !it.runtime }.forEach { flag = true; println it } }
+		if (flag)
+			throw new RuntimeException("At is not working properly")
+		input.delete()
+		file(input.path.replace(".jar", "-fixed.jar")).renameTo(input)
+	}
+}
+
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
-	
+    
     options.encoding = 'utf-8'
     options.fork = true
     doFirst {
@@ -80,13 +109,18 @@ compileJava {
             def toSort = { it.toString().contains("forgeSrc-") ? -1 : 0 }
             lib.sort { a, b -> toSort(a) - toSort(b) }
             println "Main Compile Class Path: "
-            sourceSets.main.compileClasspath.each { File f -> println f }
-			source = sourceSets.main.java.exclude { it.getFile().toString().replace("\\", ".").replace("/", ".").contains("index.alchemy.core.run") }
-			source.each { f -> println f }
-			println "JDT-ECJ lib path: " + jdt
+            sourceSets.main.compileClasspath.each { println it }
+            source = sourceSets.main.java.exclude { checkPackageName(it.getFile().toString().replace("\\", ".").replace("/", ".")) }
+            println "Main Compile Path: "
+            source.each { println it }
+            println "JDT-ECJ lib path: " + jdt
             jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
         }
     }
+}
+
+boolean checkPackageName(String packageName) {
+    return packageName.contains("index.alchemy.core.run") || packageName.contains("index.alchemy.ztest") || packageName.contains("index.alchemy.development")
 }
 
 task sourcesJar(type: Jar) {
@@ -97,7 +131,6 @@ task sourcesJar(type: Jar) {
 }
 
 task dlc {
-    println net.md_5.specialsource.JarRemapper.class.getProtectionDomain().getCodeSource().getLocation().getPath()
     dirList('dlcs').each { File dlc ->
         def name = dlc.name
         println "Found DLC -> ${name}"
@@ -118,7 +151,7 @@ task dlc {
             targetCompatibility = '1.8'
             dependencyCacheDir = file("build/classes/${name}")
             classpath = tasks['compileJava'].classpath + files('build/classes/main')
-			
+            
             options.encoding = 'utf-8'
             options.fork = true
             doFirst {
@@ -128,6 +161,8 @@ task dlc {
                     classpath = new org.gradle.api.internal.file.UnionFileCollection(lib)
                     def toSort = { it.toString().contains("forgeSrc-") ? -1 : 0 }
                     lib.sort { a, b -> toSort(a) - toSort(b) }
+                    println "DLC-${name} Compile List: "
+                    source.each { println it }
                     jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
                 }
              }
@@ -145,13 +180,13 @@ task dlc {
         
         task "reobfDLC-${name}"(dependsOn: "jarDLC-${name}") << {
             def inputName = "${archivesBaseName}-dlc-${name}-${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}-deobf.jar"
-            reobfDLC(inputName)
+            reobfDLC(inputName, tasks["compileDLC-${name}"].classpath)
         }
         tasks["jarDLC-${name}"].finalizedBy tasks["reobfDLC-${name}"]
     }
 }
 
-void reobfDLC(String inputName) {
+void reobfDLC(String inputName, org.gradle.api.internal.file.UnionFileCollection classpath) {
     def mcpVersion = project.config.mappings_version.substring('snapshot_'.length())
     def outputName = inputName.replace('deobf', 'universal')
     def mapping = new net.md_5.specialsource.JarMapping()
@@ -162,55 +197,10 @@ void reobfDLC(String inputName) {
     def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
     def inputJar = net.md_5.specialsource.Jar.init(inputFile)
     def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
-    def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
-    inheritanceProviders.add(jarProvider)
+    inheritanceProviders.add(getProvider(inputFile, classpath))
     mapping.loadMappings(srgFile)
     mapping.setFallbackInheritanceProvider(inheritanceProviders)
-       remapper.remapJar(inputJar, outputFile)
-}
-
-void deobfCSL(String inputName) {
-    def mcpVersion = project.config.mappings_version.substring('snapshot_'.length()) // custom
-    def outputName = inputName.replace('.jar', '-deobf.jar')
-    def mapping = new net.md_5.specialsource.JarMapping()
-    def srgFile = file(System.getProperty('user.home') +
-        "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/notch-mcp.srg")
-    def inputFile = file("${inputName}")
-    def outputFile = file("${outputName}")
-    def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
-    def inputJar = net.md_5.specialsource.Jar.init(inputFile)
-    def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
-    def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
-    inheritanceProviders.add(jarProvider)
-    mapping.loadMappings(srgFile)
-    mapping.setFallbackInheritanceProvider(inheritanceProviders)
-       remapper.remapJar(inputJar, outputFile)
-    
-    inputJar.jarFiles.each {
-        it.close()
-    }
-    inputJar.jarForResource.each {
-        it.value.close()
-    }
-    
-    def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${outputName}"))
-    def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${outputName}".replace(".jar", "-fixed.jar")))
-    for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
-        if (entry.name.startsWith("net/minecraft")) {
-            println entry.name.replace('/', '.')
-            entry = new java.util.zip.ZipEntry(entry.name.replace('/', '.'))
-        }
-        zos.putNextEntry(entry)
-        org.apache.commons.io.IOUtils.copy(zis, zos)
-    }
-    zis.close()
-    zos.finish()
-    inputFile.delete()
-    outputFile.delete()
-}
-
-task deobf_csl << {
-    deobfCSL('mods/CustomSkinLoader_1.10-14.3.jar')
+    remapper.remapJar(inputJar, outputFile)
 }
 
 void deobf(String inputName) {
@@ -228,13 +218,19 @@ void deobf(String inputName) {
     inheritanceProviders.add(jarProvider)
     mapping.loadMappings(srgFile)
     mapping.setFallbackInheritanceProvider(inheritanceProviders)
-       remapper.remapJar(inputJar, outputFile)
+    remapper.remapJar(inputJar, outputFile)
+}
+
+net.md_5.specialsource.provider.ClassLoaderProvider getProvider(File input, org.gradle.api.internal.file.UnionFileCollection classpath) {
+    def set = classpath.getFiles()
+    set.addAll(Arrays.asList(fileList("build/libs/")))
+    def urls = set.stream().filter { it.getName().endsWith(".jar") && it.getName().contains("-universal") }.map { it.toURI() }.map { it.toURL() }.toArray { new URL[it] }
+    def classLoader = new java.net.URLClassLoader(urls)
+    return new net.md_5.specialsource.provider.ClassLoaderProvider(classLoader)
 }
 
 task deobf << {
-    fileList('deobf').each { File f ->
-        deobf(f.name)
-    }
+    fileList('deobf').each { deobf(it.name) }
 }
 
 File[] fileList(String dir) {
@@ -272,10 +268,6 @@ jar {
 
 artifacts {
     archives sourcesJar
-}
-
-dependencies {
-    compile fileTree(dir: 'mods', include: ['*.jar'])
 }
 
 processResources

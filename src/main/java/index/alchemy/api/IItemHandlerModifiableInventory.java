@@ -11,6 +11,7 @@ public interface IItemHandlerModifiableInventory extends IItemHandlerModifiable,
 	
 	ItemStack getInventorySlotContents(int slot);
 	
+	@Override
 	default ItemStack getStackInSlot(int slot) { return getInventorySlotContents(slot); }
 	
 	@Hook.Provider

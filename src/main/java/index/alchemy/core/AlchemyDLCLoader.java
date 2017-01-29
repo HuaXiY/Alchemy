@@ -10,7 +10,6 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -23,14 +22,12 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
-import com.google.common.io.Resources;
 
 import index.alchemy.api.IDLCInfo;
 import index.alchemy.api.annotation.DLC;
@@ -45,6 +42,7 @@ import index.alchemy.util.Tool;
 import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Beta;
 import net.minecraft.client.gui.GuiErrorScreen;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.DummyModContainer;
@@ -54,7 +52,6 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.LoaderState.ModState;
-import net.minecraftforge.fml.common.asm.transformers.ModAccessTransformer;
 import net.minecraftforge.fml.common.event.FMLEvent;
 import net.minecraftforge.fml.common.functions.ModIdFunction;
 
@@ -215,18 +212,11 @@ public class AlchemyDLCLoader {
 					AlchemyModLoader.logger.info("Skip loading DLC: " + file.getPath());
 					return;
 				}
-				if (file.isDirectory()) {
-					File meta = new File(file, "META-INF");
-					if (meta.isDirectory())
-				        for (File at : meta.listFiles()) {
-				        	if (at.getName().endsWith("_at.cfg")) {
-				        		Map<String, String> embedded = $(ModAccessTransformer.class, "embedded");
-				        		embedded.put(String.format("%s/META-INF/%s", file.getPath(), at), Resources.asCharSource(
-				        				at.toURI().toURL(), Charsets.UTF_8).read());
-				        	}
-				        }
-				} else
-					ModAccessTransformer.addJar(new JarFile(file));
+				if (file.isFile()) {
+					LaunchClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
+					AlchemySetup.injectAccessTransformer(file, loader);
+					AlchemySetup.injectAccessTransformer(file, dlc.id() + "_at.cfg", loader);
+				}
 				URL url = file.toURI().toURL();
 				Tool.addURLToClassLoader(AlchemyDLCLoader.class.getClassLoader(), url);
 				List<String> classes = AlchemyModLoader.findClassFromURL(url);
@@ -261,12 +251,12 @@ public class AlchemyDLCLoader {
 			for (URL url : Tool.getAllURL(file, Lists.newLinkedList()))
 				if (url.getFile().endsWith(".class") && (dlc = checkClassIsDLC(url.openStream())) != null)
 					result.add(dlc);
-		} else {
-			ZipInputStream input = new ZipInputStream(new FileInputStream(file));
-			for (ZipEntry entry; (entry = input.getNextEntry()) != null;)
-				if (!entry.isDirectory() && entry.getName().endsWith(".class") && (dlc = checkClassIsDLC(input)) != null)
-					result.add(dlc);
-		}
+		} else
+			try (ZipInputStream input = new ZipInputStream(new FileInputStream(file))) {
+				for (ZipEntry entry; (entry = input.getNextEntry()) != null;)
+					if (!entry.isDirectory() && entry.getName().endsWith(".class") && (dlc = checkClassIsDLC(input)) != null)
+						result.add(dlc);
+			}
 		if (result.size() > 1)
 			AlchemyRuntimeException.onException(new RuntimeException("This file(" + file + ") has multiple DLC"));
 		return Tool.getSafe(result, 0);
@@ -283,7 +273,10 @@ public class AlchemyDLCLoader {
 					if (DESCRIPTOR.equals(annotation.desc))
 						return Tool.makeAnnotation(IDLCInfo.class, makeHandlerMapping(node.name.replace('/', '.')), annotation.values,
 								"forgeVersion", "*", "description", "");
-		} finally { IOUtils.closeQuietly(input); }
+		} finally { 
+			if (!(input instanceof ZipInputStream))
+				IOUtils.closeQuietly(input);
+		}
 		return null;
 	}
 	

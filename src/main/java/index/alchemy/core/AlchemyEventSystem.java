@@ -38,7 +38,7 @@ import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.development.DMain;
+import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.util.Always;
 import index.alchemy.util.Counter;
 import index.alchemy.util.Tool;
@@ -353,10 +353,11 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onClientTick(ClientTickEvent event) {
-		String flag = "22";
+		String flag = "26";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
+				Tool.$(AlchemyItemLoader.amulet_heal, "color<", 0xEF2E55);
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);
 		}
@@ -366,8 +367,6 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SubscribeEvent
 	public static void onInitHook(InitHookEvent event) {
 		AlchemyModLoader.info(event.init.getClass(), event.init);
-		if (AlchemyModLoader.enable_dmain)
-			DMain.init(event.init);
 	}
 	
 	public static synchronized void registerGuiHandle(IGuiHandle handle) {
@@ -524,9 +523,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static void registerTileEntity(ITileEntity tile) {
-		try {
-			GameRegistry.registerTileEntity(tile.getTileEntityClass(), tile.getTileEntityName());
-		} catch (Exception e) { }
+		GameRegistry.registerTileEntity(tile.getTileEntityClass(), tile.getTileEntityName());
 	}
 	
 	public static void init() {

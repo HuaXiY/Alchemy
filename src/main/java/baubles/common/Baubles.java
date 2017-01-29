@@ -17,7 +17,7 @@ public class Baubles {
 	public static final String MODNAME = "Baubles";
 	public static final String VERSION = "1.3.0";
 
-	@Instance(value=Baubles.MODID)
+	@Instance(Baubles.MODID)
 	public static Baubles instance;
 		
 }
