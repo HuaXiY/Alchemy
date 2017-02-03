@@ -14,6 +14,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 
 import index.alchemy.api.annotation.Listener;
+import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Beta;
@@ -339,7 +340,7 @@ public class GuiWardrobe extends GuiScreen {
 	
 	public List<GuiSkinList.Entry> getAllEntry() {
 		List<GuiSkinList.Entry> result = Lists.newArrayList();
-		File skin = new File(Minecraft.getMinecraft().mcDataDir, "skin");
+		File skin = new File(AlchemyCorePlugin.getMinecraftDir(), "skin");
 		if (skin.isDirectory())
 			Arrays.stream(skin.listFiles()).forEach(f -> {
 				try {

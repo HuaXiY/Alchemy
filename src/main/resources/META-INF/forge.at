@@ -18,3 +18,21 @@ public net.minecraftforge.client.model.ModelLoader$VanillaModelWrapper
 
 #?
 public net.minecraftforge.client.model.animation.ModelBlockAnimation defaultModelBlockAnimation
+
+#index.alchemy.util.EventHelper
+public net.minecraftforge.fml.common.eventhandler.ListenerList lists
+
+#index.alchemy.util.EventHelper
+public net.minecraftforge.fml.common.eventhandler.ListenerList$ListenerListInst
+
+#index.alchemy.util.EventHelper
+public net.minecraftforge.fml.common.eventhandler.ListenerList$ListenerListInst parent
+
+#index.alchemy.util.EventHelper
+public net.minecraftforge.fml.common.eventhandler.EventBus listenerOwners
+
+#index.alchemy.easteregg.FMLLoading
+public net.minecraftforge.fml.client.SplashProgress$Texture
+
+#index.alchemy.easteregg.FMLLoading
+public net.minecraftforge.fml.client.SplashProgress forgeTexture

@@ -11,18 +11,22 @@ import java.util.Map.Entry;
 import index.alchemy.api.annotation.DInit;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Lang;
+import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.core.AlchemyConstants;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Alpha;
 import net.minecraftforge.fml.common.LoaderState.ModState;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Alpha
 //@Loading
+@Listener
 @SideOnly(Side.CLIENT)
 //@Init(state = ModState.AVAILABLE)
 public class DMain {
@@ -89,9 +93,15 @@ public class DMain {
 		updateVersion();
 	}
 	
+	@SubscribeEvent
+	public static void onInitHook(InitHookEvent event) {
+		if (AlchemyModLoader.enable_dmain)
+			DMain.init(event.init);
+	}
+	
 	private static void updateVersion() throws IOException {
 		Map<String, String> mapping = Tool.getMapping(Tool.readSafe(new File(AlchemyModLoader.mc_dir, PROPERTIES)));
-		mapping.put(DEV_VERSION_KEY_NAME, String.valueOf(Integer.valueOf(Tool.isNullOr(mapping.get(DEV_VERSION_KEY_NAME), "0")) + 1));
+		mapping.put(DEV_VERSION_KEY_NAME, String.valueOf(Integer.valueOf(Tool.isNullOr(mapping.get(DEV_VERSION_KEY_NAME), () -> "0")) + 1));
 		StringBuilder builder = new StringBuilder();
 		for (Entry<String, String> entry : mapping.entrySet())
 			builder.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');

@@ -99,7 +99,7 @@ public class SkinCore {
 		public UpdateSkinClient(int id, String type, byte data[]) {
 			this.id = id;
 			this.type = Tool.isEmptyOr(type, "");
-			this.data = Tool.isNullOr(data, new byte[0]);
+			this.data = Tool.isNullOr(data, () -> new byte[0]);
 		}
 
 		@Override
@@ -161,7 +161,7 @@ public class SkinCore {
 	public static CommandBase update_skin = new CommandUpdateSkin();
 	
 	public static void init() {
-		WoodType.types.stream().map(BlockWardrobe::new).forEach(b ->
+		WoodType.stream().map(BlockWardrobe::new).forEach(b ->
 				GameRegistry.addRecipe(new ItemStack(b), "BAB", "B B", "BAB", 'B', b.type.log, 'A', b.type.plank));
 		if (Always.isClient())
 			registerModelLoader();

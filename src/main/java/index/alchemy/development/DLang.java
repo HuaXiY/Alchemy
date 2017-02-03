@@ -91,7 +91,7 @@ public class DLang {
 		try {
 			Map<String, String> map = getMap(file);
 			StringBuilder builder = new StringBuilder("//MODID\n" + AlchemyConstants.MOD_ID + "=" +
-					Tool.isNullOr(map.get(AlchemyConstants.MOD_ID), AlchemyConstants.MOD_ID) + "\n");
+					Tool.isNullOr(map.get(AlchemyConstants.MOD_ID), () -> AlchemyConstants.MOD_ID) + "\n");
 			for (Field field : DLang.class.getDeclaredFields())
 				if (Tool.setAccessible(field).getType() == Map.class && !field.getName().startsWith("_")) {
 					builder.append("\n//" + field.getName() + "\n");
