@@ -51,21 +51,21 @@ public class FMLLoading {
 		SplashProgress.Texture gif = gifs[f];
 		gif.bind();
 		float fw = (float) gif.getWidth() / 2;
-        float fh = (float) gif.getHeight() / 2;
-        glPushMatrix();
-        glLoadIdentity();
-        glTranslatef(-fw, Display.getHeight() - gif.getHeight() + fh - 10, 0);
-        glBegin(GL_QUADS);
-        gif.texCoord(0, 0, 0);
-        glVertex2f(-fw, -fh);
-        gif.texCoord(0, 0, 1);
-        glVertex2f(-fw, fh);
-        gif.texCoord(0, 1, 1);
-        glVertex2f(fw, fh);
-        gif.texCoord(0, 1, 0);
-        glVertex2f(fw, -fh);
-        glEnd();
-        glPopMatrix();
+		float fh = (float) gif.getHeight() / 2;
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(-fw, Display.getHeight() - gif.getHeight() + fh - 10, 0);
+		glBegin(GL_QUADS);
+		gif.texCoord(0, 0, 0);
+		glVertex2f(-fw, -fh);
+		gif.texCoord(0, 0, 1);
+		glVertex2f(-fw, fh);
+		gif.texCoord(0, 1, 1);
+		glVertex2f(fw, fh);
+		gif.texCoord(0, 1, 0);
+		glVertex2f(fw, -fh);
+		glEnd();
+		glPopMatrix();
 	}
 	
 	@Hook(value = "net.minecraftforge.fml.client.SplashProgress#open", isStatic = true)
