@@ -40,12 +40,10 @@ public class TransformerSide extends SideTransformer {
 	public static void inject(LaunchClassLoader classLoader) {
 		try {
 			List<IClassTransformer> transformers = $(classLoader, "transformers");
-			transformers.forEach(t -> {
-				if (t instanceof TransformerWrapper) {
-					IClassTransformer parent = $(t, "parent");
-					if (parent instanceof SideTransformer)
-						$(t, "parent<", new TransformerSide(parent));
-				}
+			transformers.stream().filter(TransformerWrapper.class::isInstance).forEach(t -> {
+				IClassTransformer parent = $(t, "parent");
+				if (parent instanceof SideTransformer)
+					$(t, "parent<", new TransformerSide(parent));
 			});
 		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 	}

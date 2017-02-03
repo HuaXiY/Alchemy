@@ -1,5 +1,6 @@
 package index.alchemy.core;
 
+import index.alchemy.api.IAlchemyBiome;
 import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.ICapability;
 import index.alchemy.api.IColorBlock;
@@ -23,11 +24,11 @@ import index.alchemy.item.AlchemyItemBlock;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
-import index.alchemy.world.biome.AlchemyBiome;
 import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -39,14 +40,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
 import net.minecraftforge.oredict.OreDictionary;
 
-import static index.alchemy.util.Tool.$;
-
-import java.util.function.Consumer;
-
 @Omega
 public class AlchemyInitHook {
-	
-	static { $(IRegister.class, "impl<", (Consumer<IRegister>) AlchemyInitHook::init); }
 	
 	@Omega
 	public static class InitHookEvent extends Event {
@@ -116,14 +111,11 @@ public class AlchemyInitHook {
 		if (obj instanceof IAlchemyRecipe)
 			AlchemyRegistry.registerAlchemyRecipe((IAlchemyRecipe) obj);
 		
-		if (obj instanceof AlchemyBiome) {
-			AlchemyBiome biome = (AlchemyBiome) obj;
+		if (obj instanceof IAlchemyBiome) {
+			IAlchemyBiome biome = (IAlchemyBiome) obj;
 			
-			if (biome.canSpawnInBiome)
-				BiomeManager.addSpawnBiome(biome);
-			
-			if (biome.canGenerateVillages)
-				BiomeManager.addVillageBiome(biome, true);
+			if (biome.canGenerateVillages())
+				BiomeManager.addVillageBiome((Biome) biome, true);
 		}
 		
 		if (Always.isClient()) {

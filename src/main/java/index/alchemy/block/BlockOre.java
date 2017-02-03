@@ -5,13 +5,14 @@ import java.util.Random;
 import org.apache.commons.lang3.ArrayUtils;
 
 import index.alchemy.api.IColorItem;
-import index.alchemy.api.IGenerator;
+import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IOreDictionary;
 import index.alchemy.api.annotation.Config;
 import index.alchemy.config.AlchemyConfig;
 import index.alchemy.util.Tool;
 import index.alchemy.world.AlchemyWorldGenerator;
 import index.project.version.annotation.Beta;
+import index.project.version.annotation.Gamma;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -20,14 +21,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkGenerator;
-import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
+import net.minecraftforge.event.terraingen.OreGenEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Beta
-public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGenerator, IColorItem {
+public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IEventHandle.Ore, IColorItem {
 	
 	@Config(handle = AlchemyConfig.HANDLE_INT_ARRAY, category = AlchemyWorldGenerator.CATEGORY_GENERATOR, comment = "Ore generation exception dimension ids.")
 	public static int not_generator_dimension_ids[] = { -1, 1 };
@@ -35,17 +36,19 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 	public static class OreGeneratorSetting {
 		
 		public final int size, count, minH, maxH, dH;
+		public final OreGenEvent.GenerateMinable.EventType type;
 		
 		public boolean canGenerator(World world, BlockPos pos) {
 			return true;
 		}
 		
-		public OreGeneratorSetting(int size, int count, int minH, int maxH) {
+		public OreGeneratorSetting(int size, int count, int minH, int maxH, OreGenEvent.GenerateMinable.EventType type) {
 			this.size = size;
 			this.count = count;
 			this.minH = minH;
 			this.maxH = maxH;
 			this.dH = maxH - minH;
+			this.type = type;
 		}
 		
 	}
@@ -82,8 +85,7 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 		return Tool._ToUpper(getRegistryName().getResourcePath());
 	}
 	
-	@Override
-	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+	public void generate(Random random, int chunkX, int chunkZ, World world) {
 		if (!ArrayUtils.contains(not_generator_dimension_ids, world.provider.getDimension()))
 			for (int i = 0; i < setting.count; i++) {
 				BlockPos pos = new BlockPos(chunkX * 16 + random.nextInt(16),
@@ -92,13 +94,16 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 					generator.generate(world, random, pos);
 			}
 	}
-
-	@Override
-	public int getWeight() {
-		return 1;
+	
+	@SubscribeEvent
+	public void onOreGen_GenerateMinable(OreGenEvent.GenerateMinable event) {
+		if (setting != null && event.getType() == setting.type)
+			generate(event.getRand(), event.getPos().getX(), event.getPos().getZ(), event.getWorld());
 	}
 	
+	@Gamma
 	@Override
+	@Deprecated
 	@SideOnly(Side.CLIENT)
 	public IItemColor getItemColor() {
 		return new IItemColor() {
@@ -123,7 +128,7 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IGene
 		this.max_xp = max_xp;
 		this.drop_fortune = drop_fortune;
 		this.setting = setting;
-		this.generator = new WorldGenMinable(this.getDefaultState(), setting.size);
+		this.generator = new WorldGenMinable(getDefaultState(), setting.size);
 	}
 
 }

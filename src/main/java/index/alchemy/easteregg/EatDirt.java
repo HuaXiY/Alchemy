@@ -49,6 +49,7 @@ public class EatDirt extends ItemMultiTexture {
 	}
 	
 	@Override
+	@Patch.Spare
 	public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
 		return super.onItemRightClick(item, world, player, hand);
 	}
@@ -67,6 +68,7 @@ public class EatDirt extends ItemMultiTexture {
 	}
 	
 	@Override
+	@Patch.Spare
 	public EnumAction getItemUseAction(ItemStack stack) {
 		return super.getItemUseAction(stack);
 	}
@@ -78,6 +80,7 @@ public class EatDirt extends ItemMultiTexture {
 	}
 	
 	@Override
+	@Patch.Spare
 	public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase living) {
 		return super.onItemUseFinish(stack, world, living);
 	}
@@ -103,6 +106,7 @@ public class EatDirt extends ItemMultiTexture {
 	}
 	
 	@Override
+	@Patch.Spare
 	public int getMaxItemUseDuration(ItemStack stack) {
 		return super.getMaxItemUseDuration(stack);
 	}

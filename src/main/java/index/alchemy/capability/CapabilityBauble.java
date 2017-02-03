@@ -4,6 +4,7 @@ import static java.lang.Math.min;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
+import baubles.client.BaublesRenderLayer;
 import index.alchemy.api.AlchemyBaubles;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.annotation.Hook;
@@ -17,6 +18,8 @@ import index.project.version.annotation.Beta;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -129,6 +132,12 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 			BaubleType type = ((IBauble) event.getItemStack().getItem()).getBaubleType(event.getItemStack());
 			event.getToolTip().add(min(event.getToolTip().size(), 1), TextFormatting.GOLD + type.toString());
 		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.client.renderer.entity.RenderPlayer#<init>", type = Hook.Type.TAIL)
+	public static final void init_RenderPlayer(RenderPlayer renderPlayer, RenderManager renderManager, boolean useSmallArms) {
+		renderPlayer.addLayer(new BaublesRenderLayer());
 	}
 
 	@SideOnly(Side.CLIENT)

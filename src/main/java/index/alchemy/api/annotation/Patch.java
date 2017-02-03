@@ -13,6 +13,10 @@ public @interface Patch {
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface Exception { }
 	
+	@Target({ ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface Spare { }
+	
 	String value();
 
 }

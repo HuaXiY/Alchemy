@@ -45,6 +45,23 @@ public final class TransformerHook implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		String srgName = this.srgName;
+		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
+			String desc = null;
+			Type args[] = Type.getArgumentTypes(hookMethod.desc);
+			StringBuilder builder = new StringBuilder("(");
+			for (int i = isStatic ? 0 : 1; i < args.length; i++)
+				builder.append(args[i].getDescriptor());
+			desc = srgName + builder.append(")").toString();
+			try {
+				for (Entry<String, String> entry : Tool.<Map<String, String>>$(FMLDeobfuscatingRemapper.INSTANCE, "getMethodMap",
+						this.owner).entrySet())
+					if (entry.getKey().startsWith(desc)) {
+						srgName = entry.getValue();
+						break;
+					}
+			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
+		}
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		ClassNode node = new ClassNode(ASM5);
@@ -204,23 +221,7 @@ public final class TransformerHook implements IClassTransformer {
 		this.hookMethod = hookMethod;
 		this.hookSrc = hookSrc;
 		this.owner = ASMHelper.getClassName(owner);
-		String desc = null, result = null;
-		Type args[] = Type.getArgumentTypes(hookMethod.desc);
-		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
-			StringBuilder builder = new StringBuilder("(");
-			for (int i = isStatic ? 0 : 1; i < args.length; i++)
-				builder.append(args[i].getDescriptor());
-			desc = srgName + builder.append(")").toString();
-			try {
-				for (Entry<String, String> entry : Tool.<Map<String, String>>$(FMLDeobfuscatingRemapper.INSTANCE, "getMethodMap",
-						this.owner).entrySet())
-					if (entry.getKey().startsWith(desc)) {
-						result = entry.getValue();
-						break;
-					}
-			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
-		}
-		this.srgName = Tool.isNullOr(result, srgName);
+		this.srgName = srgName;
 		this.isStatic = isStatic;
 		this.stackFlag = shouldMarkStack(hookMethod);
 		this.type = type;

@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -538,8 +539,8 @@ public class Tool {
 		return loader.getClassBytes(name.replace('/', '.'));
 	}
 	
-	public static final <T> T isNullOr(T t, T or) {
-		return t == null ? or : t;
+	public static final <T> T isNullOr(T t, Supplier<T> or) {
+		return t == null ? or.get() : t;
 	}
 	
 	public static final String isEmptyOr(String str, String or) {
@@ -696,27 +697,30 @@ public class Tool {
 					clazz = String.class;
 			} else
 				clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
+			ReflectionHelper.getUnsafe().ensureClassInitialized(clazz);
 			if (args.length == 1)
 				return (T) clazz;
 			String name = (String) args[1];
 			Object object = args[0].getClass() == clazz ? args[0] : null;
-			try {
-				if (args.length == 2)
-					return (T) setAccessible(searchField(clazz, (String) args[1])).get(object);
-				if (args.length == 3 && ((String) args[1]).endsWith("<")) {
-					Field field = setAccessible(((String) args[1]).endsWith("<<") ?
-							clazz.getDeclaredField(((String) args[1]).replace("<", "")) :
-								searchField(clazz, ((String) args[1]).replace("<", "")));
-					if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
-						if (object == null)
-							FinalFieldSetter.instance().setStatic(field, args[2]);
+			if (!name.startsWith(">"))
+				try {
+					if (args.length == 2)
+						return (T) setAccessible(searchField(clazz, (String) args[1])).get(object);
+					if (args.length == 3 && ((String) args[1]).endsWith("<")) {
+						Field field = setAccessible(((String) args[1]).endsWith("<<") ?
+								clazz.getDeclaredField(((String) args[1]).replace("<", "")) :
+									searchField(clazz, ((String) args[1]).replace("<", "")));
+						if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
+							if (object == null)
+								FinalFieldSetter.instance().setStatic(field, args[2]);
+							else
+								FinalFieldSetter.instance().set(object, field, args[2]);
 						else
-							FinalFieldSetter.instance().set(object, field, args[2]);
-					else
-						field.set(object, args[2]);
-					return (T) args[2];
-				}
-			} catch (NoSuchFieldException e) { }
+							field.set(object, args[2]);
+						return (T) args[2];
+					}
+				} catch (NoSuchFieldException e) { }
+			name = name.replace(">", "");
 			args = ArrayUtils.subarray(args, 2, args.length);
 			if (name.equals("new")) {
 				method_forEach:
@@ -738,7 +742,7 @@ public class Tool {
 			} while((clazz = clazz.getSuperclass()) != null);
 			throw new IllegalArgumentException();
 		} catch(Exception e) {
-			throw new RuntimeException("Can't invoke: " + Joiner.on(',').join(args), e);
+			throw new RuntimeException("Can't invoke: " + Joiner.on(',').useForNull("null").join(args), e);
 		}
 	}
 	

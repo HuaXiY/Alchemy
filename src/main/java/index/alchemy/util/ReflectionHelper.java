@@ -5,8 +5,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Maps;
 
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Beta;
 
 @Beta
@@ -63,6 +66,15 @@ public class ReflectionHelper {
 		return accessible;
 	}
 	
+	@Nullable
+	public static final <T> T allocateInstance(Class<T> clazz) {
+		try {
+			return (T) unsafe.allocateInstance(clazz);
+		} catch (InstantiationException e) { AlchemyRuntimeException.onException(e); }
+		return null;
+	}
+	
+	@Nullable
 	public static final Field getField(Class<?> owner, String name) {
 		Class<?> clazz = owner;
 		while (clazz != null)
@@ -72,33 +84,34 @@ public class ReflectionHelper {
 				clazz = clazz.getSuperclass();
 				continue;
 			}
-		throw new RuntimeException(new NoSuchFieldException(owner.getName() + "." + name));
+		AlchemyRuntimeException.onException(new NoSuchFieldException(owner.getName() + "." + name));
+		return null;
 	}
 	
 	public static final void set(Field field, Object obj, Object val) {
 		try {
 			field.set(obj, val);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 	}
 	
 	public static final void set(Field field, Object val) {
 		set(field, null, val);
 	}
 	
+	@Nullable
 	public static final <T> T get(Field field, Object obj) {
 		try {
 			return (T) field.get(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
+		return null;
 	}
 	
+	@Nullable
 	public static final <T> T get(Field field) {
 		return get(field, null);
 	}
 	
+	@Nullable
 	public static final Method getMethod(Class<?> owner, String name, Class... args) {
 		Class<?> clazz = owner;
 		while (clazz != null)
@@ -108,15 +121,16 @@ public class ReflectionHelper {
 				clazz = clazz.getSuperclass();
 				continue;
 			}
-		throw new RuntimeException(new NoSuchMethodException(owner.getName() + "#" + name));
+		AlchemyRuntimeException.onException(new NoSuchMethodException(owner.getName() + "#" + name));
+		return null;
 	}
 	
+	@Nullable
 	public static final <R> R invoke(Method method, Object obj, Object... args) {
 		try {
 			return (R) method.invoke(obj, args);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
+		return null;
 	}
 	
 }

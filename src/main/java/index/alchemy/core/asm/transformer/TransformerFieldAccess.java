@@ -21,8 +21,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IFieldAccess;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyFieldAccess;
-import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.AlchemyCorePlugin;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.project.version.annotation.Alpha;
@@ -59,8 +58,8 @@ public class TransformerFieldAccess implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		AlchemyTransformerManager.transform("<access>" + name + "|" + transformedName + "#" + accessField.name + " : " + accessField.signature +
-				 "\n->  " + AlchemyFieldAccess.class.getName() + "#" + accessField.name + " : " + accessField.signature);
+		AlchemyTransformerManager.transform("<access>" + name + "|" + transformedName + "#" + accessField.name + " : " +
+				accessField.signature + "\n->  " + owner + "#" + accessField.name + " : " + accessField.signature);
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		ClassNode node = new ClassNode(ASM5);
@@ -99,7 +98,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 	}
 	
 	public void updateAccessField(String clazzName, FieldNode field, String desc) {
-		$("L" + owner, field.name + "<", createAccess(clazzName, field, desc, false));
+		$("L" + owner, field.name + "<<", createAccess(clazzName, field, desc, false));
 	}
 	
 	@Nullable
@@ -114,7 +113,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 				desc = ASMHelper.getClassName(clazzName), type = ASMHelper.getClassName(fieldDesc);
 
 		cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, nameDesc, null, "java/lang/Object", new String[]{ I_FIELD_ACCESS_DESC });
-		cw.visitSource("TransformerFieldAccess.java:107", "invoke: " + clazzName + "." + field.name);
+		cw.visitSource("TransformerFieldAccess.java:106", "invoke: " + clazzName + "." + field.name);
 		{
 			mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", "()V", null, null);
 			mv.visitCode();
@@ -154,18 +153,17 @@ public class TransformerFieldAccess implements IClassTransformer {
 		cw.visitEnd();
 		
 		try {
-			Class<?> ret =  AlchemyModLoader.asm_loader.define(name, cw.toByteArray());
+			Class<?> ret =  AlchemyCorePlugin.getASMClassLoader().define(name, cw.toByteArray());
 			result = (IFieldAccess) ret.newInstance();
-		} catch(Exception e) {
-			AlchemyRuntimeException.onException(e);
-		}
+		} catch(Exception e) { AlchemyRuntimeException.onException(e); }
 		return result;
 	}
 	
 	private static String getUniqueName(String name, FieldNode field) {
 		return String.format(
 				"%s_%d_%s_%s_%s",
-				AlchemyModLoader.asm_loader.getClass().getName(), nextId(),
+				AlchemyCorePlugin.getASMClassLoader().getClass().getName(),
+				nextId(),
 				name.replace('.', '_'),
 				field.name,
 				ASMHelper.getClassName(field.desc).replace('/', '_')

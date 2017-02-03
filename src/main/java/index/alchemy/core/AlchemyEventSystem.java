@@ -21,12 +21,14 @@ import com.google.common.collect.Sets;
 
 import index.alchemy.api.IContinuedRunnable;
 import index.alchemy.api.IEventHandle;
+import index.alchemy.api.IFieldAccess;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.api.ITileEntity;
+import index.alchemy.api.annotation.Field;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.KeyEvent;
@@ -38,7 +40,6 @@ import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.util.Always;
 import index.alchemy.util.Counter;
 import index.alchemy.util.Tool;
@@ -59,6 +60,8 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
+import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
@@ -77,14 +80,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Listener
 @ThreadSafe
 @Hook.Provider
+@Field.Provider
 @Init(state = ModState.CONSTRUCTED)
 public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	INSTANCE;
 	
-	public static AlchemyEventSystem instance() {
-		return INSTANCE;
-	}
+	public static AlchemyEventSystem instance() { return INSTANCE; }
 	
 	public static enum EventType {
 		EVENT_BUS,
@@ -104,7 +106,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			this.binding = binding;
 			this.target = target;
 			this.method = method;
-			this.handler = AlchemyModLoader.asm_loader.createWrapper(method, target);
+			this.handler = AlchemyCorePlugin.getASMClassLoader().createWrapper(method, target);
 		}
 		
 		public KeyBinding getBinding() {
@@ -340,7 +342,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onServerTick(ServerTickEvent event) {
-		String flag = "6";
+		String flag = "18";
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -357,7 +359,6 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
-				Tool.$(AlchemyItemLoader.amulet_heal, "color<", 0xEF2E55);
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);
 		}
@@ -524,6 +525,14 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	public static void registerTileEntity(ITileEntity tile) {
 		GameRegistry.registerTileEntity(tile.getTileEntityClass(), tile.getTileEntityName());
+	}
+	
+	public static final IFieldAccess<Event, Boolean> markIgnore = null;
+	
+	@Hook("net.minecraftforge.fml.common.eventhandler.ASMEventHandler#invoke")
+	public static Hook.Result invoke(ASMEventHandler handler, Event event) {
+		Boolean ignore = Tool.isNullOr(markIgnore.get(event), Boolean.FALSE::booleanValue);
+		return ignore ? Hook.Result.NULL : Hook.Result.VOID;
 	}
 	
 	public static void init() {

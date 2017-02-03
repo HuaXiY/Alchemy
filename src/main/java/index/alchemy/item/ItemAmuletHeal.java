@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Omega
 public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle, IItemTemperature {
 	
-	public static final float AMPLIFY = 0.5F, TEMPERATURE_RATE = 100F, TEMPERATURE_TARGET = 4F;
+	public static final float AMPLIFY = 0.5F, TEMPERATURE_RATE = 150F, TEMPERATURE_TARGET = 5F;
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
@@ -37,7 +37,7 @@ public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle, I
 	
 	@Override
 	public float modifyChangeRate(World world, EntityPlayer player, float changeRate, int trend) {
-		return trend < 0 ? changeRate + TEMPERATURE_RATE : changeRate;
+		return trend < 0 ? changeRate + TEMPERATURE_RATE : trend > 0 ? changeRate - TEMPERATURE_RATE : changeRate;
 	}
 
 	@Override

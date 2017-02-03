@@ -41,7 +41,7 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements IEventHandle,
 		IItemTemperature, ICoolDown {
 	
 	public static final int INTERVAL = 20 * 16, MAX_AIR = 300;
-	public static final float TEMPERATURE_RATE = 100F, TEMPERATURE_TARGET = -4F;
+	public static final float TEMPERATURE_RATE = 150F, TEMPERATURE_TARGET = -5F;
 	public static final String NBT_KEY_CD = "amulet_purify";
 	
 	public static final ItemAmuletPurify type = null;
@@ -100,7 +100,7 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements IEventHandle,
 	
 	@Override
 	public float modifyChangeRate(World world, EntityPlayer player, float changeRate, int trend) {
-		return trend > 0 ? changeRate + TEMPERATURE_RATE : changeRate;
+		return trend > 0 ? changeRate + TEMPERATURE_RATE : trend < 0 ? changeRate - TEMPERATURE_RATE : changeRate;
 	}
 
 	@Override

@@ -18,6 +18,8 @@ public class JFXDialog {
 	
 	public static void showThrowable(Throwable ex) { showThrowable(ex, null, null); }
 	
+	public static void showThrowableAndWait(Throwable ex) { showThrowableAndWait(ex, null, null); }
+	
 	public static void showThrowableAndWait(Throwable ex, String title, String str) {
 		JFXHelper.runAndWait(getShowAlertRunnable(ex, title, str));
 	}
@@ -53,7 +55,7 @@ public class JFXDialog {
 			expContent.add(label, 0, 0);
 			expContent.add(textArea, 0, 1);
 			alert.getDialogPane().setExpandableContent(expContent);
-			alert.show();
+			alert.showAndWait();
 		};
 	}
 	

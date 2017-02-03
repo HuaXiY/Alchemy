@@ -6,6 +6,7 @@ import java.util.Random;
 import com.google.common.collect.Maps;
 
 import biomesoplenty.common.biome.overworld.BOPBiome;
+import index.alchemy.api.IAlchemyBiome;
 import index.alchemy.api.IGenTerrainBlocks;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.annotation.Listener;
@@ -21,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 
 @Listener(Listener.Type.TERRAIN)
-public class AlchemyBiome extends BOPBiome implements IRegister {
+public class AlchemyBiome extends BOPBiome implements IAlchemyBiome, IRegister {
 	
 	protected final Map<String, IGenTerrainBlocks> terrainGenerators = Maps.newHashMap();
 	
@@ -29,6 +30,11 @@ public class AlchemyBiome extends BOPBiome implements IRegister {
 	
 	public Map<String, IGenTerrainBlocks> getTerrainGenerators() {
 		return terrainGenerators;
+	}
+	
+	@Override
+	public boolean canGenerateVillages() {
+		return canGenerateVillages;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
@@ -63,5 +69,5 @@ public class AlchemyBiome extends BOPBiome implements IRegister {
 		setRegistryName(name);
 		register();
 	}
-	
+
 }

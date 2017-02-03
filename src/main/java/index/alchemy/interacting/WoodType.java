@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
@@ -27,7 +28,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
@@ -40,21 +40,22 @@ import static index.alchemy.util.Tool.$;
 @Init(state = ModState.INITIALIZED)
 public class WoodType {
 	
-	public static final List<WoodType> types = Lists.newArrayList();
-	public static final Map<String, BiFunction<ItemStack, String, String>> func_mapping = Maps.newHashMap();
+	protected static final List<WoodType> types = Lists.newArrayList();
+	protected static final Map<String, BiFunction<ItemStack, String, String>> func_mapping = Maps.newHashMap();
+	
 	static {
-		func_mapping.put("forestry", safe((i, s) -> $($($(i.getItem(), "getBlock"), "getWoodType", i.getMetadata()),
+		addTextureHandler("forestry", safe((i, s) -> $($($(i.getItem(), "getBlock"), "getWoodType", i.getMetadata()),
 				s.equals("planks") ? "getPlankTexture" : "getBarkTexture")));
 	}
 	
 	private static <A, B, C> BiFunction<A, B, C> safe(BiFunction<A, B, C> func) {
-		return (a, b) -> {
-			try {
-				return func.apply(a, b);
-			} catch(Exception e) {
-				return null;
-			}
-		};
+		return (a, b) -> { try { return func.apply(a, b); } catch(Exception e) { return null; } };
+	}
+	
+	public static Stream<WoodType> stream() { return types.stream(); }
+	
+	public static void addTextureHandler(String domain, BiFunction<ItemStack, String, String> handler) {
+		func_mapping.put(domain, handler);
 	}
 	
 	public final ItemStack log, plank;
@@ -193,14 +194,13 @@ public class WoodType {
 	@SideOnly(Side.CLIENT)
 	public static String getTexture(IBlockState state, String defaultTexture) {
 		try {
-			ICustomModelLoader customLoader = $("Lnet.minecraftforge.client.model.ModelLoader$VanillaLoader", "INSTANCE");
-			ModelLoader loader = $(customLoader, "getLoader");
-			BlockStateMapper mapper = $($(loader, "blockModelShapes"), "getBlockStateMapper");
+			ModelLoader loader = ModelLoader.VanillaLoader.INSTANCE.getLoader();
+			BlockStateMapper mapper = loader.blockModelShapes.getBlockStateMapper();
 			Map<IBlockState, ModelResourceLocation> map = mapper.getVariants(state.getBlock());
 			ModelResourceLocation stateLocation = map.get(state);
-			ModelBlockDefinition definition = $(loader, "getModelBlockDefinition", stateLocation);
+			ModelBlockDefinition definition = loader.getModelBlockDefinition(stateLocation);
 			ResourceLocation modelLocation = definition.getVariant(stateLocation.getVariant()).getVariantList().get(0).getModelLocation();
-			ModelBlock modelBlock = $(loader, "loadModel",
+			ModelBlock modelBlock = loader.loadModel(
 					new ResourceLocation(modelLocation.getResourceDomain(), "models/" + modelLocation.getResourcePath()));
 			String texture = getTexture(modelBlock);
 			return ObjectUtils.firstNonNull(texture, defaultTexture);

@@ -1,10 +1,11 @@
 package index.alchemy.core.debug;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.common.collect.Maps;
 
 import index.project.version.annotation.Omega;
 
@@ -13,7 +14,7 @@ public class AlchemyDebug {
 
 	public static final Logger logger = LogManager.getLogger(AlchemyDebug.class.getSimpleName());
 	
-	private static final Map<String, Long> time_mapping = new HashMap<String, Long>();
+	private static final Map<String, Long> time_mapping = Maps.newHashMap();
 	
 	public static final void start(String name) {
 		time_mapping.put(name, System.currentTimeMillis());

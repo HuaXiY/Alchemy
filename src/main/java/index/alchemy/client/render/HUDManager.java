@@ -76,7 +76,7 @@ public class HUDManager {
 			if (cd_per <= 0)
 				continue;
 			++i;
-			int x = getCDXStart(i), y = getCDYStart(i), snake = Tool.isNullOr(snakes.get(cd), 0), sx = 0, sy = 0;
+			int x = getCDXStart(i), y = getCDYStart(i), snake = Tool.isNullOr(snakes.get(cd), () -> 0), sx = 0, sy = 0;
 			if (snake > 0) {
 				snakes.put(cd, cd.getResidualCD() == 1 ? 0 : --snake);
 				sx = Tool.getRandom(-SNAKE, SNAKE);

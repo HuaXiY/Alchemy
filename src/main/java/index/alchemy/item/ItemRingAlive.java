@@ -166,7 +166,6 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 	
 	@Override
 	public void onWornTick(ItemStack item, EntityLivingBase living) {
-		alive_power.set(item, MAX_POWER);
 		if (Always.isServer() && living.ticksExisted % 5 == 0 && living.getHealth() < living.getMaxHealth() && alive_power.get(item) >= 1) {
 			living.heal(1);
 			alive_power.set(item, alive_power.get(item) - 1);

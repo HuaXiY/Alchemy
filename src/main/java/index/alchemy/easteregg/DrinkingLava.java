@@ -43,6 +43,7 @@ public class DrinkingLava extends ItemBucket {
 	}
 	
 	@Override
+	@Patch.Spare
 	public EnumAction getItemUseAction(ItemStack stack) {
 		return super.getItemUseAction(stack);
 	}
@@ -54,6 +55,7 @@ public class DrinkingLava extends ItemBucket {
 	}
 	
 	@Override
+	@Patch.Spare
 	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase living) {
 		return super.onItemUseFinish(stack, worldIn, living);
 	}
@@ -74,6 +76,7 @@ public class DrinkingLava extends ItemBucket {
 	}
 	
 	@Override
+	@Patch.Spare
 	public int getMaxItemUseDuration(ItemStack stack) {
 		return super.getMaxItemUseDuration(stack);
 	}

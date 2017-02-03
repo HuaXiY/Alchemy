@@ -20,6 +20,7 @@ public interface IItemHandlerModifiableInventory extends IItemHandlerModifiable,
 		
 		default ItemStack getStackInSlot(int slot) { return null; }
 		
+		@Patch.Exception
 		@Hook("index.alchemy.api.IItemHandlerModifiableInventory#getStackInSlot")
 		static Hook.Result getStackInSlot(IItemHandlerModifiableInventory handler, int slot) {
 			return new Hook.Result(handler.getInventorySlotContents(slot));

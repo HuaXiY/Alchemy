@@ -26,8 +26,17 @@ public class AlchemyRuntimeException extends RuntimeException {
 	
 	private AlchemyRuntimeException(Throwable t) { super(t); }
 	
+	public static boolean checkException(Throwable t) {
+		for (Throwable tx : t.getSuppressed())
+			if (tx instanceof AlchemyRuntimeException)
+				return true;
+			else
+				return checkException(tx);
+		return false;
+	}
+	
 	public static void onException(Throwable t) throws RuntimeException {
-		if (t instanceof AlchemyRuntimeException)
+		if (checkException(t))
 			return;
 		
 		AlchemyRuntimeException ex = new AlchemyRuntimeException(t);
@@ -47,7 +56,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 						break;
 			} catch (ClassNotFoundException e) { continue; }
 		
-		JFXDialog.showThrowable(ex);
+		JFXDialog.showThrowableAndWait(ex);
 		
 		throw ex;
 	}

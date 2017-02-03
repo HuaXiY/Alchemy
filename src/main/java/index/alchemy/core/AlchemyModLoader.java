@@ -3,7 +3,6 @@ package index.alchemy.core;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -11,7 +10,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -21,34 +19,26 @@ import java.util.Random;
 import java.util.Stack;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
 
 import baubles.common.Baubles;
+import index.alchemy.api.IDLCInfo;
+import index.alchemy.api.annotation.DLC;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Premise;
 import index.alchemy.api.annotation.Test;
-import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.util.ASMHelper;
-import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -75,10 +65,9 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static org.objectweb.asm.Opcodes.*;
-
 import static index.alchemy.core.AlchemyConstants.*;
 import static index.alchemy.core.AlchemyModLoader.*;
+import static index.alchemy.util.FunctionHelper.*;
 
 /* 
  * -----------------------------------------------
@@ -91,6 +80,7 @@ import static index.alchemy.core.AlchemyModLoader.*;
  */
 
 @Omega
+@Loading
 @Premise({ Baubles.MODID, BOP_ID })
 @Mod(
 		modid = MOD_ID,
@@ -103,9 +93,7 @@ public enum AlchemyModLoader {
 	INSTANCE;
 	
 	@Mod.InstanceFactory
-	public static AlchemyModLoader instance() {
-		return INSTANCE;
-	}
+	public static AlchemyModLoader instance() { return INSTANCE; }
 	
 	public static final String REQUIRED_BEFORE = "required-before:", REQUIRED_AFTER = "required-after:";
 	
@@ -133,112 +121,6 @@ public enum AlchemyModLoader {
 	public static void info(Class<?> clazz, Object obj) {
 		info("Init", "<" + clazz.getName() + "> " + obj);
 	}
-	
-	public static class ASMClassLoader extends ClassLoader {
-		
-		private static final String HANDLER_DESC = Type.getInternalName(Function.class);
-		private static final String HANDLER_FUNC_NAME = Function.class.getDeclaredMethods()[1].getName();
-		private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Function.class.getDeclaredMethods()[1]);
-		
-		private static int id = -1;
-		
-		public static synchronized int nextId() {
-			return ++id;
-		}
-		
-		private ASMClassLoader() {
-			super(ASMClassLoader.class.getClassLoader());
-		}
-		
-		public Class<?> define(String name, byte[] data) {
-			return defineClass(name, data, 0, data.length);
-		}
-		
-		private String getUniqueName(Method callback) {
-			return String.format(
-					"%s_%d_%s_%s_%s",
-					getClass().getName(), nextId(),
-					callback.getDeclaringClass().getSimpleName().replace("[]", "_L"),
-					callback.getName(),
-					callback.getParameterTypes()[0].getSimpleName().replace("[]", "_L")
-			);
-		}
-		
-		@Nullable
-		@Unsafe(Unsafe.ASM_API)
-		public Function createWrapper(Method callback, Object target) {
-			Function result = null;
-			
-			ClassWriter cw = new ClassWriter(0);
-			MethodVisitor mv;
-			
-			boolean isStatic = Modifier.isStatic(callback.getModifiers());
-			String name = getUniqueName(callback);
-			String desc = name.replace('.',  '/');
-			String instType = Type.getInternalName(callback.getDeclaringClass());
-			String callType = Type.getInternalName(callback.getParameterTypes()[0]);
-			String handleName = callback.getName();
-			String handleDesc = Type.getMethodDescriptor(callback);
-			
-			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
-			cw.visitSource("AlchemyModLoader.java:159", "invoke: " + instType + handleName + handleDesc);
-			{
-				if (!isStatic)
-					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
-			}
-			{
-				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "<init>", isStatic ? "()V" : "(Ljava/lang/Object;)V", null, null);
-				mv.visitCode();
-				mv.visitVarInsn(ALOAD, 0);
-				mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-				if (!isStatic) {
-					mv.visitVarInsn(ALOAD, 0);
-					mv.visitVarInsn(ALOAD, 1);
-					mv.visitFieldInsn(PUTFIELD, desc, "instance", "Ljava/lang/Object;");
-				}
-				mv.visitInsn(RETURN);
-				mv.visitMaxs(2, 2);
-				mv.visitEnd();
-			}
-			{
-				mv = cw.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, HANDLER_FUNC_NAME, HANDLER_FUNC_DESC, null, null);
-				mv.visitCode();
-				mv.visitVarInsn(ALOAD, 0);
-				if (!isStatic) {
-					mv.visitFieldInsn(GETFIELD, desc, "instance", "Ljava/lang/Object;");
-					mv.visitTypeInsn(CHECKCAST, instType);
-				}
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitTypeInsn(CHECKCAST, callType);
-				mv.visitMethodInsn(isStatic ? INVOKESTATIC : INVOKEVIRTUAL, instType, handleName, handleDesc, false);
-				Class<?> returnType = callback.getReturnType(), pack = Tool.getPrimitiveMapping(returnType);
-				if (returnType == void.class)
-					mv.visitInsn(ACONST_NULL);
-				else if (returnType.isPrimitive())
-					mv.visitMethodInsn(INVOKEVIRTUAL, ASMHelper.getClassDesc(pack),
-							"valueOf", Type.getMethodDescriptor(Type.getType(pack), Type.getType(returnType)), false);
-				mv.visitInsn(ARETURN);
-				mv.visitMaxs(2, 2);
-				mv.visitEnd();
-			}
-			cw.visitEnd();
-			
-			try {
-				info("Define", name);
-				Class<?> ret = define(name, cw.toByteArray());
-				if (isStatic)
-					result = (Function) ret.newInstance();
-				else
-					result = (Function) ret.getConstructor(Object.class).newInstance(target);
-			} catch(Exception e) { AlchemyRuntimeException.onException(e); }
-			return result;
-		}
-		
-	}
-	
-	public static final ASMClassLoader asm_loader = new ASMClassLoader();
-	
-	public static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 	
 	public static final String mc_dir;
 	public static final boolean is_modding, enable_test, enable_dmain;
@@ -334,6 +216,29 @@ public enum AlchemyModLoader {
 		return false;
 	}
 	
+	public static void init(Class<?> clazz) throws IllegalAccessException, InstantiationException {
+		DLC dlc = clazz.getAnnotation(DLC.class);
+		if (dlc != null) {
+			IDLCInfo info = AlchemyDLCLoader.findDLC(dlc.name());
+			Object instance = clazz.newInstance();
+			for (Method method : clazz.getMethods()) {
+				if (!Modifier.isStatic(method.getModifiers()) && method.getReturnType() == void.class) {
+					EventHandler handler = method.getAnnotation(EventHandler.class);
+					if (handler != null) {
+						Class<?> args[] = method.getParameterTypes();
+						if (args.length == 1 && Tool.isInstance(FMLEvent.class, args[0])) {
+							MethodHandle handle = AlchemyCorePlugin.lookup().unreflect(method).bindTo(instance);
+							AlchemyModLoader.addFMLEventCallback((Class<FMLEvent>) args[0],
+									onThrowable(e -> handle.invoke(e), AlchemyRuntimeException::onException));
+						}
+					}
+				}
+			}
+			if (AlchemyCorePlugin.runtimeSide().isClient())
+				FMLClientHandler.instance().addModAsResource(info.getDLCContainer());
+		}
+	}
+	
 	public static void restart() {
 		checkInvokePermissions();
 		RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
@@ -343,9 +248,7 @@ public enum AlchemyModLoader {
 		try {
 			Process process = Runtime.getRuntime().exec("java " + Joiner.on(' ').join(args) + " -cp " + cp + " " + main);
 			FMLCommonHandler.instance().exitJava(0x0, false);
-		} catch (IOException e) {
-			AlchemyRuntimeException.onException(e);
-		}
+		} catch (IOException e) { AlchemyRuntimeException.onException(e); }
 	}
 	
 	static {
@@ -353,7 +256,9 @@ public enum AlchemyModLoader {
 		
 		is_modding = !AlchemyCorePlugin.isRuntimeDeobfuscationEnabled();
 		mc_dir = AlchemyCorePlugin.getMinecraftDir().getPath();
-		try {
+		if (AlchemyCorePlugin.getAlchemyCoreLocation() != null)
+			mod_path = AlchemyCorePlugin.getAlchemyCoreLocation();
+		else try {
 			String offset = AlchemyModLoader.class.getName().replace('.', '/') + ".class";
 			URL src = AlchemyModLoader.class.getResource("/" + offset);
 			if (src.getProtocol().equals("jar"))
@@ -377,15 +282,7 @@ public enum AlchemyModLoader {
 		logger.info("Development mode state: " + enable_dmain);
 	}
 	
-	public static List<String> findClassFromURL(URL url) throws Exception {
-		List<String> result = Lists.newLinkedList();
-		ClassLoader loader = new URLClassLoader(new URL[]{ url }, null);
-		ClassPath path = ClassPath.from(loader);
-		for (ClassInfo info : path.getAllClasses())
-			if (!info.getName().matches(".*\\$[0-9]+") && !info.getName().contains("$$"))
-				result.add(info.getName());
-		return result;
-	}
+	private static final String BOOTSTRAP = "bootstrap";
 	
 	private static void bootstrap() throws Throwable {
 		checkInvokePermissions();
@@ -396,10 +293,12 @@ public enum AlchemyModLoader {
 				logger.info(line);
 		} catch (Exception e) { }
 		
-		AlchemyDebug.start("bootstrap");
-		class_list.addAll(0, findClassFromURL(mod_path.toURI().toURL()));
+		AlchemyDebug.start(BOOTSTRAP);
+		class_list.addAll(0, AlchemyCorePlugin.findClassFromURL(mod_path.toURI().toURL()));
 		
-		Side side = Always.getSide();
+		AlchemyDLCLoader.stream().map(IDLCInfo::getDLCAllClass).forEach(AlchemyModLoader::addClass);
+		
+		Side side = AlchemyCorePlugin.runtimeSide();
 		ClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
 		
 		for (String name : class_list) {
@@ -411,11 +310,9 @@ public enum AlchemyModLoader {
 				Loading loading = clazz.getAnnotation(Loading.class);
 				if (loading != null) {
 					logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
-					loading_list.add(lookup.findStatic(clazz, "init", MethodType.methodType(void.class, Class.class)));
+					loading_list.add(AlchemyCorePlugin.lookup().findStatic(clazz, "init", MethodType.methodType(void.class, Class.class)));
 				}
-			} catch (ClassNotFoundException e) {
-				continue;
-			}
+			} catch (ClassNotFoundException e) { continue; }
 		}
 		
 		for (String name : class_list) {
@@ -436,12 +333,10 @@ public enum AlchemyModLoader {
 						instance_map.get(instance.value()).add(clazz);
 					else
 						AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @InitInstance.value()"));
-			} catch (ClassNotFoundException e) {
-				continue;
-			}
+			} catch (ClassNotFoundException e) { continue; }
 		}
 		
-		AlchemyDebug.end("bootstrap");
+		AlchemyDebug.end(BOOTSTRAP);
 		log_stack.clear();
 		
 		init(ModState.LOADED);
@@ -465,17 +360,17 @@ public enum AlchemyModLoader {
 		for (Class clazz : init_map.get(state)) {
 			bar.step(clazz.getSimpleName());
 			if (clazz.getAnnotation(Test.class) == null || enable_test)
-				init(clazz);
+				init0(clazz);
 		}
 		ProgressManager.pop(bar);
 		logger.info("************************************   " + state_str + "  END    ************************************");
 	}
 	
-	public static void init(Class<?> clazz) {
+	public static void init0(Class<?> clazz) {
 		try {
 			logger.info("Starting init class: " + clazz.getName());
 			try {
-				lookup.findStatic(clazz, "init", MethodType.methodType(void.class)).invoke();
+				AlchemyCorePlugin.lookup().findStatic(clazz, "init", MethodType.methodType(void.class)).invoke();
 			} catch (NoSuchMethodException e) {
 				Tool.init(clazz);
 			} catch (Throwable t) {

@@ -24,7 +24,6 @@ import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyCorePlugin;
-import index.alchemy.core.AlchemySetup;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.ReflectionHelper;
@@ -47,6 +46,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			HOOK_RESULT_DESC = "index/alchemy/api/annotation/Hook$Result",
 			PATCH_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch;",
 			PATCH_EXCEPTION_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch$Exception;",
+			PATCH_SPARE_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch$Spare;",
 			FIELD_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field$Provider;",
 			FIELD_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field;",
 			FIELD_ACCESS_DESC = "Lindex/alchemy/api/IFieldAccess;",
@@ -68,7 +68,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	static { ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyCorePlugin.getLaunchClassLoader()); }
 	
 	public static void setup() {
-		AlchemySetup.checkInvokePermissions();
+		AlchemyCorePlugin.checkInvokePermissions();
+		logger.info("Setup: " + AlchemyTransformerManager.class.getName());
 		try {
 			loadAllProvider();
 			loadAllTransform();
@@ -161,16 +162,20 @@ public class AlchemyTransformerManager implements IClassTransformer {
 								transformers.add(transformer);
 							else
 								transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
+					} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 			}
 		}
 	}
 	
+	private static AlchemyTransformerManager instance;
+	
+	public AlchemyTransformerManager() { synchronized (AlchemyTransformerManager.class) { instance = this; } }
+	
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		if (instance != this)
+			return basicClass;
 		if (debug_print)
 			logger.info("loading: " + transformedName);
 		byte[] old = basicClass;
@@ -180,7 +185,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
 		if (transformedName.endsWith("EntityLivingBase"))
-			Tool.dumpClass(basicClass, "D:/EntityLivingBase.bytecode");
+			Tool.dumpClass(basicClass, "d:/temp/" + transformedName + ".bytecode");
 		return basicClass;
 	}
 	
@@ -218,8 +223,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 	}
 	
-	public static void transform(String name) {
-		logger.info("Transform: " + name);
-	}
+	public static void transform(String name) { logger.info("Transform: " + name); }
+	
+	static { sun.reflect.Reflection.registerFieldsToFilter(AlchemyTransformerManager.class, "instance"); }
 
 }

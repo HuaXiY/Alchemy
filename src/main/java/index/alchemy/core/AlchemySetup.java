@@ -24,15 +24,14 @@ import static index.alchemy.util.Tool.$;
 
 @Beta
 public class AlchemySetup implements IFMLCallHook {
-
+	
 	@Override
 	public Void call() throws Exception {
+		AlchemyModLoader.logger.info("Setup: " + AlchemySetup.class.getName());
 		LaunchClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
 		injectAccessTransformer(AlchemyModLoader.mod_path, loader);
 		loader.addTransformerExclusion("javafx.");
 		TransformerSide.inject(loader);
-		AlchemyDLCLoader.setup();
-		AlchemyTransformerManager.setup();
 		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled())
 			if (AlchemyCorePlugin.runtimeSide().isClient())
 				TransformerInjectOptifine.tryInject(loader);
@@ -43,10 +42,6 @@ public class AlchemySetup implements IFMLCallHook {
 
 	@Override
 	public void injectData(Map<String, Object> data) { }
-	
-	public static void checkInvokePermissions() {
-		Tool.checkInvokePermissions(3, AlchemySetup.class);
-	}
 	
 	public static void injectAccessTransformer(File file, LaunchClassLoader loader) throws IOException {
 		injectAccessTransformer(file, "forge.at", loader);
@@ -61,16 +56,12 @@ public class AlchemySetup implements IFMLCallHook {
 	        if (entry != null)
 	        	at = Tool.read(jar.getInputStream(entry));
 		}
-		System.out.println(at);
 		if (at != null) {
 			List<IClassTransformer> transformers = $(loader, "transformers");
 			for (IClassTransformer t : transformers)
 				if (t instanceof AccessTransformer) {
 					AccessTransformer transformer = (AccessTransformer) t;
-					System.out.println(transformer);
-					System.out.println((Object)$(transformer, "modifiers"));
 					$(transformer, "processATFile", CharSource.wrap(at));
-					System.out.println((Object)$(transformer, "modifiers"));
 					break;
 				}
 		}
