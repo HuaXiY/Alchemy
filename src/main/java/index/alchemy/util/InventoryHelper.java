@@ -18,19 +18,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Omega
-public class InventoryHelper  {
+public interface InventoryHelper  {
 	
-	private static final Random RANDOM = new Random();
+	Random RANDOM = new Random();
 
-	public static final void dropInventoryItems(World world, BlockPos pos, IInventory inventory) {
+	static void dropInventoryItems(World world, BlockPos pos, IInventory inventory) {
 		dropInventoryItems(world, pos.getX(), pos.getY(), pos.getZ(), inventory);
 	}
 
-	public static final void dropInventoryItems(World world, Entity entity, IInventory inventory) {
+	static void dropInventoryItems(World world, Entity entity, IInventory inventory) {
 		dropInventoryItems(world, entity.posX, entity.posY, entity.posZ, inventory);
 	}
 
-	private static void dropInventoryItems(World world, double x, double y, double z, IInventory inventory) {
+	static void dropInventoryItems(World world, double x, double y, double z, IInventory inventory) {
 		for (int i = 0; i < inventory.getSizeInventory(); ++i)  {
 			ItemStack item = inventory.getStackInSlot(i);
 			if (item != null)
@@ -38,21 +38,21 @@ public class InventoryHelper  {
 		}
 	}
 	
-	public static final void dropInventoryItems(World world, BlockPos pos, List<ItemStack> inventory) {
+	static void dropInventoryItems(World world, BlockPos pos, List<ItemStack> inventory) {
 		dropInventoryItems(world, pos.getX(), pos.getY(), pos.getZ(), inventory);
 	}
 
-	public static final void dropInventoryItems(World world, Entity entity, List<ItemStack> inventory) {
+	static void dropInventoryItems(World world, Entity entity, List<ItemStack> inventory) {
 		dropInventoryItems(world, entity.posX, entity.posY, entity.posZ, inventory);
 	}
 
-	private static void dropInventoryItems(World world, double x, double y, double z, List<ItemStack> inventory) {
+	static void dropInventoryItems(World world, double x, double y, double z, List<ItemStack> inventory) {
 		for (ItemStack item : inventory)
 			if (item != null)
 				spawnItemStack(world, x, y, z, item);
 	}
 
-	public static final void spawnItemStack(World world, double x, double y, double z, ItemStack item) {
+	static void spawnItemStack(World world, double x, double y, double z, ItemStack item) {
 		float mx = RANDOM.nextFloat() * 0.8F + 0.1F;
 		float my = RANDOM.nextFloat() * 0.8F + 0.1F;
 		float mz = RANDOM.nextFloat() * 0.8F + 0.1F;
@@ -71,11 +71,11 @@ public class InventoryHelper  {
 		}
 	}
 	
-	public static final EntityItem getEntityItem(Entity entity, ItemStack item) {
+	static EntityItem getEntityItem(Entity entity, ItemStack item) {
 		return getEntityItem(entity.worldObj, entity.posX, entity.posY, entity.posZ, item);
 	}
 	
-	public static final EntityItem getEntityItem(World world, double x, double y, double z, ItemStack item) {
+	static EntityItem getEntityItem(World world, double x, double y, double z, ItemStack item) {
 		float mx = RANDOM.nextFloat() * 0.8F + 0.1F;
 		float my = RANDOM.nextFloat() * 0.8F + 0.1F;
 		float mz = RANDOM.nextFloat() * 0.8F + 0.1F;
@@ -90,14 +90,14 @@ public class InventoryHelper  {
 		return entityitem;
 	}
 	
-	public static final void addItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {
+	static void addItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {
 		if (!player.capabilities.isCreativeMode && --heldItem.stackSize == 0)
 			player.setHeldItem(hand, item);
 		else if (item != null && !player.inventory.addItemStackToInventory(item))
 			player.dropItem(item, false);
 	}
 	
-	public static final void addNonCreativeModeItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {
+	static void addNonCreativeModeItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {
 		if (!player.capabilities.isCreativeMode)
 			if (--heldItem.stackSize == 0)
 				player.setHeldItem(hand, item);
@@ -105,7 +105,7 @@ public class InventoryHelper  {
 				player.dropItem(item, false);
 	}
 	
-	public static final boolean canMergeItemStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {
+	static boolean canMergeItemStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {
 		return 	a.getItem() == b.getItem() &&
 				a.getItemDamage() == b.getItemDamage() &&
 				a.getMetadata() == b.getMetadata() &&
@@ -113,15 +113,15 @@ public class InventoryHelper  {
 				a.areCapsCompatible(b);
 	}
 	
-	public static final boolean areItemsEqual(ItemStack a, ItemStack b) {
+	static boolean areItemsEqual(ItemStack a, ItemStack b) {
 		return a == null ? b == null : b != null && canMergeItemStack(a, b);
 	}
 	
-	public static final boolean areItemsMetaEqual(ItemStack a, ItemStack b) {
+	static boolean areItemsMetaEqual(ItemStack a, ItemStack b) {
 		return a == null ? b == null : b != null && a.getItem() == b.getItem() && a.getMetadata() == b.getMetadata();
 	}
 	
-	public static final boolean isItem(ItemStack stack, Item item) {
+	static boolean isItem(ItemStack stack, Item item) {
 		return stack != null && stack.getItem() == item;
 	}
 	

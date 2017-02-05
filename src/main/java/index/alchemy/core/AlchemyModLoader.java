@@ -227,14 +227,14 @@ public enum AlchemyModLoader {
 					if (handler != null) {
 						Class<?> args[] = method.getParameterTypes();
 						if (args.length == 1 && Tool.isInstance(FMLEvent.class, args[0])) {
-							MethodHandle handle = AlchemyCorePlugin.lookup().unreflect(method).bindTo(instance);
+							MethodHandle handle = AlchemyEngine.lookup().unreflect(method).bindTo(instance);
 							AlchemyModLoader.addFMLEventCallback((Class<FMLEvent>) args[0],
 									onThrowable(e -> handle.invoke(e), AlchemyRuntimeException::onException));
 						}
 					}
 				}
 			}
-			if (AlchemyCorePlugin.runtimeSide().isClient())
+			if (AlchemyEngine.runtimeSide().isClient())
 				FMLClientHandler.instance().addModAsResource(info.getDLCContainer());
 		}
 	}
@@ -254,10 +254,10 @@ public enum AlchemyModLoader {
 	static {
 		logger.info("Max Direct Memory: " + sun.misc.VM.maxDirectMemory());
 		
-		is_modding = !AlchemyCorePlugin.isRuntimeDeobfuscationEnabled();
-		mc_dir = AlchemyCorePlugin.getMinecraftDir().getPath();
-		if (AlchemyCorePlugin.getAlchemyCoreLocation() != null)
-			mod_path = AlchemyCorePlugin.getAlchemyCoreLocation();
+		is_modding = !AlchemyEngine.isRuntimeDeobfuscationEnabled();
+		mc_dir = AlchemyEngine.getMinecraftDir().getPath();
+		if (AlchemyEngine.getAlchemyCoreLocation() != null)
+			mod_path = AlchemyEngine.getAlchemyCoreLocation();
 		else try {
 			String offset = AlchemyModLoader.class.getName().replace('.', '/') + ".class";
 			URL src = AlchemyModLoader.class.getResource("/" + offset);
@@ -294,12 +294,12 @@ public enum AlchemyModLoader {
 		} catch (Exception e) { }
 		
 		AlchemyDebug.start(BOOTSTRAP);
-		class_list.addAll(0, AlchemyCorePlugin.findClassFromURL(mod_path.toURI().toURL()));
+		class_list.addAll(0, AlchemyEngine.findClassFromURL(mod_path.toURI().toURL()));
 		
 		AlchemyDLCLoader.stream().map(IDLCInfo::getDLCAllClass).forEach(AlchemyModLoader::addClass);
 		
-		Side side = AlchemyCorePlugin.runtimeSide();
-		ClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
+		Side side = AlchemyEngine.runtimeSide();
+		ClassLoader loader = AlchemyEngine.getLaunchClassLoader();
 		
 		for (String name : class_list) {
 			try {
@@ -310,7 +310,7 @@ public enum AlchemyModLoader {
 				Loading loading = clazz.getAnnotation(Loading.class);
 				if (loading != null) {
 					logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
-					loading_list.add(AlchemyCorePlugin.lookup().findStatic(clazz, "init", MethodType.methodType(void.class, Class.class)));
+					loading_list.add(AlchemyEngine.lookup().findStatic(clazz, "init", MethodType.methodType(void.class, Class.class)));
 				}
 			} catch (ClassNotFoundException e) { continue; }
 		}
@@ -340,7 +340,7 @@ public enum AlchemyModLoader {
 		log_stack.clear();
 		
 		init(ModState.LOADED);
-		AlchemyUpdateManager.invoke(MOD_ID, DEV_VERSION, null, new File(mod_path.toURI()));
+		AlchemyUpdateManager.invoke(MOD_ID, DEV_VERSION, null, mod_path);
 	}
 	
 	public static String format(String src, String max) {
@@ -370,7 +370,7 @@ public enum AlchemyModLoader {
 		try {
 			logger.info("Starting init class: " + clazz.getName());
 			try {
-				AlchemyCorePlugin.lookup().findStatic(clazz, "init", MethodType.methodType(void.class)).invoke();
+				AlchemyEngine.lookup().findStatic(clazz, "init", MethodType.methodType(void.class)).invoke();
 			} catch (NoSuchMethodException e) {
 				Tool.init(clazz);
 			} catch (Throwable t) {

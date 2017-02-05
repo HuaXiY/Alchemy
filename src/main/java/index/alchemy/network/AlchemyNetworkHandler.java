@@ -113,8 +113,8 @@ public class AlchemyNetworkHandler {
 			network_wrapper.sendTo(new MessageSound(sound.getRegistryName().toString(), category.getName(), d3f2p), player);
 	}
 	
-	public static void updateEntityNBT(MessageNBTUpdate.Type type, int id, NBTTagCompound data, EntityPlayerMP player) {
-		network_wrapper.sendTo(new MessageNBTUpdate(type, id, data), player);
+	public static void updateEntityBaubleNBT(int id, NBTTagCompound data, EntityPlayerMP player) {
+		network_wrapper.sendTo(new MessageBaubleNBTUpdate(id, data), player);
 	}
 	
 	public static <T extends IMessage & IMessageHandler<T, IMessage>> void init() {

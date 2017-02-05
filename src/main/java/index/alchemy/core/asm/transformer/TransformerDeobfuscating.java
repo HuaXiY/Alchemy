@@ -14,7 +14,8 @@ import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
+import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Gamma;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -34,10 +35,10 @@ public class TransformerDeobfuscating implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		if (AlchemyCorePlugin.isRuntimeDeobfuscationEnabled())
+		if (AlchemyEngine.isRuntimeDeobfuscationEnabled())
 			return basicClass;
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(0);
+		ClassWriter writer = ASMHelper.newClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (FieldNode field : node.fields)

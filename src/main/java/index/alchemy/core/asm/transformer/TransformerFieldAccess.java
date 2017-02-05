@@ -21,7 +21,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IFieldAccess;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.project.version.annotation.Alpha;
@@ -61,7 +61,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 		AlchemyTransformerManager.transform("<access>" + name + "|" + transformedName + "#" + accessField.name + " : " +
 				accessField.signature + "\n->  " + owner + "#" + accessField.name + " : " + accessField.signature);
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_MAXS);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		String signature = ASMHelper.getGenericType(ASMHelper.getGeneric(accessField.signature))[1];
@@ -106,7 +106,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 	public static IFieldAccess createAccess(String clazzName, FieldNode field, String fieldDesc, boolean isStatic) {
 		IFieldAccess result = null;
 		
-		ClassWriter cw = new ClassWriter(0);
+		ClassWriter cw = ASMHelper.newClassWriter(0);
 		MethodVisitor mv;
 
 		String name = getUniqueName(clazzName, field), nameDesc = ASMHelper.getClassName(name),
@@ -153,7 +153,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 		cw.visitEnd();
 		
 		try {
-			Class<?> ret =  AlchemyCorePlugin.getASMClassLoader().define(name, cw.toByteArray());
+			Class<?> ret =  AlchemyEngine.getASMClassLoader().define(name, cw.toByteArray());
 			result = (IFieldAccess) ret.newInstance();
 		} catch(Exception e) { AlchemyRuntimeException.onException(e); }
 		return result;
@@ -162,7 +162,7 @@ public class TransformerFieldAccess implements IClassTransformer {
 	private static String getUniqueName(String name, FieldNode field) {
 		return String.format(
 				"%s_%d_%s_%s_%s",
-				AlchemyCorePlugin.getASMClassLoader().getClass().getName(),
+				AlchemyEngine.getASMClassLoader().getClass().getName(),
 				nextId(),
 				name.replace('.', '_'),
 				field.name,

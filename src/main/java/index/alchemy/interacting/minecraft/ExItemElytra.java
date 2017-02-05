@@ -167,14 +167,14 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 				{
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 					GlStateManager.enableBlend();
-
+					
 					if (player.isPlayerInfoSet() && player.getLocationElytra() != null)
 						layer.renderPlayer.bindTexture(player.getLocationElytra());
 					else if (player.hasPlayerInfo() && player.getLocationCape() != null && player.isWearing(EnumPlayerModelParts.CAPE))
 						layer.renderPlayer.bindTexture(player.getLocationCape());
 					else
 						layer.renderPlayer.bindTexture(LayerElytra.TEXTURE_ELYTRA);
-
+					
 					GlStateManager.pushMatrix();
 					GlStateManager.translate(0.0F, 0.0F, 0.125F);
 					layer.modelElytra.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
@@ -183,7 +183,7 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 					if (item.isItemEnchanted())
 						LayerArmorBase.renderEnchantedGlint(layer.renderPlayer, player, layer.modelElytra, limbSwing, limbSwingAmount,
 								partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-
+					
 					GlStateManager.popMatrix();
 				}
 				return Hook.Result.NULL;

@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import index.alchemy.api.IItemTemperature;
 import index.alchemy.api.annotation.Hook;
+import index.alchemy.api.annotation.Init;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.DynamicNumber;
@@ -11,6 +12,7 @@ import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
+import net.minecraftforge.fml.common.LoaderState.ModState;
 import toughasnails.api.temperature.Temperature;
 import toughasnails.temperature.TemperatureDebugger;
 import toughasnails.temperature.TemperatureTrend;
@@ -19,11 +21,12 @@ import toughasnails.temperature.modifier.ArmorModifier;
 import static index.alchemy.util.Tool.$;
 
 @Hook.Provider
+@Init(state = ModState.POSTINITIALIZED)
 public class ExArmorModifier {
 	
 	public static final TemperatureDebugger.Modifier BAUBLE_TARGET = null, BAUBLE_RATE = null;
 	
-	static {
+	public static void init() {
 		Tool.load(TemperatureDebugger.Modifier.class);
 		try {
 			$(ExArmorModifier.class, "BAUBLE_TARGET<<",

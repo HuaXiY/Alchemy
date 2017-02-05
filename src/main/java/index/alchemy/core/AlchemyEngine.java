@@ -6,9 +6,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -16,7 +18,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -28,11 +29,13 @@ import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.DeobfuscatingRemapper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraftforge.fml.common.asm.ASMTransformerWrapper.TransformerWrapper;
 import net.minecraftforge.fml.relauncher.CoreModManager;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -51,7 +54,7 @@ import static index.alchemy.util.Tool.$;
 @MCVersion(MC_VERSION)
 @SortingIndex(Integer.MAX_VALUE)
 @TransformerExclusions(MOD_TRANSFORMER_PACKAGE)
-public class AlchemyCorePlugin implements IFMLLoadingPlugin {
+public class AlchemyEngine implements IFMLLoadingPlugin {
 	
 	private static final String SETUP_CORE = "setup core";
 	
@@ -59,11 +62,34 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 		AlchemyDebug.start(SETUP_CORE);
 		Set<String> libs = Sets.newHashSet(Splitter.on(';').split(Tool.isEmptyOr(
 				System.getProperty("index.alchemy.runtime.lib.ext"), "")));
+		libs.remove("");
 		libs.add("jfxrt");
-		libs.forEach(AlchemyCorePlugin::addRuntimeExtLibFromJRE);
+		libs.forEach(AlchemyEngine::addRuntimeExtLibFromJRE);
+		Tool.load(DeobfuscatingRemapper.class);
+		$(ASMHelper.class, "getClassByteArray<<", (Function<String, byte[]>)
+				name -> Tool.getClassByteArray(getLaunchClassLoader(), DeobfuscatingRemapper.INSTANCE.unmapType(name.replace('.', '/'))));
 		AlchemyDLCLoader.setup();
 		AlchemyTransformerManager.setup();
 		registerTransformer(AlchemyTransformerManager.class);
+		$(getLaunchClassLoader(), "transformers<<", new ArrayList(2) {
+			
+			{ addAll($(getLaunchClassLoader(), "transformers")); }
+			
+			public boolean add(Object e) {
+				if (e.getClass().getName().startsWith(MOD_PACKAGE) ||
+						(e instanceof TransformerWrapper && $(e, "parent").getClass().getName().startsWith(MOD_PACKAGE)) ||
+						e.getClass().getName().equals("net.minecraftforge.fml.common.asm.transformers.ModAPITransformer"))
+					return super.add(e);
+				else
+					for (int i = 0, len = size(); i < len; i++)
+						if (get(i).getClass().getName().startsWith(MOD_PACKAGE)) {
+							super.add(i, e);
+							return true;
+						}
+				return true;
+			}
+			
+		});
 		AlchemyDebug.end(SETUP_CORE);
 	}
 	
@@ -81,14 +107,14 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 	}
 	
 	public static void checkInvokePermissions() {
-		Tool.checkInvokePermissions(3, AlchemyCorePlugin.class);
+		Tool.checkInvokePermissions(3, AlchemyEngine.class);
 	}
 	
 	public static class ASMClassLoader extends ClassLoader {
 		
 		private static final String HANDLER_DESC = Type.getInternalName(Function.class);
-		private static final String HANDLER_FUNC_NAME = Function.class.getDeclaredMethods()[1].getName();
-		private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Function.class.getDeclaredMethods()[1]);
+		private static final String HANDLER_FUNC_NAME = Tool.searchMethod(Function.class, "apply", Object.class).getName();
+		private static final String HANDLER_FUNC_DESC = Type.getMethodDescriptor(Tool.searchMethod(Function.class, "apply", Object.class));
 		
 		private static int id = -1;
 		
@@ -242,7 +268,7 @@ public class AlchemyCorePlugin implements IFMLLoadingPlugin {
 
 	@Override
 	public String getAccessTransformerClass() {
-		return "index.alchemy.core.asm.transformer.AlchemyTransformerManager";
+		return null;
 	}
 
 }

@@ -3,14 +3,14 @@ package index.alchemy.client.fx.update;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.function.Function;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.annotation.FX;
 import index.alchemy.api.annotation.Loading;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
@@ -36,7 +36,7 @@ public class FXUpdateHelper {
 							&& method.getParameterTypes()[0].isArray() && method.getParameterTypes()[0].getComponentType() == int.class)
 								if (method.getReturnType() == List.class) {
 									strings.add(m.value());
-									functions.add(AlchemyCorePlugin.getASMClassLoader().createWrapper(method, null));
+									functions.add(AlchemyEngine.getASMClassLoader().createWrapper(method, null));
 								} else
 									AlchemyRuntimeException.onException(new ClassCastException(
 											clazz + "#" + method.getName() + "() -> return type != " + List.class.getName()));

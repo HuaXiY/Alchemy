@@ -225,7 +225,6 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		flag = true;
 		check = false;
 		recipe = null;
-		
 	}
 
 	@Override

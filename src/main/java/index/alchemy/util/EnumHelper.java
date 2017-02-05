@@ -9,7 +9,7 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 
 import static index.alchemy.util.Tool.$;
 
-public class EnumHelper extends net.minecraftforge.common.util.EnumHelper {
+public abstract class EnumHelper extends net.minecraftforge.common.util.EnumHelper {
 	
 	@Nullable
 	public static final Field findValuesField(Class<? extends Enum<?>> clazz) {

@@ -28,12 +28,12 @@ public class AlchemySetup implements IFMLCallHook {
 	@Override
 	public Void call() throws Exception {
 		AlchemyModLoader.logger.info("Setup: " + AlchemySetup.class.getName());
-		LaunchClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
+		LaunchClassLoader loader = AlchemyEngine.getLaunchClassLoader();
 		injectAccessTransformer(AlchemyModLoader.mod_path, loader);
 		loader.addTransformerExclusion("javafx.");
 		TransformerSide.inject(loader);
-		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled())
-			if (AlchemyCorePlugin.runtimeSide().isClient())
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
+			if (AlchemyEngine.runtimeSide().isClient())
 				TransformerInjectOptifine.tryInject(loader);
 		List<IClassTransformer> transformers = $(loader, "transformers");
 		AlchemyTransformerManager.logger.info(Joiner.on('\n').appendTo(new StringBuilder("Transformers: \n"), transformers).toString());
@@ -48,7 +48,7 @@ public class AlchemySetup implements IFMLCallHook {
 	}
 	
 	public static void injectAccessTransformer(File file, String atName, LaunchClassLoader loader) throws IOException {
-		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled())
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
 			return;
 		String at = null;
 		try (JarFile jar = new JarFile(file)) {

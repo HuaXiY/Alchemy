@@ -122,7 +122,7 @@ public class AlchemyDLCLoader {
 	
 	private static final Logger logger = LogManager.getLogger(AlchemyDLCLoader.class.getSimpleName());
 	
-	private static final String mc_dir = AlchemyCorePlugin.getMinecraftDir().getPath();
+	private static final String mc_dir = AlchemyEngine.getMinecraftDir().getPath();
 	
 	private static final Map<String, IDLCInfo> dlc_mapping = Maps.newHashMap();
 	
@@ -142,7 +142,7 @@ public class AlchemyDLCLoader {
 	public static void init() { injectLoader(); }
 	
 	public static void setup() {
-		AlchemyCorePlugin.checkInvokePermissions();
+		AlchemyEngine.checkInvokePermissions();
 		logger.info("Setup: " + AlchemyDLCLoader.class.getName());
 		
 		String val = System.getProperty("index.alchemy.dlcs.bin", "");
@@ -167,9 +167,8 @@ public class AlchemyDLCLoader {
 		IDLCInfo dlc = null;
 		try {
 			if ((dlc = checkFileIsDLC(file)) != null) {
-				file = update(dlc, file);
 				if (file.isFile()) {
-					LaunchClassLoader loader = AlchemyCorePlugin.getLaunchClassLoader();
+					LaunchClassLoader loader = AlchemyEngine.getLaunchClassLoader();
 					AlchemySetup.injectAccessTransformer(file, loader);
 					AlchemySetup.injectAccessTransformer(file, dlc.id() + "_at.cfg", loader);
 				}
@@ -177,7 +176,7 @@ public class AlchemyDLCLoader {
 				Tool.addURLToClassLoader(AlchemyDLCLoader.class.getClassLoader(), url);
 				AnnotationInvocationHandler invocationHandler = AnnotationInvocationHandler.asOneOfUs(dlc);
 				invocationHandler.memberValues.put("getDLCContainer", new DLCContainer(dlc));
-				invocationHandler.memberValues.put("getDLCAllClass", ImmutableList.copyOf(AlchemyCorePlugin.findClassFromURL(url)));
+				invocationHandler.memberValues.put("getDLCAllClass", ImmutableList.copyOf(AlchemyEngine.findClassFromURL(url)));
 				invocationHandler.memberValues.put("getDLCFile", file);
 				file_mapping.put(dlc.name(), file);
 				dlc_mapping.put(dlc.name(), dlc);
@@ -187,13 +186,6 @@ public class AlchemyDLCLoader {
 		} catch (Exception e) {
 			logger.warn("Failed to load DLC: " + file.getPath(), e);
 		}
-	}
-	
-	private static File update(IDLCInfo dlc, File file) {
-		if (file.isDirectory())
-			return file;
-		// TODO
-		return file;
 	}
 	
 	@Nullable

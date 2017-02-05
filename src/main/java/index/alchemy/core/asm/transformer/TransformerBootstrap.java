@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.util.ASMHelper;
 import index.project.version.annotation.Omega;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -26,7 +27,7 @@ public class TransformerBootstrap implements IAlchemyClassTransformer {
 		try {
 			String methodName = "<clinit>", fieldName = "BLOCKED_SERVERS";
 			ClassReader reader = new ClassReader(basicClass);
-			ClassWriter writer = new ClassWriter(0);
+			ClassWriter writer = ASMHelper.newClassWriter(0);
 			ClassNode node = new ClassNode(ASM5);
 			reader.accept(node, 0);
 			insn_node: for (MethodNode method : node.methods)

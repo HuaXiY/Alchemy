@@ -6,16 +6,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 @Omega
-public class NBTHelper {
+public interface NBTHelper {
 	
-	public static final NBTTagCompound getOrSetNBT(ItemStack item) {
+	static NBTTagCompound getOrSetNBT(ItemStack item) {
 		NBTTagCompound nbt = item.getTagCompound();
 		if (nbt == null)
 			item.setTagCompound(nbt = new NBTTagCompound());
 		return nbt;
 	}
 	
-	public static final NBTTagCompound getNBTFormItemStack(ItemStack item) {
+	static NBTTagCompound getNBTFormItemStack(ItemStack item) {
 		NBTTagCompound nbt = new NBTTagCompound();
 		if (item == null)
 			return nbt;
@@ -23,18 +23,18 @@ public class NBTHelper {
 		return nbt;
 	}
 	
-	public static final NBTTagList getNBTListFormItemStacks(ItemStack[] items) {
+	static NBTTagList getNBTListFormItemStacks(ItemStack[] items) {
 		NBTTagList list = new NBTTagList();
 		for (ItemStack item : items)
 			list.appendTag(getNBTFormItemStack(item));
 		return list;
 	}
 	
-	public static final ItemStack getItemStackFormNBT(NBTTagCompound nbt) {
-		return ItemStack.loadItemStackFromNBT(nbt);
+	static ItemStack getItemStackFormNBT(NBTTagCompound nbt) {
+		return nbt.hasNoTags() ? null : ItemStack.loadItemStackFromNBT(nbt);
 	}
 	
-	public static final ItemStack[] getItemStacksFormNBTList(NBTTagList list) {
+	static ItemStack[] getItemStacksFormNBTList(NBTTagList list) {
 		ItemStack[] item = new ItemStack[list.tagCount()];
 		for (int i = 0; i < list.tagCount(); i++)
 			item[i] = ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(i));

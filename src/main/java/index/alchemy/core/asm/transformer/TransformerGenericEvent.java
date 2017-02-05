@@ -17,7 +17,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.project.version.annotation.Omega;
@@ -38,7 +38,6 @@ public class TransformerGenericEvent implements IClassTransformer {
 			return basicClass;
 		boolean flag = false;
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)
@@ -56,7 +55,7 @@ public class TransformerGenericEvent implements IClassTransformer {
 								String new_generic = "";
 								Class<?> super_class = null;
 								try {
-									super_class = AlchemyCorePlugin.getLaunchClassLoader().loadClass(clazz.replace('/', '.'));
+									super_class = AlchemyEngine.getLaunchClassLoader().loadClass(clazz.replace('/', '.'));
 								} catch (ClassNotFoundException e) { AlchemyRuntimeException.onException(e); }
 								do 
 									if (ASMHelper.isPrimaryClass(super_class.getName())) {
@@ -91,6 +90,7 @@ public class TransformerGenericEvent implements IClassTransformer {
 					}
 		if (!flag)
 			return basicClass;
+		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_FRAMES);
 		node.accept(writer);
 		return writer.toByteArray();
 	}

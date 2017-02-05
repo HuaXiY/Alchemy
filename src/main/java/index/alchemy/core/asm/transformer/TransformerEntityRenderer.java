@@ -13,11 +13,10 @@ import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.DeobfuscatingRemapper;
 import index.project.version.annotation.Omega;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,12 +32,12 @@ public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 		if (true) return basicClass;
 		String srgMethodName = "func_175068_a"/* renderWorldPass */, srgFieldName = "field_175078_W"/* debugView */,
 				clazzName = ASMHelper.getClassName(transformedName);
-		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
-			srgMethodName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(clazzName, srgMethodName, "(IFJ)V");
-			srgFieldName = FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(clazzName, srgFieldName, "Z");
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
+			srgMethodName = DeobfuscatingRemapper.INSTANCE.mapMethodName(clazzName, srgMethodName, "(IFJ)V");
+			srgFieldName = DeobfuscatingRemapper.INSTANCE.mapFieldName(clazzName, srgFieldName, "Z");
 		}
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(0);
+		ClassWriter writer = ASMHelper.newClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		insn_node: for (MethodNode method : node.methods)

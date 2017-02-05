@@ -1,11 +1,13 @@
 package index.alchemy.util;
 
-import java.io.IOException;
 import java.util.ListIterator;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -20,18 +22,18 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
 import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Omega;
 
 import static org.objectweb.asm.Opcodes.*;
 
 @Omega
-public class ASMHelper {
+public interface ASMHelper {
 	
-	public static final int getReturnOpcode(Type type) {
+	static int getReturnOpcode(Type type) {
 		switch (type.getSort()) {
 			case Type.BYTE:
 			case Type.SHORT:
@@ -53,7 +55,7 @@ public class ASMHelper {
 		}
 	}
 	
-	public static final int getLoadOpcode(Type type) {
+	static int getLoadOpcode(Type type) {
 		switch (type.getSort()) {
 			case Type.BYTE:
 			case Type.SHORT:
@@ -71,7 +73,7 @@ public class ASMHelper {
 		}
 	}
 	
-	public static final int getStoreOpcode(Type type) {
+	static int getStoreOpcode(Type type) {
 		switch (type.getSort()) {
 			case Type.BYTE:
 			case Type.SHORT:
@@ -89,7 +91,7 @@ public class ASMHelper {
 		}
 	}
 	
-	public static final int getStackFrameLength(Type type) {
+	static int getStackFrameLength(Type type) {
 		switch (type.getSort()) {
 			case Type.LONG:
 			case Type.DOUBLE:
@@ -99,7 +101,7 @@ public class ASMHelper {
 		}
 	}
 	
-	public static final AbstractInsnNode getIntNode(int value) {
+	static AbstractInsnNode getIntNode(int value) {
 		if (value <= 5 && -1 <= value)
 			return new InsnNode(ICONST_M1 + value + 1);
 		if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
@@ -109,41 +111,41 @@ public class ASMHelper {
 		return new LdcInsnNode(value);
 	}
 	
-	public static final String getClassName(Class<?> clazz) {
+	static String getClassName(Class<?> clazz) {
 		return getClassName(clazz.getName());
 	}
 	
-	public static final String getClassName(String clazz) {
+	static String getClassName(String clazz) {
 		return clazz.indexOf('L') == 0 && clazz.indexOf(';') == clazz.length() - 1 ?
 				clazz.replaceFirst("L", "").replace('.', '/').replace(";", "") : clazz.replace('.', '/').replace(";", "");
 	}
 	
-	public static final String getClassDesc(Class<?> clazz) {
+	static String getClassDesc(Class<?> clazz) {
 		return getClassDesc(clazz.getName());
 	}
 	
-	public static final String getClassDesc(String clazz) {
+	static String getClassDesc(String clazz) {
 		return "L" + getClassName(clazz) + ";";
 	}
 	
-	public static final String getClassSrcName(String name) {
+	static String getClassSrcName(String name) {
 		return getClassName(name).replace('/', '.');
 	}
 	
-	public static final boolean isOverOpcode(int opcode) {
+	static boolean isOverOpcode(int opcode) {
 		return opcode >= IRETURN && opcode <= RETURN || opcode == ATHROW;
 	}
 	
-	public static final boolean isPrimaryClass(String name) {
+	static boolean isPrimaryClass(String name) {
 		String temp[] = name.replace('/', '.').split("\\.");
 		return temp.length > 1 && temp[temp.length - 1].equalsIgnoreCase(temp[temp.length - 2]);
 	}
 	
-	public static final String getGeneric(String signature) {
+	static String getGeneric(String signature) {
 		return Tool.get(signature, "(<.*>)");
 	}
 	
-	public static final String[] getGenericType(String generic) {
+	static String[] getGenericType(String generic) {
 		Type types[] = Type.getArgumentTypes("(" + removeGeneric(Tool.get(generic, "<(.*)>")).replace("+", "").replace("-", "") + ")V");
 		String result[] = new String[types.length];
 		for (int i = 0; i < types.length; i++)
@@ -151,46 +153,53 @@ public class ASMHelper {
 		return result;
 	}
 	
-	public static final String removeGeneric(String signature) {
+	static String removeGeneric(String signature) {
 		return signature.replaceAll("(<.*>)", "");
 	}
 	
+	Function<String, byte[]> getClassByteArray = c -> null;
+	
 	@Nullable
-	public static final ClassNode getSuperClassNode(String name) {
+	static ClassNode getClassNode(String name) {
+		if (Strings.isNullOrEmpty(name))
+			return null;
 		try {
-			ClassReader reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), name));
+			byte bytecode[] = getClassByteArray.apply(name);
+			if (bytecode == null)
+				bytecode = IOUtils.toByteArray(ASMHelper.class.getClassLoader().getResourceAsStream(name.replace('.', '/') + ".class"));
+			ClassReader reader = new ClassReader(bytecode);
 			ClassNode result = new ClassNode();
 			reader.accept(result, 0);
-			return getSuperClassNode(result);
-		} catch (IOException e) { return null; }
+			return result;
+		} catch (Exception e) { return null; }
 	}
 	
 	@Nullable
-	public static final ClassNode getSuperClassNode(ClassNode node) {
-		if (node.superName == null || node.superName.isEmpty())
-			return null;
-		else
-			try {
-				ClassReader reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), node.superName));
-				ClassNode result = new ClassNode();
-				reader.accept(result, 0);
-				return result;
-			} catch (IOException e) { return null; }
+	static ClassNode getSuperClassNode(String name) {
+		return getSuperClassNode(getClassNode(name));
 	}
 	
-	public static final boolean corresponding(FieldNode field, String owner, FieldInsnNode fieldInsn) {
+	@Nullable
+	static ClassNode getSuperClassNode(ClassNode node) {
+		if (node == null || node.superName == null || node.superName.isEmpty())
+			return null;
+		else
+			return getClassNode(node.superName);
+	}
+	
+	static boolean corresponding(FieldNode field, String owner, FieldInsnNode fieldInsn) {
 		return Objects.equal(field.name, fieldInsn.name)
 				&& Objects.equal(field.desc, fieldInsn.desc)
 				&& Objects.equal(owner, fieldInsn.owner);
 	}
 	
-	public static final boolean corresponding(MethodNode method, String owner, MethodInsnNode methodInsn) {
+	static boolean corresponding(MethodNode method, String owner, MethodInsnNode methodInsn) {
 		return Objects.equal(method.name, methodInsn.name)
 				&& Objects.equal(method.desc, methodInsn.desc)
 				&& Objects.equal(owner, methodInsn.owner);
 	}
 	
-	public static final void removeInvoke(ListIterator<AbstractInsnNode> iterator) {
+	static void removeInvoke(ListIterator<AbstractInsnNode> iterator) {
 		int offset = getStackFrameOffset(iterator.previous());
 		iterator.remove();
 		while (offset != 0) {
@@ -204,7 +213,7 @@ public class ASMHelper {
 	
 	@Alpha
 	@Unsafe(Unsafe.ASM_API)
-	public static final int getStackFrameOffset(AbstractInsnNode insn) {
+	static int getStackFrameOffset(AbstractInsnNode insn) {
 		int opcode = insn.getOpcode();
 		if (insn instanceof InsnNode) {
 			if (opcode == NOP)
@@ -254,6 +263,47 @@ public class ASMHelper {
 			if (opcode == NEW)
 				return 1;
 		return 0;
+	}
+	
+	static ClassWriter newClassWriter(int flags) {
+		return new ClassWriter(flags) {
+			
+			@Override
+			protected String getCommonSuperClass(String a, String b) {
+				ClassNode aNode = getClassNode(a), bNode = getClassNode(b);
+				Tool.checkNull(aNode, bNode);
+				if (isInstance(aNode, bNode))
+					return a;
+				if (isInstance(bNode, aNode))
+					return b;
+				if (isInterface(aNode) || isInterface(bNode))
+					return "java/lang/Object";
+				do
+					aNode = getSuperClassNode(aNode);
+				while (!isInstance(aNode, bNode));
+				return aNode.name;
+			}
+			
+		};
+	}
+	
+	static boolean isSubclass(ClassNode supers, ClassNode clazz) {
+		do
+			if (supers.name.equals(clazz.name))
+				return true;
+		while ((clazz = getSuperClassNode(clazz)) != null);
+		return false;
+	}
+	
+	static boolean isInstance(ClassNode supers, ClassNode clazz) {
+		for (String i : clazz.interfaces)
+			if (isInstance(supers, getClassNode(i)))
+				return true;
+		return isSubclass(supers, clazz);
+	}
+	
+	static boolean isInterface(ClassNode node) {
+		return (node.access & ACC_INTERFACE) != 0;
 	}
 	
 }

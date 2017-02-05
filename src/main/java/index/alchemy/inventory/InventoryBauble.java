@@ -15,7 +15,6 @@ import index.alchemy.api.annotation.Texture;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.network.MessageNBTUpdate;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
@@ -127,7 +126,7 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	}
 	
 	public void updatePlayer(EntityPlayerMP player, NBTTagCompound data) {
-		AlchemyNetworkHandler.updateEntityNBT(MessageNBTUpdate.Type.ENTITY_BAUBLE_DATA, living.getEntityId(), data, player);
+		AlchemyNetworkHandler.updateEntityBaubleNBT(living.getEntityId(), data, player);
 	}
 	
 	@Nullable

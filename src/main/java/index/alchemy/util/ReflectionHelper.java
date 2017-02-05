@@ -13,7 +13,7 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Beta;
 
 @Beta
-public class ReflectionHelper {
+public abstract class ReflectionHelper {
 	
 	static { resetReflection(); }
 	

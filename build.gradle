@@ -228,7 +228,8 @@ net.md_5.specialsource.provider.ClassLoaderProvider getProvider(File input, org.
     def set = classpath.getFiles()
     set.addAll(Arrays.asList(fileList("build/libs/")))
     def urls = set.stream().filter { it.getName().endsWith(".jar") && !it.getName().contains("-sources") && (it.getName().contains("-deobf") || 
-			it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) }
+			it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) ||
+			it.getName().contains("ToughAsNails-") || it.getName().contains("mobends-") }
 			.map { it.toURI() }.map { it.toURL() }.toArray { new URL[it] }
 	println "ReobfDLC class path: "
 	urls.each { println it }
@@ -262,7 +263,7 @@ build.finalizedBy rename
 
 def commonManifest = {
     attributes 'FMLAT' : 'alchemy_at.cfg',
-               'FMLCorePlugin': 'index.alchemy.core.AlchemyCorePlugin', 
+               'FMLCorePlugin': 'index.alchemy.core.AlchemyEngine', 
                'FMLCorePluginContainsFMLMod': 'true'
 }
 

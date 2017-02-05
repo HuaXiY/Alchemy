@@ -42,7 +42,7 @@ public class TransformerPatch implements IClassTransformer {
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		AlchemyTransformerManager.transform("<patch>" + name + "|" + transformedName + "\n->  " + patch.name.replace('/', '.'));
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(0);
+		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (Iterator<MethodNode> iterator = patch.methods.iterator(); iterator.hasNext();)

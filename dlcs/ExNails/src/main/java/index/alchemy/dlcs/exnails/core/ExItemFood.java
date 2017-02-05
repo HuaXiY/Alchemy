@@ -13,6 +13,7 @@ import index.alchemy.api.IItemThirst;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Patch;
+import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
@@ -100,6 +101,8 @@ public class ExItemFood extends ItemFood implements IItemThirst, IItemPotion {
 	@Patch.Exception
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onFoodEaten(LivingEntityUseItemEvent.Finish event) {
+		if (Always.isClient())
+			return;
 		ItemStack item = event.getItem();
 		if (event.getEntityLiving() instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) event.getEntityLiving();
@@ -114,11 +117,11 @@ public class ExItemFood extends ItemFood implements IItemThirst, IItemPotion {
 		}
 		if (item.getItem() instanceof IItemPotion) {
 			IItemPotion potion = (IItemPotion) item.getItem();
-			potion.getEffects(item).forEach(event.getEntityLiving()::addPotionEffect);
+			potion.getEffects(item).stream().map(PotionEffect::new).forEach(event.getEntityLiving()::addPotionEffect);
 		} else {
 			ExPotionLoader.EffectNode node = ExPotionLoader.findNode(item.getItem());
 			if (node != null && item.getMetadata() < node.effects.length)
-				node.effects[item.getMetadata()].forEach(event.getEntityLiving()::addPotionEffect);
+				node.effects[item.getMetadata()].stream().map(PotionEffect::new).forEach(event.getEntityLiving()::addPotionEffect);
 		}
 	}
 	

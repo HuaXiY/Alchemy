@@ -13,9 +13,10 @@ import org.objectweb.asm.tree.MethodNode;
 import index.alchemy.api.AlchemyBaubles;
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
+import index.alchemy.util.ASMHelper;
+import index.alchemy.util.DeobfuscatingRemapper;
 import index.project.version.annotation.Beta;
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -26,14 +27,14 @@ public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		String srgName1 = "func_147347_a"/* processPlayer */, srgName2 = "func_147344_a"/* processCreativeInventoryAction */;
-		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
-			srgName1 = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName1,
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
+			srgName1 = DeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName1,
 					"(Lnet/minecraft/network/play/client/CPacketPlayer;)V");
-			srgName2 = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName2,
+			srgName2 = DeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName2,
 					"(Lnet/minecraft/network/play/client/CPacketCreativeInventoryAction;)V");
 		}
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(0);
+		ClassWriter writer = ASMHelper.newClassWriter(0);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)

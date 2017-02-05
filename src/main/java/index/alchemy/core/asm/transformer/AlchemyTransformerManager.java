@@ -23,7 +23,7 @@ import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.ReflectionHelper;
@@ -38,7 +38,8 @@ import static index.alchemy.core.AlchemyConstants.*;
 @Omega
 public class AlchemyTransformerManager implements IClassTransformer {
 	
-	public static final String 
+	public static final String
+			I_ALCHEMY_CLASS_TRANSFORMER_DESC = "index/alchemy/api/IAlchemyClassTransformer",
 			ALCHEMY_HOOKS_CLASS = "index.alchemy.core.AlchemyHooks",
 			ALCHEMY_HOOKS_DESC = "index/alchemy/core/AlchemyHooks",
 			HOOK_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook$Provider;",
@@ -65,14 +66,13 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		}
 	};
 	
-	static { ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyCorePlugin.getLaunchClassLoader()); }
+	static { ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyEngine.getLaunchClassLoader()); }
 	
 	public static void setup() {
-		AlchemyCorePlugin.checkInvokePermissions();
+		AlchemyEngine.checkInvokePermissions();
 		logger.info("Setup: " + AlchemyTransformerManager.class.getName());
 		try {
 			loadAllProvider();
-			loadAllTransform();
 		} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 	}
 	
@@ -90,6 +90,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 					loadPatch(node);
 					loadField(node);
 					loadHook(node);
+					loadTransform(node, info);
 				}
 			}
 	}
@@ -146,36 +147,21 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	@Unsafe(Unsafe.ASM_API)
-	private static void loadAllTransform() throws Exception {
-		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
-		for (ClassInfo info : path.getTopLevelClassesRecursive(MOD_TRANSFORMER_PACKAGE.substring(0, MOD_TRANSFORMER_PACKAGE.length() - 1))) {
-			ClassReader reader = new ClassReader(info.url().openStream());
-			ClassNode node = new ClassNode(ASM5);
-			reader.accept(node, 0);
-			if (checkSideOnly(node)) {
-				Class clazz = info.load();
-				if (Tool.isInstance(IAlchemyClassTransformer.class, clazz))
-					try {
-						IAlchemyClassTransformer transformer = (IAlchemyClassTransformer) clazz.newInstance();
-						if (!transformer.disable())
-							if (transformer.getTransformerClassName() == null)
-								transformers.add(transformer);
-							else
-								transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
-					} catch (Exception e) { AlchemyRuntimeException.onException(e); }
-			}
-		}
+	private static void loadTransform(ClassNode node, ClassInfo info) throws Exception {
+		if (checkSideOnly(node) && checkTransformer(node))
+			try {
+				IAlchemyClassTransformer transformer = (IAlchemyClassTransformer) info.load().newInstance();
+				if (!transformer.disable())
+					if (transformer.getTransformerClassName() == null)
+						transformers.add(transformer);
+					else
+						transformers_mapping.get(transformer.getTransformerClassName()).add(transformer);
+			} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 	}
-	
-	private static AlchemyTransformerManager instance;
-	
-	public AlchemyTransformerManager() { synchronized (AlchemyTransformerManager.class) { instance = this; } }
 	
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		if (instance != this)
-			return basicClass;
 		if (debug_print)
 			logger.info("loading: " + transformedName);
 		byte[] old = basicClass;
@@ -184,9 +170,14 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
-		if (transformedName.endsWith("EntityLivingBase"))
-			Tool.dumpClass(basicClass, "d:/temp/" + transformedName + ".bytecode");
 		return basicClass;
+	}
+	
+	public static boolean checkTransformer(ClassNode node) {
+		for (String i : node.interfaces)
+			if (i.equals(I_ALCHEMY_CLASS_TRANSFORMER_DESC))
+				return true;
+		return false;
 	}
 	
 	public static boolean checkSideOnly(ClassNode node) {
@@ -194,7 +185,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			return true;
 		for (AnnotationNode annotation : node.visibleAnnotations)
 			if (annotation.desc.equals(SIDE_ONLY_ANNOTATION_DESC))
-				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyCorePlugin.runtimeSide();
+				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyEngine.runtimeSide();
 		return true;
 	}
 	
@@ -203,7 +194,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			return true;
 		for (AnnotationNode annotation : node.visibleAnnotations)
 			if (annotation.desc.equals(SIDE_ONLY_ANNOTATION_DESC))
-				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyCorePlugin.runtimeSide();
+				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyEngine.runtimeSide();
 		return true;
 	}
 	
@@ -212,7 +203,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			return true;
 		for (AnnotationNode annotation : node.visibleAnnotations)
 			if (annotation.desc.equals(SIDE_ONLY_ANNOTATION_DESC))
-				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyCorePlugin.runtimeSide();
+				return Tool.makeAnnotation(SideOnly.class, annotation.values).value() == AlchemyEngine.runtimeSide();
 		return true;
 	}
 	

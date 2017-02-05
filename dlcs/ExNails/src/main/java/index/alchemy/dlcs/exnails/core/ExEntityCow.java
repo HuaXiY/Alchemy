@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import index.alchemy.api.Time;
 import index.alchemy.api.annotation.Patch;
+import index.alchemy.util.Always;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -22,6 +23,8 @@ public class ExEntityCow extends EntityCow {
 	
 	@Override
 	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack) {
+		if (Always.isClient())
+			return false;
 		if (stack != null && stack.getItem() == Items.BUCKET && !player.capabilities.isCreativeMode && !isChild() &&
 				worldObj.getTotalWorldTime() - getEntityData().getLong(NBT_KEY_INTERACT) > Time.DAY * 3) {
 			player.playSound(SoundEvents.ENTITY_COW_MILK, 1.0F, 1.0F);

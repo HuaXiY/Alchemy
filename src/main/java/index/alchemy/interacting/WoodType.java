@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.block.model.ModelBlockDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.BlockStateMapper;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
@@ -44,7 +45,7 @@ public class WoodType {
 	protected static final Map<String, BiFunction<ItemStack, String, String>> func_mapping = Maps.newHashMap();
 	
 	static {
-		addTextureHandler("forestry", safe((i, s) -> $($($(i.getItem(), "getBlock"), "getWoodType", i.getMetadata()),
+		addTextureHandler("forestry", safe((i, s) -> $($(((ItemBlock) i.getItem()).getBlock(), "getWoodType", i.getMetadata()),
 				s.equals("planks") ? "getPlankTexture" : "getBarkTexture")));
 	}
 	

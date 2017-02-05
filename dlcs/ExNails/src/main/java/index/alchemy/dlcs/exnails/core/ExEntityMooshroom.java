@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import index.alchemy.api.Time;
 import index.alchemy.api.annotation.Patch;
+import index.alchemy.util.Always;
 import net.minecraft.entity.passive.EntityMooshroom;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -22,6 +23,8 @@ public class ExEntityMooshroom extends EntityMooshroom {
 	
 	@Override
 	public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack) {
+		if (Always.isClient())
+			return false;
 		if (stack != null && stack.getItem() == Items.BOWL && getGrowingAge() >= 0 && !player.capabilities.isCreativeMode &&
 				worldObj.getTotalWorldTime() - getEntityData().getLong(NBT_KEY_INTERACT) > Time.DAY) {
 			player.playSound(SoundEvents.ENTITY_COW_MILK, 1.0F, 1.0F);

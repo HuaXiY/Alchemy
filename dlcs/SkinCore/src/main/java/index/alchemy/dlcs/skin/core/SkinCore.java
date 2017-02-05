@@ -180,6 +180,12 @@ public class SkinCore {
 		textureManager.loadTexture(GuiWardrobe.BUTTON_TEXTURES, new SimpleTexture(GuiWardrobe.BUTTON_TEXTURES));
 	}
 	
+	public static void updatePlayerItselfSkin(EntityPlayer player) {
+		SkinInfo info = player.getCapability(skin_info, null);
+		AlchemyNetworkHandler.network_wrapper.sendTo(new UpdateSkinClient(player.getEntityId(), info.skin_type, info.skin_data),
+				(EntityPlayerMP) player);
+	}
+	
 	public static void updatePlayerSkin(EntityPlayer player) {
 		SkinInfo info = player.getCapability(skin_info, null);
 		for (EntityPlayer other : ((WorldServer) player.worldObj).getEntityTracker().getTrackingPlayers(player))

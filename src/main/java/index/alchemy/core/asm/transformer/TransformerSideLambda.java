@@ -1,6 +1,5 @@
 package index.alchemy.core.asm.transformer;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -17,8 +16,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 
 import index.alchemy.api.annotation.SideOnlyLambda;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
-import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
@@ -42,13 +40,7 @@ public class TransformerSideLambda implements IClassTransformer {
 		LinkedList<Type> types = new LinkedList<>();
 		LinkedList<Boolean> marks = new LinkedList<>();
 		int flag = -1;
-		ClassReader reader = null;
-		try {
-			reader = new ClassReader(Tool.getClassByteArray(AlchemyCorePlugin.getLaunchClassLoader(), transformedName));
-		} catch (IOException e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
-		ClassWriter writer = new ClassWriter(0);
-		ClassNode node = new ClassNode(ASM5);
-		reader.accept(node, 0);
+		ClassNode node = ASMHelper.getClassNode(transformedName);
 		for (Iterator<MethodNode> iterator = node.methods.iterator(); iterator.hasNext();) {
 			MethodNode method = iterator.next();
 			Side side = null;
@@ -62,7 +54,7 @@ public class TransformerSideLambda implements IClassTransformer {
 					InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
 					Type type = Type.getReturnType(dynamic.desc);
 					types.add(type);
-					marks.add(side != null && side != AlchemyCorePlugin.runtimeSide());
+					marks.add(side != null && side != AlchemyEngine.runtimeSide());
 					flag = 3;
 				}
 				if (flag > -1 && !marks.getLast() && insn instanceof TypeInsnNode) {
@@ -72,14 +64,15 @@ public class TransformerSideLambda implements IClassTransformer {
 							insn.visibleTypeAnnotations != null)
 						for (TypeAnnotationNode ann : insn.visibleTypeAnnotations)
 							if (ann.desc.equals(SIDE_ONLY_LAMBDA_ANNOTATION_DESC) &&
-									Tool.makeAnnotation(SideOnlyLambda.class, ann.values).value() != AlchemyCorePlugin.runtimeSide())
+									Tool.makeAnnotation(SideOnlyLambda.class, ann.values).value() != AlchemyEngine.runtimeSide())
 								marks.set(marks.size() - 1, true);
 				}
 			}
 		}
 		if (marks.isEmpty())
 			return basicClass;
-		reader = new ClassReader(basicClass);
+		ClassReader reader = new ClassReader(basicClass);
+		ClassWriter writer = ASMHelper.newClassWriter(0);
 		node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (Iterator<MethodNode> iterator = node.methods.iterator(); !marks.isEmpty() && iterator.hasNext();) {

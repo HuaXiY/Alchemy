@@ -24,7 +24,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
@@ -46,7 +46,7 @@ public final class TransformerHook implements IClassTransformer {
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		String srgName = this.srgName;
-		if (!AlchemyCorePlugin.isRuntimeDeobfuscationEnabled()) {
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
 			String desc = null;
 			Type args[] = Type.getArgumentTypes(hookMethod.desc);
 			StringBuilder builder = new StringBuilder("(");
@@ -63,7 +63,7 @@ public final class TransformerHook implements IClassTransformer {
 			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
 		}
 		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_FRAMES);
 		ClassNode node = new ClassNode(ASM5);
 		reader.accept(node, 0);
 		for (MethodNode method : node.methods)

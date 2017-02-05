@@ -18,6 +18,7 @@ import net.minecraftforge.fml.client.SplashProgress;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static java.lang.Math.*;
 import static org.lwjgl.opengl.GL11.*;
 
 @Hook.Provider
@@ -25,36 +26,35 @@ import static org.lwjgl.opengl.GL11.*;
 public class FMLLoading {
 	
 	private static final IResourcePack alchemyPack;
-	private static SplashProgress.Texture gifs[];
+	private static final SplashProgress.Texture gifs[];
 	private static int index;
 	
 	static {
 		File alchemy = AlchemyModLoader.mod_path;
 		alchemyPack = alchemy.isDirectory() ? new FolderResourcePack(alchemy) : new FileResourcePack(alchemy);
+		List<SplashProgress.Texture> textures = Lists.newLinkedList();
+		for (int i = 1; true; i++) {
+			ResourceLocation loading = new AlchemyResourceLocation("textures/gui/loading/" + i + ".png");
+			if (!alchemyPack.resourceExists(loading))
+				break;
+			textures.add(new SplashProgress.Texture(loading));
+		}
+		gifs = textures.toArray(new SplashProgress.Texture[textures.size()]);
 	}
 	
 	@Hook("net.minecraftforge.fml.client.SplashProgress$Texture#bind")
 	public static void bind(SplashProgress.Texture texture) {
 		if (texture != SplashProgress.forgeTexture)
 			return;
-		if (gifs == null) {
-			List<SplashProgress.Texture> textures = Lists.newLinkedList();
-			for (int i = 1; true; i++) {
-				ResourceLocation loading = new AlchemyResourceLocation("textures/gui/loading/" + i + ".png");
-				if (!alchemyPack.resourceExists(loading))
-					break;
-				textures.add(new SplashProgress.Texture(loading));
-			}
-			gifs = textures.toArray(new SplashProgress.Texture[textures.size()]);
-		}
-		int f = (++index / 10) % gifs.length;
+		int f = (++index / 20) % gifs.length;
 		SplashProgress.Texture gif = gifs[f];
 		gif.bind();
 		float fw = (float) gif.getWidth() / 2;
 		float fh = (float) gif.getHeight() / 2;
 		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(-fw, Display.getHeight() - gif.getHeight() + fh - 10, 0);
+		int w = Display.getWidth(), h = Display.getHeight(), offset = 20;
+        glLoadIdentity();
+        glTranslatef(min(0, (720 - w) / 2) + offset, min(0, (480 - h) / 2) + h - fh - offset, 0);
 		glBegin(GL_QUADS);
 		gif.texCoord(0, 0, 0);
 		glVertex2f(-fw, -fh);

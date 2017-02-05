@@ -11,18 +11,18 @@ import java.util.concurrent.CountDownLatch;
 
 import com.sun.javafx.application.PlatformImpl;
 
-public class JFXHelper {
+public interface JFXHelper {
 	
-	public static final boolean isSupported() {
+	static boolean isSupported() {
 		return Platform.isSupported(ConditionalFeature.GRAPHICS) && Platform.isSupported(ConditionalFeature.CONTROLS);
 	}
 	
-	public static void runLater(Runnable runnable) {
+	static void runLater(Runnable runnable) {
 		if (isSupported())
 			AlchemyThreadManager.runOnNewThread(link(JFXPanel::new, () -> Platform.runLater(runnable)));
 	}
 	
-	public static void runAndWait(Runnable runnable) {
+	static void runAndWait(Runnable runnable) {
 		if (isSupported()) {
 			CountDownLatch latch = new CountDownLatch(1);
 			AlchemyThreadManager.runOnNewThread(link(JFXPanel::new, () -> PlatformImpl.runAndWait(link(runnable, latch::countDown))));

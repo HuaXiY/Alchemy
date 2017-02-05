@@ -51,7 +51,7 @@ import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 @Omega
-public class Tool {
+public abstract class Tool {
 	
 	public static final StackTraceElement[] getStackTrace() {
 		return new Throwable().getStackTrace();
@@ -535,8 +535,10 @@ public class Tool {
 	}
 	
 	@Nullable
-	public static final byte[] getClassByteArray(LaunchClassLoader loader, String name) throws IOException {
-		return loader.getClassBytes(name.replace('/', '.'));
+	public static final byte[] getClassByteArray(LaunchClassLoader loader, String name) {
+		try {
+			return loader.getClassBytes(name.replace('/', '.'));
+		} catch (IOException e) { return null; }
 	}
 	
 	public static final <T> T isNullOr(T t, Supplier<T> or) {

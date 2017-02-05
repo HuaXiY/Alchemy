@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -14,7 +15,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -106,28 +106,20 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			this.binding = binding;
 			this.target = target;
 			this.method = method;
-			this.handler = AlchemyCorePlugin.getASMClassLoader().createWrapper(method, target);
+			this.handler = AlchemyEngine.getASMClassLoader().createWrapper(method, target);
 		}
 		
-		public KeyBinding getBinding() {
-			return binding;
-		}
+		public KeyBinding getBinding() { return binding; }
 		
-		public IInputHandle getTarget() {
-			return target;
-		}
+		public IInputHandle getTarget() { return target; }
 		
-		public Method getMethod() {
-			return method;
-		}
+		public Method getMethod() { return method; }
 		
 		public void handle() {
 			if (handler != null)
 				try {
 					handler.apply(binding);
-				} catch (Exception e) {
-					AlchemyRuntimeException.onException(e);
-				}
+				} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 		}
 		
 	}
@@ -176,7 +168,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onPlayerTick(PlayerTickEvent event) {
-		String flag = "92";
+		String flag = "96";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -355,7 +347,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onClientTick(ClientTickEvent event) {
-		String flag = "26";
+		String flag = "28";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -544,11 +536,11 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
+		Listener listener = clazz.getAnnotation(Listener.class);
+		if (listener != null)
+			for (Listener.Type type : listener.value())
+				type.getEventBus().register(clazz);
 		if (Always.isClient()) {
-			Listener listener = clazz.getAnnotation(Listener.class);
-			if (listener != null)
-				for (Listener.Type type : listener.value())
-					type.getEventBus().register(clazz);
 			Texture texture = clazz.getAnnotation(Texture.class);
 			if (texture != null)
 				if (texture.value() != null)

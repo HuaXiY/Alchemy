@@ -7,7 +7,6 @@ import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
 import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -22,13 +21,13 @@ public class SkinInfo implements ICapabilityProvider, ICapabilitySerializable {
 	
 	public String skin_type;
 	
-	public transient final EntityPlayer player;
+	public transient final ISkinEntity entity;
 	
 	public transient final Map<MinecraftProfileTexture.Type, ResourceLocation>
 			skin_mapping = Maps.newEnumMap(MinecraftProfileTexture.Type.class);
 	
-	public SkinInfo(EntityPlayer player) {
-		this.player = player;
+	public SkinInfo(ISkinEntity entity) {
+		this.entity = entity;
 	}
 
 	@Override

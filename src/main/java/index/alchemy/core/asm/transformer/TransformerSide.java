@@ -18,7 +18,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.collect.Lists;
 
-import index.alchemy.core.AlchemyCorePlugin;
+import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.Tool;
@@ -62,7 +62,7 @@ public class TransformerSide extends SideTransformer {
 
 		if (check(node.visibleAnnotations))
 			throw new RuntimeException(String.format("Attempted to load class %s for invalid side %s", node.name,
-					AlchemyCorePlugin.runtimeSide()));
+					AlchemyEngine.runtimeSide()));
 		
 		List<FieldNode> invalidField = Lists.newLinkedList(), invalidStaticField = Lists.newLinkedList();
 
@@ -99,7 +99,7 @@ public class TransformerSide extends SideTransformer {
 			}
 		}
 
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_MAXS);
 		node.accept(writer);
 		return writer.toByteArray();
 	}
@@ -109,7 +109,7 @@ public class TransformerSide extends SideTransformer {
 			return false;
 		for (AnnotationNode ann : anns)
 			if (ann.desc.equals(AlchemyTransformerManager.SIDE_ONLY_ANNOTATION_DESC))
-					if (Tool.makeAnnotation(SideOnly.class, ann.values).value() != AlchemyCorePlugin.runtimeSide())
+					if (Tool.makeAnnotation(SideOnly.class, ann.values).value() != AlchemyEngine.runtimeSide())
 						return true;
 		return false;
 	}
