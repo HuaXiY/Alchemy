@@ -12,7 +12,7 @@ public class FinalFieldSetter {
 
     private static final FinalFieldSetter INSTANCE = new FinalFieldSetter();
     
-    private static final sun.misc.Unsafe unsafe = ReflectionHelper.getUnsafe();
+    private static final sun.misc.Unsafe unsafe = ReflectionHelper.unsafe();
 
     @Nullable
     public static FinalFieldSetter instance() {

@@ -46,7 +46,7 @@ public class FMLLoading {
 	public static void bind(SplashProgress.Texture texture) {
 		if (texture != SplashProgress.forgeTexture)
 			return;
-		int f = (++index / 20) % gifs.length;
+		int f = (++index / (60 / 4)) % gifs.length;
 		SplashProgress.Texture gif = gifs[f];
 		gif.bind();
 		float fw = (float) gif.getWidth() / 2;

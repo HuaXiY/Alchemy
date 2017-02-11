@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -52,6 +53,15 @@ public class TransformerSideLambda implements IClassTransformer {
 				AbstractInsnNode insn = insnIterator.next();
 				if (insn instanceof InvokeDynamicInsnNode) {
 					InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
+					boolean lambda = false;
+					for (int i = 0; i < dynamic.bsmArgs.length; i++)
+						if (dynamic.bsmArgs[i] instanceof Handle) {
+							Handle handle = (Handle) dynamic.bsmArgs[i];
+							if (handle.getOwner().equals(node.name) && handle.getName().startsWith("lambda$"))
+								lambda = true;
+						}
+					if (!lambda)
+						continue;
 					Type type = Type.getReturnType(dynamic.desc);
 					types.add(type);
 					marks.add(side != null && side != AlchemyEngine.runtimeSide());

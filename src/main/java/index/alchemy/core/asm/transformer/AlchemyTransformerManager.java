@@ -208,10 +208,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	public static void loadAllTransformClass() {
-		for (String clazz : transformers_mapping.keySet())
-			try {
-				Class.forName(clazz, false, AlchemyTransformerManager.class.getClassLoader());
-			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
+		transformers_mapping.keySet().forEach(Tool::forName);
 	}
 	
 	public static void transform(String name) { logger.info("Transform: " + name); }

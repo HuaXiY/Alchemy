@@ -8,6 +8,7 @@ import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
 import index.alchemy.util.Always;
 import index.project.version.annotation.Omega;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyResourceLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -175,7 +176,7 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	public void onLivingAttack(LivingAttackEvent event) {
 		TimeSnapshot snapshot = event.getEntityLiving().getCapability(AlchemyCapabilityLoader.time_leap, null);
 		if (snapshot != null && snapshot.isLeaping())
-			event.setCanceled(true);
+			AlchemyEventSystem.markEventCanceled(event);
 	}
 	
 	@SubscribeEvent

@@ -2,9 +2,9 @@
 alchemy=alchemy
 
 //itemMap
-item.dush_witchcraft.name=dush_witchcraft
-item.ingot_silver.name=ingot_silver
-item.lapis_lazuli.name=青金石溶液
+item.dush_witchcraft.name=魔法粉末(巫术)
+item.ingot_silver.name=银锭
+item.lapis_lazuli.name=青金石魔法溶剂
 item.scroll_boom.name=爆炸卷轴
 item.scroll_ice_screen.name=冰墙卷轴
 item.scroll_lightning.name=落雷卷轴
@@ -19,25 +19,24 @@ item.amulet_heal.name=生命吊坠
 item.amulet_purify.name=净化吊坠
 
 //blockMap
-tile.null.name=null
-tile.wardrobe.name=wardrobe
+tile.ore_silver.name=银矿石
 
 //potionMap
-effect.feather_fall=feather_fall
-effect.alacrity=alacrity
-effect.soul_withered=soul_withered
+effect.feather_fall=羽落
+effect.alacrity=灵巧
+effect.soul_withered=灵魂枯萎
 effect.eternal=eternal
-effect.dead_or_alive=dead_or_alive
-effect.multiple_xp=multiple_xp
-effect.elapse=elapse
-effect.plague=plague
-effect.danger_sense=danger_sense
-effect.witchcraft=witchcraft
+effect.dead_or_alive=死或生
+effect.multiple_xp=多倍经验
+effect.elapse=消逝
+effect.plague=瘟疫
+effect.danger_sense=危机感知
+effect.witchcraft=巫术
 
 //enchantmentMap
-enchantment.siphon_life=siphon_life
-enchantment.double_jump=double_jump
-enchantment.phase_shift=phase_shift
+enchantment.siphon_life=生命汲取
+enchantment.double_jump=二连跳
+enchantment.phase_shift=相位移动
 
 //keyMap
 key.space_ring_open=打开空间戒指
@@ -45,12 +44,12 @@ key.space_ring_pickup=收进空间戒指
 key.time_ring_leap=时间跳跃
 
 //damageMap
-death.attack.soul_withred=%1$s
-death.attack.dead_magic=%1$s
-death.attack.plague=%1$s
+death.attack.soul_withred=%1$s的灵魂之力枯萎了
+death.attack.dead_magic=%1$s感受到了死亡之力
+death.attack.plague=%1$s变成了一只僵尸
 
 //inventoryMap
-inventory.ring_space=ring_space
+inventory.ring_space=空间戒指
 
 //achievementMap
 achievement.delicious_dirt=美味的泥土

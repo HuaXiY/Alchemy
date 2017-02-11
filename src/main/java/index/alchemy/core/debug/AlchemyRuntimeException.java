@@ -27,6 +27,8 @@ public class AlchemyRuntimeException extends RuntimeException {
 	private AlchemyRuntimeException(Throwable t) { super(t); }
 	
 	public static boolean checkException(Throwable t) {
+		if (t instanceof AlchemyRuntimeException)
+			return true;
 		for (Throwable tx : t.getSuppressed())
 			if (tx instanceof AlchemyRuntimeException)
 				return true;

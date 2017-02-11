@@ -1,12 +1,12 @@
 package index.alchemy.dlcs.skin.core;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
 
 import index.alchemy.command.AlchemyCommandClient;
 import index.project.version.annotation.Omega;
+import javafx.scene.image.Image;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -46,8 +46,14 @@ public class CommandUpdateSkin extends AlchemyCommandClient {
 		} else
 			type = "default";
 		try {
-			byte data[] = IOUtils.toByteArray(png.toURI());
-			SkinCore.updateSkin(type, data, true);
+			Image image = new Image(new FileInputStream(png));
+			if (SkinHelper.isSkin(image)) {
+				if (SkinHelper.isX32(image))
+					image = SkinHelper.x32Tox64(image);
+				byte data[] = SkinHelper.toInputSteam(image);
+				SkinCore.updateSkin(type, data, true);
+			} else
+				throw new IOException(png.toString());
 		} catch (IOException e) {
 			sender.addChatMessage(new TextComponentString("Invalid file !!!"));
 			return;

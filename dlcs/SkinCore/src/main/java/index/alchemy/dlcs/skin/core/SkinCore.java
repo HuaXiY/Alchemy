@@ -30,6 +30,7 @@ import index.alchemy.api.annotation.DLC;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Message;
 import index.alchemy.client.MemoryTexture;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.interacting.WoodType;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
@@ -121,31 +122,27 @@ public class SkinCore {
 		@Override
 		@SideOnly(Side.CLIENT)
 		public IMessage onMessage(UpdateSkinClient message, MessageContext ctx) {
-			Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-				
-				@Override
-				public void run() {
-					Entity entity = Always.findEntityFormClientWorld(message.id);
-					if (entity == null && message.id == Integer.MAX_VALUE - 10)
-						entity = GuiWardrobe.player;
-					if (entity != null) {
-						SkinInfo info = entity.getCapability(SkinCore.skin_info, null);
-						if (info != null) {
-							ResourceLocation skin = new ResourceLocation("skin:" + entity.getName());
-							Minecraft.getMinecraft().getTextureManager().deleteTexture(skin);
-							if (message.data.length > 0) {
-								Minecraft.getMinecraft().getTextureManager().loadTexture(skin, new MemoryTexture(message.data));
-								info.skin_mapping.put(Type.SKIN, skin);
-								info.skin_type = message.type;
-							} else {
-								info.skin_mapping.put(Type.SKIN, null);
-								info.skin_type = null;
-							}
+			AlchemyEventSystem.addDelayedRunnable(p -> {
+				Entity entity = Always.findEntityFormClientWorld(message.id);
+				System.out.println(entity);
+				if (entity == null && message.id == Integer.MAX_VALUE - 10)
+					entity = GuiWardrobe.player;
+				if (entity != null) {
+					SkinInfo info = entity.getCapability(SkinCore.skin_info, null);
+					if (info != null) {
+						ResourceLocation skin = new ResourceLocation("skin:" + entity.getName());
+						Minecraft.getMinecraft().getTextureManager().deleteTexture(skin);
+						if (message.data.length > 0) {
+							Minecraft.getMinecraft().getTextureManager().loadTexture(skin, new MemoryTexture(message.data));
+							info.skin_mapping.put(Type.SKIN, skin);
+							info.skin_type = message.type;
+						} else {
+							info.skin_mapping.put(Type.SKIN, null);
+							info.skin_type = null;
 						}
 					}
 				}
-				
-			});
+			}, 0);
 			return null;
 		}
 		

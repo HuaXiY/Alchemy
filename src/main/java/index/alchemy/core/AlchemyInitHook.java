@@ -1,5 +1,6 @@
 package index.alchemy.core;
 
+import index.alchemy.api.AlchemyRegistry;
 import index.alchemy.api.IAlchemyBiome;
 import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.ICapability;

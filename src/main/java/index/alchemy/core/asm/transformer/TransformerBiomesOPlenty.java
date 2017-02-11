@@ -20,7 +20,7 @@ public class TransformerBiomesOPlenty implements IAlchemyClassTransformer {
 		MissingModsException e = new MissingModsException(Sets.newHashSet(new DefaultArtifactVersion("5.0.0")),
 				"BiomesOPlenty", "Biomes O' Plenty");
 		RuntimeException ex = new RuntimeException("Could not find a premise mod: Biomes O' Plenty", e);
-		JFXDialog.showThrowable(ex);
+		JFXDialog.showThrowableAndWait(ex);
 		throw ex;
 	}
 

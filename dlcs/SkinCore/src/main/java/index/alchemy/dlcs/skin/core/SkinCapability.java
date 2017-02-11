@@ -1,8 +1,13 @@
 package index.alchemy.dlcs.skin.core;
 
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple3;
+
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 
+import index.alchemy.api.ICache;
 import index.alchemy.api.IEventHandle;
+import index.alchemy.api.annotation.Field;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.capability.AlchemyCapability;
@@ -11,6 +16,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.dlcs.skin.core.BlockWardrobe.EnumPartType;
 import index.alchemy.dlcs.skin.core.SkinCore.UpdateSkinClient;
 import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.util.cache.ThreadContextCache;
 import index.project.version.annotation.Beta;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -21,6 +27,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +38,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,6 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Beta
 @Hook.Provider
+@Field.Provider
 @InitInstance(AlchemyCapabilityLoader.TYPE)
 public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEventHandle {
 	
@@ -48,7 +57,14 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	
 	@SubscribeEvent
 	public void onAttachCapabilities(AttachCapabilitiesEvent<? extends ISkinEntity> event) {
-		event.addCapability(RESOURCE, new SkinInfo(event.getObject()));
+		if (event.getObject() instanceof ISkinEntity)
+			event.addCapability(RESOURCE, new SkinInfo(event.getObject()));
+	}
+	
+	@SubscribeEvent
+	public void onPlayer_Clone(PlayerEvent.Clone event) {
+		event.getOriginal().getCapability(SkinCore.skin_info, null).copy(event.getEntityPlayer());
+		SkinCore.updatePlayerItselfSkin(event.getEntityPlayer());
 	}
 	
 	@SubscribeEvent
@@ -57,8 +73,8 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	}
 	
 	@SubscribeEvent
-	public void onPlayer_Clone(PlayerEvent.Clone event) {
-		event.getOriginal().getCapability(SkinCore.skin_info, null).copy(event.getEntityPlayer());
+	public void onPlayerChangedDimensionEvent(PlayerChangedDimensionEvent event) {
+		SkinCore.updatePlayerItselfSkin(event.player);
 	}
 	
 	@SubscribeEvent
@@ -109,6 +125,12 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	}
 	
 	@SideOnly(Side.CLIENT)
+	@Hook("net.minecraft.network.NetworkManager#func_179292_f")
+	public static Hook.Result isEncrypted(NetworkManager network) {
+		return Hook.Result.TRUE;
+	}
+	
+	@SideOnly(Side.CLIENT)
 	@Hook("net.minecraft.client.network.NetworkPlayerInfo#func_178837_g")
 	public static Hook.Result getLocationSkin(NetworkPlayerInfo playerInfo) {
 		if (playerInfo.getGameProfile() == null)
@@ -132,24 +154,21 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 		return type == null || type.isEmpty() ? Hook.Result.VOID : new Hook.Result(type);
 	}
 	
-	private static ThreadLocal<IBlockAccess> cacheWorld = new ThreadLocal<>();
-	private static ThreadLocal<BlockPos> cachePos = new ThreadLocal<>();
-	private static ThreadLocal<IBlockState> cacheState = new ThreadLocal<>();
+	private static ICache.ContextCache<Thread, Tuple3<IBlockAccess, BlockPos, IBlockState>> cache = new ThreadContextCache<>();
 	
 	public static void updateCache(IBlockAccess world, BlockPos pos, IBlockState state) {
-		cacheWorld.set(world);
-		cachePos.set(pos);
-		cacheState.set(state);
+		cache.add(Tuple.tuple(world, pos, state));
 	}
 	
 	public static void clearCache() {
-		updateCache(null, null, null);
+		cache.del();
 	}
 	
 	@Hook("net.minecraft.world.World#func_180495_p")
 	public static Hook.Result getBlockState(World world, BlockPos pos) {
-		if (cacheWorld.get() == world && pos.equals(cachePos.get()))
-			return new Hook.Result(cacheState.get());
+		Tuple3<IBlockAccess, BlockPos, IBlockState> tuple3 = cache.get();
+		if (tuple3 != null && tuple3.v1() == world && pos.equals(tuple3.v2()))
+			return new Hook.Result(tuple3.v3());
 		return Hook.Result.VOID;
 	}
 	

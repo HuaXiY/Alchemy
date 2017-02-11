@@ -45,7 +45,7 @@ public class AlchemyBlock extends Block implements IResourceLocation, IRegister 
 			icon_name = new AlchemyResourceLocation(icon);
 		if (hasCreativeTab())
 			setCreativeTab(getCreativeTab());
-		if (getUnlocalizedName() == null) {
+		if (getUnlocalizedName() == null || getUnlocalizedName().equals("tile.null")) {
 			int index = name.lastIndexOf(':');
 			setUnlocalizedName(index == -1 ? name : name.substring(index + 1));
 		}

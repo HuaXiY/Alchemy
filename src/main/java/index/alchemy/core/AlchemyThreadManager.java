@@ -6,14 +6,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import javax.annotation.concurrent.ThreadSafe;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.collect.Lists;
 
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Omega;
 
+import static index.alchemy.util.FunctionHelper.*;
+
 @Omega
 @ThreadSafe
 public final class AlchemyThreadManager {
+	
+	private static final Logger logger = LogManager.getLogger(AlchemyThreadManager.class.getSimpleName());
 	
 	public static class OtherThreadThrowable extends Throwable {
 		
@@ -51,12 +58,13 @@ public final class AlchemyThreadManager {
 	private int index = -1, size = -1, min, max, listAddThreshold, warning, num, skipFlag;
 	private List<Threads> lt = Lists.newArrayList();
 	private WriteLock lock = new ReentrantReadWriteLock().writeLock();
+	
+	private static int nextId() { return id++; }
 
 	private final class Threads extends Thread {
-		Threads() {
-			lock.lock();
-			setName("ThreadManager-" + id++);
-			lock.unlock();
+		
+		{
+			setName("AlchemyThreadManager-" + nextId());
 			start();
 		}
 
@@ -100,8 +108,6 @@ public final class AlchemyThreadManager {
 			deleltThread(Threads.this);
 		}
 	}
-	
-	
 
 	private void deleltThread(Threads t) {
 		lock.lock();
@@ -112,7 +118,7 @@ public final class AlchemyThreadManager {
 
 	public void addThread() {
 		if (size > max && ++warning > 100) {
-			AlchemyModLoader.logger.error("Warning: ThreadManager can't meet the list needs.(" + ++num + ")");
+			logger.error("Warning: ThreadManager can't meet the list needs.(" + ++num + ")");
 			return;
 		}
 		lock.lock();
@@ -128,7 +134,13 @@ public final class AlchemyThreadManager {
 	}
 	
 	public static Thread runOnNewThread(Runnable runnable) {
-		Thread thread = new Thread(runnable);
+		String name = "Alchemy-" + nextId();
+		Thread thread = new Thread(link(
+				() -> logger.info("Thread[" + name + "] start"),
+				runnable,
+				() -> logger.info("Thread[" + name + "] end"))
+		);
+		thread.setName(name);
 		thread.start();
 		return thread;
 	}

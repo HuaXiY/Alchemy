@@ -15,9 +15,34 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import index.alchemy.api.IItemThirst;
+import index.alchemy.command.AlchemyCommandServer;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.item.Item;
+import net.minecraft.server.MinecraftServer;
 
 public class ExThirstLoader {
+	
+	public static class CommandReloadThirst extends AlchemyCommandServer {
+
+		@Override
+		public String getCommandName() {
+			return "reload-thirst";
+		}
+
+		@Override
+		public String getCommandUsage(ICommandSender sender) {
+			return "/reload-thirst";
+		}
+
+		@Override
+		public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+			try {
+				loadConfig(ExNails.ITEM_THIRST_CFG);
+			} catch (Exception e) { throw new CommandException(e.toString()); }
+		}
+
+	}
 	
 	private static final Logger logger = LogManager.getLogger(ExThirstLoader.class.getSimpleName());
 	
@@ -51,7 +76,9 @@ public class ExThirstLoader {
 			if (index != -1)
 				s = s.substring(0, index);
 			if (!s.isEmpty()) {
+				s = s.replace("\\ ", "$blank$");
 				String args[] = s.split(" ");
+				args[0] = args[0].replace("$blank$", " ");
 				if (args.length > 2 && args.length % 2 == 1) {
 					try {
 						Item item = Item.getByNameOrId(args[0]);

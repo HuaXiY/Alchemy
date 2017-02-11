@@ -17,6 +17,7 @@ import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.entity.ai.EntityAIFindEntityNearestHelper;
 import index.alchemy.interacting.ModItems;
 import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryItem;
@@ -57,7 +58,7 @@ import static java.lang.Math.*;
 public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider<ItemStack>, IInputHandle, IGuiHandle,
 	IEventHandle, ICoolDown, INetworkMessage.Server<MessageSpaceRingPickup> {
 	
-	public static final int PICKUP_CD = 20 * 3, SIZE = 9 * 6;
+	public static final int PICKUP_CD = 20 * 8, SIZE = 9 * 6;
 	public static final String NBT_KEY_CD = "cd_ring_space", KEY_DESCRIPTION_OPEN = "key.space_ring_open";
 	
 	public static final ItemRingSpace type = null;
@@ -84,10 +85,20 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 				EntityPlayer player = (EntityPlayer) living;
 				if (player.getHealth() > 0.0F && !player.isSpectator())
 					for (EntityItem entity : player.worldObj.getEntitiesWithinAABB(EntityItem.class,
-							player.getEntityBoundingBox().expand(5D, 5D, 5D)))
-						if (!entity.isDead)
-							entity.onCollideWithPlayer(player);
+							player.getEntityBoundingBox().expand(5D, 5D, 5D))) {
+						List<EntityPlayer> players = entity.worldObj.getEntitiesWithinAABB(EntityPlayer.class,
+								AABBHelper.getAABBFromEntity(entity, 5D), this::isEquipmented);
+						if (players.size() > 1)
+							players.sort(new EntityAIFindEntityNearestHelper.Sorter(entity));
+						if (!players.isEmpty() && !entity.isDead)
+							entity.onCollideWithPlayer(players.get(0));
+					}
 			}
+	}
+	
+	@Override
+	public boolean willAutoSync(ItemStack itemstack, EntityLivingBase living) {
+		return true;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -96,7 +107,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		for (EntityLivingBase living : target.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
 				AABBHelper.getAABBFromEntity(target, 5)))
 			if (target != living && isEquipmented(living)) {
-				event.setCanceled(true);
+				AlchemyEventSystem.markEventCanceled(event);
 				return;
 			}
 		if (isEquipmented(target))
@@ -106,7 +117,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingAttack(LivingAttackEvent event) {
 		if (event.getSource() == DamageSource.outOfWorld && isEquipmented(event.getEntityLiving()))
-			event.setCanceled(true);
+			AlchemyEventSystem.markEventCanceled(event);
 	}
 	
 	@Override
@@ -163,7 +174,7 @@ public class ItemRingSpace extends AlchemyItemRing implements IInventoryProvider
 		AlchemyInventory inventory = getInventory(getFormLiving(player));
 		if (inventory == null)
 			return;
-		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 8D));
+		List<EntityItem> list = player.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(player, 24D));
 		List<Double6IntArrayPackage> d6iaps = new LinkedList<Double6IntArrayPackage>(); 
 		for (EntityItem entity : list) {
 			inventory.mergeItemStack(entity.getEntityItem());

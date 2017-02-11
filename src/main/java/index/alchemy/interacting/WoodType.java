@@ -96,7 +96,7 @@ public class WoodType {
 		for (IRecipe recipe : CraftingManager.getInstance().getRecipeList()) {
 			ItemStack output = recipe.getRecipeOutput();
 			List<ItemStack> inputs = Lists.newLinkedList();
-			if (output != null && output.stackSize == 4 && isOre(output, "plankWood")) {
+			if (output != null && isOre(output, "plankWood")) {
 				for (Field field : recipe.getClass().getDeclaredFields())
 					if (field.getType() == ItemStack[].class)
 						try {

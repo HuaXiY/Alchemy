@@ -7,8 +7,6 @@ import net.minecraft.command.CommandBase;
 @Omega
 public abstract class AlchemyCommand extends CommandBase implements IRegister {
 	
-	public AlchemyCommand() {
-		register();
-	}
+	public AlchemyCommand() { register(); }
 
 }

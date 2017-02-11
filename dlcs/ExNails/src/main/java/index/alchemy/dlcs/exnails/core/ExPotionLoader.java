@@ -15,11 +15,36 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import index.alchemy.api.IItemPotion;
+import index.alchemy.command.AlchemyCommandServer;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.server.MinecraftServer;
 
 public class ExPotionLoader {
+	
+	public static class CommandReloadPotion extends AlchemyCommandServer {
+
+		@Override
+		public String getCommandName() {
+			return "reload-potion";
+		}
+
+		@Override
+		public String getCommandUsage(ICommandSender sender) {
+			return "/reload-potion";
+		}
+
+		@Override
+		public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+			try {
+				loadConfig(ExNails.ITEM_POTION_CFG);
+			} catch (Exception e) { throw new CommandException(e.toString()); }
+		}
+
+	}
 	
 	private static final Logger logger = LogManager.getLogger(ExPotionLoader.class.getSimpleName());
 	
@@ -52,7 +77,9 @@ public class ExPotionLoader {
 			if (index != -1)
 				s = s.substring(0, index);
 			if (!s.isEmpty()) {
+				s = s.replace("\\ ", "$blank$");
 				String args[] = s.split(" ");
+				args[0] = args[0].replace("$blank$", " ");
 				if (args.length > 1) {
 					try {
 						Item item = Item.getByNameOrId(args[0]);

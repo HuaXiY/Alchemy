@@ -43,6 +43,13 @@ public class ExItemFood extends ItemFood implements IItemThirst, IItemPotion {
 		hydrationMap = new IItemThirst.HydrationMap();
 		effectsMap = new IItemPotion.EffectsMap();
 	}
+	
+	private ExItemFood(int amount, boolean isWolfFood) {
+		super(amount, 0.6F, isWolfFood);
+		thirstMap = new IItemThirst.ThirstMap();
+		hydrationMap = new IItemThirst.HydrationMap();
+		effectsMap = new IItemPotion.EffectsMap();
+	}
 
 	@Override
 	public int getThirst(ItemStack item) {

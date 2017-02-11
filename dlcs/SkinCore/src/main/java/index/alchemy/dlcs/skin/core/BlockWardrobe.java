@@ -159,7 +159,8 @@ public class BlockWardrobe extends AlchemyBlock {
 			BlockPos next = pos.offset(relyType == EnumRelyType.LEFT ? facing.rotateYCCW() : facing.rotateY());
 			IBlockState nextState = world.getBlockState(next);
 			if (nextState.getBlock() == state.getBlock() && nextState.getValue(RELY).getOpposite() == relyType)
-				return state;
+				if (relyType == EnumRelyType.RIGHT || nextState.getValue(FACING) == facing)
+					return state;
 		}
 		return state.withProperty(RELY, EnumRelyType.NULL);
 	}
@@ -178,6 +179,11 @@ public class BlockWardrobe extends AlchemyBlock {
 	}
 	
 	@Override
+	public boolean isFullBlock(IBlockState state) {
+		return false;
+	}
+	
+	@Override
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
@@ -189,11 +195,16 @@ public class BlockWardrobe extends AlchemyBlock {
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-		Minecraft.getMinecraft().displayGuiScreen(new GuiWardrobe());
+		if (Always.isClient())
+			openWardobeGui();
 		return true;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static void openWardobeGui() {
+		Minecraft.getMinecraft().displayGuiScreen(new GuiWardrobe());
 	}
 	
 	public BlockWardrobe(WoodType type) {

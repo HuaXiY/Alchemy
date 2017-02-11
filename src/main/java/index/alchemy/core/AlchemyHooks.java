@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.jooq.lambda.tuple.Tuple;
+
 import baubles.client.BaublesRenderLayer;
 import biomesoplenty.api.biome.BOPBiomes;
 import index.alchemy.api.IMaterialContainer;
@@ -28,6 +30,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.chunk.NibbleArray;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -35,9 +39,25 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Hook.Provider
 public class AlchemyHooks {
 	
+	// IO blocking
 	@Hook(value = "biomesoplenty.common.remote.TrailManager#retrieveTrails", isStatic = true)
 	public static final Hook.Result retrieveTrails() {
 		return Hook.Result.NULL;
+	}
+	
+	@Hook("net.minecraft.world.World#getCollisionBoxes")
+	public static void getCollisionBoxes(World world, AxisAlignedBB bb) {
+		if (true)
+			return;
+		for (StackTraceElement element : Tool.getStackTrace())
+			if (element.getClassName().startsWith("net.gobbob.")) {
+				System.out.println(bb);
+				Tool.where();
+				return;
+			}
+//		Tool.where();
+//		System.out.println(storage.getYLocation());
+//		System.out.println(Arrays.toString(Tool.<byte[]>$(newBlocklightArray, "data")));
 	}
 	
 //	@Hook("net.minecraft.pathfinding.WalkNodeProcessor#getPathNodeTypeRaw")

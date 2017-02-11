@@ -3,6 +3,7 @@ package index.alchemy.item;
 import java.util.UUID;
 
 import index.alchemy.api.IEventHandle;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemBelt;
 import index.alchemy.util.Always;
 import index.project.version.annotation.Omega;
@@ -57,7 +58,7 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 	public void onLivingDeath(LivingDeathEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
 		if (Always.isServer() && isEquipmented(living) && living.rand.nextFloat() > TRIGGER_PROBABILITY) {
-			event.setCanceled(true);
+			AlchemyEventSystem.markEventCanceled(event);
 			living.setHealth(MIN_HEALTH);
 		}
 	}

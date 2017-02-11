@@ -12,7 +12,6 @@ import index.alchemy.config.AlchemyConfig;
 import index.alchemy.util.Tool;
 import index.alchemy.world.AlchemyWorldGenerator;
 import index.project.version.annotation.Beta;
-import index.project.version.annotation.Gamma;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.color.IItemColor;
@@ -101,9 +100,7 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IEven
 			generate(event.getRand(), event.getPos().getX(), event.getPos().getZ(), event.getWorld());
 	}
 	
-	@Gamma
 	@Override
-	@Deprecated
 	@SideOnly(Side.CLIENT)
 	public IItemColor getItemColor() {
 		return new IItemColor() {

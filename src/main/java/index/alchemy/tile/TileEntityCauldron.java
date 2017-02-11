@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 
 import index.alchemy.animation.StdCycle;
+import index.alchemy.api.AlchemyRegistry;
 import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.IFXUpdate;
 import index.alchemy.api.annotation.FX;
@@ -22,7 +23,6 @@ import index.alchemy.client.fx.update.FXMotionUpdate;
 import index.alchemy.client.fx.update.FXPosUpdate;
 import index.alchemy.client.fx.update.FXScaleUpdate;
 import index.alchemy.client.fx.update.FXUpdateHelper;
-import index.alchemy.core.AlchemyRegistry;
 import index.alchemy.interacting.Elemix;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.network.Double3Float2Package;
@@ -94,7 +94,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	public static enum State { NULL, ALCHEMY, OVER }
 	
-	public static final int CONTAINER_MAX_ITEM = 6;
+	public static final int CONTAINER_MAX_ITEM = 9;
 	
 	protected static final int
 			UPDATE_STATE = 0,
@@ -129,6 +129,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			super.setFluid(stack);
 			if (getFluidType() != fluid)
 				update();
+			updateTracker();
 		};
 		
 		@Override
@@ -137,6 +138,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			int result = super.fillInternal(resource, doFill);
 			if (getFluidType() != fluid)
 				update();
+			updateTracker();
 			return result;
 		}
 		
@@ -146,6 +148,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			FluidStack result = super.drainInternal(maxDrain, doDrain);
 			if (getFluidType() != fluid)
 				update();
+			updateTracker();
 			return result;
 		};
 		
@@ -205,7 +208,11 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	@Nullable
 	public IBlockState getLiquid() {
-		return tank.getFluid() == null ? null : tank.getFluid().getFluid().getBlock().getDefaultState();
+		if (tank.getFluid() == null)
+			return null;
+		if (tank.getFluid().getFluid() == null)
+			return null;
+		return tank.getFluid().getFluid().getBlock().getDefaultState();
 	}
 	
 	public FluidTank getTank() {
@@ -230,13 +237,11 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	@Override
 	public void update() {
 		if (Always.isServer()) {
-			if (worldObj.getWorldTime() % 5 == 0 && worldObj.isRainingAt(pos.up())) {
+			if (worldObj.getWorldTime() % 2 == 0 && worldObj.isRainingAt(pos.up())) {
 				int level = getLevel();
 				if (level < 3 && level > -1) {
-					if (tank.getFluid() == null) {
+					if (tank.getFluid() == null)
 						tank.setFluid(new FluidStack(FluidRegistry.WATER, 0));
-						updateTracker();
-					}
 					tank.getFluid().amount = Math.min(tank.getFluid().amount + (int) worldObj.getRainStrength(1), tank.getCapacity());
 					updateFluidAmount();
 				}

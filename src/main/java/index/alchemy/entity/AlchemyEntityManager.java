@@ -1,8 +1,9 @@
 package index.alchemy.entity;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
@@ -20,9 +21,9 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 @Init(state = ModState.AVAILABLE)
 public class AlchemyEntityManager {
 	
-	public static List<Class<? extends EntityLivingBase>> 
-			FRIENDLY_LIVING_LIST = new ArrayList<Class<? extends EntityLivingBase>>(),
-			MONSTER_LIST = new ArrayList<Class<? extends EntityLivingBase>>();
+	public static final List<Class<? extends EntityLivingBase>> 
+			FRIENDLY_LIVING_LIST = Lists.newArrayList(),
+			MONSTER_LIST = Lists.newArrayList();
 	
 	public static EntityLivingBase getRandomEntity(List<Class<? extends EntityLivingBase>> list, World world) {
 		return getEntityById(list, AlchemyModLoader.random.nextInt(list.size()), world);

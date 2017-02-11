@@ -50,7 +50,7 @@ public class ItemBeltGuard extends AlchemyItemBelt implements IEventHandle, INet
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingAttack(LivingAttackEvent event) {
 		if (Always.isServer() && isEquipmented(event.getEntityLiving()) && isCDOver(event.getEntityLiving())) {
-			event.setCanceled(true);
+			AlchemyEventSystem.markEventCanceled(event);
 			EntityLivingBase living = event.getEntityLiving();
 			living.getCombatTracker().lastDamageTime = living.ticksExisted;
 			if (!(living instanceof FakePlayer))

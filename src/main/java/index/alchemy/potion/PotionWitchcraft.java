@@ -74,7 +74,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 		EntityLivingBase living = event.getEntity();
 		int id = living.getEntityData().getInteger(NBT_KEY_RENDER);
 		if (id != 0) {
-			event.setCanceled(true);
+			AlchemyEventSystem.markEventCanceled(event);
 			last = AlchemyEntityManager.getEntityById(AlchemyEntityManager.FRIENDLY_LIVING_LIST, id, minecraft.theWorld);
 			float partialTick = minecraft.getRenderPartialTicks();
 			double lx = living.lastTickPosX + (living.posX - living.lastTickPosX) * partialTick;

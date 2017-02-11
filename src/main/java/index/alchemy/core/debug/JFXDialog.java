@@ -25,7 +25,6 @@ public class JFXDialog {
 	}
 	
 	public static void showThrowable(Throwable ex, String title, String str) {
-		
 		JFXHelper.runLater(getShowAlertRunnable(ex, title, str));
 	}
 	

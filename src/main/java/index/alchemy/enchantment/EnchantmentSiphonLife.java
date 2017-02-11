@@ -17,7 +17,7 @@ import static java.lang.Math.*;
 @Beta
 public class EnchantmentSiphonLife extends AlchemyEnchantment implements IEventHandle {
 	
-	public static final float SIPHON_COEFFICIENT = 0.05F;
+	public static final float SIPHON_COEFFICIENT = 0.1F;
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingHurt(LivingHurtEvent event) {

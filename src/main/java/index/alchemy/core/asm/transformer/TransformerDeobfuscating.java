@@ -11,6 +11,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.annotation.Unsafe;
@@ -53,6 +54,10 @@ public class TransformerDeobfuscating implements IClassTransformer {
 					FieldInsnNode field = (FieldInsnNode) insn;
 					if (field.name.startsWith("field_"))
 						field.name = map(field.name, fieldNameMaps);
+				} else if (insn instanceof MethodInsnNode) {
+					MethodInsnNode methodInsn = (MethodInsnNode) insn;
+					if (methodInsn.name.startsWith("func_"))
+						methodInsn.name = map(methodInsn.name, methodNameMaps);
 				} else if (insn instanceof InvokeDynamicInsnNode) {
 					InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
 					if (dynamic.name.startsWith("func_"))
@@ -68,7 +73,8 @@ public class TransformerDeobfuscating implements IClassTransformer {
 		for (Map<String, String> mapping : maps.values())
 			for (Entry<String, String> entry : mapping.entrySet())
 				if (entry.getKey().startsWith(name + ":") || entry.getKey().startsWith(name + "("))
-					return entry.getValue();
+					if (!entry.getValue().equals(name))
+						return entry.getValue();
 		return name;
 	}
 

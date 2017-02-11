@@ -217,18 +217,21 @@ public abstract class Tool {
 	}
 	
 	@Nullable
+	public static final Class forName(String name) {
+		return forName(name, false);
+	}
+	
+	@Nullable
 	public static final Class forName(String name, boolean init) {
 		if (name == null || name.isEmpty())
 			return null;
 		try {
 			return Class.forName(name, init, Tool.class.getClassLoader());
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
+		} catch (ClassNotFoundException e) { return null; }
 	}
 	
 	public static final void load(Class<?> clazz) {
-		ReflectionHelper.getUnsafe().ensureClassInitialized(clazz);
+		ReflectionHelper.unsafe().ensureClassInitialized(clazz);
 	}
 	
 	public static final void init(Class<?> clazz) {
@@ -699,7 +702,7 @@ public abstract class Tool {
 					clazz = String.class;
 			} else
 				clazz = args[0].getClass() == Class.class ? (Class<?>) args[0] : args[0].getClass();
-			ReflectionHelper.getUnsafe().ensureClassInitialized(clazz);
+			ReflectionHelper.unsafe().ensureClassInitialized(clazz);
 			if (args.length == 1)
 				return (T) clazz;
 			String name = (String) args[1];

@@ -9,8 +9,6 @@ import static index.alchemy.util.FunctionHelper.*;
 
 import java.util.concurrent.CountDownLatch;
 
-import com.sun.javafx.application.PlatformImpl;
-
 public interface JFXHelper {
 	
 	static boolean isSupported() {
@@ -25,7 +23,7 @@ public interface JFXHelper {
 	static void runAndWait(Runnable runnable) {
 		if (isSupported()) {
 			CountDownLatch latch = new CountDownLatch(1);
-			AlchemyThreadManager.runOnNewThread(link(JFXPanel::new, () -> PlatformImpl.runAndWait(link(runnable, latch::countDown))));
+			AlchemyThreadManager.runOnNewThread(link(JFXPanel::new, () -> Platform.runLater(link(runnable, latch::countDown))));
 			try { latch.await(); } catch (InterruptedException e) { }
 		}
 	}

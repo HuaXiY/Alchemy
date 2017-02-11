@@ -15,6 +15,7 @@ import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 
 import index.alchemy.api.annotation.Listener;
 import index.alchemy.core.AlchemyEngine;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Beta;
@@ -240,7 +241,7 @@ public class GuiWardrobe extends GuiScreen {
 	@SubscribeEvent
 	public static void onRenderLiving_Specials_Pre(RenderLivingEvent.Specials.Pre event) {
 		if (event.getEntity() == player)
-			event.setCanceled(true);
+			AlchemyEventSystem.markEventCanceled(event);
 	}
 	
 	public static void init() {

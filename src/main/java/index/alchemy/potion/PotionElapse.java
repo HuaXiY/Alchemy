@@ -26,7 +26,7 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 			Class<EntityLivingBase> type = (Class<EntityLivingBase>) 
 					(event.getEntityLiving() instanceof EntityPlayer ? EntityPlayer.class : event.getEntityLiving().getClass());
 			living.attackTarget = EntityAIFindEntityNearestHelper.<EntityLivingBase>findNearest(
-					(EntityLiving) living.attackTarget, type, null, NOT_ACTIVE
+					living.attackTarget, type, null, NOT_ACTIVE
 					.and(l -> EntityAIFindEntityNearestHelper.isSuitableLivingTarget(living, l)));
 		}
 	}

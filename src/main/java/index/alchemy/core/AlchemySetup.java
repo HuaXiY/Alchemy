@@ -29,12 +29,18 @@ public class AlchemySetup implements IFMLCallHook {
 	public Void call() throws Exception {
 		AlchemyModLoader.logger.info("Setup: " + AlchemySetup.class.getName());
 		LaunchClassLoader loader = AlchemyEngine.getLaunchClassLoader();
+		// Injection is used to modify the at(AccessTransformer) logic of forge
+		// See build.gradle#L73 & ast.gradle
 		injectAccessTransformer(AlchemyModLoader.mod_path, loader);
+		// Should not be transformer javafx
 		loader.addTransformerExclusion("javafx.");
+		// An extension to net.minecraftforge.fml.common.asm.transformers.SideTransformer when transformer Alchemy's class
 		TransformerSide.inject(loader);
+		// Support for optifine in a development environment
 		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
 			if (AlchemyEngine.runtimeSide().isClient())
 				TransformerInjectOptifine.tryInject(loader);
+		// Debug info
 		List<IClassTransformer> transformers = $(loader, "transformers");
 		AlchemyTransformerManager.logger.info(Joiner.on('\n').appendTo(new StringBuilder("Transformers: \n"), transformers).toString());
 		return Tool.VOID;

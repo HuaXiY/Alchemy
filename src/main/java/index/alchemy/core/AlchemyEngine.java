@@ -1,11 +1,18 @@
 package index.alchemy.core;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +21,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import org.jooq.lambda.Unchecked;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -26,12 +34,14 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
+import index.alchemy.core.asm.transformer.MeowTweaker;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.DeobfuscatingRemapper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
+import javafx.application.Platform;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -58,19 +68,53 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	
 	private static final String SETUP_CORE = "setup core";
 	
+	public static final Double JAVA_VERSION = Double.parseDouble(System.getProperty("java.specification.version", "0"));
+	
+	public static final PrintStream
+			sysout = new PrintStream(new FileOutputStream(FileDescriptor.out)),
+			syserr = new PrintStream(new FileOutputStream(FileDescriptor.err));
+	
+	private static final sun.misc.Unsafe unsafe = Unchecked.supplier(AlchemyEngine::getUnsafe).get();
+	
+	public static final sun.misc.Unsafe unsafe() { return unsafe; }
+	
+	private static sun.misc.Unsafe getUnsafe() throws PrivilegedActionException {
+		return AccessController.doPrivileged(new PrivilegedExceptionAction<sun.misc.Unsafe>() {
+			
+			@Override
+			public sun.misc.Unsafe run() throws Exception {
+				Field theUnsafe = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+				theUnsafe.setAccessible(true);
+				return (sun.misc.Unsafe) theUnsafe.get(null);
+			}
+			
+	   });
+	}
+	
 	static {
+		registerTransformer(MeowTweaker.instance());
 		AlchemyDebug.start(SETUP_CORE);
 		Set<String> libs = Sets.newHashSet(Splitter.on(';').split(Tool.isEmptyOr(
 				System.getProperty("index.alchemy.runtime.lib.ext"), "")));
 		libs.remove("");
+		// Forge hack native libs when startup
 		libs.add("jfxrt");
 		libs.forEach(AlchemyEngine::addRuntimeExtLibFromJRE);
+		// Should not to implicitly exit(com.sun.javafx.tk.Toolkit) when the last window is closed
+		Platform.setImplicitExit(false);
+		// Initialization index.alchemy.util.DeobfuscatingRemapper
 		Tool.load(DeobfuscatingRemapper.class);
+		// Set class byte array provider
 		$(ASMHelper.class, "getClassByteArray<<", (Function<String, byte[]>)
 				name -> Tool.getClassByteArray(getLaunchClassLoader(), DeobfuscatingRemapper.INSTANCE.unmapType(name.replace('.', '/'))));
+		// Load all Alchemy's DLCs
 		AlchemyDLCLoader.setup();
+		// Load all Alchemy and Alchemy's DLC of the class transformer 
 		AlchemyTransformerManager.setup();
 		registerTransformer(AlchemyTransformerManager.class);
+		// Other class transformer should not be behind Alchemy
+		// See index.alchemy.core.asm.transformer.TransformerPatch#L113 { node.version = V1_8 }
+		// Fixed conflict with enderio
 		$(getLaunchClassLoader(), "transformers<<", new ArrayList(2) {
 			
 			{ addAll($(getLaunchClassLoader(), "transformers")); }
@@ -104,6 +148,11 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	public static void registerTransformer(Class<? extends IClassTransformer> clazz) {
 		checkInvokePermissions();
 		getLaunchClassLoader().registerTransformer(clazz.getName());
+	}
+	
+	public static void registerTransformer(IClassTransformer transformer) {
+		checkInvokePermissions();
+		((List<IClassTransformer>) $(getLaunchClassLoader(), "transformers")).add(transformer);
 	}
 	
 	public static void checkInvokePermissions() {
@@ -157,7 +206,7 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 			String handleDesc = Type.getMethodDescriptor(callback);
 			
 			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
-			cw.visitSource("AlchemyCorePlugin.java:105", "invoke: " + instType + handleName + handleDesc);
+			cw.visitSource("AlchemyEngine.java:154", "invoke: " + instType + handleName + handleDesc);
 			{
 				if (!isStatic)
 					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();
@@ -268,7 +317,8 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 
 	@Override
 	public String getAccessTransformerClass() {
-		return null;
+		// move to AlchemyEngine#<clinit>
+		return null/* index.alchemy.core.asm.transformer.AlchemyTransformerManager */;
 	}
 
 }

@@ -9,7 +9,7 @@ import net.minecraft.item.crafting.CraftingManager;
 public interface CraftingHelper {
 	
 	static void remove(Class<? extends Item> type) {
-		remove(i -> type.isInstance(type));
+		remove(i -> i != null && type.isInstance(i.getItem()));
 	}
 	
 	static void remove(ItemStack item) {

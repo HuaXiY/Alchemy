@@ -22,10 +22,13 @@ apply from: 'ast.gradle'
 
 configurations {
     ecj
+    shade
+    compile.extendsFrom shade
 }
 dependencies {
-    ecj 'org.eclipse.jdt.core.compiler:ecj:4.6.1'
-	compile fileTree(dir: 'mods', include: ['*.jar'])
+    ecj 'org.eclipse.jdt.core.compiler:ecj:+'
+    compile fileTree(dir: 'mods', include: ['*.jar'])
+    shade 'org.jooq:jool:+'
 }
 
 def jdt = configurations.ecj.asPath
@@ -38,6 +41,9 @@ configFile.withReader {
     prop.load(it)
     project.ext.config = new ConfigSlurper().parse prop
 }
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 version = config.mod_version
 group= "com.github.mickeyxiami.alchemy" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -65,40 +71,40 @@ minecraft {
 }
 
 recompileMc {
-	doFirst {
-		def at = file("src/main/resources/META-INF/forge.at")
-		def lines = com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(new FileInputStream(at)))
-		def mapping = VERConsts['getMapping'](lines)
-		mapping.values().forEach { it.forEach { println it } }
-		def input = getInSources()
-		def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${input.path}"))
-		def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${input.path}".replace(".jar", "-fixed.jar")))
-		def result = new java.util.LinkedList()
-		for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
-			zos.putNextEntry(entry)
-			if (entry.name.endsWith(".java")) {
-				def name = entry.name.replace('/', '.').replace(".java", "")
-				org.apache.commons.io.IOUtils.write(VERConsts['doAccessTransformer'](
-						com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(zis)), name, mapping, result),
-						zos, "utf-8")
-			} else
-				org.apache.commons.io.IOUtils.copy(zis, zos)
-		}
-		zis.close()
-		zos.finish()
-		zos.close()
-		def flag
-		println "----"
-		mapping.values().forEach { it.stream().filter { !result.contains(it) && !it.runtime }.forEach { flag = true; println it } }
-		if (flag)
-			throw new RuntimeException("At is not working properly")
-		input.delete()
-		file(input.path.replace(".jar", "-fixed.jar")).renameTo(input)
-	}
+    doFirst {
+        def at = file("src/main/resources/META-INF/forge.at")
+        def lines = com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(new FileInputStream(at)))
+        def mapping = VERConsts['getMapping'](lines)
+        mapping.values().forEach { it.forEach { println it } }
+        def input = getInSources()
+        def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${input.path}"))
+        def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${input.path}".replace(".jar", "-fixed.jar")))
+        def result = new java.util.LinkedList()
+        for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
+            zos.putNextEntry(entry)
+            if (entry.name.endsWith(".java")) {
+                def name = entry.name.replace('/', '.').replace(".java", "")
+                org.apache.commons.io.IOUtils.write(VERConsts['doAccessTransformer'](
+                        com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(zis)), name, mapping, result),
+                        zos, "utf-8")
+            } else
+                org.apache.commons.io.IOUtils.copy(zis, zos)
+        }
+        zis.close()
+        zos.finish()
+        zos.close()
+        def flag
+        println "----"
+        mapping.values().forEach { it.stream().filter { !result.contains(it) && !it.runtime }.forEach { flag = true; println it } }
+        if (flag)
+            throw new RuntimeException("At is not working properly")
+        input.delete()
+        file(input.path.replace(".jar", "-fixed.jar")).renameTo(input)
+    }
 }
 
 task sourcesJar(type: Jar) {
-	baseName = "${archivesBaseName}-core"
+    baseName = "${archivesBaseName}-core"
     from 'src/main/java/'
     classifier = 'sources'
     
@@ -228,11 +234,11 @@ net.md_5.specialsource.provider.ClassLoaderProvider getProvider(File input, org.
     def set = classpath.getFiles()
     set.addAll(Arrays.asList(fileList("build/libs/")))
     def urls = set.stream().filter { it.getName().endsWith(".jar") && !it.getName().contains("-sources") && (it.getName().contains("-deobf") || 
-			it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) ||
-			it.getName().contains("ToughAsNails-") || it.getName().contains("mobends-") }
-			.map { it.toURI() }.map { it.toURL() }.toArray { new URL[it] }
-	println "ReobfDLC class path: "
-	urls.each { println it }
+            it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) ||
+            it.getName().contains("ToughAsNails-") || it.getName().contains("mobends-") }
+            .map { it.toURI() }.map { it.toURL() }.toArray { new URL[it] }
+    println "ReobfDLC class path: "
+    urls.each { println it }
     def classLoader = new java.net.URLClassLoader(urls)
     return new net.md_5.specialsource.provider.ClassLoaderProvider(classLoader)
 }
@@ -268,11 +274,17 @@ def commonManifest = {
 }
 
 jar {
-	baseName = "${archivesBaseName}-core"
+    baseName = "${archivesBaseName}-core"
     manifest commonManifest
     classifier = 'universal'
     
     from 'README.txt'
+	
+	configurations.shade.each { dep ->
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
 }
 
 processResources

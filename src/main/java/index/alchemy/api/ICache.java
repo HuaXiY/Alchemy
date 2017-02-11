@@ -5,6 +5,18 @@ import java.util.Objects;
 
 public interface ICache<K, V> {
 	
+	interface ContextCache<K, V> extends ICache<K, V> {
+		
+		K getContext();
+		
+		default V get() { return get(getContext()); }
+		
+		default V add(V val) { return add(getContext(), val); }
+		
+		default V del() { return del(getContext()); }
+		
+	}
+	
 	int getMaxCache();
 	
 	ICache<K, V> setMaxCache(int max);

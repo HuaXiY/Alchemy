@@ -2,6 +2,7 @@ package index.alchemy.item;
 
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IItemTemperature;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemAmulet;
 import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,7 +33,7 @@ public class ItemAmuletHeal extends AlchemyItemAmulet implements IEventHandle, I
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void onLivingAttack(LivingAttackEvent event) {
 		if (isEquipmented(event.getEntityLiving()) && event.getSource().isFireDamage())
-			event.setCanceled(true);
+			AlchemyEventSystem.markEventCanceled(event);
 	}
 	
 	@Override

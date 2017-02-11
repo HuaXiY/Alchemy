@@ -1,7 +1,8 @@
 package index.alchemy.client.color;
 
-import java.util.LinkedList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import index.alchemy.api.IColorBlock;
 import index.alchemy.api.IColorItem;
@@ -23,7 +24,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyColorLoader {
 	
-	private static final List item_color = new LinkedList(), block_color = new LinkedList();
+	protected static final List item_color = Lists.newLinkedList(), block_color = Lists.newLinkedList();
 	
 	public static <T extends Item & IColorItem> void addItemColor(T t) {
 		AlchemyModLoader.checkState();

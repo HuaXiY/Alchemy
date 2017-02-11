@@ -27,9 +27,7 @@ public abstract class ReflectionHelper {
 	
 	private static final sun.misc.Unsafe unsafe = sun.misc.Unsafe.getUnsafe();
 	
-	public static final sun.misc.Unsafe getUnsafe() {
-		return unsafe;
-	}
+	public static final sun.misc.Unsafe unsafe() { return unsafe; }
 	
 	public static final void resetReflectionData(Class<?> clazz) {
 		set(refData, clazz, null);

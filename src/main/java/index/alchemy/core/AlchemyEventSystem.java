@@ -168,7 +168,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onPlayerTick(PlayerTickEvent event) {
-		String flag = "96";
+		String flag = "103";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -195,6 +195,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 //			EntityPlayer player = event.player;
+//			player.changeDimension(0);
 //			Item item = player.getHeldItemMainhand().getItem();
 //			if (item instanceof IItemThirst) {
 //				((IItemThirst) item).setThirst(2);
@@ -345,14 +346,27 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	@SideOnly(Side.CLIENT)
+	private static long lastTickTime = -1;
+	
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onClientTick(ClientTickEvent event) {
-		String flag = "28";
+		String flag = "26";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
+				
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);
+		}
+//		Object object = Minecraft.getMinecraft().objectMouseOver.hitInfo;
+//		System.out.println(object);
+//		if (object instanceof Block)
+//			;
+		{
+			if (System.currentTimeMillis() - lastTickTime > 3000)
+				Minecraft.getMinecraft().effectRenderer.clearEffects(Minecraft.getMinecraft().theWorld);
+			lastTickTime = System.currentTimeMillis();
 		}
 		onRunnableTick(event.side, event.phase);
 	}
@@ -451,7 +465,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onMouseInput(MouseEvent event) {
 		if (hookInputState)
-			event.setCanceled(true);
+			markEventCanceled(event);
 	}
 	
 	public static final String KEY_DEBUG_DISABLE_HOOK = "key.debug_disable_hook";
@@ -472,7 +486,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@Hook(value = "net.minecraft.client.Minecraft#func_184124_aB", disable = "index.alchemy.asm.hook.disable_mouse_hook")
 	public static final Hook.Result runTickMouse(Minecraft minecraft) {
-		if (AlchemyEventSystem.isHookInput())
+		if (isHookInput())
 			return Hook.Result.NULL;
 		else
 			return Hook.Result.VOID;
@@ -481,7 +495,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@Hook(value = "net.minecraft.util.MouseHelper#func_74374_c", disable = "index.alchemy.asm.hook.disable_mouse_hook")
 	public static final Hook.Result mouseXYChange(MouseHelper helper) {
-		if (AlchemyEventSystem.isHookInput()) {
+		if (isHookInput()) {
 			Mouse.getDX();
 			Mouse.getDY();
 			return Hook.Result.NULL;
@@ -525,6 +539,20 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	public static Hook.Result invoke(ASMEventHandler handler, Event event) {
 		Boolean ignore = Tool.isNullOr(markIgnore.get(event), Boolean.FALSE::booleanValue);
 		return ignore ? Hook.Result.NULL : Hook.Result.VOID;
+	}
+	
+	public static void markEventIgnore(Event event) {
+		markIgnore.set(event, true);
+	}
+	
+	public static void markEventIgnore(Event event, Event.Result result) {
+		event.setResult(result);
+		markIgnore.set(event, true);
+	}
+	
+	public static void markEventCanceled(Event event) {
+		event.setCanceled(true);
+		markIgnore.set(event, true);
 	}
 	
 	public static void init() {
