@@ -16,7 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class FireworkHelper {
 	
 	public static double[][] stringToDoubleArrayShape(String str) {
-		//str = "Sayaka\\n    I love you ~";
+		//str = "Sayaka\\n	I love you ~";
 		String strings[] = str.split("\\\\n");
 		List<double[]> result = Lists.newLinkedList();
 		double offsetY = 1;
@@ -52,28 +52,28 @@ public class FireworkHelper {
 		if (shape.length == 0)
 			return;
 		double fx = shape[0][0];
-        double fy = shape[0][1];
-        starter.createParticle(starter.posX, starter.posY, starter.posZ, fx * speed, fy * speed, 0.0D, colours, fadeColours,
-        		trail, twinkle);
-        float f = starter.rand.nextFloat() * (float)Math.PI;
-        double d = (double) f + Math.PI;
-        double x = fx;
-        double y = fy;
-        for (int s = 1; s < shape.length; s++) {
-            double nx = shape[s][0];
-            double ny = shape[s][1];
+		double fy = shape[0][1];
+		starter.createParticle(starter.posX, starter.posY, starter.posZ, fx * speed, fy * speed, 0.0D, colours, fadeColours,
+				trail, twinkle);
+		float f = starter.rand.nextFloat() * (float)Math.PI;
+		double d = (double) f + Math.PI;
+		double x = fx;
+		double y = fy;
+		for (int s = 1; s < shape.length; s++) {
+			double nx = shape[s][0];
+			double ny = shape[s][1];
 
-            double rx = (x + (nx - x) * 1) * speed;
-            double ry = (y + (ny - y) * 1) * speed;
-            double sinx = rx * Math.sin(d);
-            rx = rx * Math.cos(d);
-            starter.createParticle(starter.posX, starter.posY, starter.posZ, rx * -1, ry, sinx * -1, colours,
-        			fadeColours, trail, twinkle);
-            starter.createParticle(starter.posX, starter.posY, starter.posZ, rx, ry, sinx, colours,
-        			fadeColours, trail, twinkle);
-            x = nx;
-            y = ny;
-        }
+			double rx = (x + (nx - x) * 1) * speed;
+			double ry = (y + (ny - y) * 1) * speed;
+			double sinx = rx * Math.sin(d);
+			rx = rx * Math.cos(d);
+			starter.createParticle(starter.posX, starter.posY, starter.posZ, rx * -1, ry, sinx * -1, colours,
+					fadeColours, trail, twinkle);
+			starter.createParticle(starter.posX, starter.posY, starter.posZ, rx, ry, sinx, colours,
+					fadeColours, trail, twinkle);
+			x = nx;
+			y = ny;
+		}
 	}
 
 }
