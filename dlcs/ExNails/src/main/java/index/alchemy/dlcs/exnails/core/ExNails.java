@@ -17,6 +17,7 @@ import index.alchemy.util.EventHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Alpha;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
@@ -90,6 +91,13 @@ public class ExNails {
 	
 	@Hook("toughasnails.block.BlockTANTemperatureCoil#func_149915_a")
 	public static Hook.Result createNewTileEntity(BlockTANTemperatureCoil block, World world, int meta) {
+		return Hook.Result.NULL;
+	}
+	
+	@Hook("toughasnails.block.BlockTANTemperatureCoil#func_149915_a")
+	public static Hook.Result updatePowered(BlockTANTemperatureCoil block, World world, BlockPos pos, IBlockState state) {
+		world.setBlockState(pos, state.withProperty(BlockTANTemperatureCoil.POWERED,
+				world.isBlockPowered(pos) || world.isBlockPowered(pos.up())));
 		return Hook.Result.NULL;
 	}
 	

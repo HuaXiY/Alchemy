@@ -64,22 +64,22 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	@SubscribeEvent
 	public void onPlayer_Clone(PlayerEvent.Clone event) {
 		event.getOriginal().getCapability(SkinCore.skin_info, null).copy(event.getEntityPlayer());
-		SkinCore.updatePlayerItselfSkin(event.getEntityPlayer());
+		SkinCore.updatePlayerSkin(event.getEntityPlayer());
 	}
 	
 	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
-		SkinCore.updatePlayerItselfSkin(event.player);
+		SkinCore.updatePlayerSkin(event.player);
 	}
 	
 	@SubscribeEvent
 	public void onPlayerChangedDimensionEvent(PlayerChangedDimensionEvent event) {
-		SkinCore.updatePlayerItselfSkin(event.player);
+		SkinCore.updatePlayerSkin(event.player);
 	}
 	
 	@SubscribeEvent
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		SkinCore.updatePlayerItselfSkin(event.player);
+		SkinCore.updatePlayerSkin(event.player);
 	}
 	
 	@SubscribeEvent
@@ -87,7 +87,7 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 		SkinInfo info = event.getTarget().getCapability(SkinCore.skin_info, null);
 		if (info != null && info.skin_data != null && info.skin_type != null)
 			AlchemyNetworkHandler.network_wrapper.sendTo(new UpdateSkinClient(event.getTarget().getEntityId(),
-					info.skin_type, info.skin_data), (EntityPlayerMP) event.getEntityPlayer());
+					event.getTarget().getName(), info.skin_type, info.skin_data), (EntityPlayerMP) event.getEntityPlayer());
 	}
 	
 	@Override
@@ -110,7 +110,8 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 				instance.skin_type = nbt.getString(NBT_KEY_SKIN_TYPE);
 			if (instance.entity instanceof EntityPlayerMP && !(instance.entity instanceof FakePlayer))
 				AlchemyEventSystem.addDelayedRunnable(p -> AlchemyNetworkHandler.network_wrapper.sendTo(new SkinCore.UpdateSkinClient(
-						((Entity) instance.entity).getEntityId(), instance.skin_type, instance.skin_data), (EntityPlayerMP) instance.entity), 0);
+						((Entity) instance.entity).getEntityId(), ((Entity) instance.entity).getName(), instance.skin_type, instance.skin_data),
+						(EntityPlayerMP) instance.entity), 0);
 		}
 	}
 	

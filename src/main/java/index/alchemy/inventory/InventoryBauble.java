@@ -116,9 +116,8 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 			AlchemyEventSystem.addDelayedRunnable(p -> {
 				for (EntityPlayer player : ((WorldServer) living.worldObj).getEntityTracker().getTrackingPlayers(living))
 					updatePlayer((EntityPlayerMP) player, data);
-				// Container#detectAndSendChanges auto sync
-				/* if (living instanceof EntityPlayerMP)
-					updatePlayer((EntityPlayerMP) living, data); */
+				if (living instanceof EntityPlayerMP)
+					updatePlayer((EntityPlayerMP) living, data);
 			}, 0);
 			return true;
 		}

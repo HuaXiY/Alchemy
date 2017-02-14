@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -22,19 +24,25 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.UsernameCache;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.IFuelHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.server.FMLServerHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
 import static java.lang.Math.*;
+
+import java.io.File;
 
 @Omega
 public class Always {
@@ -72,6 +80,26 @@ public class Always {
 		if (side == null)
 			SIDE_MAPPING.put(Thread.currentThread(), side = FMLCommonHandler.instance().getEffectiveSide());
 		return side;
+	}
+	
+	@Nullable
+	public static final UUID getUUIDFromPlayerName(String name) {
+		return UsernameCache.getMap()
+				.entrySet()
+				.stream()
+				.collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey))
+				.get(name);
+	}
+	
+	@Nullable
+	public static final File getWorldDirectory() {
+		if (DimensionManager.getWorld(0) != null)
+			return DimensionManager.getWorld(0).getSaveHandler().getWorldDirectory();
+		else if (FMLServerHandler.instance().getServer() != null) {
+			MinecraftServer server = FMLServerHandler.instance().getServer();
+			return server.getActiveAnvilConverter().getSaveLoader(server.getFolderName(), false).getWorldDirectory();
+		} else
+			return null;
 	}
 	
 	public static final boolean isServer() {

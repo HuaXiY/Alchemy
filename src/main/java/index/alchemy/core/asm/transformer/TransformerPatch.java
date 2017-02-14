@@ -15,8 +15,9 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.FrameNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -26,6 +27,7 @@ import com.google.common.collect.Maps;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.NodeCopier;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -86,7 +88,7 @@ public class TransformerPatch implements IClassTransformer {
 						for (AbstractInsnNode insn = insnListIterator.previous(); insnListIterator.hasPrevious();) {
 							insn = insnListIterator.previous();
 							insnListIterator.remove();
-							if (insn instanceof LabelNode)
+							if (insn instanceof InsnNode)
 								break;
 						}
 						if (method.name.equals("<init>"))
@@ -96,7 +98,18 @@ public class TransformerPatch implements IClassTransformer {
 								if (insn instanceof MethodInsnNode)
 									break;
 							}
-						method.instructions.add(patchMethod.instructions);
+						InsnList list = new InsnList();
+						NodeCopier copier = new NodeCopier();
+						for (Iterator<AbstractInsnNode> insnIterator = method.instructions.iterator(); insnIterator.hasNext();) {
+							AbstractInsnNode insn = insnIterator.next();
+							copier.copyTo(insn, list);
+						}
+						for (Iterator<AbstractInsnNode> insnIterator = patchMethod.instructions.iterator(); insnIterator.hasNext();) {
+							AbstractInsnNode insn = insnIterator.next();
+							copier.copyTo(insn, list);
+						}
+						method.instructions.clear();
+						method.instructions.add(list);
 						iterator.remove();
 					}
 			}

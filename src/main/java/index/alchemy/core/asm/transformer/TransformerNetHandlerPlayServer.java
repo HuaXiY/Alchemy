@@ -28,9 +28,9 @@ public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		String srgName1 = "func_147347_a"/* processPlayer */, srgName2 = "func_147344_a"/* processCreativeInventoryAction */;
 		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
-			srgName1 = DeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName1,
+			srgName1 = DeobfuscatingRemapper.instance().mapMethodName(transformedName, srgName1,
 					"(Lnet/minecraft/network/play/client/CPacketPlayer;)V");
-			srgName2 = DeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName2,
+			srgName2 = DeobfuscatingRemapper.instance().mapMethodName(transformedName, srgName2,
 					"(Lnet/minecraft/network/play/client/CPacketCreativeInventoryAction;)V");
 		}
 		ClassReader reader = new ClassReader(basicClass);

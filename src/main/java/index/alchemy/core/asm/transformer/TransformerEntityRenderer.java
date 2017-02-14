@@ -33,8 +33,8 @@ public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 		String srgMethodName = "func_175068_a"/* renderWorldPass */, srgFieldName = "field_175078_W"/* debugView */,
 				clazzName = ASMHelper.getClassName(transformedName);
 		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
-			srgMethodName = DeobfuscatingRemapper.INSTANCE.mapMethodName(clazzName, srgMethodName, "(IFJ)V");
-			srgFieldName = DeobfuscatingRemapper.INSTANCE.mapFieldName(clazzName, srgFieldName, "Z");
+			srgMethodName = DeobfuscatingRemapper.instance().mapMethodName(clazzName, srgMethodName, "(IFJ)V");
+			srgFieldName = DeobfuscatingRemapper.instance().mapFieldName(clazzName, srgFieldName, "Z");
 		}
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = ASMHelper.newClassWriter(0);

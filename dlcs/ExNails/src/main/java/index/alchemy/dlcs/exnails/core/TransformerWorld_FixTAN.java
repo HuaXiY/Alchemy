@@ -25,7 +25,7 @@ public class TransformerWorld_FixTAN implements IAlchemyClassTransformer {
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		String srgName = "func_175727_C";
 		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
-			srgName = DeobfuscatingRemapper.INSTANCE.mapMethodName(transformedName, srgName,
+			srgName = DeobfuscatingRemapper.instance().mapMethodName(transformedName, srgName,
 					"(Lnet/minecraft/util/math/BlockPos;)Z");
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = ASMHelper.newClassWriter(0);

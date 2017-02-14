@@ -27,6 +27,8 @@ public interface DeobfuscatingRemapper {
 		}
 		
 	};
+	
+	static DeobfuscatingRemapper instance() { return INSTANCE; }
 
 	String unmapType(String typeName);
 	

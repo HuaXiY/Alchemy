@@ -1,10 +1,5 @@
 package index.alchemy.core.asm.transformer;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.Nullable;
 
 import org.objectweb.asm.ClassReader;
@@ -13,11 +8,6 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import index.alchemy.api.IFieldAccess;
 import index.alchemy.api.annotation.Unsafe;
@@ -34,18 +24,6 @@ import static index.alchemy.util.Tool.$;
 public class TransformerFieldAccess implements IClassTransformer {
 	
 	public static final String I_FIELD_ACCESS_DESC = Type.getInternalName(IFieldAccess.class);
-	
-	public static final Map<String, List<Runnable>> callback_mapping = new HashMap<String, List<Runnable>>() {
-		
-		@Override
-		public List<Runnable> get(Object key) {
-			List<Runnable> result = super.get(key);
-			if (result == null)
-				put((String) key, result = new LinkedList());
-			return result;
-		}
-		
-	};
 	
 	private static int id = -1;
 	public static synchronized int nextId() {
@@ -70,31 +48,9 @@ public class TransformerFieldAccess implements IClassTransformer {
 		String desc = ASMHelper.removeGeneric(signature);
 		node.fields.removeIf(f -> f.name.equals(accessField.name));
 		node.fields.add(new FieldNode(ACC_PUBLIC, accessField.name, desc, signature, null));
-		callback_mapping.get(transformedName).add(() -> updateAccessField(transformedName, accessField, desc));
-		MethodNode clinit = null;
-		for (MethodNode method : node.methods)
-			if (method.name.equals("<clinit>")) {
-				clinit = method;
-				break;
-			}
-		boolean flag = clinit == null;
-		if (flag)
-			node.methods.add(clinit = new MethodNode(0, "<clinit>", "()V", null, null));
-		InsnList list = new InsnList();
-		list.add(new LdcInsnNode(transformedName));
-		list.add(new MethodInsnNode(INVOKESTATIC, "index/alchemy/core/asm/transformer/TransformerFieldAccess",
-				"callback", "(Ljava/lang/String;)V", false));
-		if (flag)
-			list.add(new InsnNode(RETURN));
-		clinit.instructions.insert(list);
+		AlchemyTransformerManager.markClinitCallback(node, () -> updateAccessField(transformedName, accessField, desc));
 		node.accept(writer);
 		return writer.toByteArray();
-	}
-	
-	public static void callback(String name) {
-		List<Runnable> callback = callback_mapping.remove(name);
-		if (callback != null)
-			callback.forEach(Runnable::run);
 	}
 	
 	public void updateAccessField(String clazzName, FieldNode field, String desc) {

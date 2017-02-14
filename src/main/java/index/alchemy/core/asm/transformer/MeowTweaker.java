@@ -22,9 +22,9 @@ import static org.objectweb.asm.Opcodes.*;
 
 public enum MeowTweaker implements ITweaker, IClassTransformer {
 	
-	INSTANCE() {
+	Sayaka() {
 		{
-			if (AlchemyEngine.JAVA_VERSION >= 9)
+			if (AlchemyEngine.JAVA_VERSION >= '⑨' / 1000)
 				try {
 					LaunchClassLoader loader = AlchemyEngine.getLaunchClassLoader();
 					Field transformersField = loader.getClass().getDeclaredField("transformers");
@@ -35,7 +35,7 @@ public enum MeowTweaker implements ITweaker, IClassTransformer {
 		}
 	};
 	
-	public static MeowTweaker instance() { return INSTANCE; }
+	public static MeowTweaker instance() { return Sayaka; }
 
 	@Override
 	public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) { /* O.o */ }
@@ -44,14 +44,10 @@ public enum MeowTweaker implements ITweaker, IClassTransformer {
 	public void injectIntoClassLoader(LaunchClassLoader classLoader) { /* ٩(｡·ω·｡)﻿و （๑ • ‿ • ๑ ） */ }
 
 	@Override
-	public String getLaunchTarget() {
-		return null;
-	}
+	public String getLaunchTarget() { return null; }
 
 	@Override
-	public String[] getLaunchArguments() {
-		return new String[0];
-	}
+	public String[] getLaunchArguments() { return new String[0]; }
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {

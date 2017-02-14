@@ -42,6 +42,7 @@ import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Always;
 import index.alchemy.util.Counter;
+import index.alchemy.util.EventHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
@@ -58,6 +59,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
@@ -95,17 +97,19 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	private static class KeyBindingHandle {
+	private static final class KeyBindingHandle {
 		
 		private final KeyBinding binding;
 		private final IInputHandle target;
 		private final Method method;
+		private final boolean ignoreHook;
 		private final Function<KeyBinding, Void> handler;
 		
-		public KeyBindingHandle(KeyBinding binding, IInputHandle target, Method method) {
+		public KeyBindingHandle(KeyBinding binding, IInputHandle target, Method method, boolean ignoreHook) {
 			this.binding = binding;
 			this.target = target;
 			this.method = method;
+			this.ignoreHook = ignoreHook;
 			this.handler = AlchemyEngine.getASMClassLoader().createWrapper(method, target);
 		}
 		
@@ -114,6 +118,8 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		public IInputHandle getTarget() { return target; }
 		
 		public Method getMethod() { return method; }
+		
+		public boolean isIgnoreHook() { return ignoreHook; }
 		
 		public void handle() {
 			if (handler != null)
@@ -335,10 +341,11 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onServerTick(ServerTickEvent event) {
-		String flag = "18";
+		String flag = "20";
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
+				System.out.println(EventHelper.getAllHandler(PlayerDropsEvent.class, 0));
 			}
 			System.setProperty("index.alchemy.runtime.debug.server", flag);
 		}
@@ -363,11 +370,11 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 //		System.out.println(object);
 //		if (object instanceof Block)
 //			;
-		{
-			if (System.currentTimeMillis() - lastTickTime > 3000)
-				Minecraft.getMinecraft().effectRenderer.clearEffects(Minecraft.getMinecraft().theWorld);
-			lastTickTime = System.currentTimeMillis();
-		}
+//		{
+//			if (System.currentTimeMillis() - lastTickTime > 3000)
+//				Minecraft.getMinecraft().effectRenderer.clearEffects(Minecraft.getMinecraft().theWorld);
+//			lastTickTime = System.currentTimeMillis();
+//		}
 		onRunnableTick(event.side, event.phase);
 	}
 	
@@ -438,7 +445,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 						if (method.getParameterTypes().length == 1 && method.getParameterTypes()[0] == KeyBinding.class) {
 							for (String value : event.value())
 								if (value.equals(description))
-									key_handle.add(new KeyBindingHandle(binding, handle, method));
+									key_handle.add(new KeyBindingHandle(binding, handle, method, event.ignoreHook()));
 						}
 						else
 							AlchemyRuntimeException.onException(new IllegalArgumentException(
@@ -453,34 +460,45 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onKeyInput(KeyInputEvent event) {
-		if (hookInputState)
+		if (isHookInput())
 			KeyBinding.unPressAllKeys();
-		else
-			for (KeyBindingHandle handle : key_handle)
-				if (Keyboard.isKeyDown(handle.getBinding().getKeyCode()))
+		for (KeyBindingHandle handle : key_handle)
+				if ((!isHookInput() || handle.isIgnoreHook()) && Keyboard.isKeyDown(handle.getBinding().getKeyCode()))
 					handle.handle();
 	}
 	
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onMouseInput(MouseEvent event) {
-		if (hookInputState)
+		if (isHookInput())
 			markEventCanceled(event);
 	}
 	
-	public static final String KEY_DEBUG_DISABLE_HOOK = "key.debug_disable_hook";
+	public static final String
+			KEY_DEBUG_DISABLE_HOOK = "key.debug_disable_hook",
+			KEY_DEBUG_CLEAR_EFFECTS = "key.debug_clear_effects";
 	
 	@Override
 	@SideOnly(Side.CLIENT)
 	public KeyBinding[] getKeyBindings() {
-		return new KeyBinding[]{ new AlchemyKeyBinding(KEY_DEBUG_DISABLE_HOOK, Keyboard.KEY_ADD) };
+		return new KeyBinding[]{
+				new AlchemyKeyBinding(KEY_DEBUG_DISABLE_HOOK, Keyboard.KEY_F9),
+				new AlchemyKeyBinding(KEY_DEBUG_CLEAR_EFFECTS, Keyboard.KEY_MINUS)
+		};
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@KeyEvent(KEY_DEBUG_DISABLE_HOOK)
+	@KeyEvent(value = KEY_DEBUG_DISABLE_HOOK, ignoreHook = true)
 	public void onKeyDebugDisableHookPressed(KeyBinding binding) {
 		if (GuiScreen.isAltKeyDown())
 			clearInputHook();
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@KeyEvent(KEY_DEBUG_CLEAR_EFFECTS)
+	public void onKeyDebugClearEffects(KeyBinding binding) {
+		if (GuiScreen.isAltKeyDown())
+			Minecraft.getMinecraft().effectRenderer.clearEffects(Minecraft.getMinecraft().theWorld);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -537,7 +555,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@Hook("net.minecraftforge.fml.common.eventhandler.ASMEventHandler#invoke")
 	public static Hook.Result invoke(ASMEventHandler handler, Event event) {
-		Boolean ignore = Tool.isNullOr(markIgnore.get(event), Boolean.FALSE::booleanValue);
+		Boolean ignore = Tool.isNullOr(markIgnore.get(event), false);
 		return ignore ? Hook.Result.NULL : Hook.Result.VOID;
 	}
 	

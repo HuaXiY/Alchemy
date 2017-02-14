@@ -1,5 +1,6 @@
 package index.alchemy.core.asm.transformer;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,10 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.collect.Lists;
@@ -51,7 +56,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			FIELD_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field$Provider;",
 			FIELD_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field;",
 			FIELD_ACCESS_DESC = "Lindex/alchemy/api/IFieldAccess;",
-			SIDE_ONLY_ANNOTATION_DESC = "Lnet/minecraftforge/fml/relauncher/SideOnly;";
+			SIDE_ONLY_ANNOTATION_DESC = "Lnet/minecraftforge/fml/relauncher/SideOnly;",
+			CALLBACK_FLAG_DESC = "index/alchemy/core/asm/transformer/AlchemyTransformerManager$CALLBACK_FLAG";
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyTransformerManager.class.getSimpleName());
 	
@@ -65,6 +71,51 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			return result;
 		}
 	};
+	
+	public static final Map<String, List<Runnable>> callback_mapping = new HashMap<String, List<Runnable>>() {
+		
+		@Override
+		public List<Runnable> get(Object key) {
+			List<Runnable> result = super.get(key);
+			if (result == null)
+				put((String) key, result = Lists.newLinkedList());
+			return result;
+		}
+		
+	};
+	
+	@Deprecated
+	public static interface CALLBACK_FLAG { }
+	
+	public static void markClinitCallback(ClassNode node, Runnable... runnables) {
+		callback_mapping.get(node.name).addAll(Arrays.asList(runnables));
+		for (String i : node.interfaces)
+			if (i.equals(CALLBACK_FLAG_DESC))
+				return;
+		node.interfaces.add(CALLBACK_FLAG_DESC);
+		MethodNode clinit = null;
+		for (MethodNode method : node.methods)
+			if (method.name.equals("<clinit>")) {
+				clinit = method;
+				break;
+			}
+		boolean flag = clinit == null;
+		if (flag)
+			node.methods.add(clinit = new MethodNode(0, "<clinit>", "()V", null, null));
+		InsnList list = new InsnList();
+		list.add(new LdcInsnNode(node.name));
+		list.add(new MethodInsnNode(INVOKESTATIC, "index/alchemy/core/asm/transformer/AlchemyTransformerManager",
+				"callback", "(Ljava/lang/String;)V", false));
+		if (flag)
+			list.add(new InsnNode(RETURN));
+		clinit.instructions.insert(list);
+	}
+	
+	public static void callback(String name) {
+		List<Runnable> callback = callback_mapping.remove(name);
+		if (callback != null)
+			callback.forEach(Runnable::run);
+	}
 	
 	static { ReflectionHelper.setClassLoader(ClassWriter.class, AlchemyEngine.getLaunchClassLoader()); }
 	
@@ -170,6 +221,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
+		if (transformedName.equals("net.minecraft.client.particle.ParticleFirework$Starter"))
+			Tool.dumpClass(basicClass, "D:/temp/" + transformedName + ".bytecode");
 		return basicClass;
 	}
 	
@@ -212,7 +265,5 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	}
 	
 	public static void transform(String name) { logger.info("Transform: " + name); }
-	
-	static { sun.reflect.Reflection.registerFieldsToFilter(AlchemyTransformerManager.class, "instance"); }
 
 }

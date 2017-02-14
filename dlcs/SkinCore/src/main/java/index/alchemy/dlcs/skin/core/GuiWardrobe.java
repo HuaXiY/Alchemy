@@ -161,9 +161,9 @@ public class GuiWardrobe extends GuiScreen {
 		public void update(GuiSkinList.Entry entry, EntityPlayer player, boolean send) {
 			SkinCore.UpdateSkinClient updater = null;
 			if (entry.name.equals("default"))
-				updater = new SkinCore.UpdateSkinClient(player.getEntityId(), "", new byte[0]);
+				updater = new SkinCore.UpdateSkinClient(player.getEntityId(), player.getName(), "", new byte[0]);
 			else if (entry.file != null)
-				updater = new SkinCore.UpdateSkinClient(player.getEntityId(), type, entry.data);
+				updater = new SkinCore.UpdateSkinClient(player.getEntityId(), player.getName(), type, entry.data);
 			if (updater != null) {
 				updater.onMessage(updater, null);
 				if (send)
@@ -249,7 +249,7 @@ public class GuiWardrobe extends GuiScreen {
 			player = new EntityOtherPlayerMP(Minecraft.getMinecraft().theWorld,
 					new GameProfile(UUID.randomUUID(), "preview")) {
 				
-				{ setEntityId(Integer.MAX_VALUE - 10); }
+				{ setEntityId(-1); }
 				
 				@Override
 				public ResourceLocation getLocationSkin() {

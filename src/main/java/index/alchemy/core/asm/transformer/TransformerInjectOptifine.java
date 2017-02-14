@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.io.IOUtils;
 
 import com.google.common.reflect.ClassPath;
@@ -42,7 +40,6 @@ public class TransformerInjectOptifine implements IClassTransformer {
 	
 	protected JarFile jar;
 	
-	@Nullable
 	public static void tryInject(LaunchClassLoader classLoader) {
 		try {
 			List<IClassTransformer> transformers = $(classLoader, "transformers");

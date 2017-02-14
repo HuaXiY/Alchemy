@@ -544,6 +544,10 @@ public abstract class Tool {
 		} catch (IOException e) { return null; }
 	}
 	
+	public static final <T> T isNullOr(T t, T or) {
+		return t == null ? or : t;
+	}
+	
 	public static final <T> T isNullOr(T t, Supplier<T> or) {
 		return t == null ? or.get() : t;
 	}

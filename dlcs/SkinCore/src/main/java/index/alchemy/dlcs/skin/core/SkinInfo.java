@@ -2,6 +2,8 @@ package index.alchemy.dlcs.skin.core;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Maps;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 
@@ -21,6 +23,7 @@ public class SkinInfo implements ICapabilityProvider, ICapabilitySerializable {
 	
 	public String skin_type;
 	
+	@Nullable
 	public transient final ISkinEntity entity;
 	
 	public transient final Map<MinecraftProfileTexture.Type, ResourceLocation>
@@ -28,6 +31,12 @@ public class SkinInfo implements ICapabilityProvider, ICapabilitySerializable {
 	
 	public SkinInfo(ISkinEntity entity) {
 		this.entity = entity;
+	}
+	
+	public SkinInfo(byte skin_data[], String skin_type) {
+		this.skin_data = skin_data;
+		this.skin_type = skin_type;
+		this.entity = null;
 	}
 
 	@Override
@@ -53,5 +62,5 @@ public class SkinInfo implements ICapabilityProvider, ICapabilitySerializable {
 	public void deserializeNBT(NBTBase nbt) {
 		SkinCore.skin_info.readNBT(this, null, nbt);
 	}
-
+	
 }

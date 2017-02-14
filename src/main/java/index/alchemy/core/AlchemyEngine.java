@@ -16,6 +16,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -35,6 +36,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.asm.transformer.MeowTweaker;
+import index.alchemy.core.asm.transformer.SrgMap;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
@@ -66,9 +68,9 @@ import static index.alchemy.util.Tool.$;
 @TransformerExclusions(MOD_TRANSFORMER_PACKAGE)
 public class AlchemyEngine implements IFMLLoadingPlugin {
 	
-	private static final String SETUP_CORE = "setup core";
+	private static final String SETUP_CORE = "setup core", SRG_MCP = "net.minecraftforge.gradle.GradleStart.srg.srg-mcp";
 	
-	public static final Double JAVA_VERSION = Double.parseDouble(System.getProperty("java.specification.version", "0"));
+	public static final double JAVA_VERSION = Optional.of(System.getProperty("java.specification.version")).map(Double::parseDouble).get();
 	
 	public static final PrintStream
 			sysout = new PrintStream(new FileOutputStream(FileDescriptor.out)),
@@ -91,9 +93,14 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	   });
 	}
 	
+	private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.deobf.disable");
+	
+	public static boolean isRuntimeDeobfuscationEnabled() { return runtimeDeobfuscationEnabled; }
+	
 	static {
-		registerTransformer(MeowTweaker.instance());
 		AlchemyDebug.start(SETUP_CORE);
+		// Java9 Tweaker
+		MeowTweaker.instance();
 		Set<String> libs = Sets.newHashSet(Splitter.on(';').split(Tool.isEmptyOr(
 				System.getProperty("index.alchemy.runtime.lib.ext"), "")));
 		libs.remove("");
@@ -104,9 +111,13 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 		Platform.setImplicitExit(false);
 		// Initialization index.alchemy.util.DeobfuscatingRemapper
 		Tool.load(DeobfuscatingRemapper.class);
+		// Load SrgMap from net.minecraftforge.gradle.GradleStart.srg.srg-mcp or use FMLDeobfuscatingRemapper 
+		if (!isRuntimeDeobfuscationEnabled() && System.getProperty(SRG_MCP) != null)
+			$(DeobfuscatingRemapper.class, "INSTANCE<<", new SrgMap(Tool.readSafe(new File(System.getProperty(SRG_MCP)))));
 		// Set class byte array provider
 		$(ASMHelper.class, "getClassByteArray<<", (Function<String, byte[]>)
-				name -> Tool.getClassByteArray(getLaunchClassLoader(), DeobfuscatingRemapper.INSTANCE.unmapType(name.replace('.', '/'))));
+				name -> Tool.getClassByteArray(getLaunchClassLoader(), isRuntimeDeobfuscationEnabled() ?
+						DeobfuscatingRemapper.instance().unmapType(name.replace('.', '/')) : name.replace('.', '/')));
 		// Load all Alchemy's DLCs
 		AlchemyDLCLoader.setup();
 		// Load all Alchemy and Alchemy's DLC of the class transformer 
@@ -277,10 +288,6 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 				result.add(info.getName());
 		return result;
 	}
-	
-	private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.deobf.disable");
-	
-	public static boolean isRuntimeDeobfuscationEnabled() { return runtimeDeobfuscationEnabled; }
 	
 	private static File alchemyCoreLocation;
 	

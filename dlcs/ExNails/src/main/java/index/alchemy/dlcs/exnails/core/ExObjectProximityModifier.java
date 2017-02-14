@@ -1,7 +1,6 @@
 package index.alchemy.dlcs.exnails.core;
 
 import index.alchemy.api.IBlockTemperature;
-import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -52,43 +51,18 @@ public class ExObjectProximityModifier extends ObjectProximityModifier {
 	}
 
 	public static float getBlockTemperature(EntityPlayer player, IBlockState state) {
+		boolean flag = !state.getBlock().getClass().getName().startsWith("net.minecraft.");
 		World world = player.worldObj;
 		Material material = state.getMaterial();
-		System.out.println(state);
 		if (material == Material.FIRE)
 			return 1.0F;
 		else if (material == Material.LAVA)
 			return 1.5F;
-		System.out.println(state.getBlock() instanceof IBlockTemperature);
 		if (state.getBlock() instanceof IBlockTemperature) {
 			IBlockTemperature temperature = (IBlockTemperature) state.getBlock();
 			return temperature.getBlockTemperature(player, state);
 		}
-		
 		return 0.0F;
 	}
 	
-	@Hook.Provider
-	public static class Patch$ {
-		
-		@Hook(value = "toughasnails.temperature.modifier.ObjectProximityModifier#getBlockTemperature", isStatic = true)
-		public static Hook.Result getBlockTemperature(EntityPlayer player, IBlockState state) {
-			World world = player.worldObj;
-			Material material = state.getMaterial();
-			//System.out.println(state.getBlock().getMetaFromState(state) + " - " + state);
-			if (material == Material.FIRE)
-				return new Hook.Result(1.0F);
-			else if (material == Material.LAVA)
-				return new Hook.Result(1.5F);
-			if (state.getBlock() instanceof IBlockTemperature) {
-				IBlockTemperature temperature = (IBlockTemperature) state.getBlock();
-				//System.out.println("" + temperature.getBlockTemperature(player, state));
-				return new Hook.Result(temperature.getBlockTemperature(player, state));
-			}
-			
-			return new Hook.Result(0.0F);
-		}
-		
-	}
-
 }

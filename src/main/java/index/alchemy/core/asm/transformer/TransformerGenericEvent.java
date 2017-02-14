@@ -20,6 +20,7 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.DeobfuscatingRemapper;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -29,7 +30,12 @@ import static index.alchemy.core.AlchemyConstants.*;
 @Omega
 public class TransformerGenericEvent implements IClassTransformer {
 	
-	public static final String SUBSCRIBE_EVENT_ANNOTATION_DESC = "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;";
+	public static final String
+			SUBSCRIBE_EVENT_ANNOTATION_DESC = "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+			ITEMSTACK_DESC = "net/minecraft/item/ItemStack",
+			ITEMSTACK_GET_ITEM_METHOD_DESC = "()Lnet/minecraft/item/Item;",
+			srgName = AlchemyEngine.isRuntimeDeobfuscationEnabled() ? "func_77973_b" :
+				DeobfuscatingRemapper.instance().mapMethodName(ITEMSTACK_DESC, "func_77973_b", ITEMSTACK_GET_ITEM_METHOD_DESC);
 
 	@Override
 	@Unsafe(Unsafe.ASM_API)
@@ -68,10 +74,17 @@ public class TransformerGenericEvent implements IClassTransformer {
 									if (localVar.signature != null)
 										localVar.signature = localVar.signature.replace(generic, new_generic);
 								InsnList list = new InsnList();
-								LabelNode label = new LabelNode();
+								LabelNode label = new LabelNode(), getItem = new LabelNode();
 								list.add(new VarInsnNode(ALOAD, (method.access & ACC_STATIC) == 0 ? 1 : 0));
 								list.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/event/AttachCapabilitiesEvent",
 										"getObject", "()Ljava/lang/Object;", false));
+								list.add(new InsnNode(DUP));
+								list.add(new TypeInsnNode(INSTANCEOF, ITEMSTACK_DESC));
+								list.add(new JumpInsnNode(IFEQ, getItem));
+								list.add(new TypeInsnNode(CHECKCAST, ITEMSTACK_DESC));
+								list.add(new MethodInsnNode(INVOKEVIRTUAL, ITEMSTACK_DESC, srgName,
+										"()Lnet/minecraft/item/Item;", false));
+								list.add(getItem);
 								if (generic.contains("+")) {
 									list.add(new TypeInsnNode(INSTANCEOF, clazz));
 									list.add(new JumpInsnNode(IFNE, label));
@@ -84,6 +97,7 @@ public class TransformerGenericEvent implements IClassTransformer {
 								list.add(new InsnNode(RETURN));
 								list.add(label);
 								method.instructions.insert(list);
+								AlchemyTransformerManager.markClinitCallback(node, () -> {});
 							}
 							break;
 						}

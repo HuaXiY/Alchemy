@@ -11,4 +11,6 @@ public @interface KeyEvent {
 	
 	String[] value();
 	
+	boolean ignoreHook() default false;
+	
 }

@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Test
 @Omega
 @SideOnly(Side.CLIENT)
-@Init(state = ModState.PREINITIALIZED, enable = true)
+@Init(state = ModState.PREINITIALIZED, enable = false)
 public class RColorPicker {
 	
 	public static ColorPicker color_picker;

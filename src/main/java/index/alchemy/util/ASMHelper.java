@@ -137,7 +137,10 @@ public interface ASMHelper {
 	}
 	
 	static boolean isPrimaryClass(String name) {
-		String temp[] = name.replace('/', '.').split("\\.");
+		name = name.replace('/', '.');
+		if (name.equals("net.minecraft.item.ItemStack"))
+			return true;
+		String temp[] = name.split("\\.");
 		return temp.length > 1 && temp[temp.length - 1].equalsIgnoreCase(temp[temp.length - 2]);
 	}
 	

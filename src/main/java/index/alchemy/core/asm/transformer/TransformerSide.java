@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -36,7 +35,6 @@ public class TransformerSide extends SideTransformer {
 	
 	public final IClassTransformer parent;
 	
-	@Nullable
 	public static void inject(LaunchClassLoader classLoader) {
 		try {
 			List<IClassTransformer> transformers = $(classLoader, "transformers");
