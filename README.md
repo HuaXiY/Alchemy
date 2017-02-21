@@ -14,6 +14,7 @@ Organizer:
 Member:
   <ul>
     <li><a href="https://github.com/Mrkwtkr">@Mrkwtkr</a></li>
+    <li><a href="https://github.com/YurisCat">@YurisCat</a></li>
   </ul>
 <hr>
 Minecraft version: 1.10.2<br>
