@@ -13,6 +13,8 @@ Organizer:
   </ul>
 Member:
   <ul>
+    <li><a href="https://github.com/SakuraSayaka">@SakuraSayaka</a></li>
+    <li><a href="https://github.com/YurisCat">@YurisCat</a></li>
     <li><a href="https://github.com/Mrkwtkr">@Mrkwtkr</a></li>
   </ul>
 <hr>
