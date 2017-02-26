@@ -36,7 +36,10 @@ public class AlchemyItemLoader {
 			belt_guard = new ItemBeltGuard(),
 			belt_tough = new ItemBeltTough(),
 			amulet_heal = new ItemAmuletHeal(),
-			amulet_purify = new ItemAmuletPurify();
+			amulet_purify = new ItemAmuletPurify(),
+			forest_bat = new ItemHeadForestBat(),
+			magic_pixie = new ItemHeadMagicPixie(),
+			magic_butterfly = new ItemHeadMagicButterfly();
 	
 	public static final AlchemyItemRecord
 			record_re_awake = new AlchemyItemRecord("re_awake", AlchemySoundLoader.record_re_awake, 0xFF3333);

@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -25,12 +24,11 @@ import org.objectweb.asm.tree.VarInsnNode;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyEngine;
-import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.DeobfuscatingRemapper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -46,22 +44,8 @@ public final class TransformerHook implements IClassTransformer {
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		String srgName = this.srgName;
-		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
-			String desc = null;
-			Type args[] = Type.getArgumentTypes(hookMethod.desc);
-			StringBuilder builder = new StringBuilder("(");
-			for (int i = isStatic ? 0 : 1; i < args.length; i++)
-				builder.append(args[i].getDescriptor());
-			desc = srgName + builder.append(")").toString();
-			try {
-				for (Entry<String, String> entry : Tool.<Map<String, String>>$(FMLDeobfuscatingRemapper.INSTANCE, "getMethodMap",
-						this.owner).entrySet())
-					if (entry.getKey().startsWith(desc)) {
-						srgName = entry.getValue();
-						break;
-					}
-			} catch (Exception e) { AlchemyRuntimeException.onException(new RuntimeException(e)); }
-		}
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
+			srgName = DeobfuscatingRemapper.instance().mapMethodName(transformedName, this.srgName, "");
 		ClassReader reader = new ClassReader(basicClass);
 		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_FRAMES);
 		ClassNode node = new ClassNode(ASM5);
@@ -218,7 +202,8 @@ public final class TransformerHook implements IClassTransformer {
 
 	@Unsafe(Unsafe.REFLECT_API)
 	public TransformerHook(MethodNode hookMethod, String hookSrc, String owner, String srgName, boolean isStatic, Hook.Type type) {
-		this.hookMethod = hookMethod;
+		hookMethod.accept(this.hookMethod = new MethodNode(hookMethod.access, hookMethod.name, hookMethod.desc,
+				hookMethod.signature, hookMethod.exceptions.toArray(new String[hookMethod.exceptions.size()])));
 		this.hookSrc = hookSrc;
 		this.owner = ASMHelper.getClassName(owner);
 		this.srgName = srgName;

@@ -17,6 +17,14 @@ public @interface Patch {
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface Spare { }
 	
+	@Target({ ElementType.TYPE_USE })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface Generic {
+		
+		String value();
+		
+	}
+	
 	String value();
 
 }

@@ -36,12 +36,10 @@ public class FireworkHelper {
 				g.drawString(String.valueOf(chars[i]), 0, 14);
 				g.dispose();
 				for (int x = 0; x < 18; x++)
-					for (int y = 0; y < 18; y++) {
+					for (int y = 0; y < 18; y++)
 						if (image.getRGB(x, y) == -1)
 							result.add(new double[]{ offsetX + x / 18.0D, offsetY + (1 - y / 18.0D) });
-					}
 			}
-			
 		}
 		return result.toArray(new double[result.size()][2]);
 	}
@@ -55,24 +53,19 @@ public class FireworkHelper {
 		double fy = shape[0][1];
 		starter.createParticle(starter.posX, starter.posY, starter.posZ, fx * speed, fy * speed, 0.0D, colours, fadeColours,
 				trail, twinkle);
-		float f = starter.rand.nextFloat() * (float)Math.PI;
-		double d = (double) f + Math.PI;
-		double x = fx;
-		double y = fy;
+		float f = starter.rand.nextFloat() * (float) Math.PI;
+		double d = f + Math.PI;
 		for (int s = 1; s < shape.length; s++) {
 			double nx = shape[s][0];
 			double ny = shape[s][1];
-
-			double rx = (x + (nx - x) * 1) * speed;
-			double ry = (y + (ny - y) * 1) * speed;
+			double rx = nx * speed;
+			double ry = ny * speed;
 			double sinx = rx * Math.sin(d);
 			rx = rx * Math.cos(d);
 			starter.createParticle(starter.posX, starter.posY, starter.posZ, rx * -1, ry, sinx * -1, colours,
 					fadeColours, trail, twinkle);
 			starter.createParticle(starter.posX, starter.posY, starter.posZ, rx, ry, sinx, colours,
 					fadeColours, trail, twinkle);
-			x = nx;
-			y = ny;
 		}
 	}
 

@@ -37,10 +37,13 @@ import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.asm.transformer.MeowTweaker;
 import index.alchemy.core.asm.transformer.SrgMap;
+import index.alchemy.core.asm.transformer.TransformerInjectOptifine;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.core.debug.JFXDialog;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.DeobfuscatingRemapper;
+import index.alchemy.util.ReflectionHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import javafx.application.Platform;
@@ -93,20 +96,22 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	   });
 	}
 	
+	static { /* Java9 Tweaker */ MeowTweaker.Sayaka(); }
+	
 	private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.deobf.disable");
 	
 	public static boolean isRuntimeDeobfuscationEnabled() { return runtimeDeobfuscationEnabled; }
 	
 	static {
 		AlchemyDebug.start(SETUP_CORE);
-		// Java9 Tweaker
-		MeowTweaker.instance();
-		Set<String> libs = Sets.newHashSet(Splitter.on(';').split(Tool.isEmptyOr(
-				System.getProperty("index.alchemy.runtime.lib.ext"), "")));
-		libs.remove("");
+		String libArgs = System.getProperty("index.alchemy.runtime.lib.ext");
+		Set<String> libs = libArgs != null ? Sets.newHashSet(Splitter.on(';').split(libArgs)) : Sets.newHashSet();
 		// Forge hack native libs when startup
 		libs.add("jfxrt");
 		libs.forEach(AlchemyEngine::addRuntimeExtLibFromJRE);
+		checkThrowables();
+		// Initialization index.alchemy.util.ReflectionHelper
+		Tool.load(ReflectionHelper.class);
 		// Should not to implicitly exit(com.sun.javafx.tk.Toolkit) when the last window is closed
 		Platform.setImplicitExit(false);
 		// Initialization index.alchemy.util.DeobfuscatingRemapper
@@ -130,17 +135,23 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 			
 			{ addAll($(getLaunchClassLoader(), "transformers")); }
 			
+			{ removeIf(MeowTweaker.class::isInstance); }
+			
 			public boolean add(Object e) {
 				if (e.getClass().getName().startsWith(MOD_PACKAGE) ||
 						(e instanceof TransformerWrapper && $(e, "parent").getClass().getName().startsWith(MOD_PACKAGE)) ||
 						e.getClass().getName().equals("net.minecraftforge.fml.common.asm.transformers.ModAPITransformer"))
 					return super.add(e);
 				else
-					for (int i = 0, len = size(); i < len; i++)
-						if (get(i).getClass().getName().startsWith(MOD_PACKAGE)) {
+					for (int i = 0, len = size(); i < len; i++) {
+						Object transformer = get(i);
+						if (transformer.getClass().getName().startsWith(MOD_PACKAGE) &&
+								!(transformer instanceof MeowTweaker) &&
+								transformer.getClass() != TransformerInjectOptifine.class) {
 							super.add(i, e);
 							return true;
 						}
+					}
 				return true;
 			}
 			
@@ -168,6 +179,11 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	
 	public static void checkInvokePermissions() {
 		Tool.checkInvokePermissions(3, AlchemyEngine.class);
+	}
+	
+	public static synchronized void checkThrowables() {
+		AlchemyThrowables.getThrowables().forEach(JFXDialog::showThrowableAndWait);
+		AlchemyThrowables.getThrowables().clear();
 	}
 	
 	public static class ASMClassLoader extends ClassLoader {
@@ -275,7 +291,7 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	
 	public static ASMClassLoader getASMClassLoader() { return asm_loader; }
 	
-	public static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+	private static final MethodHandles.Lookup lookup = $(MethodHandles.Lookup.class, "new", Object.class, -1);
 	
 	public static MethodHandles.Lookup lookup() { return lookup; }
 	

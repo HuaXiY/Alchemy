@@ -43,7 +43,7 @@ public class TransformerInjectOptifine implements IClassTransformer {
 	public static void tryInject(LaunchClassLoader classLoader) {
 		try {
 			List<IClassTransformer> transformers = $(classLoader, "transformers");
-			transformers.remove(1);
+			transformers.removeIf(t -> t.getClass().getName().startsWith("optifine."));
 			transformers.add(0, new TransformerInjectOptifine(classLoader));
 		} catch (Exception e) { e.printStackTrace(); }
 	}

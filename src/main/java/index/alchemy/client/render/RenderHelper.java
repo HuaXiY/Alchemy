@@ -1,6 +1,7 @@
 package index.alchemy.client.render;
 
 import index.alchemy.client.color.ColorHelper;
+import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -12,7 +13,6 @@ import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -73,12 +73,12 @@ public class RenderHelper extends GlStateManager {
 	}
 	
 	public static void translateToZero() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		Entity view = Tool.isNullOr(Minecraft.getMinecraft().getRenderViewEntity(), () -> Minecraft.getMinecraft().thePlayer);
 		float partialTicks = getRenderPartialTicks();
 		glTranslatef(
-				-calculateRenderOffset((float) player.posX, (float) player.lastTickPosX, partialTicks),
-				-calculateRenderOffset((float) player.posY, (float) player.lastTickPosY, partialTicks),
-				-calculateRenderOffset((float) player.posZ, (float) player.lastTickPosZ, partialTicks)
+				-calculateRenderOffset((float) view.posX, (float) view.lastTickPosX, partialTicks),
+				-calculateRenderOffset((float) view.posY, (float) view.lastTickPosY, partialTicks),
+				-calculateRenderOffset((float) view.posZ, (float) view.lastTickPosZ, partialTicks)
 		);
 	}
 	

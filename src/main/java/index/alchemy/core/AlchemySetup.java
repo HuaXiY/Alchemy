@@ -27,6 +27,7 @@ public class AlchemySetup implements IFMLCallHook {
 	
 	@Override
 	public Void call() throws Exception {
+		AlchemyEngine.checkThrowables();
 		AlchemyModLoader.logger.info("Setup: " + AlchemySetup.class.getName());
 		LaunchClassLoader loader = AlchemyEngine.getLaunchClassLoader();
 		// Injection is used to modify the at(AccessTransformer) logic of forge

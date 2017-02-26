@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 public class AlchemyBiomeLoader {
 	
 	public static final AlchemyBiome
+			time = new BiomeGenTime(),
 			dragon_island = new BiomeGenDragonIsland();
 	
 }

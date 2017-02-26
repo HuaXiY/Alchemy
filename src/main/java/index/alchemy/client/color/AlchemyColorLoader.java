@@ -13,6 +13,8 @@ import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.LoaderState.ModState;
@@ -39,16 +41,22 @@ public class AlchemyColorLoader {
 	private static <T extends Item & IColorItem> void registerItemColor() {
 		ItemColors colors = Minecraft.getMinecraft().getItemColors();
 		for (T t : (List<T>) item_color) {
-			colors.registerItemColorHandler(t.getItemColor(), t);
-			AlchemyInitHook.push_event(t);
+			IItemColor color = t.getItemColor();
+			if (color != null) {
+				colors.registerItemColorHandler(color, t);
+				AlchemyInitHook.push_event(t);
+			}
 		}
 	}
 	
 	private static <T extends Block & IColorBlock> void registerBlockColor() {
 		BlockColors colors = Minecraft.getMinecraft().getBlockColors();
 		for (T t : (List<T>) block_color) {
-			colors.registerBlockColorHandler(t.getBlockColor(), t);
-			AlchemyInitHook.push_event(t);
+			IBlockColor color = t.getBlockColor();
+			if (color != null) {
+				colors.registerBlockColorHandler(color, t);
+				AlchemyInitHook.push_event(t);
+			}
 		}
 	}
 	

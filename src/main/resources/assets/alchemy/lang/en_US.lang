@@ -2,21 +2,24 @@
 alchemy=alchemy
 
 //itemMap
-item.dush_witchcraft.name=dush_witchcraft
-item.ingot_silver.name=ingot_silver
-item.lapis_lazuli.name=lapis_lazuli
-item.scroll_boom.name=scroll_boom
+item.dush_witchcraft.name=dush witchcraft
+item.ingot_silver.name=ingot silver
+item.lapis_lazuli.name=lapis lazuli
+item.scroll_boom.name=scroll boom
 item.scroll_ice_screen.name=scroll_ice_screen
 item.scroll_lightning.name=scroll_lightning
 item.scroll_tp.name=scroll_tp
-item.ring_space.name=ring_space
-item.ring_time.name=ring_time
-item.ring_alive.name=ring_alive
-item.ring_blessing.name=ring_blessing
-item.belt_guard.name=belt_guard
-item.belt_tough.name=belt_tough
-item.amulet_heal.name=amulet_heal
-item.amulet_purify.name=amulet_purify
+item.ring_space.name=ring space
+item.ring_time.name=ring time
+item.ring_alive.name=ring alive
+item.ring_blessing.name=ring blessing
+item.belt_guard.name=belt guard
+item.belt_tough.name=belt tough
+item.amulet_heal.name=amulet heal
+item.amulet_purify.name=amulet purify
+item.head_forest_bat.name=forest bat
+item.head_magic_pixie.name=magic pixie
+item.head_magic_butterfly.name=magic butterfly
 
 //blockMap
 tile.null.name=null

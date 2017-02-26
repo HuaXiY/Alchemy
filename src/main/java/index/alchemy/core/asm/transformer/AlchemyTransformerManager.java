@@ -27,6 +27,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
+import index.alchemy.api.annotation.Proxy;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -50,9 +51,12 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			HOOK_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook$Provider;",
 			HOOK_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Hook;",
 			HOOK_RESULT_DESC = "index/alchemy/api/annotation/Hook$Result",
+			PROXY_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Proxy$Provider;",
+			PROXY_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Proxy;",
 			PATCH_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch;",
 			PATCH_EXCEPTION_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch$Exception;",
 			PATCH_SPARE_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch$Spare;",
+			PATCH_GENERIC_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Patch$Generic;",
 			FIELD_PROVIDER_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field$Provider;",
 			FIELD_ANNOTATION_DESC = "Lindex/alchemy/api/annotation/Field;",
 			FIELD_ACCESS_DESC = "Lindex/alchemy/api/IFieldAccess;",
@@ -140,6 +144,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 				if (checkSideOnly(node)) {
 					loadPatch(node);
 					loadField(node);
+					loadProxy(node);
 					loadHook(node);
 					loadTransform(node, info);
 				}
@@ -176,6 +181,27 @@ public class AlchemyTransformerManager implements IClassTransformer {
 										else
 											AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
 									}
+								}
+					break;
+				}
+	}
+	
+	@Unsafe(Unsafe.ASM_API)
+	private static void loadProxy(ClassNode node) throws Exception {
+		if (node.visibleAnnotations != null)
+			for (AnnotationNode nann : node.visibleAnnotations)
+				if (nann.desc.equals(PROXY_PROVIDER_ANNOTATION_DESC)) {
+					for (MethodNode methodNode : node.methods)
+						if (checkSideOnly(methodNode) && methodNode.visibleAnnotations != null)
+							for (AnnotationNode ann : methodNode.visibleAnnotations)
+								if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
+									Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values);
+									String args[] = proxy.target().split("#");
+									if (args.length == 2)
+										transformers_mapping.get(ASMHelper.getClassSrcName(node.name)).add(new TransformerProxy(
+												methodNode, proxy.opcode(), args[0], args[1]));
+									else
+										AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
 								}
 					break;
 				}
@@ -221,8 +247,8 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
-		if (transformedName.equals("net.minecraft.client.particle.ParticleFirework$Starter"))
-			Tool.dumpClass(basicClass, "D:/temp/" + transformedName + ".bytecode");
+		if (transformedName.endsWith(".EntityRenderer"))
+			Tool.dumpClass(basicClass, "D:/" + transformedName + ".bytecode");
 		return basicClass;
 	}
 	

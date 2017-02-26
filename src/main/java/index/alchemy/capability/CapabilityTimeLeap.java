@@ -167,9 +167,12 @@ public class CapabilityTimeLeap extends AlchemyCapability<TimeSnapshot> implemen
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onEntityViewRender_FOVModifier(EntityViewRenderEvent.FOVModifier event) {
-		TimeSnapshot snapshot = Minecraft.getMinecraft().thePlayer.getCapability(AlchemyCapabilityLoader.time_leap, null);
-		if (snapshot != null && snapshot.isLeaping())
-			event.setFOV(max(80, event.getFOV()));
+		Entity render = Minecraft.getMinecraft().getRenderViewEntity();
+		if (render != null) {
+			TimeSnapshot snapshot = render.getCapability(AlchemyCapabilityLoader.time_leap, null);
+			if (snapshot != null && snapshot.isLeaping())
+				event.setFOV(max(80, event.getFOV()));
+		}
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)

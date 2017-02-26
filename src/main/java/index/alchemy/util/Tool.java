@@ -23,8 +23,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,6 +40,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyInitHook;
@@ -186,8 +185,7 @@ public abstract class Tool {
 	}
 	
 	public static final <T extends AccessibleObject> T setAccessible(T t) {
-		t.setAccessible(true);
-		return t;
+		return ReflectionHelper.setAccessible(t);
 	}
 	
 	public static final int getRandom(int min, int max) {
@@ -266,7 +264,7 @@ public abstract class Tool {
 		if (objects == null)
 			objects = Lists.newLinkedList();
 		objects.addAll(Arrays.asList(others));
-		Map<String, Object> args = new HashMap<String, Object>();
+		Map<String, Object> args = Maps.newHashMap();
 		if (objects.size() % 2 != 0)
 			AlchemyRuntimeException.onException(new RuntimeException("objects.size() % 2 != 0"));
 		else {
@@ -333,7 +331,7 @@ public abstract class Tool {
 				ea[deep - 1].getClassName() + "#" + ea[deep - 1].getMethodName()));
 	}
 	
-	private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPING = new HashMap<Class<?>, Class<?>>();
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPING = Maps.newHashMap();
 	static {
 		PRIMITIVE_MAPPING.put(byte.class, Byte.class);
 		PRIMITIVE_MAPPING.put(short.class, Short.class);
@@ -352,15 +350,15 @@ public abstract class Tool {
 		return PRIMITIVE_MAPPING.get(clazz);
 	}
 	
-	public static final boolean isPacking(Class<?> clazz){
+	public static final boolean isPacking(Class<?> clazz) {
 		return ArrayUtils.contains(SIMPLE, clazz);
 	}
 	
-	public static final boolean isSimple(Class<?> clazz){
+	public static final boolean isSimple(Class<?> clazz) {
 		return clazz.isPrimitive() || isPacking(clazz);
 	}
 	
-	public static final boolean isBasics(Class<?> clazz){
+	public static final boolean isBasics(Class<?> clazz) {
 		return isSimple(clazz) || clazz == String.class;
 	}
 
@@ -511,7 +509,7 @@ public abstract class Tool {
 		}
 	}
 	
-	public static final List<String> getAllFile(File f, List<String> list){
+	public static final List<String> getAllFile(File f, List<String> list) {
 		if (f.exists())
 			if (f.isDirectory()) {
 				File fa[] = f.listFiles();
@@ -680,7 +678,7 @@ public abstract class Tool {
 	}
 	
 	public static final Map<String, String> getMapping(String str) {
-		Map<String, String> result = new LinkedHashMap<String, String>();
+		Map<String, String> result = Maps.newLinkedHashMap();
 		for (String line : str.split("\n")) {
 			String sa[] = line.split("=");
 			if (sa.length == 2)
@@ -737,7 +735,7 @@ public abstract class Tool {
 					Class<?> now_args[] = constructor.getParameterTypes();
 					if (now_args.length == args.length) {
 						for (int i = 0; i < args.length; i++)
-							if (!isInstance(now_args[i], args[i].getClass()))
+							if (args[i] != null ? !isInstance(now_args[i], args[i].getClass()) : now_args[i].isPrimitive())
 								continue method_forEach;
 						setAccessible(constructor);
 						return (T) constructor.newInstance(args);

@@ -36,7 +36,7 @@ public class JFXDialog {
 			alert.initOwner(null);
 			alert.setTitle(title == null ? "Exception Dialog" : title);
 			alert.setHeaderText(str == null ?
-					"The program has an unknown exception, please send a message to 931920447@qq.com for help." : str);
+					"The program has an unknown exception, please send a message to xiami@mickey.moe for help." : str);
 			alert.setContentText(ex.getClass().getName() + ": " + ex.getMessage());
 			StringWriter sw = new StringWriter();
 			ex.printStackTrace(new PrintWriter(sw));

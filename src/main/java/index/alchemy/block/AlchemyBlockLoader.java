@@ -15,4 +15,6 @@ public class AlchemyBlockLoader {
 			ore_silver = new BlockOre("ore_silver", null, 0xFFFFFF,
 					new BlockOre.OreGeneratorSetting(9, 4, 0, 40, OreGenEvent.GenerateMinable.EventType.GOLD));
 	
+	public static final BlockSpellWovenTable spell_woven_table = new BlockSpellWovenTable();
+	
 }

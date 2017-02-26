@@ -17,6 +17,9 @@ item.belt_guard.name=守护腰带
 item.belt_tough.name=坚韧腰带
 item.amulet_heal.name=生命吊坠
 item.amulet_purify.name=净化吊坠
+item.head_forest_bat.name=森林蝙蝠
+item.head_magic_pixie.name=魔法精灵
+item.head_magic_butterfly.name=魔法蝴蝶
 
 //blockMap
 tile.ore_silver.name=银矿石

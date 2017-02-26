@@ -56,7 +56,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 				for (Method method : Tool.searchMethod(clazz, element.getMethodName()))
 					if (checkAnnotation(clazz, method))
 						break;
-			} catch (ClassNotFoundException e) { continue; }
+			} catch (ClassNotFoundException | NoClassDefFoundError e) { continue; }
 		
 		JFXDialog.showThrowableAndWait(ex);
 		

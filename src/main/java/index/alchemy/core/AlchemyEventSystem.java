@@ -40,9 +40,9 @@ import index.alchemy.client.AlchemyKeyBinding;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.entity.control.SingleProjection;
 import index.alchemy.util.Always;
 import index.alchemy.util.Counter;
-import index.alchemy.util.EventHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
@@ -59,7 +59,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
@@ -174,10 +173,18 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onPlayerTick(PlayerTickEvent event) {
-		String flag = "103";
+		String flag = "134";
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
+//				System.out.println(event.player.isWearing(EnumPlayerModelParts.HAT));
+				//EntityLivingBase entity = IFollower.follower.get(event.player);
+				//SingleProjection.cutoverState();
+//				System.out.println(entity);
+				//SingleProjection.projection(entity);
+//				for (EntityLivingBase living : event.player.worldObj.getEntitiesWithinAABB(EntityMagicPixie.class, AABBHelper.getAABBFromEntity(event.player, 16))) {
+//					SingleProjection.projectionFollower(living);
+//				}
 				//registerEventHandle(new RTest());
 				//System.out.println(((ItemRingSpace)AlchemyItemLoader.ring_space).getInventory(AlchemyItemLoader.ring_space.getFormLiving(Minecraft.getMinecraft().thePlayer)));;
 				//Minecraft.getMinecraft().thePlayer.playSound(AlchemySoundLoader.record_re_awake, 1, 1);
@@ -197,12 +204,13 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 				}*/
 				//System.out.println(Tool.get(Names.Name.class, 1, Tool.get(Names.class, 3)));
 			}
-			//System.setProperty("index.alchemy.runtime.debug.player", flag);
+			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 //			EntityPlayer player = event.player;
-//			player.changeDimension(0);
-//			Item item = player.getHeldItemMainhand().getItem();
+//			player.changeDimension(10);
+//			System.out.println(player.worldObj.provider.getDimensionType());
+////			Item item = player.getHeldItemMainhand().getItem();
 //			if (item instanceof IItemThirst) {
 //				((IItemThirst) item).setThirst(2);
 //				((IItemThirst) item).setHydration(4);
@@ -245,7 +253,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			//event.player.changeDimension(0);
 			//System.out.println(DimensionManager.getWorld(1).getDefaultTeleporter().placeInExistingPortal(event.player, event.player.rotationYaw));
 			//new MagicTeleportDirectional(1).apply(null, event.player, 1);
-			System.setProperty("index.alchemy.runtime.debug.player", flag);
+			//System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
 		for (IPlayerTickable tickable : event.side.isServer() ? server_tickable : client_tickable)
 			tickable.onTick(event.player, event.phase);
@@ -345,7 +353,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		if (!System.getProperty("index.alchemy.runtime.debug.server", "").equals(flag)) {
 			// runtime do some thing
 			{
-				System.out.println(EventHelper.getAllHandler(PlayerDropsEvent.class, 0));
+				//System.out.println(EventHelper.getAllHandler(PlayerDropsEvent.class, 0));
 			}
 			System.setProperty("index.alchemy.runtime.debug.server", flag);
 		}
@@ -358,11 +366,17 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onClientTick(ClientTickEvent event) {
-		String flag = "26";
+		String flag = "35";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
+//				Block.getBlockFromName(name)
+//				List<EntityMagicPixie> result = Minecraft.getMinecraft().theWorld.getEntitiesWithinAABB(EntityMagicPixie.class,
+//						AABBHelper.getAABBFromEntity(Minecraft.getMinecraft().thePlayer, 15));
+//				if (result.size() > 0)
+//					Minecraft.getMinecraft().setRenderViewEntity(result.get(0));
 				
+//				Minecraft.getMinecraft().setRenderViewEntity(Minecraft.getMinecraft().thePlayer);
 			}
 			System.setProperty("index.alchemy.runtime.debug.client", flag);
 		}
@@ -463,8 +477,19 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 		if (isHookInput())
 			KeyBinding.unPressAllKeys();
 		for (KeyBindingHandle handle : key_handle)
-				if ((!isHookInput() || handle.isIgnoreHook()) && Keyboard.isKeyDown(handle.getBinding().getKeyCode()))
+				if (isKeyHandleActive(handle))
 					handle.handle();
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static boolean isKeyHandleActive(KeyBindingHandle handle) {
+		return (!isHookInput() || handle.isIgnoreHook()) && handle.getBinding().getKeyConflictContext().isActive() &&
+				Keyboard.isKeyDown(handle.getBinding().getKeyCode());
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static boolean isKeyBindingActive(KeyBinding binding) {
+		return !isHookInput() && binding.getKeyConflictContext().isActive() && Keyboard.isKeyDown(binding.getKeyCode());
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -524,6 +549,10 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public static void renderBar(RenderGameOverlayEvent.Pre event) {
+		if (SingleProjection.isProjectionState()) {
+			markEventCanceled(event);
+			return;
+		}
 		if (event.getType() == ElementType.ALL)
 			HUDManager.render();
 	}
@@ -555,8 +584,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@Hook("net.minecraftforge.fml.common.eventhandler.ASMEventHandler#invoke")
 	public static Hook.Result invoke(ASMEventHandler handler, Event event) {
-		Boolean ignore = Tool.isNullOr(markIgnore.get(event), false);
-		return ignore ? Hook.Result.NULL : Hook.Result.VOID;
+		return Tool.isNullOr(markIgnore.get(event), false) ? Hook.Result.NULL : Hook.Result.VOID;
 	}
 	
 	public static void markEventIgnore(Event event) {
@@ -600,9 +628,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 					if (Tool.isSubclass(TileEntity.class, render.value()) && Tool.isSubclass(TileEntitySpecialRenderer.class, clazz))
 						try {
 							ClientRegistry.bindTileEntitySpecialRenderer(render.value(), (TileEntitySpecialRenderer) clazz.newInstance());
-						} catch (Exception e) {
-							AlchemyRuntimeException.onException(e);
-						}
+						} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 					else
 						AlchemyRuntimeException.onException(new RuntimeException(
 								"Can't bind Render: " + render.value().getName() + " -> " + clazz.getName()));

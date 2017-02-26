@@ -233,19 +233,23 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		check = false;
 		recipe = null;
 	}
-
+	
 	@Override
 	public void update() {
+		FluidStack stack = tank.getFluid();
 		if (Always.isServer()) {
+			// fill with rain
 			if (worldObj.getWorldTime() % 2 == 0 && worldObj.isRainingAt(pos.up())) {
 				int level = getLevel();
-				if (level < 3 && level > -1) {
-					if (tank.getFluid() == null)
-						tank.setFluid(new FluidStack(FluidRegistry.WATER, 0));
-					tank.getFluid().amount = Math.min(tank.getFluid().amount + (int) worldObj.getRainStrength(1), tank.getCapacity());
+				if (stack == null || stack.getFluid() == FluidRegistry.WATER && stack.amount < tank.getCapacity()) {
+					if (stack == null)
+						tank.setFluid(stack = new FluidStack(FluidRegistry.WATER, 0));
+					stack.amount = Math.min(stack.amount + (int) worldObj.getRainStrength(1), tank.getCapacity());
 					updateFluidAmount();
 				}
 			}
+			
+			// collect EntityItem
 			List<EntityItem> entitys = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).setMaxY(pos.getY() + .35));
 			for (EntityItem entity : entitys) {
 				ItemStack item = entity.getEntityItem();
@@ -258,7 +262,8 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 					entity.setDead();
 			}
 			
-			if (!container.isEmpty() && tank.getFluid() != null && tank.getFluid().getFluid() == FluidRegistry.LAVA) {
+			// on lava
+			if (!container.isEmpty() && stack != null && stack.getFluid() == FluidRegistry.LAVA) {
 				container.clear();
 				onContainerChange();
 				List<Double3Float2Package> d3f2ps = new LinkedList<>();
@@ -268,15 +273,17 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 						AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getSoundRange()), worldObj, d3f2ps);
 			}
 			
+			// update alchemy recipe
 			if (!check && state == State.NULL && container.size() > 0) {
 				recipe = AlchemyRegistry.findRecipe(container);
 				check = true;
 			}
 			
+			// in alchemy
 			if (recipe != null && state != State.OVER) {
 				if (worldObj.isAirBlock(pos.up()) && Elemix.blockIsHeatSource(worldObj, pos.down()) &&
-						tank.getFluid() != null && tank.getFluid().getFluid() == recipe.getAlchemyFluid() &&
-						tank.getFluidAmount() == Fluid.BUCKET_VOLUME) {
+						stack != null && stack.getFluid() == recipe.getAlchemyFluid() &&
+						tank.getFluidAmount() == tank.getCapacity()) {
 					time++;
 					checkStateChange(State.ALCHEMY);
 				} else {
@@ -297,7 +304,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			if (flag)
 				updateTracker();
 		} else {
-			if (tank.getFluid() != null && tank.getFluid().getFluid() == FluidRegistry.LAVA && worldObj.isRainingAt(pos.up()))
+			if (stack != null && stack.getFluid() == FluidRegistry.LAVA && worldObj.isRainingAt(pos.up()))
 				worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
 							pos.getX() + random.nextDouble(), pos.getY() + 1, pos.getZ() + random.nextDouble(), 0, 0, 0);
 			if (recipe != null) {

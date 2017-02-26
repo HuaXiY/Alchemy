@@ -1,6 +1,5 @@
 package index.alchemy.interacting.minecraft;
 
-
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.util.FireworkHelper;

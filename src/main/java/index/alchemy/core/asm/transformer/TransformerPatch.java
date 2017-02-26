@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -21,13 +22,16 @@ import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeAnnotationNode;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.NodeCopier;
+import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -73,10 +77,23 @@ public class TransformerPatch implements IClassTransformer {
 								if (ASMHelper.corresponding(patchMethod, node.name, methodInsn)) {
 									if (copy == null) {
 										method.accept(copy = new MethodNode(method.access, method.name, method.desc, method.signature,
-												method.exceptions.toArray(new String[0])));
+												method.exceptions.toArray(new String[method.exceptions.size()])));
 										copy.name = getMethodName(node, copy.name);
 									}
 									methodInsn.name = copy.name;
+								}
+								if (methodInsn.getOpcode() == INVOKESPECIAL && methodInsn.name.equals(patchMethod.name) &&
+										patchMethod.visibleTypeAnnotations != null) {
+									Type args[] = Type.getArgumentTypes(methodInsn.desc);
+									for (int i = 0; i < patchMethod.visibleTypeAnnotations.size(); i++) {
+										TypeAnnotationNode ann = patchMethod.visibleTypeAnnotations.get(i);
+										if (ann != null && ann.desc.equals(AlchemyTransformerManager.PATCH_GENERIC_ANNOTATION_DESC)) {
+											Patch.Generic generic = Tool.makeAnnotation(Patch.Generic.class, ann.values);
+											args[i] = Type.getType(generic.value());
+											break;
+										}
+									}
+									methodInsn.desc = Type.getMethodDescriptor(Type.getReturnType(methodInsn.desc), args);
 								}
 							}
 						}
