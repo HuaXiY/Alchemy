@@ -284,9 +284,7 @@ public abstract class Tool {
 								obj = setAccessible(forName(sa[0].substring(1, sa[0].length() - 1).replace('/', '.'), true)
 										.getDeclaredField(sa[1])).get(null);
 							}
-						} catch (Exception e) {
-							AlchemyRuntimeException.onException(e);
-						}
+						} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 						args.put(temp, obj);
 					}
 					temp = null;

@@ -168,9 +168,9 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 			String name = method.getName();
 			Object a = memberValues.get(name);
 			Object b = null;
-			AnnotationInvocationHandler annotationInvocationHandler = asOneOfUs(obj);
-			if (annotationInvocationHandler != null)
-				b = annotationInvocationHandler.memberValues.get(name);
+			AnnotationInvocationHandler handler = asOneOfUs(obj);
+			if (handler != null)
+				b = handler.memberValues.get(name);
 			else
 				try {
 					b = method.invoke(obj);
@@ -186,23 +186,23 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 	}
 	
 	protected String toStringImpl() {
-		StringBuilder stringBuilder = new StringBuilder(128);
-		stringBuilder.append('@');
-		stringBuilder.append(type.getName());
-		stringBuilder.append('(');
+		StringBuilder builder = new StringBuilder(128);
+		builder.append('@');
+		builder.append(type.getName());
+		builder.append('(');
 		boolean bl = true;
 		for (Map.Entry<String, Object> entry : memberValues.entrySet()) {
 			if (bl) {
 				bl = false;
 			} else {
-				stringBuilder.append(", ");
+				builder.append(", ");
 			}
-			stringBuilder.append(entry.getKey());
-			stringBuilder.append('=');
-			stringBuilder.append(Tool.toString(entry.getValue()));
+			builder.append(entry.getKey());
+			builder.append('=');
+			builder.append(Tool.toString(entry.getValue()));
 		}
-		stringBuilder.append(')');
-		return stringBuilder.toString();
+		builder.append(')');
+		return builder.toString();
 	}
 	
 	protected int hashCodeImpl() {

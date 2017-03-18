@@ -1,11 +1,8 @@
 package index.alchemy.world.dimension;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 
 import index.alchemy.world.biome.AlchemyBiomeLoader;

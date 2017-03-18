@@ -25,8 +25,6 @@ public class TransformerBiomesOPlenty implements IAlchemyClassTransformer {
 	}
 
 	@Override
-	public String getTransformerClassName() {
-		return null;
-	}
+	public String getTransformerClassName() { return null; }
 
 }

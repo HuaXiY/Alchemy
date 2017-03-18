@@ -31,11 +31,8 @@ public class FakeChunkPrimer extends ChunkPrimer {
 		int chunkX = x >> 4, chunkZ = z >> 4;
 		if (chunkX == cx && chunkZ == cz)
 			chunkPrimer.setBlockState(x & 15, y, z & 15, state);
-		else {
+		else
 			world.setBlockState(new BlockPos(x, y, z), state, 2);
-//			Chunk chunk = world.getChunkProvider().provideChunk(x, z);
-//			chunk.setBlockState(new BlockPos(x, y, z), state);
-		}
 	}
 	
 }

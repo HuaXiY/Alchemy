@@ -11,11 +11,9 @@ import net.minecraft.client.resources.IResourceManager;
 public class LocalTexture implements ITextureObject {
 	
 	public final File file;
-	private int id;
+	private int id = -1, i;
 	
-	public LocalTexture(File file) {
-		this.file = file;
-	}
+	public LocalTexture(File file) { this.file = file; }
 	
 	@Override
 	public void setBlurMipmap(boolean blurIn, boolean mipmapIn) { }
@@ -25,16 +23,19 @@ public class LocalTexture implements ITextureObject {
 	
 	@Override
 	public void loadTexture(IResourceManager resourceManager) throws IOException {
-		try {
-			id = TextureLoader.loadTexture(file);
-		} catch (IOException e) {
-			id = -1;
-		}
+		IOException exception = null;
+		while (id == -1 && i++ < 3)
+			try {
+				id = TextureLoader.loadTexture(file);
+			} catch (IOException e) {
+				id = -1;
+				exception = e;
+			}
+		if (id == -1 && exception != null)
+			exception.printStackTrace();
 	}
 	
 	@Override
-	public int getGlTextureId() {
-		return id;
-	}
+	public int getGlTextureId() { return id; }
 	
 }

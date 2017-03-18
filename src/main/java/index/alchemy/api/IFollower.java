@@ -20,7 +20,7 @@ public interface IFollower {
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		if (player != null) {
 			IFollower follower = (IFollower) IFollower.follower.get(player);
-			if (follower.getProjectionState() && world.getEntityByID(packet.entityId) == follower)
+			if (follower != null && follower.getProjectionState() && world.getEntityByID(packet.entityId) == follower)
 				return Hook.Result.NULL;
 		}
 		return Hook.Result.VOID;

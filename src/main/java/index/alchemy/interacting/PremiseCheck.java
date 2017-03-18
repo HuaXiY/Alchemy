@@ -1,8 +1,9 @@
 package index.alchemy.interacting;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Loading;
@@ -18,7 +19,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 @Init(state = ModState.CONSTRUCTED)
 public class PremiseCheck {
 	
-	public static final List<String> premises = new LinkedList<String>();
+	public static final Set<String> premises = Sets.newHashSet();
 	
 	public static void init(Class<?> clazz) {
 		AlchemyModLoader.checkState();
@@ -30,9 +31,9 @@ public class PremiseCheck {
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
-		for (String premise : premises)
-			if (!AlchemyModLoader.isModLoaded(premise) && !AlchemyDLCLoader.isDLCLoaded(premise))
-				onMiss(premise);
+		premises.stream()
+			.filter(premise -> !AlchemyModLoader.isModLoaded(premise) && !AlchemyDLCLoader.isDLCLoaded(premise))
+			.forEach(PremiseCheck::onMiss);
 	}
 	
 	public static void onMiss(String modid) {

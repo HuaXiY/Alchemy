@@ -53,8 +53,8 @@ public class FMLLoading {
 		float fh = (float) gif.getHeight() / 2;
 		glPushMatrix();
 		int w = Display.getWidth(), h = Display.getHeight(), offset = 20;
-        glLoadIdentity();
-        glTranslatef(min(0, (720 - w) / 2) + offset, min(0, (480 - h) / 2) + h - fh - offset, 0);
+		glLoadIdentity();
+		glTranslatef(min(0, (720 - w) / 2) + offset, min(0, (480 - h) / 2) + h - fh - offset, 0);
 		glBegin(GL_QUADS);
 		gif.texCoord(0, 0, 0);
 		glVertex2f(-fw, -fh);

@@ -228,6 +228,7 @@ public class AlchemyDLCLoader {
 	private static Map<String, InvocationHandler> makeHandlerMapping(String mainClass) {
 		Map<String, InvocationHandler> result = Maps.newHashMap();
 		result.put("getDLCMainClass", (proxy, method, args) -> Tool.forName(mainClass, false));
+		result.put("clinitDLCMainClass", (proxy, method, args) -> Tool.forName(mainClass, true));
 		return result;
 	}
 	

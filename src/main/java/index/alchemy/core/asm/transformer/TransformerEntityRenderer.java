@@ -99,8 +99,6 @@ public class TransformerEntityRenderer implements IAlchemyClassTransformer {
 	}
 
 	@Override
-	public String getTransformerClassName() {
-		return "net.minecraft.client.renderer.EntityRenderer";
-	}
+	public String getTransformerClassName() { return "net.minecraft.client.renderer.EntityRenderer"; }
 
 }

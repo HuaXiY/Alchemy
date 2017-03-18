@@ -46,7 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Beta
 @Hook.Provider
-@InitInstance(AlchemyCapabilityLoader.TYPE)
+@InitInstance(AlchemyCapability.TYPE)
 public class CapabilityBauble extends AlchemyCapability<InventoryBauble> implements IEventHandle {
 	
 	public static final ResourceLocation RESOURCE = new AlchemyResourceLocation("bauble");

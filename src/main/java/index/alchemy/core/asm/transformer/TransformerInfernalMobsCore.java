@@ -36,8 +36,6 @@ public class TransformerInfernalMobsCore implements IAlchemyClassTransformer {
 	}
 
 	@Override
-	public String getTransformerClassName() {
-		return "atomicstryker.infernalmobs.common.InfernalMobsCore";
-	}
+	public String getTransformerClassName() { return "atomicstryker.infernalmobs.common.InfernalMobsCore"; }
 
 }

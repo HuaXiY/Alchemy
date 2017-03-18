@@ -114,6 +114,7 @@ public class SingleProjection {
 	@SideOnly(Side.CLIENT)
 	private static boolean projectionState;
 	
+	@SideOnly(Side.CLIENT)
 	public static boolean isProjectionState() {
 		return projectionState;
 	}
@@ -121,6 +122,7 @@ public class SingleProjection {
 	@SideOnly(Side.CLIENT)
 	private static EntityLivingBase follower;
 	
+	@SideOnly(Side.CLIENT)
 	public static EntityLivingBase getFollower() {
 		return follower;
 	}
@@ -222,7 +224,7 @@ public class SingleProjection {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onLivingAttack(LivingAttackEvent event) {
 		EntityLivingBase follower = IFollower.follower.get(event.getEntityLiving());
-		if (((IFollower) follower).getProjectionState())
+		if (follower != null && ((IFollower) follower).getProjectionState())
 			follower.setDead();
 	}
 	

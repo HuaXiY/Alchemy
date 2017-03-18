@@ -234,7 +234,7 @@ public enum AlchemyModLoader {
 					}
 				}
 			}
-			if (AlchemyEngine.runtimeSide().isClient())
+			if (info != null && AlchemyEngine.runtimeSide().isClient())
 				FMLClientHandler.instance().addModAsResource(info.getDLCContainer());
 		}
 	}

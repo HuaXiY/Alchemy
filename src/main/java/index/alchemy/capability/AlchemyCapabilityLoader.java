@@ -1,21 +1,14 @@
 package index.alchemy.capability;
 
-import index.alchemy.api.annotation.Init;
 import index.alchemy.capability.CapabilityTimeLeap.TimeSnapshot;
-import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.inventory.AlchemyInventory;
 import index.alchemy.inventory.InventoryBauble;
 import index.project.version.annotation.Omega;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.common.LoaderState.ModState;
 
 @Omega
-@Init(state = ModState.PREINITIALIZED)
 public class AlchemyCapabilityLoader {
-	
-	public static final String TYPE = "Capability";
 	
 	@CapabilityInject(CapabilityTimeLeap.class)
 	public static final Capability<TimeSnapshot> time_leap = null;
@@ -26,15 +19,4 @@ public class AlchemyCapabilityLoader {
 	@CapabilityInject(CapabilityInventory.class)
 	public static final Capability<AlchemyInventory> inventory = null;
 	
-	public static void init() {
-		AlchemyModLoader.checkInvokePermissions();
-		AlchemyModLoader.checkState();
-		for (Class<?> clazz : AlchemyModLoader.getInstance(TYPE))
-			try {
-				clazz.newInstance();
-			} catch (Exception e) {
-				AlchemyRuntimeException.onException(e);
-			}
-	}
-
 }

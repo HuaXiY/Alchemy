@@ -61,8 +61,6 @@ public class TransformerBootstrap implements IAlchemyClassTransformer {
 	}
 
 	@Override
-	public String getTransformerClassName() {
-		return "io.netty.bootstrap.Bootstrap";
-	}
+	public String getTransformerClassName() { return "io.netty.bootstrap.Bootstrap"; }
 
 }

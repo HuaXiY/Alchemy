@@ -247,8 +247,6 @@ public class AlchemyTransformerManager implements IClassTransformer {
 		if (transformers_mapping.containsKey(transformedName))
 			for (IClassTransformer transformer : transformers_mapping.get(transformedName))
 				basicClass = transformer.transform(name, transformedName, basicClass);
-		if (transformedName.endsWith(".EntityRenderer"))
-			Tool.dumpClass(basicClass, "D:/" + transformedName + ".bytecode");
 		return basicClass;
 	}
 	

@@ -13,6 +13,8 @@ public interface IDLCInfo extends DLC {
 	
 	Class<?> getDLCMainClass();
 	
+	void clinitDLCMainClass();
+	
 	DLCContainer getDLCContainer();
 	
 	List<String> getDLCAllClass();

@@ -56,8 +56,6 @@ public class TransformerWorld_FixTAN implements IAlchemyClassTransformer {
 	}
 
 	@Override
-	public String getTransformerClassName() {
-		return "net.minecraft.world.World";
-	}
+	public String getTransformerClassName() { return "net.minecraft.world.World"; }
 
 }

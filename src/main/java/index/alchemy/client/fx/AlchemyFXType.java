@@ -41,10 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Init(state = ModState.POSTINITIALIZED)
 public class AlchemyFXType {
 	
-    private static final Map<Integer, EnumParticleTypes> PARTICLES = Tool.get(EnumParticleTypes.class, 51);
-    private static final Map<String, EnumParticleTypes> BY_NAME = Tool.get(EnumParticleTypes.class, 52);
-    
-    private static final Map<FX, Class<?>> FX_MAPPING = new HashMap<FX, Class<?>>();
+    private static final Map<FX, Class<?>> fx_mapping = new HashMap<FX, Class<?>>();
     
     @SideOnly(Side.CLIENT)
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -77,8 +74,8 @@ public class AlchemyFXType {
 						"Class<" + factory.getName() + "> forgot to implement the Interface<" + IParticleFactory.class.getName() + "> ?"));
 		EnumParticleTypes type = EnumHelper.addEnum(EnumParticleTypes.class, name,
 				new Class[] { String.class, int.class, boolean.class }, name, id, ignoreRange);
-		PARTICLES.put(type.getParticleID(), type);
-        BY_NAME.put(type.getParticleName(), type);
+		EnumParticleTypes.PARTICLES.put(type.getParticleID(), type);
+		EnumParticleTypes.BY_NAME.put(type.getParticleName(), type);
 		return type;
 	}
 	
@@ -87,7 +84,7 @@ public class AlchemyFXType {
 		FX fx = clazz.getAnnotation(FX.class);
 		if (fx != null)
 			if (fx.name() != null)
-					FX_MAPPING.put(fx, clazz);
+					fx_mapping.put(fx, clazz);
 				else
 					AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @FX.name()"));
 	}
@@ -95,7 +92,7 @@ public class AlchemyFXType {
 	public static void init() {
 		AlchemyModLoader.checkInvokePermissions();
 		AlchemyModLoader.checkState();
-		for (Entry<FX, Class<?>> entry : FX_MAPPING.entrySet()) {
+		for (Entry<FX, Class<?>> entry : fx_mapping.entrySet()) {
 			FX fx = entry.getKey();
 			Class<?> clazz = entry.getValue();
 			AlchemyModLoader.info(clazz, fx);

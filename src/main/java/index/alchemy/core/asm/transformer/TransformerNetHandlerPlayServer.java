@@ -64,8 +64,6 @@ public class TransformerNetHandlerPlayServer implements IAlchemyClassTransformer
 	}
 
 	@Override
-	public String getTransformerClassName() {
-		return "net.minecraft.network.NetHandlerPlayServer";
-	}
+	public String getTransformerClassName() { return "net.minecraft.network.NetHandlerPlayServer"; }
 
 }

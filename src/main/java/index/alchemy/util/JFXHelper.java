@@ -1,6 +1,7 @@
 package index.alchemy.util;
 
 import index.alchemy.core.AlchemyThreadManager;
+import index.alchemy.core.debug.AlchemyRuntimeException;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -8,6 +9,8 @@ import javafx.embed.swing.JFXPanel;
 import static index.alchemy.util.FunctionHelper.*;
 
 import java.util.concurrent.CountDownLatch;
+
+import org.jooq.lambda.fi.lang.CheckedRunnable;
 
 public interface JFXHelper {
 	
@@ -24,7 +27,7 @@ public interface JFXHelper {
 		if (isSupported()) {
 			CountDownLatch latch = new CountDownLatch(1);
 			AlchemyThreadManager.runOnNewThread(link(JFXPanel::new, () -> Platform.runLater(link(runnable, latch::countDown))));
-			try { latch.await(); } catch (InterruptedException e) { }
+			CheckedRunnable.unchecked(latch::await, AlchemyRuntimeException::onException).run();
 		}
 	}
 	

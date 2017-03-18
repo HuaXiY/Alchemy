@@ -11,7 +11,6 @@ import index.alchemy.api.annotation.Field;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.InitInstance;
 import index.alchemy.capability.AlchemyCapability;
-import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.dlcs.skin.core.BlockWardrobe.EnumPartType;
 import index.alchemy.dlcs.skin.core.SkinCore.UpdateSkinClient;
@@ -47,7 +46,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Beta
 @Hook.Provider
 @Field.Provider
-@InitInstance(AlchemyCapabilityLoader.TYPE)
+@InitInstance(AlchemyCapability.TYPE)
 public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEventHandle {
 	
 	public static final ResourceLocation RESOURCE = new ResourceLocation("skin:info");
@@ -64,7 +63,7 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	@SubscribeEvent
 	public void onPlayer_Clone(PlayerEvent.Clone event) {
 		event.getOriginal().getCapability(SkinCore.skin_info, null).copy(event.getEntityPlayer());
-		SkinCore.updatePlayerSkin(event.getEntityPlayer());
+		SkinCore.updatePlayerSkinTracking(event.getEntityPlayer());
 	}
 	
 	@SubscribeEvent
@@ -73,13 +72,13 @@ public class SkinCapability extends AlchemyCapability<SkinInfo> implements IEven
 	}
 	
 	@SubscribeEvent
-	public void onPlayerChangedDimensionEvent(PlayerChangedDimensionEvent event) {
+	public void onPlayerChangedDimension(PlayerChangedDimensionEvent event) {
 		SkinCore.updatePlayerSkin(event.player);
 	}
 	
 	@SubscribeEvent
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		SkinCore.updatePlayerSkin(event.player);
+		SkinCore.updatePlayerSkinTracking(event.player);
 	}
 	
 	@SubscribeEvent

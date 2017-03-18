@@ -43,6 +43,7 @@ import index.alchemy.api.annotation.Message;
 import index.alchemy.client.MemoryTexture;
 import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.AlchemyEventSystem;
+import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.interacting.WoodType;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
@@ -262,9 +263,10 @@ public class SkinCore {
 	@CapabilityInject(SkinCapability.class)
 	public static final Capability<SkinInfo> skin_info = null;
 	
-	public static CommandBase update_skin = new CommandUpdateSkin();
+	public static final CommandBase update_skin = new CommandUpdateSkin();
 	
 	public static void init() {
+		AlchemyModLoader.checkInvokePermissions();
 		WoodType.stream().map(BlockWardrobe::new).forEach(b ->
 				GameRegistry.addRecipe(new ItemStack(b), "BAB", "B B", "BAB", 'B', b.type.log, 'A', b.type.plank));
 		if (Always.isClient())
@@ -295,6 +297,16 @@ public class SkinCore {
 		for (EntityPlayer other : ((WorldServer) player.worldObj).getEntityTracker().getTrackingPlayers(player))
 			AlchemyNetworkHandler.network_wrapper.sendTo(new UpdateSkinClient(player.getEntityId(), player.getName(),
 					info.skin_type, info.skin_data), (EntityPlayerMP) other);
+		updatePlayerItselfSkin(player);
+	}
+	
+	public static void updatePlayerSkinTracking(EntityPlayer player) {
+		for (EntityPlayer other : ((WorldServer) player.worldObj).getEntityTracker().getTrackingPlayers(player)) {
+			SkinInfo info = other.getCapability(skin_info, null);
+			AlchemyNetworkHandler.network_wrapper.sendTo(new UpdateSkinClient(other.getEntityId(), other.getName(),
+					info.skin_type, info.skin_data), (EntityPlayerMP) player);
+		}
+		updatePlayerSkin(player);
 	}
 	
 	@SideOnly(Side.CLIENT)

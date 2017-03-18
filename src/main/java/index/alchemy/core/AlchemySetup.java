@@ -10,6 +10,7 @@ import java.util.zip.ZipEntry;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharSource;
 
+import index.alchemy.api.IDLCInfo;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.asm.transformer.TransformerInjectOptifine;
 import index.alchemy.core.asm.transformer.TransformerSide;
@@ -37,6 +38,8 @@ public class AlchemySetup implements IFMLCallHook {
 		loader.addTransformerExclusion("javafx.");
 		// An extension to net.minecraftforge.fml.common.asm.transformers.SideTransformer when transformer Alchemy's class
 		TransformerSide.inject(loader);
+		// Init DLC main class
+		AlchemyDLCLoader.stream().forEach(IDLCInfo::clinitDLCMainClass);
 		// Support for optifine in a development environment
 		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
 			if (AlchemyEngine.runtimeSide().isClient())

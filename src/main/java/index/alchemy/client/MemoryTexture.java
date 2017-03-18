@@ -10,11 +10,9 @@ import net.minecraft.client.resources.IResourceManager;
 public class MemoryTexture implements ITextureObject {
 	
 	public final byte data[];
-	private int id;
+	private int id = -1, i;
 	
-	public MemoryTexture(byte data[]) {
-		this.data = data;
-	}
+	public MemoryTexture(byte data[]) { this.data = data; }
 	
 	@Override
 	public void setBlurMipmap(boolean blurIn, boolean mipmapIn) { }
@@ -24,16 +22,19 @@ public class MemoryTexture implements ITextureObject {
 	
 	@Override
 	public void loadTexture(IResourceManager resourceManager) throws IOException {
-		try {
-			id = TextureLoader.loadTexture(data);
-		} catch (IOException e) {
-			id = -1;
-		}
+		IOException exception = null;
+		while (id == -1 && i++ < 3)
+			try {
+				id = TextureLoader.loadTexture(data);
+			} catch (IOException e) {
+				id = -1;
+				exception = e;
+			}
+		if (id == -1 && exception != null)
+			exception.printStackTrace();
 	}
 	
 	@Override
-	public int getGlTextureId() {
-		return id;
-	}
+	public int getGlTextureId() { return id; }
 	
 }

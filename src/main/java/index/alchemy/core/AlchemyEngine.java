@@ -233,7 +233,7 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 			String handleDesc = Type.getMethodDescriptor(callback);
 			
 			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, desc, null, "java/lang/Object", new String[]{ HANDLER_DESC });
-			cw.visitSource("AlchemyEngine.java:154", "invoke: " + instType + handleName + handleDesc);
+			cw.visitSource("AlchemyEngine.java:221", "invoke: " + instType + handleName + handleDesc);
 			{
 				if (!isStatic)
 					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, "instance", "Ljava/lang/Object;", null, null).visitEnd();

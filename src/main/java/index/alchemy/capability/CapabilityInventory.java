@@ -11,7 +11,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Omega
-@InitInstance(AlchemyCapabilityLoader.TYPE)
+@InitInstance(AlchemyCapability.TYPE)
 public class CapabilityInventory extends AlchemyCapability<AlchemyInventory> implements IEventHandle {
 	
 	public static final ResourceLocation RESOURCE = new AlchemyResourceLocation("inventory");
