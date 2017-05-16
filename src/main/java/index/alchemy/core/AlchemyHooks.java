@@ -1,5 +1,8 @@
 package index.alchemy.core;
 
+import static index.alchemy.util.Tool.$;
+
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,13 +14,16 @@ import baubles.client.BaublesRenderLayer;
 import biomesoplenty.api.biome.BOPBiomes;
 import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.annotation.Hook;
+import index.alchemy.core.asm.transformer.TransformerInjectOptifine;
 import index.alchemy.entity.ai.EntityAIEatMeat;
+import index.alchemy.util.ReflectionHelper;
 import index.alchemy.util.Tool;
 import index.alchemy.world.biome.AlchemyBiomeLoader;
 import index.project.version.annotation.Gamma;
 import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,6 +33,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
@@ -43,6 +50,19 @@ public class AlchemyHooks {
 	@Hook(value = "biomesoplenty.common.remote.TrailManager#retrieveTrails", isStatic = true)
 	public static final Hook.Result retrieveTrails() {
 		return Hook.Result.NULL;
+	}
+	
+	@Hook(value = "Reflector#<clinit>", isStatic = true, type = Hook.Type.TAIL)
+	public static void clinit() {
+		try {
+			Method target;
+			$($("LReflector", "ForgeBlock_getLightOpacity"), "targetMethod<", target = ReflectionHelper.getMethod(Block.class,
+					"getLightOpacity", IBlockState.class, IBlockAccess.class, BlockPos.class));
+			AlchemyEngine.sysout.println(TransformerInjectOptifine.OPTIFINE_INFO + "Set method net.minecraft.block.Block.getLightOpacity -> " + target);
+			$($("LReflector", "ForgeBlock_getLightValue"), "targetMethod<", target = ReflectionHelper.getMethod(Block.class,
+					"getLightValue", IBlockState.class, IBlockAccess.class, BlockPos.class));
+			AlchemyEngine.sysout.println(TransformerInjectOptifine.OPTIFINE_INFO + "Set method net.minecraft.block.Block.getLightValue -> " + target);
+		} catch(Exception e) { new RuntimeException("Can't set optifine Reflector", e).printStackTrace(AlchemyEngine.syserr); }
 	}
 	
 //	@Hook("net.minecraft.world.World#getCollisionBoxes")
@@ -75,51 +95,51 @@ public class AlchemyHooks {
 //		return Tool.isNullOr(Biome.getBiome(x % 20 + y / 20), BOPBiomes.flower_island.get());
 //	}
 //	
-//	@Gamma
-//	public static Biome getBiome() {
-//		return /*BOPBiomes.flower_island.get();*/AlchemyBiomeLoader.dragon_island;
-//	}
-//	
-//	@Gamma
-//	static boolean debug_biome_flag;
-//	
-//	@Gamma
-//	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
-//	public static final Hook.Result getBiomes(BiomeProvider provider, @Nullable Biome[] oldBiomeList,
-//			int x, int z, int width, int depth, boolean cacheFlag) {
-//		if (debug_biome_flag)
-//			return Hook.Result.VOID;
-//		Biome result[] = new Biome[width * depth];
-//		Arrays.fill(result, getBiome());
-//		return new Hook.Result(result);
-//	}
-//	
-//	@Gamma
-//	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
-//	public static final Hook.Result getBiome(BiomeProvider provider, BlockPos pos, Biome defaultBiome) {
-//		if (debug_biome_flag)
-//			return Hook.Result.VOID;
-//		return new Hook.Result(getBiome());
-//	}
-//	
-//	@Gamma
-//	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomesForGeneration")
-//	public static final Hook.Result getBiomesForGeneration(BiomeProvider provider, Biome[] biomes,
-//			int x, int z, int width, int height) {
-//		if (debug_biome_flag)
-//			return Hook.Result.VOID;
-//		Biome result[] = new Biome[width * height];
-//		Arrays.fill(result, getBiome());
-//		return new Hook.Result(result);
-//	}
-//	
-//	@Gamma
-//	@Hook("net.minecraft.world.biome.BiomeProvider#areBiomesViable")
-//	public static final Hook.Result areBiomesViable(BiomeProvider provider, int x, int z, int radius, List<Biome> allowed) {
-//		if (debug_biome_flag)
-//			return Hook.Result.VOID;
-//		Biome biome = getBiome();
-//		return allowed.stream().filter(b -> b != biome).count() > 0 ? Hook.Result.FALSE : Hook.Result.TRUE;
-//	}
+	@Gamma
+	public static Biome getBiome() {
+		return /*BOPBiomes.flower_island.get();*/AlchemyBiomeLoader.dragon_island;
+	}
+	
+	@Gamma
+	static boolean debug_biome_flag;
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
+	public static final Hook.Result getBiomes(BiomeProvider provider, @Nullable Biome[] oldBiomeList,
+			int x, int z, int width, int depth, boolean cacheFlag) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
+		Biome result[] = new Biome[width * depth];
+		Arrays.fill(result, getBiome());
+		return new Hook.Result(result);
+	}
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomes")
+	public static final Hook.Result getBiome(BiomeProvider provider, BlockPos pos, Biome defaultBiome) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
+		return new Hook.Result(getBiome());
+	}
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#getBiomesForGeneration")
+	public static final Hook.Result getBiomesForGeneration(BiomeProvider provider, Biome[] biomes,
+			int x, int z, int width, int height) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
+		Biome result[] = new Biome[width * height];
+		Arrays.fill(result, getBiome());
+		return new Hook.Result(result);
+	}
+	
+	@Gamma
+	@Hook("net.minecraft.world.biome.BiomeProvider#areBiomesViable")
+	public static final Hook.Result areBiomesViable(BiomeProvider provider, int x, int z, int radius, List<Biome> allowed) {
+		if (debug_biome_flag)
+			return Hook.Result.VOID;
+		Biome biome = getBiome();
+		return allowed.stream().filter(b -> b != biome).count() > 0 ? Hook.Result.FALSE : Hook.Result.TRUE;
+	}
 	
 }

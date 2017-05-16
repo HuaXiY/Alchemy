@@ -1,7 +1,9 @@
 package index.alchemy.util;
 
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 
+@Omega
 public interface DeobfuscatingRemapper {
 	
 	DeobfuscatingRemapper INSTANCE = new DeobfuscatingRemapper() {

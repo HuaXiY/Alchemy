@@ -8,10 +8,12 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.client.particle.ParticleFirework;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Omega
 @SideOnly(Side.CLIENT)
 public class FireworkHelper {
 	

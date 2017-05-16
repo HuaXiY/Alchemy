@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.LongConsumer;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class Http {
 	
 	public static final class Code {

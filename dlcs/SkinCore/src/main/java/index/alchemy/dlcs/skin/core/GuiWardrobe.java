@@ -19,6 +19,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Beta;
+import index.project.version.annotation.Omega;
 import javafx.scene.image.Image;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
@@ -44,6 +45,7 @@ public class GuiWardrobe extends GuiScreen {
 	
 	protected static final ResourceLocation BUTTON_TEXTURES = new ResourceLocation("skin:textures/gui_widgets.png");
 	
+	@Omega
 	public class ButtonWardrobe extends GuiButton {
 		
 		public ButtonWardrobe(int buttonId, int x, int y, int widthIn, int heightIn, String buttonText) {
@@ -92,8 +94,10 @@ public class GuiWardrobe extends GuiScreen {
 		
 	}
 	
+	@Omega
 	public class GuiSkinList extends GuiListExtended {
 		
+		@Omega
 		public class Entry implements IGuiListEntry {
 			
 			protected String name;

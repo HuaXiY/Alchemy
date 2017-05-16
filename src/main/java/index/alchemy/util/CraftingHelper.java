@@ -2,6 +2,7 @@ package index.alchemy.util;
 
 import java.util.function.Predicate;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -9,6 +10,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+@Omega
 public interface CraftingHelper {
 	
 	static void remove(Class<? extends Item> type) {

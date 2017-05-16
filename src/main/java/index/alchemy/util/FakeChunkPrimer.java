@@ -1,10 +1,12 @@
 package index.alchemy.util;
 
+import index.project.version.annotation.Omega;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 
+@Omega
 public class FakeChunkPrimer extends ChunkPrimer {
 	
 	protected World world;

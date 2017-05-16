@@ -6,9 +6,11 @@ import java.lang.reflect.Modifier;
 import javax.annotation.Nullable;
 
 import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.project.version.annotation.Omega;
 
 import static index.alchemy.util.Tool.$;
 
+@Omega
 public abstract class EnumHelper extends net.minecraftforge.common.util.EnumHelper {
 	
 	@Nullable

@@ -11,13 +11,16 @@ import com.google.common.io.Files;
 
 import index.alchemy.api.IBlockTemperature;
 import index.alchemy.command.AlchemyCommandServer;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 
+@Omega
 public class ExTemperatureLoader {
 	
+	@Omega
 	public static class CommandReloadTemperature extends AlchemyCommandServer {
 
 		@Override

@@ -3,6 +3,9 @@ package index.alchemy.entity;
 import biomesoplenty.common.entities.EntityButterfly;
 import index.alchemy.api.IFollower;
 import index.alchemy.api.annotation.EntityMapping;
+import index.alchemy.entity.control.SingleProjection;
+import index.alchemy.network.AlchemyNetworkHandler;
+import index.alchemy.util.Always;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -57,6 +60,34 @@ public class EntityMagicButterfly extends EntityButterfly implements IFollower {
 	
 	@Override
 	public boolean isEntityInvulnerable(DamageSource source) { return true; }
+	
+	@Override
+	public void onLivingUpdate() {
+		if (Always.isClient()) {
+			if (owner == null) {
+				Optional<UUID> uuid = dataManager.get(owner_uuid);
+				if (uuid.isPresent())
+					bindUUID(uuid.get());
+			}
+			if (getProjectionState()) {
+				movementInput.updatePlayerMoveState();
+				float flySpeed = 0.05F;
+				if (movementInput.sneak) {
+	                movementInput.moveStrafe = movementInput.moveStrafe / 0.3F;
+	                movementInput.moveForward = movementInput.moveForward / 0.3F;
+	                motionY -= flySpeed * 3.0F;
+	            }
+	            if (movementInput.jump)
+	                motionY += flySpeed * 3.0F;
+	            float sin = sin(rotationYaw * 0.017453292F);
+	            float cos = cos(rotationYaw * 0.017453292F);
+	            motionX += flySpeed * (movementInput.moveStrafe * cos - movementInput.moveForward * sin);
+	            motionZ += flySpeed * (movementInput.moveForward * cos + movementInput.moveStrafe * sin);
+				AlchemyNetworkHandler.network_wrapper.sendToServer(new SingleProjection.MessageSingleProjection(this));
+			}
+		}
+		super.onLivingUpdate();
+	}
 	
 	@Override
 	protected void updateAITasks() {

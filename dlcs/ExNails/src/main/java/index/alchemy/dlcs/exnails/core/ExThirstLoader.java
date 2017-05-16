@@ -16,13 +16,16 @@ import com.google.common.io.Files;
 
 import index.alchemy.api.IItemThirst;
 import index.alchemy.command.AlchemyCommandServer;
+import index.project.version.annotation.Omega;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 
+@Omega
 public class ExThirstLoader {
 	
+	@Omega
 	public static class CommandReloadThirst extends AlchemyCommandServer {
 
 		@Override
@@ -46,6 +49,7 @@ public class ExThirstLoader {
 	
 	private static final Logger logger = LogManager.getLogger(ExThirstLoader.class.getSimpleName());
 	
+	@Omega
 	public static class ThirstNode {
 		
 		public final Item item;

@@ -202,6 +202,37 @@ public interface ASMHelper {
 				&& Objects.equal(owner, methodInsn.owner);
 	}
 	
+	static AbstractInsnNode getDefaultLdcNode(Type type) {
+		switch (type.getSort()) {
+			case Type.INT:
+				return getIntNode(0);
+			case Type.BOOLEAN:
+				return new LdcInsnNode(false);
+			case Type.BYTE:
+				return new LdcInsnNode((byte) 0);
+			case Type.SHORT:
+				return new LdcInsnNode((short) 0);
+			case Type.LONG:
+				return new LdcInsnNode(0L);
+			case Type.FLOAT:
+				return new LdcInsnNode(0F);
+			case Type.DOUBLE:
+				return new LdcInsnNode(0D);
+			case Type.CHAR:
+				return new LdcInsnNode((char) 0);
+			default:
+				return new InsnNode(ACONST_NULL);
+		}
+	}
+	
+	static void clearMethod(MethodNode method) {
+		Type returnType = Type.getReturnType(method.desc);
+		method.instructions.clear();
+		if (returnType.getSort() != Type.VOID)
+			method.instructions.add(getDefaultLdcNode(returnType));
+		method.instructions.add(new InsnNode(getReturnOpcode(returnType)));
+	}
+	
 	static void removeInvoke(ListIterator<AbstractInsnNode> iterator) {
 		int offset = getStackFrameOffset(iterator.previous());
 		iterator.remove();

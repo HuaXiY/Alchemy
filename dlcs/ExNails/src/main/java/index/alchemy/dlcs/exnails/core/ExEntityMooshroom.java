@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import index.alchemy.api.Time;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.passive.EntityMooshroom;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -13,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 
+@Omega
 @Patch("net.minecraft.entity.passive.EntityMooshroom")
 public class ExEntityMooshroom extends EntityMooshroom {
 	

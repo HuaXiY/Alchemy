@@ -8,6 +8,7 @@ import index.alchemy.api.annotation.Patch;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
+import index.project.version.annotation.Alpha;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -35,6 +36,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Alpha
 @Listener
 @Hook.Provider
 public class SingleProjection {
@@ -115,17 +117,13 @@ public class SingleProjection {
 	private static boolean projectionState;
 	
 	@SideOnly(Side.CLIENT)
-	public static boolean isProjectionState() {
-		return projectionState;
-	}
+	public static boolean isProjectionState() { return projectionState; }
 	
 	@SideOnly(Side.CLIENT)
 	private static EntityLivingBase follower;
 	
 	@SideOnly(Side.CLIENT)
-	public static EntityLivingBase getFollower() {
-		return follower;
-	}
+	public static EntityLivingBase getFollower() { return follower; }
 	
 	@SideOnly(Side.CLIENT)
 	public static void cutoverState() {

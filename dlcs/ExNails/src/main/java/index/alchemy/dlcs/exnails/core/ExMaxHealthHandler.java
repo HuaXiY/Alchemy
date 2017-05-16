@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import index.alchemy.api.annotation.Listener;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
@@ -13,6 +14,7 @@ import toughasnails.api.HealthHelper;
 import toughasnails.config.GameplayOption;
 import toughasnails.config.SyncedConfigHandler;
 
+@Omega
 @Listener
 public class ExMaxHealthHandler {
 	

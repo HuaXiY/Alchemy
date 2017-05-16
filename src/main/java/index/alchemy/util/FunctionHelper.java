@@ -12,15 +12,15 @@ import index.project.version.annotation.Omega;
 public interface FunctionHelper {
 	
 	static <T> void always(Consumer<T> consumer, T... ts) {
-		Arrays.asList(ts).forEach(consumer);
+		Arrays.stream(ts).forEach(consumer);
 	}
 	
 	static <A, B> void alwaysA(BiConsumer<A, B> consumer, A a, B... bs) {
-		Arrays.asList(bs).forEach(b -> consumer.accept(a, b));
+		Arrays.stream(bs).forEach(b -> consumer.accept(a, b));
 	}
 	
 	static <A, B> void alwaysB(BiConsumer<A, B> consumer, B b, A... as) {
-		Arrays.asList(as).forEach(a -> consumer.accept(a, b));
+		Arrays.stream(as).forEach(a -> consumer.accept(a, b));
 	}
 	
 	static <A, B> BiConsumer<B, A> exchange(BiConsumer<A, B> consumer) {

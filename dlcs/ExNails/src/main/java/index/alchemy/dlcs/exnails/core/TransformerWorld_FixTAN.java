@@ -15,9 +15,11 @@ import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.DeobfuscatingRemapper;
+import index.project.version.annotation.Omega;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 public class TransformerWorld_FixTAN implements IAlchemyClassTransformer {
 
 	@Override

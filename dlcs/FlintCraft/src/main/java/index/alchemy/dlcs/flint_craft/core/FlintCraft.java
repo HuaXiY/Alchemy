@@ -8,6 +8,7 @@ import index.alchemy.api.annotation.Listener;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.Always;
 import index.alchemy.util.CraftingHelper;
+import index.project.version.annotation.Omega;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -25,6 +26,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import static index.alchemy.dlcs.flint_craft.core.FlintCraft.*;
 
+@Omega
 @Listener
 @Init(state = ModState.PREINITIALIZED)
 @DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "[1.10.2]")

@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class FileMap implements Map<String, File> {
 	
 	protected final File folder;

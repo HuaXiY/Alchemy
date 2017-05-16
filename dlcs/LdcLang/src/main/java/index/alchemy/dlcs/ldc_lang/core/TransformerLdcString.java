@@ -18,9 +18,11 @@ import com.google.common.collect.Sets;
 
 import index.alchemy.api.IAlchemyClassTransformer;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 public class TransformerLdcString implements IAlchemyClassTransformer {
 	
 	public static final Map<String, String> mapping = Maps.newHashMap();

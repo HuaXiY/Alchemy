@@ -2,6 +2,7 @@ package index.alchemy.dlcs.exnails.core;
 
 import index.alchemy.api.IBlockTemperature;
 import index.alchemy.api.annotation.Patch;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,6 +14,7 @@ import toughasnails.temperature.TemperatureTrend;
 import toughasnails.temperature.TemperatureDebugger.Modifier;
 import toughasnails.temperature.modifier.ObjectProximityModifier;
 
+@Omega
 @Patch("toughasnails.temperature.modifier.ObjectProximityModifier")
 public class ExObjectProximityModifier extends ObjectProximityModifier {
 	

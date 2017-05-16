@@ -15,6 +15,7 @@ import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.util.Always;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -28,6 +29,7 @@ import toughasnails.api.thirst.ThirstHelper;
 
 import static index.alchemy.util.Tool.$;
 
+@Omega
 @Listener
 @Patch("net.minecraft.item.ItemFood")
 @Init(state = ModState.POSTINITIALIZED)

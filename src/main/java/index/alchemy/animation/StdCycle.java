@@ -1,5 +1,7 @@
 package index.alchemy.animation;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import index.alchemy.api.ICycle;
 import index.project.version.annotation.Omega;
 
@@ -107,6 +109,11 @@ public class StdCycle implements ICycle {
 			cycles++;
 		}
 		return rotation && cycles % 2 == 1 ? min + dif * now / lenght : max - dif * now / lenght;
+	}
+	
+	@Override
+	public String toString() {
+		return ReflectionToStringBuilder.toString(this);
 	}
 	
 	@Override

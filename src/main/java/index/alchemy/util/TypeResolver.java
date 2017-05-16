@@ -37,13 +37,16 @@ import java.util.WeakHashMap;
 import com.google.common.collect.Maps;
 
 import index.alchemy.core.AlchemyEngine;
+import index.project.version.annotation.Omega;
 
 /**
  * Enhanced type resolution utilities.
  *
  * @author Jonathan Halterman
  */
+@Omega
 public final class TypeResolver {
+	
 	/** Cache of type variable/argument pairs */
 	private static final Map<Class<?>, Reference<Map<TypeVariable<?>, Type>>> TYPE_VARIABLE_CACHE = Collections
 			.synchronizedMap(new WeakHashMap<Class<?>, Reference<Map<TypeVariable<?>, Type>>>());

@@ -13,14 +13,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Omega
-@SideOnly(Side.CLIENT)
 public interface SkinHelper {
 	
-	@SideOnly(Side.CLIENT)
+	@Omega
 	public static class PixelCopyer {
 		
 		protected Image srcImage;

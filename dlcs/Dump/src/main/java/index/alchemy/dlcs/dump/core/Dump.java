@@ -14,6 +14,7 @@ import com.google.common.collect.Maps;
 import index.alchemy.api.annotation.DLC;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.core.AlchemyModLoader;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
 
 import static index.alchemy.dlcs.dump.core.Dump.*;
 
+@Omega
 @Init(state = ModState.AVAILABLE)
 @DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "[1.10.2]")
 public class Dump {

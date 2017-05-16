@@ -51,7 +51,8 @@ import index.alchemy.util.FileMap;
 import index.alchemy.util.NBTHelper;
 import index.alchemy.util.Tool;
 import index.alchemy.util.cache.AsyncLocalFileCache;
-import index.project.version.annotation.Alpha;
+import index.project.version.annotation.Beta;
+import index.project.version.annotation.Omega;
 import io.netty.buffer.ByteBuf;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +61,7 @@ import org.jooq.lambda.Unchecked;
 
 import static index.alchemy.dlcs.skin.core.SkinCore.*;
 
-@Alpha
+@Beta
 @Init(state = ModState.INITIALIZED)
 @DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "[1.10.2]")
 public class SkinCore {
@@ -70,6 +71,7 @@ public class SkinCore {
 			DLC_NAME = "Skin",
 			DLC_VERSION = "0.0.1-dev";
 	
+	@Omega
 	@Message(Side.SERVER)
 	public static class UpdateSkinServer implements IMessage, IMessageHandler<UpdateSkinServer, IMessage> {
 		
@@ -108,6 +110,7 @@ public class SkinCore {
 		
 	}
 	
+	@Omega
 	@Message(Side.CLIENT)
 	public static class UpdateSkinClient implements IMessage, IMessageHandler<UpdateSkinClient, IMessage> {
 		
@@ -175,6 +178,7 @@ public class SkinCore {
 		
 	}
 	
+	@Omega
 	@Message(Side.SERVER)
 	public static class RequestSkinData implements IMessage, IMessageHandler<RequestSkinData, UpdateSkinClient> {
 		

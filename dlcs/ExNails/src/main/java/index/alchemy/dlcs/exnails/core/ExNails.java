@@ -15,7 +15,7 @@ import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.entity.AlchemyDamageSource;
 import index.alchemy.util.EventHelper;
 import index.alchemy.util.Tool;
-import index.project.version.annotation.Alpha;
+import index.project.version.annotation.Beta;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
@@ -42,7 +42,7 @@ import toughasnails.temperature.modifier.TemperatureModifier;
 
 import static index.alchemy.dlcs.exnails.core.ExNails.*;
 
-@Alpha
+@Beta
 @Listener
 @Hook.Provider
 @Field.Provider

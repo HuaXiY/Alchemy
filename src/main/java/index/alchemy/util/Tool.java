@@ -747,7 +747,7 @@ public abstract class Tool {
 			} while((clazz = clazz.getSuperclass()) != null);
 			throw new IllegalArgumentException();
 		} catch(Exception e) {
-			throw new RuntimeException("Can't invoke: " + Joiner.on(',').useForNull("null").join(args), e);
+			throw new RuntimeException("Can't invoke(" + args.length + "): " + Joiner.on(',').useForNull("null").join(args), e);
 		}
 	}
 	

@@ -1,10 +1,12 @@
 package index.alchemy.util;
 
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
 import net.minecraftforge.fml.common.eventhandler.ListenerList;
 
+@Omega
 public interface EventHelper {
 	
 	static IEventListener[] getAllHandler(Class<? extends Event> clazz, int busId) {

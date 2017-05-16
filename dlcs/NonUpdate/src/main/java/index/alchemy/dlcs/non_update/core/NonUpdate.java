@@ -20,11 +20,13 @@ import com.google.common.io.LineProcessor;
 import index.alchemy.api.annotation.DLC;
 import index.alchemy.util.ReflectionHelper;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager.ExitTrappedException;
 
 import static index.alchemy.dlcs.non_update.core.Config.*;
 import static index.alchemy.dlcs.non_update.core.NonUpdate.*;
 
+@Omega
 @DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "[1.10.2]")
 public class NonUpdate {
 	
@@ -32,8 +34,6 @@ public class NonUpdate {
 			DLC_ID = "non_update",
 			DLC_NAME = "NonUpdate",
 			DLC_VERSION = "0.0.1-dev";
-	
-	public static final String MODID = "non_update", MOD_NAME = "NonUpdate", VERSION = "1.0";
 	
 	public static final Logger logger = LogManager.getLogger(NonUpdate.class.getSimpleName());
 	

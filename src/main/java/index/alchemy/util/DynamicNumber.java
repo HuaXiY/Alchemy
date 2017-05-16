@@ -1,11 +1,24 @@
 package index.alchemy.util;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class DynamicNumber<T extends Number> extends Number {
 	
 	public T value;
 	
 	public DynamicNumber(T number) {
 		value = number;
+	}
+	
+	@Override
+	public byte byteValue() {
+		return value.byteValue();
+	}
+	
+	@Override
+	public short shortValue() {
+		return value.shortValue();
 	}
 	
 	@Override

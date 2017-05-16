@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import baubles.common.Baubles;
@@ -54,7 +55,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLModDisabledEvent;
-import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
+import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;	
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
@@ -175,12 +176,14 @@ public enum AlchemyModLoader {
 		return instance_map.get(key);
 	}
 	
+	public static List<String> getClassList() { return ImmutableList.copyOf(class_list); }
+	
 	public static void addClass(List<String> classes) {
 		checkInvokePermissions();
 		checkState();
 		for (String clazz : classes)
 			if (class_list.contains(clazz))
-				AlchemyRuntimeException.onException(new RuntimeException());
+				AlchemyRuntimeException.onException(new RuntimeException(clazz));
 			else
 				class_list.add(clazz);
 	}
@@ -252,8 +255,6 @@ public enum AlchemyModLoader {
 	}
 	
 	static {
-		logger.info("Max Direct Memory: " + sun.misc.VM.maxDirectMemory());
-		
 		is_modding = !AlchemyEngine.isRuntimeDeobfuscationEnabled();
 		mc_dir = AlchemyEngine.getMinecraftDir().getPath();
 		if (AlchemyEngine.getAlchemyCoreLocation() != null)
@@ -301,7 +302,7 @@ public enum AlchemyModLoader {
 		Side side = AlchemyEngine.runtimeSide();
 		ClassLoader loader = AlchemyEngine.getLaunchClassLoader();
 		
-		for (String name : class_list) {
+		for (String name : class_list)
 			try {
 				Class<?> clazz = Class.forName(name, false, loader);
 				SideOnly only = clazz.getAnnotation(SideOnly.class);
@@ -312,10 +313,9 @@ public enum AlchemyModLoader {
 					logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
 					loading_list.add(AlchemyEngine.lookup().findStatic(clazz, "init", MethodType.methodType(void.class, Class.class)));
 				}
-			} catch (ClassNotFoundException e) { continue; }
-		}
+			} catch (ClassNotFoundException | NoClassDefFoundError e) { continue; }
 		
-		for (String name : class_list) {
+		for (String name : class_list)
 			try {
 				Class<?> clazz = Class.forName(name, false, loader);
 				logger.info(AlchemyModLoader.class.getName() + " Loading -> " + clazz);
@@ -333,8 +333,7 @@ public enum AlchemyModLoader {
 						instance_map.get(instance.value()).add(clazz);
 					else
 						AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @InitInstance.value()"));
-			} catch (ClassNotFoundException e) { continue; }
-		}
+			} catch (ClassNotFoundException | NoClassDefFoundError e) { continue; }
 		
 		AlchemyDebug.end(BOOTSTRAP);
 		log_stack.clear();
@@ -350,8 +349,7 @@ public enum AlchemyModLoader {
 	
 	private static void init(ModState state) {
 		if (AlchemyModLoader.state.ordinal() >= state.ordinal())
-			AlchemyRuntimeException.onException(new RuntimeException(
-					"old state(" + getState().name() + ") > new state(" + state.name() + ")"));
+			return;
 		log_stack.clear();
 		AlchemyModLoader.state = state;
 		String state_str = format(state.toString(), ModState.POSTINITIALIZED.toString());

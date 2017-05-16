@@ -3,12 +3,16 @@ package index.alchemy.util;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Beta;
 
@@ -70,6 +74,51 @@ public abstract class ReflectionHelper {
 			return (T) unsafe.allocateInstance(clazz);
 		} catch (InstantiationException e) { AlchemyRuntimeException.onException(e); }
 		return null;
+	}
+	
+	private static final int NR_BITS = Integer.valueOf(System.getProperty("sun.arch.data.model"));
+	private static final int BYTE = 8;
+	private static final int WORD = NR_BITS / BYTE;
+	private static final int MIN_SIZE = 16; 
+	
+	@Unsafe(Unsafe.UNSAFE_API)
+	public static final long sizeOf(Object obj) {
+		Class<?> src = obj.getClass();
+		List<Field> instanceFields = Lists.newLinkedList();
+	    do {
+	        if(src == Object.class)
+	        	return MIN_SIZE;
+	        for (Field f : src.getDeclaredFields())
+	            if(!Modifier.isStatic(f.getModifiers()))
+	                instanceFields.add(f);
+	        src = src.getSuperclass();
+	    } while(instanceFields.isEmpty());
+		long maxOffset  = 0;
+		for(Field f : instanceFields) {
+			long offset = unsafe().objectFieldOffset(f);
+			if(offset > maxOffset)
+				maxOffset  = offset;
+		}
+		return (((int) maxOffset / WORD) + 1) * WORD;
+	}
+	
+	@Unsafe(Unsafe.UNSAFE_API)
+	public static final long toAddress(Object obj) {
+		return unsafe().getLong(new Object[]{ obj }, (long) unsafe().arrayBaseOffset(Object[].class));
+	}
+	
+	@Unsafe(Unsafe.UNSAFE_API)
+	public static final Object fromAddress(long address) {
+		Object array[] = { null };
+		unsafe().putLong(address, (long) unsafe().arrayBaseOffset(Object[].class), address);
+		return array[0];
+	}
+	
+	@Unsafe(Unsafe.UNSAFE_API)
+	public static final <T> T shallowCopy(T obj){
+		long size = sizeOf(obj), start = toAddress(obj), address = toAddress(allocateInstance(obj.getClass()));
+		unsafe().copyMemory(obj, 0L, null, address, size);
+		return (T) fromAddress(address);
 	}
 	
 	@Nullable

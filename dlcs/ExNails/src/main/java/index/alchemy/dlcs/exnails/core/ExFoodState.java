@@ -1,6 +1,7 @@
 package index.alchemy.dlcs.exnails.core;
 
 import index.alchemy.api.annotation.Patch;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.FoodStats;
@@ -8,6 +9,7 @@ import net.minecraft.world.EnumDifficulty;
 import toughasnails.api.thirst.ThirstHelper;
 import toughasnails.thirst.ThirstHandler;
 
+@Omega
 @Patch("net.minecraft.util.FoodStats")
 public class ExFoodState extends FoodStats {
 	

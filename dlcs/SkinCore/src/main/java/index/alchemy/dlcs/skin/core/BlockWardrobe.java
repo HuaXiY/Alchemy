@@ -8,6 +8,7 @@ import index.alchemy.util.Always;
 import index.alchemy.util.BlockContainerAccess;
 import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Beta;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -40,6 +41,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Beta
 public class BlockWardrobe extends AlchemyBlock {
 	
+	@Omega
 	public static enum EnumPartType implements IStringSerializable {
 		HEAD,
 		FOOT;
@@ -54,6 +56,7 @@ public class BlockWardrobe extends AlchemyBlock {
 		
 	}
 	
+	@Omega
 	public static enum EnumRelyType implements IStringSerializable {
 		LEFT,
 		RIGHT,

@@ -9,6 +9,7 @@ import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.DynamicNumber;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
@@ -20,6 +21,7 @@ import toughasnails.temperature.modifier.ArmorModifier;
 
 import static index.alchemy.util.Tool.$;
 
+@Omega
 @Hook.Provider
 @Init(state = ModState.POSTINITIALIZED)
 public class ExArmorModifier {

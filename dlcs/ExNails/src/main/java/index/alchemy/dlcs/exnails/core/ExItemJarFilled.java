@@ -4,7 +4,7 @@ import biomesoplenty.api.item.BOPItems;
 import biomesoplenty.common.item.ItemJarFilled;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
-import index.project.version.annotation.Beta;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
@@ -17,7 +17,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
-@Beta
+@Omega
 @Hook.Provider
 @Patch("biomesoplenty.common.item.ItemJarFilled")
 public class ExItemJarFilled extends ItemJarFilled {

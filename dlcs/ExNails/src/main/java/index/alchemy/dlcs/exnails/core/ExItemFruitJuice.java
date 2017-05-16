@@ -7,12 +7,14 @@ import index.alchemy.api.annotation.Patch;
 import index.alchemy.util.CraftingHelper;
 import index.alchemy.util.EnumHelper;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import toughasnails.item.ItemFruitJuice;
 
+@Omega
 @Init(state = ModState.POSTINITIALIZED)
 @Patch("toughasnails.item.ItemFruitJuice")
 public class ExItemFruitJuice extends ItemFruitJuice {

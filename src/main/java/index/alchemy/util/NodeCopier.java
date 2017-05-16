@@ -7,6 +7,9 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList; 
 import org.objectweb.asm.tree.LabelNode;
 
+import index.project.version.annotation.Omega;
+
+@Omega
 public class NodeCopier { 
 	
 	protected final Map<LabelNode, LabelNode> labelMap = new HashMap<LabelNode, LabelNode>() {

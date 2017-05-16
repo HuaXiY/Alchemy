@@ -53,6 +53,10 @@ public class HUDManager {
 		Minecraft.getMinecraft().getTextureManager().getTexture(res).restoreLastBlurMipmap();
 	}
 	
+	public static void setupOverlayRendering() {
+		Minecraft.getMinecraft().entityRenderer.setupOverlayRendering();
+	}
+	
 	public static void setSnake(ICoolDown cd) {
 		setSnake(cd, 20);
 	}

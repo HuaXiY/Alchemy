@@ -4,12 +4,14 @@ import java.util.function.Function;
 
 import index.alchemy.api.IBlockTemperature;
 import index.alchemy.api.annotation.Patch;
+import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 
+@Omega
 @Patch("net.minecraft.block.Block")
 public class ExBlock extends Block implements IBlockTemperature {
 	

@@ -16,6 +16,7 @@ import com.google.common.io.Files;
 
 import index.alchemy.api.IItemPotion;
 import index.alchemy.command.AlchemyCommandServer;
+import index.project.version.annotation.Omega;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.item.Item;
@@ -23,8 +24,10 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 
+@Omega
 public class ExPotionLoader {
 	
+	@Omega
 	public static class CommandReloadPotion extends AlchemyCommandServer {
 
 		@Override
@@ -48,6 +51,7 @@ public class ExPotionLoader {
 	
 	private static final Logger logger = LogManager.getLogger(ExPotionLoader.class.getSimpleName());
 	
+	@Omega
 	public static class EffectNode {
 		
 		public final Item item;

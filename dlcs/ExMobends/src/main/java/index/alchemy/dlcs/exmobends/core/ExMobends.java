@@ -6,6 +6,7 @@ import index.alchemy.api.annotation.DLC;
 import index.alchemy.api.annotation.Field;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.interacting.minecraft.ExItemElytra;
+import index.project.version.annotation.Omega;
 import net.gobbob.mobends.client.model.ModelBendsElytra;
 import net.gobbob.mobends.client.renderer.entity.RenderBendsPlayer;
 import net.gobbob.mobends.client.renderer.entity.layers.LayerBendsElytra;
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static index.alchemy.dlcs.exmobends.core.ExMobends.*;
 import static index.alchemy.util.Tool.$;
 
+@Omega
 @Hook.Provider
 @Field.Provider
 @SideOnly(Side.CLIENT)

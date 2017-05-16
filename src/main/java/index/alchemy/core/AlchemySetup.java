@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.base.Joiner;
 import com.google.common.io.CharSource;
 
@@ -21,29 +24,32 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.common.asm.transformers.AccessTransformer;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 
+import static index.alchemy.core.AlchemyConstants.MOD_NAME;
 import static index.alchemy.util.Tool.$;
 
 @Beta
 public class AlchemySetup implements IFMLCallHook {
 	
+	protected static final Logger logger = LogManager.getLogger(MOD_NAME);
+	
 	@Override
 	public Void call() throws Exception {
-		AlchemyEngine.checkThrowables();
-		AlchemyModLoader.logger.info("Setup: " + AlchemySetup.class.getName());
+		AlchemyThrowables.checkThrowables();
+		logger.info("Setup: " + AlchemySetup.class.getName());
 		LaunchClassLoader loader = AlchemyEngine.getLaunchClassLoader();
+		// Support for optifine in a development environment
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
+			if (AlchemyEngine.runtimeSide().isClient())
+				TransformerInjectOptifine.tryInject(loader);
 		// Injection is used to modify the at(AccessTransformer) logic of forge
 		// See build.gradle#L73 & ast.gradle
-		injectAccessTransformer(AlchemyModLoader.mod_path, loader);
+		injectAccessTransformer(AlchemyEngine.getAlchemyCoreLocation(), loader);
 		// Should not be transformer javafx
 		loader.addTransformerExclusion("javafx.");
 		// An extension to net.minecraftforge.fml.common.asm.transformers.SideTransformer when transformer Alchemy's class
 		TransformerSide.inject(loader);
 		// Init DLC main class
 		AlchemyDLCLoader.stream().forEach(IDLCInfo::clinitDLCMainClass);
-		// Support for optifine in a development environment
-		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
-			if (AlchemyEngine.runtimeSide().isClient())
-				TransformerInjectOptifine.tryInject(loader);
 		// Debug info
 		List<IClassTransformer> transformers = $(loader, "transformers");
 		AlchemyTransformerManager.logger.info(Joiner.on('\n').appendTo(new StringBuilder("Transformers: \n"), transformers).toString());

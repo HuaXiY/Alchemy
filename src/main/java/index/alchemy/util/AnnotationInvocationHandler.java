@@ -40,8 +40,8 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 
 			@Override
 			public Map<String, Method> run() {
-				Method[] methods = AnnotationInvocationHandler.this.type.getDeclaredMethods();
-				AnnotationInvocationHandler.this.validateAnnotationMethods(methods);
+				Method[] methods = type.getDeclaredMethods();
+				validateAnnotationMethods(methods);
 				AccessibleObject.setAccessible(methods, true);
 				return Arrays.stream(methods).collect(Maps::newHashMap, (map, method) -> map.put(method.getName(), method), Map::putAll);
 			}
@@ -192,11 +192,10 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 		builder.append('(');
 		boolean bl = true;
 		for (Map.Entry<String, Object> entry : memberValues.entrySet()) {
-			if (bl) {
+			if (bl)
 				bl = false;
-			} else {
+			else
 				builder.append(", ");
-			}
 			builder.append(entry.getKey());
 			builder.append('=');
 			builder.append(Tool.toString(entry.getValue()));

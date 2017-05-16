@@ -19,12 +19,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import index.alchemy.animation.StdCycle;
+import index.alchemy.api.AlchemyRegistry;
+import index.alchemy.api.IAlchemyRecipe;
 import index.alchemy.api.IContinuedRunnable;
+import index.alchemy.api.ICycle;
 import index.alchemy.api.IEventHandle;
 import index.alchemy.api.IFieldAccess;
 import index.alchemy.api.IGuiHandle;
 import index.alchemy.api.IIndexRunnable;
 import index.alchemy.api.IInputHandle;
+import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.api.IPhaseRunnable;
 import index.alchemy.api.IPlayerTickable;
 import index.alchemy.api.ITileEntity;
@@ -41,8 +46,10 @@ import index.alchemy.client.render.HUDManager;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.entity.control.SingleProjection;
+import index.alchemy.item.AlchemyItemLoader;
 import index.alchemy.util.Always;
 import index.alchemy.util.Counter;
+import index.alchemy.util.ReflectionHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
@@ -50,19 +57,25 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MouseHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
@@ -90,9 +103,17 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	public static AlchemyEventSystem instance() { return INSTANCE; }
 	
 	public static enum EventType {
-		EVENT_BUS,
-		TERRAIN_GEN_BUS,
-		ORE_GEN_BUS
+		
+		EVENT_BUS(MinecraftForge.EVENT_BUS),
+		TERRAIN_GEN_BUS(MinecraftForge.TERRAIN_GEN_BUS),
+		ORE_GEN_BUS(MinecraftForge.ORE_GEN_BUS);
+		
+		private EventBus bus;
+		
+		EventType(EventBus bus) { this.bus = bus; }
+		
+		public EventBus bus() { return bus; }
+		
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -173,7 +194,42 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onPlayerTick(PlayerTickEvent event) {
-		String flag = "134";
+		String flag = "135";
+//		if (!System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+//			AlchemyRegistry.registerAlchemyRecipe(new IAlchemyRecipe() {
+//				
+//				@Override
+//				public int getAlchemyTime() {
+//					return 20 * 10;
+//				}
+//				
+//				@Override
+//				public ItemStack getAlchemyResult(World world, BlockPos pos) {
+//					return new ItemStack(AlchemyItemLoader.amulet_heal);
+//				}
+//				
+//				@Override
+//				public ResourceLocation getAlchemyName() {
+//					return new AlchemyResourceLocation("Test");
+//				}
+//				
+//				@Override
+//				public List<IMaterialConsumer> getAlchemyMaterials() {
+//					return Lists.newArrayList(Always.generateMaterialConsumer(new ItemStack(Items.DIAMOND)));
+//				}
+//				
+//				@Override
+//				public Fluid getAlchemyFluid() {
+//					return FluidRegistry.WATER;
+//				}
+//				
+//				@Override
+//				public int getAlchemyColor() {
+//					return 0xFFFFFF;
+//				}
+//			});
+//			System.setProperty("index.alchemy.runtime.debug.player", flag);
+//		}
 		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
@@ -366,10 +422,13 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onClientTick(ClientTickEvent event) {
-		String flag = "42";
+		String flag = "43";
 		if (!System.getProperty("index.alchemy.runtime.debug.client", "").equals(flag)) {
 			// runtime do some thing
 			{
+//				ICycle cycle = new StdCycle().setCycles(2).setLenght(10).setLoop(true);
+//				System.out.println(cycle);
+//				System.out.println(ReflectionHelper.shallowCopy(cycle));
 //				Block.getBlockFromName(name)
 //				List<EntityMagicPixie> result = Minecraft.getMinecraft().theWorld.getEntitiesWithinAABB(EntityMagicPixie.class,
 //						AABBHelper.getAABBFromEntity(Minecraft.getMinecraft().thePlayer, 15));
@@ -546,34 +605,24 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 			return Hook.Result.VOID;
 	}
 	
-	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void renderBar(RenderGameOverlayEvent.Pre event) {
 		if (SingleProjection.isProjectionState()) {
 			markEventCanceled(event);
-			return;
-		}
-		if (event.getType() == ElementType.ALL)
+			HUDManager.setupOverlayRendering();
+		} else if (event.getType() == ElementType.ALL)
 			HUDManager.render();
 	}
 	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public static void onTextureStitch_Pre(TextureStitchEvent.Pre event) {
-		for (String res : texture_set)
-			event.getMap().registerSprite(new ResourceLocation(res));
+		texture_set.stream().map(ResourceLocation::new).forEach(event.getMap()::registerSprite);
 	}
 	
 	public static void registerEventHandle(IEventHandle handle) {
-		AlchemyModLoader.checkState();
-		for (EventType type : handle.getEventType()) {
-			if (type == EventType.EVENT_BUS)
-				MinecraftForge.EVENT_BUS.register(handle);
-			else if (type == EventType.TERRAIN_GEN_BUS)
-				MinecraftForge.TERRAIN_GEN_BUS.register(handle);
-			else if (type == EventType.ORE_GEN_BUS)
-				MinecraftForge.ORE_GEN_BUS.register(handle);
-		}
+		Arrays.stream(handle.getEventTypes()).map(EventType::bus).forEach(bus -> bus.register(handle));
 	}
 	
 	public static void registerTileEntity(ITileEntity tile) {

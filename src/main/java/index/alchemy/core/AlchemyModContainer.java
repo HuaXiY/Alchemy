@@ -14,9 +14,7 @@ import static index.alchemy.core.AlchemyConstants.*;
 @Omega
 public class AlchemyModContainer extends DummyModContainer  {
 	
-	public AlchemyModContainer() {
-		this(new ModMetadata());
-	}
+	public AlchemyModContainer() { this(new ModMetadata()); }
 	
 	public AlchemyModContainer(ModMetadata metadata) {
 		super(metadata);
@@ -29,8 +27,6 @@ public class AlchemyModContainer extends DummyModContainer  {
 	}
 	
 	@Override
-	public boolean registerBus(EventBus bus, LoadController controller) {
-		return true;
-	}
+	public boolean registerBus(EventBus bus, LoadController controller) { return true; }
 
 }

@@ -2,11 +2,13 @@ package index.alchemy.dlcs.non_update.core;
 
 import java.io.File;
 
+import index.project.version.annotation.Omega;
 import net.minecraftforge.common.config.Configuration;
 
+@Omega
 public class Config {
 	
-	private static Configuration configuration = new Configuration(new File("config/" + NonUpdate.MOD_NAME + ".cfg"));
+	private static Configuration configuration = new Configuration(new File("config/" + NonUpdate.DLC_NAME + ".cfg"));
 	
 	public static void init() {
 		configuration.load();

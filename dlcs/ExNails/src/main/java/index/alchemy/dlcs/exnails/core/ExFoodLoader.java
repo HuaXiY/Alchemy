@@ -10,14 +10,17 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import index.alchemy.command.AlchemyCommandServer;
+import index.project.version.annotation.Omega;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.server.MinecraftServer;
 
+@Omega
 public class ExFoodLoader {
 	
+	@Omega
 	public static class CommandReloadFood extends AlchemyCommandServer {
 
 		@Override

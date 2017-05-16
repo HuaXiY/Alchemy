@@ -40,13 +40,11 @@ import index.alchemy.core.asm.transformer.SrgMap;
 import index.alchemy.core.asm.transformer.TransformerInjectOptifine;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.core.debug.JFXDialog;
 import index.alchemy.util.ASMHelper;
 import index.alchemy.util.DeobfuscatingRemapper;
-import index.alchemy.util.ReflectionHelper;
+import index.alchemy.util.JFXHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
-import javafx.application.Platform;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -96,7 +94,9 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	   });
 	}
 	
-	static { /* Java9 Tweaker */ MeowTweaker.Sayaka(); }
+	static { /* Java9  Tweaker */ MeowTweaker.Sayaka(); }
+	
+	static { /* JavaFX Tweaker */ MeowTweaker.Kyouko(); }
 	
 	private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.deobf.disable");
 	
@@ -109,11 +109,16 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 		// Forge hack native libs when startup
 		libs.add("jfxrt");
 		libs.forEach(AlchemyEngine::addRuntimeExtLibFromJRE);
-		checkThrowables();
 		// Initialization index.alchemy.util.ReflectionHelper
-		Tool.load(ReflectionHelper.class);
+		Tool.forName("index.alchemy.util.ReflectionHelper");
+		// Initialization index.alchemy.util.JFXHelper
+		Tool.forName("index.alchemy.util.JFXHelper");
+		// Initialization index.alchemy.core.debug.JFXDialog
+		Tool.forName("index.alchemy.core.debug.JFXDialog");
+		// Check MeowTweaker runtime Throwable
+		AlchemyThrowables.checkThrowables();
 		// Should not to implicitly exit(com.sun.javafx.tk.Toolkit) when the last window is closed
-		Platform.setImplicitExit(false);
+		JFXHelper.setImplicitExit(false);
 		// Initialization index.alchemy.util.DeobfuscatingRemapper
 		Tool.load(DeobfuscatingRemapper.class);
 		// Load SrgMap from net.minecraftforge.gradle.GradleStart.srg.srg-mcp or use FMLDeobfuscatingRemapper 
@@ -127,6 +132,7 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 		AlchemyDLCLoader.setup();
 		// Load all Alchemy and Alchemy's DLC of the class transformer 
 		AlchemyTransformerManager.setup();
+		// Register index.alchemy.core.asm.transformer.AlchemyTransformerManager
 		registerTransformer(AlchemyTransformerManager.class);
 		// Other class transformer should not be behind Alchemy
 		// See index.alchemy.core.asm.transformer.TransformerPatch#L113 { node.version = V1_8 }
@@ -179,11 +185,6 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	
 	public static void checkInvokePermissions() {
 		Tool.checkInvokePermissions(3, AlchemyEngine.class);
-	}
-	
-	public static synchronized void checkThrowables() {
-		AlchemyThrowables.getThrowables().forEach(JFXDialog::showThrowableAndWait);
-		AlchemyThrowables.getThrowables().clear();
 	}
 	
 	public static class ASMClassLoader extends ClassLoader {

@@ -19,6 +19,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import index.alchemy.command.AlchemyCommandClient;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -26,6 +27,7 @@ import net.minecraft.util.text.TextComponentString;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@Omega
 public class CommandMakeLang extends AlchemyCommandClient {
 
 	@Override

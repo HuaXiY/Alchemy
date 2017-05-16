@@ -4,6 +4,7 @@ import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
+import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -19,6 +20,7 @@ import static java.lang.Math.*;
 
 import static index.alchemy.util.Tool.$;
 
+@Omega
 @Hook.Provider
 @Init(state = ModState.POSTINITIALIZED)
 public class ExTimeModifier {
