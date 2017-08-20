@@ -45,7 +45,6 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.LoaderState.ModState;
-import net.minecraftforge.fml.common.functions.ModIdFunction;
 
 import static index.alchemy.core.AlchemyConstants.*;
 import static index.alchemy.util.Tool.$;
@@ -74,8 +73,7 @@ public class AlchemyDLCLoader {
 		protected void injectLoader() {
 			List<ModContainer> mods = $(Loader.instance(), "mods");
 			$(Loader.instance(), "mods<", ImmutableList.builder().addAll(mods).add(this).build());
-			Map<String, ModContainer> namedMods = $(Loader.instance(), "namedMods");
-			$(Loader.instance(), "namedMods<", Maps.uniqueIndex(mods, new ModIdFunction()));
+			$(Loader.instance(), "namedMods<", Maps.uniqueIndex(mods, ModContainer::getModId));
 			LoadController modController = $(Loader.instance(), "modController");
 			Multimap<String, ModState> modStates = $(modController, "modStates");
 			modStates.put(getModId(), ModState.AVAILABLE);

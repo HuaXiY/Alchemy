@@ -41,8 +41,8 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import vazkii.botania.api.mana.ManaItemHandler;
-import vazkii.botania.common.item.rod.ItemWaterRod;
+//import vazkii.botania.api.mana.ManaItemHandler;
+//import vazkii.botania.common.item.rod.ItemWaterRod;
 
 @Beta
 @Change("1.9.4")
@@ -73,9 +73,9 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 	@Beta
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
-			@Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+			EnumFacing side, float hitX, float hitY, float hitZ) {
 		TileEntityCauldron cauldron = getTileEntityCauldron(world, pos);
-		
+		ItemStack heldItem = player.getHeldItem(hand);
 		CauldronActivatedEvent event;
 		if (MinecraftForge.EVENT_BUS.post(event = new CauldronActivatedEvent(world, pos, state, player, hand, cauldron,
 				heldItem, side, hitX, hitY, hitZ)))
@@ -95,21 +95,21 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 			int i = getWaterLevel(world, pos, state);
 			Item item = heldItem.getItem();
 			if (item == ModItems.botania$waterRod) {
-				if (i > -1 && i < 3 && ManaItemHandler.requestManaExact(heldItem, player, ItemWaterRod.COST, true))
-					setWaterLevel(world, pos, state, 3);
+//				if (i > -1 && i < 3 && ManaItemHandler.requestManaExact(heldItem, player, ItemWaterRod.COST, true))
+//					setWaterLevel(world, pos, state, 3);
 			} else if (FluidUtil.getFluidHandler(heldItem) != null) {
-				FluidUtil.interactWithFluidHandler(heldItem, cauldron.getTank(), player);
+				FluidUtil.interactWithFluidHandler(player, hand, cauldron.getTank());
 			} else if (!list.isEmpty()) {
 				if (Always.isServer()) {
 					boolean flag = false;
 					int limit = heldItem.getMaxStackSize();
-					if (heldItem.stackSize >= limit)
+					if (heldItem.getCount() >= limit)
 						return false;
 					for (Iterator<ItemStack> iterator = list.iterator(); iterator.hasNext();) {
 						ItemStack citem = iterator.next();
 						if (InventoryHelper.canMergeItemStack(heldItem, citem))
-							if (heldItem.stackSize < limit) {
-								heldItem.stackSize++;
+							if (heldItem.getCount() < limit) {
+								heldItem.setCount(heldItem.getCount() + 1);
 								iterator.remove();
 								flag = true;
 							} else
@@ -134,7 +134,7 @@ public class PBlockCauldron extends BlockCauldron implements ITileEntity, IMater
 				} else if (item instanceof ItemBanner) {
 					if (i > 0 && TileEntityBanner.getPatterns(heldItem) > 0) {
 						ItemStack banner = heldItem.copy();
-						banner.stackSize = 1;
+						banner.setCount(1);
 						TileEntityBanner.removeBannerData(banner);
 						InventoryHelper.addItemStackOrSetToHand(player, hand, heldItem, banner);
 						player.addStat(StatList.BANNER_CLEANED);

@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -22,10 +21,12 @@ import org.jooq.lambda.Unchecked;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import index.alchemy.core.asm.transformer.MeowTweaker;
 import index.alchemy.util.Tool;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.gradle.GradleStartCommon;
@@ -119,6 +120,8 @@ public class GradleStartAlchemy extends GradleStartCommon {
 		$(this, "argMap<", null);
 		$(this, "extras<", null);
 		System.gc();
+		$("L" + getBounceClass(), "new");
+		Launch.blackboard.put("Tweaks", Lists.newArrayList());
 		$("L" + getBounceClass(), "main", args);
 	}
 
@@ -137,7 +140,6 @@ public class GradleStartAlchemy extends GradleStartCommon {
 			if (!url.getProtocol().startsWith("file"))
 				continue;
 			File coreMod = new File(url.toURI().getPath());
-			Manifest manifest = null;
 			if (coreMod.exists() && coreMod.getName().endsWith("jar"))
 				try (JarFile jar = new JarFile(coreMod)) {
 					if (jar.getManifest() != null)

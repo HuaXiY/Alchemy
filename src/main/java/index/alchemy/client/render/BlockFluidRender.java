@@ -4,7 +4,7 @@ import index.project.version.annotation.Beta;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +22,7 @@ public class BlockFluidRender {
         blockColors = blockColorsIn;
     }
 
-    public boolean renderFluid(IBlockAccess blockAccess, IBlockState blockStateIn, BlockPos blockPosIn, VertexBuffer worldRendererIn, boolean aboolean[]) {
+    public boolean renderFluid(IBlockAccess blockAccess, IBlockState blockStateIn, BlockPos blockPosIn, BufferBuilder worldRendererIn, boolean aboolean[]) {
     	Minecraft minecraft = Minecraft.getMinecraft();
     	BlockRendererDispatcher dispatcher = minecraft.getBlockRendererDispatcher();
         TextureAtlasSprite textureatlassprite = dispatcher.getBlockModelShapes().getTexture(blockStateIn);
@@ -38,10 +38,6 @@ public class BlockFluidRender {
         else
         {
             boolean flag3 = false;
-            float f3 = 0.5F;
-            float f4 = 1.0F;
-            float f5 = 0.8F;
-            float f6 = 0.6F;
             float f7 = 1.0F;
             float f8 = 1.0F;
             float f9 = 1.0F;
@@ -49,7 +45,6 @@ public class BlockFluidRender {
             double d0 = blockPosIn.getX();
             double d1 = blockPosIn.getY();
             double d2 = blockPosIn.getZ();
-            float f11 = 0.001F;
 
             if (aboolean[0])
             {

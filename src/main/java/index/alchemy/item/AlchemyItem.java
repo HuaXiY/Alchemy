@@ -32,8 +32,8 @@ public class AlchemyItem extends Item implements IResourceLocation, IRegister {
 	public static final CreativeTabs CREATIVE_TABS = new AlchemyCreativeTabs(AlchemyConstants.MOD_ID) {
 
 		@Override
-		public Item getTabIconItem() {
-			return AlchemyItemLoader.solvent_lapis_lazuli;
+		public ItemStack getTabIconItem() {
+			return new ItemStack(AlchemyItemLoader.solvent_lapis_lazuli);
 		}
 		
 	};

@@ -184,7 +184,7 @@ public class AlchemyUpdateManager {
 		@Nullable
 		@WebMethod
 		public String getVersionInfoJson(String job) throws Exception {
-			String uri = getVersionInfoURL(job);
+//			String uri = getVersionInfoURL(job);
 			Http.Result result = Http.get(getVersionInfoURL(job), Http.shadowsocks);
 			return result.getCode() == Http.Code.OK ? result.getText() : null;
 		}
@@ -215,6 +215,7 @@ public class AlchemyUpdateManager {
 		return null;
 	}
 	
+	@SuppressWarnings("unused")
 	@Alpha
 	public static void invoke(String job, String now_version, @Nullable String dlcName, File file) {
 		AlchemyModLoader.checkInvokePermissions();

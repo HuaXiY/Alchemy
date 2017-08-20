@@ -11,6 +11,7 @@ import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Loading;
 import index.alchemy.api.annotation.Proxy;
 import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.Tool;
 import net.minecraft.entity.Entity;
@@ -43,7 +44,7 @@ public class AlchemyEntity {
 	}
 	
 	public static void init() {
-		entity_mapping.forEach((clazz, mapping) -> EntityRegistry.registerModEntity((Class<? extends Entity>) clazz,
+		entity_mapping.forEach((clazz, mapping) -> EntityRegistry.registerModEntity(new AlchemyResourceLocation(mapping.value()), (Class<? extends Entity>) clazz,
 				mapping.value(), nextId(), AlchemyModLoader.instance(), 80, 3, true));
 	}
 

@@ -6,7 +6,7 @@ import index.project.version.annotation.Alpha;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.Teleporter;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 
 @Alpha
 @Hook.Provider
@@ -17,7 +17,7 @@ public class DimensionTheForgottenTimeCourtyard extends AlchemyDimension {
 	
 	@Hook("net.minecraft.world.Teleporter#func_180266_a")
 	public static Hook.Result placeInPortal(Teleporter teleporter, Entity entity, float rotationYaw) {
-		if (teleporter.worldServerInstance.provider.getDimensionType() == type) {
+		if (teleporter.world.provider.getDimensionType() == type) {
 			entity.setLocationAndAngles(0, 255, 0, entity.rotationYaw, 0.0F);
             entity.motionX = 0.0D;
             entity.motionY = 2.0D;
@@ -44,7 +44,7 @@ public class DimensionTheForgottenTimeCourtyard extends AlchemyDimension {
 	
 	@Override
 	public IChunkGenerator createChunkGenerator() {
-		return new ChunkProviderTheForgottenTimeCourtyard(worldObj, worldObj.getSeed());
+		return new ChunkProviderTheForgottenTimeCourtyard(world, world.getSeed());
 	}
 	
 }

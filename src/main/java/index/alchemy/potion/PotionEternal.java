@@ -13,7 +13,7 @@ public class PotionEternal extends AlchemyPotion implements IEventHandle {
 	
 	public static final float MIN_HEALTH = 0.01F;
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingDeath(LivingDeathEvent event) {
 		if (Always.isServer() && event.getEntityLiving().isPotionActive(this)) {
 			AlchemyEventSystem.markEventCanceled(event);

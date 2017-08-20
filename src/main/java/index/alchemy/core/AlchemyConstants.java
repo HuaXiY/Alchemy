@@ -18,9 +18,9 @@ public class AlchemyConstants {
 		API_PACKAGE = MOD_PACKAGE + "api.",
 		TEST_PACKAGE = MOD_PACKAGE + "ztest.",
 		MOD_TRANSFORMER_PACKAGE = MOD_PACKAGE + "core.asm.",
-		MC_VERSION = "1.10.2",
+		MC_VERSION = "1.12",
 		E_MAIL = "931920447@qq.com",
-		BOP_ID = "BiomesOPlenty",
-		BOTANIA_ID = "Botania";
+		BOP_ID = "biomesoplenty",
+		BOTANIA_ID = "botania";
 	
 }

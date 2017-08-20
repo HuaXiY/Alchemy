@@ -13,12 +13,12 @@ import net.minecraftforge.fml.relauncher.Side;
 public class CommandSRun extends AlchemyCommandServer {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "srun";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/srun <java-code>";
 	}
 

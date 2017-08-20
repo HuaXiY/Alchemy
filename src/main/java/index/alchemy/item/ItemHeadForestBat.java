@@ -53,10 +53,10 @@ public class ItemHeadForestBat extends ItemHeadFollower implements IEventHandle 
 			EnumHand hand) {
 		if (Always.isServer() && target.getClass() == EntityBat.class) {
 			target.setDead();
-			--stack.stackSize;
+			stack.setCount(stack.getCount() - 1);
 			ItemStack batJar = new ItemStack(BOPItems.jar_filled, 1, FOREST_BAT.ordinal());
-			EntityItem batJarEntity = new EntityItem(player.worldObj, player.posX, player.posY, player.posZ, batJar);
-			player.worldObj.spawnEntityInWorld(batJarEntity);
+			EntityItem batJarEntity = new EntityItem(player.world, player.posX, player.posY, player.posZ, batJar);
+			player.world.spawnEntity(batJarEntity);
 			if (!(player instanceof FakePlayer))
 				batJarEntity.onCollideWithPlayer(player);
 			return Hook.Result.TRUE;
@@ -77,7 +77,7 @@ public class ItemHeadForestBat extends ItemHeadFollower implements IEventHandle 
 	
 	protected static ItemStack emptyJar(ItemStack stack, EntityPlayer player, ItemStack emptyJarStack) {
 		if (!player.capabilities.isCreativeMode)
-			--stack.stackSize;
+			stack.setCount(stack.getCount() - 1);
 		player.addStat(StatList.getObjectUseStats(stack.getItem()));
 		if (!player.inventory.addItemStackToInventory(emptyJarStack))
 			player.dropItem(emptyJarStack, false);
@@ -93,7 +93,7 @@ public class ItemHeadForestBat extends ItemHeadFollower implements IEventHandle 
 		float facingZ = cosYaw * cosPitch;
 
 		Vec3d playerEyePosition = new Vec3d(player.posX, player.posY + (double)player.getEyeHeight(), player.posZ);
-		Vec3d targetPosition = playerEyePosition.addVector((double)facingX * targetDistance, (double)facingY * targetDistance, (double)facingZ * targetDistance);
+		Vec3d targetPosition = playerEyePosition.addVector((double) facingX * targetDistance, (double) facingY * targetDistance, (double) facingZ * targetDistance);
 		
 		// see if there's anything in the way
 		RayTraceResult hit = world.rayTraceBlocks(playerEyePosition, targetPosition, true, false, false);
@@ -108,9 +108,9 @@ public class ItemHeadForestBat extends ItemHeadFollower implements IEventHandle 
 	
 	public static void releaseBat(ItemStack stack, World world, EntityPlayer player, Vec3d releasePoint) {
 		EntityBat bat = new EntityBat(world);					
-		bat.setLocationAndAngles(releasePoint.xCoord, releasePoint.yCoord, releasePoint.zCoord,
+		bat.setLocationAndAngles(releasePoint.x, releasePoint.y, releasePoint.z,
 				MathHelper.wrapDegrees(world.rand.nextFloat() * 360.0F), 0.0F);
-		world.spawnEntityInWorld(bat);
+		world.spawnEntity(bat);
 		bat.playLivingSound();
 		if (stack.hasDisplayName())
 			bat.setCustomNameTag(stack.getDisplayName());
@@ -136,7 +136,7 @@ public class ItemHeadForestBat extends ItemHeadFollower implements IEventHandle 
 	
 	@Override
 	public EntityLiving createFollower(ItemStack item, EntityLivingBase owner) {
-		return new EntityForestBat(owner.worldObj);
+		return new EntityForestBat(owner.world);
 	}
 	
 	public ItemHeadForestBat() {

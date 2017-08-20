@@ -38,64 +38,66 @@ public class TransformerSideLambda implements IClassTransformer {
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if (!transformedName.startsWith(MOD_PACKAGE))
 			return basicClass;
-		LinkedList<Type> types = new LinkedList<>();
-		LinkedList<Boolean> marks = new LinkedList<>();
-		int flag = -1;
-		ClassNode node = ASMHelper.getClassNode(transformedName);
-		for (Iterator<MethodNode> iterator = node.methods.iterator(); iterator.hasNext();) {
-			MethodNode method = iterator.next();
-			Side side = null;
-			if (method.visibleAnnotations != null)
-				for (AnnotationNode annotation : method.visibleAnnotations)
-					if (annotation.desc.equals(AlchemyTransformerManager.SIDE_ONLY_ANNOTATION_DESC))
-						side = Tool.makeAnnotation(SideOnly.class, annotation.values).value();
-			for (Iterator<AbstractInsnNode> insnIterator = method.instructions.iterator(); insnIterator.hasNext(); flag--) {
-				AbstractInsnNode insn = insnIterator.next();
-				if (insn instanceof InvokeDynamicInsnNode) {
-					InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
-					boolean lambda = false;
-					for (int i = 0; i < dynamic.bsmArgs.length; i++)
-						if (dynamic.bsmArgs[i] instanceof Handle) {
-							Handle handle = (Handle) dynamic.bsmArgs[i];
-							if (handle.getOwner().equals(node.name) && handle.getName().startsWith("lambda$"))
-								lambda = true;
-						}
-					if (!lambda)
-						continue;
-					Type type = Type.getReturnType(dynamic.desc);
-					types.add(type);
-					marks.add(side != null && side != AlchemyEngine.runtimeSide());
-					flag = 3;
-				}
-				if (flag > -1 && !marks.getLast() && insn instanceof TypeInsnNode) {
-					flag = -1;
-					TypeInsnNode type = (TypeInsnNode) insn;
-					if (Type.getType(ASMHelper.getClassDesc(type.desc)).equals(types.getLast()) &&
-							insn.visibleTypeAnnotations != null)
-						for (TypeAnnotationNode ann : insn.visibleTypeAnnotations)
-							if (ann.desc.equals(SIDE_ONLY_LAMBDA_ANNOTATION_DESC) &&
-									Tool.makeAnnotation(SideOnlyLambda.class, ann.values).value() != AlchemyEngine.runtimeSide())
-								marks.set(marks.size() - 1, true);
+		try {
+			LinkedList<Type> types = new LinkedList<>();
+			LinkedList<Boolean> marks = new LinkedList<>();
+			int flag = -1;
+			ClassNode node = ASMHelper.getClassNode(transformedName);
+			for (Iterator<MethodNode> iterator = node.methods.iterator(); iterator.hasNext();) {
+				MethodNode method = iterator.next();
+				Side side = null;
+				if (method.visibleAnnotations != null)
+					for (AnnotationNode annotation : method.visibleAnnotations)
+						if (annotation.desc.equals(AlchemyTransformerManager.SIDE_ONLY_ANNOTATION_DESC))
+							side = Tool.makeAnnotation(SideOnly.class, annotation.values).value();
+				for (Iterator<AbstractInsnNode> insnIterator = method.instructions.iterator(); insnIterator.hasNext(); flag--) {
+					AbstractInsnNode insn = insnIterator.next();
+					if (insn instanceof InvokeDynamicInsnNode) {
+						InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
+						boolean lambda = false;
+						for (int i = 0; i < dynamic.bsmArgs.length; i++)
+							if (dynamic.bsmArgs[i] instanceof Handle) {
+								Handle handle = (Handle) dynamic.bsmArgs[i];
+								if (handle.getOwner().equals(node.name) && handle.getName().startsWith("lambda$"))
+									lambda = true;
+							}
+						if (!lambda)
+							continue;
+						Type type = Type.getReturnType(dynamic.desc);
+						types.add(type);
+						marks.add(side != null && side != AlchemyEngine.runtimeSide());
+						flag = 3;
+					}
+					if (flag > -1 && !marks.getLast() && insn instanceof TypeInsnNode) {
+						flag = -1;
+						TypeInsnNode type = (TypeInsnNode) insn;
+						if (Type.getType(ASMHelper.getClassDesc(type.desc)).equals(types.getLast()) &&
+								insn.visibleTypeAnnotations != null)
+							for (TypeAnnotationNode ann : insn.visibleTypeAnnotations)
+								if (ann.desc.equals(SIDE_ONLY_LAMBDA_ANNOTATION_DESC) &&
+										Tool.makeAnnotation(SideOnlyLambda.class, ann.values).value() != AlchemyEngine.runtimeSide())
+									marks.set(marks.size() - 1, true);
+					}
 				}
 			}
-		}
-		if (marks.isEmpty())
-			return basicClass;
-		ClassReader reader = new ClassReader(basicClass);
-		ClassWriter writer = ASMHelper.newClassWriter(0);
-		node = new ClassNode(ASM5);
-		reader.accept(node, 0);
-		for (Iterator<MethodNode> iterator = node.methods.iterator(); !marks.isEmpty() && iterator.hasNext();) {
-			MethodNode method = iterator.next();
-			if (method.name.startsWith("lambda$") && (method.access & ACC_SYNTHETIC) != 0) {
-				if (marks.getFirst())
-					iterator.remove();
-				types.removeFirst();
-				marks.removeFirst();
+			if (marks.isEmpty())
+				return basicClass;
+			ClassReader reader = new ClassReader(basicClass);
+			ClassWriter writer = ASMHelper.newClassWriter(0);
+			node = new ClassNode(ASM5);
+			reader.accept(node, 0);
+			for (Iterator<MethodNode> iterator = node.methods.iterator(); !marks.isEmpty() && iterator.hasNext();) {
+				MethodNode method = iterator.next();
+				if (method.name.startsWith("lambda$") && (method.access & ACC_SYNTHETIC) != 0) {
+					if (marks.getFirst())
+						iterator.remove();
+					types.removeFirst();
+					marks.removeFirst();
+				}
 			}
-		}
-		node.accept(writer);
-		return writer.toByteArray();
+			node.accept(writer);
+			return writer.toByteArray();
+		} catch (Exception e) { e.printStackTrace(); throw e; }
 	}
 
 }

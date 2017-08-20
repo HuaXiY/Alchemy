@@ -65,7 +65,7 @@ public class SingleProjection {
 		@Override
 		public IMessage onMessage(MessageSingleProjection message, MessageContext ctx) {
 			AlchemyEventSystem.addDelayedRunnable(p -> {
-				EntityPlayer player = ctx.getServerHandler().playerEntity;
+				EntityPlayer player = ctx.getServerHandler().player;
 				EntityLivingBase follower = IFollower.follower.get(player);
 				if (follower != null) {
 					((IFollower) follower).setProjectionState(message.state);
@@ -137,16 +137,16 @@ public class SingleProjection {
 	public static void reduction() {
 		follower = null;
 		projectionState = false;
-		EntityLivingBase follower = IFollower.follower.get(Minecraft.getMinecraft().thePlayer);
+		EntityLivingBase follower = IFollower.follower.get(Minecraft.getMinecraft().player);
 		if (follower != null && follower instanceof IFollower)
 			((IFollower) follower).setProjectionState(false);
-		Minecraft.getMinecraft().setRenderViewEntity(Minecraft.getMinecraft().thePlayer);
+		Minecraft.getMinecraft().setRenderViewEntity(Minecraft.getMinecraft().player);
 		AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageSingleProjection());
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public static void projection() {
-		EntityLivingBase follower = IFollower.follower.get(Minecraft.getMinecraft().thePlayer);
+		EntityLivingBase follower = IFollower.follower.get(Minecraft.getMinecraft().player);
 		if (follower != null && follower instanceof IFollower)
 			projectionFollower(follower);
 	}
@@ -205,7 +205,7 @@ public class SingleProjection {
 	@SideOnly(Side.CLIENT)
 	@Hook("net.minecraft.util.MovementInputFromOptions#func_78898_a")
 	public static Hook.Result updatePlayerMoveState(MovementInputFromOptions input) {
-		if (projectionState && Minecraft.getMinecraft().thePlayer.movementInput == input) {
+		if (projectionState && Minecraft.getMinecraft().player.movementInput == input) {
 			input.moveForward = 0;
 			input.moveStrafe = 0;
 			input.backKeyDown = false;
@@ -219,7 +219,7 @@ public class SingleProjection {
 		return Hook.Result.VOID;
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.BOTTOM)
 	public static void onLivingAttack(LivingAttackEvent event) {
 		EntityLivingBase follower = IFollower.follower.get(event.getEntityLiving());
 		if (follower != null && ((IFollower) follower).getProjectionState())
@@ -230,11 +230,10 @@ public class SingleProjection {
 	@SideOnly(Side.CLIENT)
 	public static void onClientTick(ClientTickEvent event) {
 		if (projectionState) {
-			EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayerSP player = Minecraft.getMinecraft().player;
 			if (player != null) {
 				if (IFollower.follower.get(player) != follower)
 				reduction();
-				boolean flag3;
 				AxisAlignedBB axisalignedbb = player.getEntityBoundingBox();
 				double d0 = player.posX - player.lastReportedPosX;
 				double d1 = axisalignedbb.minY - player.lastReportedPosY;
@@ -243,7 +242,7 @@ public class SingleProjection {
 				double d4 = player.rotationPitch - player.lastReportedPitch;
 				++player.positionUpdateTicks;
 				boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4 || player.positionUpdateTicks >= 20;
-				boolean bl = flag3 = d3 != 0.0 || d4 != 0.0;
+				boolean flag3 = d3 != 0.0 || d4 != 0.0;
 				if (player.isRiding()) {
 					player.connection.sendPacket(new CPacketPlayer.PositionRotation(player.motionX, -999.0,
 							player.motionZ, player.rotationYaw, player.rotationPitch, player.onGround));
@@ -302,7 +301,7 @@ public class SingleProjection {
 			if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(
 					new net.minecraftforge.client.event.RenderPlayerEvent.Pre(entity, this, partialTicks, x, y, z)))
 				return;
-			if (!entity.isUser() || renderManager.renderViewEntity == entity || Minecraft.getMinecraft().thePlayer == entity) {
+			if (!entity.isUser() || renderManager.renderViewEntity == entity || Minecraft.getMinecraft().player == entity) {
 				double ny = y;
 				
 				if (entity.isSneaking() && !(entity instanceof EntityPlayerSP))

@@ -31,13 +31,13 @@ public class EnchantmentDoubleJump extends AlchemyEnchantment implements IPlayer
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void onTick(EntityPlayer player, Phase phase) {
-		if (phase == Phase.START && Minecraft.getMinecraft().thePlayer == player)
+		if (phase == Phase.START && Minecraft.getMinecraft().player == player)
 			if (player.onGround) {
 				player.getEntityData().setBoolean(NBT_KEY_CD, true);
 				last_on_ground_time = System.currentTimeMillis();
 			} else if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())
 					&& System.currentTimeMillis() - last_on_ground_time > JUMP_INTERVAL
-					&& EnchantmentHelper.getEnchantmentLevel(this, player.inventory.armorInventory[0]) > 0
+					&& EnchantmentHelper.getEnchantmentLevel(this, player.inventory.armorInventory.get(0)) > 0
 					&& player.getEntityData().getBoolean(NBT_KEY_CD)) {
 					player.motionY = JUMP_MOTION;
 					player.getEntityData().setBoolean(NBT_KEY_CD, false);

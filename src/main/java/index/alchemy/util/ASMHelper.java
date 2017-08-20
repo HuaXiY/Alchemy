@@ -1,7 +1,10 @@
 package index.alchemy.util;
 
 import java.util.ListIterator;
+import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.Nullable;
 
@@ -13,8 +16,11 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.FrameNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -32,6 +38,38 @@ import static org.objectweb.asm.Opcodes.*;
 
 @Omega
 public interface ASMHelper {
+	
+	static class DynamicVarInsnNode extends VarInsnNode {
+
+		public DynamicVarInsnNode(int opcode, int var) {
+			super(opcode, var);
+		}
+
+	}
+	
+	static void normalizationDynamicVarInsn(InsnList list, int stackSize) {
+		int max = StreamSupport.stream(Spliterators.spliteratorUnknownSize(list.iterator(), 0), false)
+			.filter(VarInsnNode.class::isInstance)
+			.filter(((Predicate<AbstractInsnNode>) DynamicVarInsnNode.class::isInstance).negate())
+			.map(VarInsnNode.class::cast)
+			.map(var -> var.var)
+			.max(Integer::compareTo)
+			.orElse(0);
+		int index = Math.max(max, stackSize);
+		StreamSupport.stream(Spliterators.spliteratorUnknownSize(list.iterator(), 0), false)
+			.filter(DynamicVarInsnNode.class::isInstance)
+			.map(DynamicVarInsnNode.class::cast)
+			.forEach(var -> list.set(var, new VarInsnNode(var.getOpcode(), var.var + index)));
+	}
+	
+	static void addLabelNode(InsnList list, LabelNode label) {
+		list.add(label);
+		list.add(getDefaultFrameNode());
+	}
+	
+	static FrameNode getDefaultFrameNode() {
+		return new FrameNode(F_SAME, 0, null, 0, null);
+	}
 	
 	static int getReturnOpcode(Type type) {
 		switch (type.getSort()) {
@@ -144,7 +182,7 @@ public interface ASMHelper {
 		return temp.length > 1 && temp[temp.length - 1].equalsIgnoreCase(temp[temp.length - 2]);
 	}
 	
-	static String getGeneric(String signature) {
+ 	static String getGeneric(String signature) {
 		return Tool.get(signature, "(<.*>)");
 	}
 	

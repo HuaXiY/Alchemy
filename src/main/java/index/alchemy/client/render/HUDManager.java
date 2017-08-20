@@ -12,7 +12,9 @@ import index.alchemy.core.AlchemyResourceLocation;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -32,10 +34,10 @@ public class HUDManager {
 	private static final Map<ICoolDown, Integer> snakes = new HashMap<ICoolDown, Integer>();
 	
 	@Config(category = CATEGORY, comment = "The x-axis offset when render the CoolDown.")
-	private static int render_cool_down_offset_x = 0;
+	private static int render_cool_down_offset_x = -50;
 	
 	@Config(category = CATEGORY, comment = "The y-axis offset when render the CoolDown.")
-	private static int render_cool_down_offset_y = 0;
+	private static int render_cool_down_offset_y = -50;
 	
 	@Config(category = CATEGORY, comment = "The number of rows when render the CoolDown.")
 	public static int render_num = 4;
@@ -73,6 +75,9 @@ public class HUDManager {
 		GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
 		RenderHelper.enableAlpha();
 		int i = -1;
+		ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
+		int width = resolution.getScaledWidth() * 2;
+        int height = resolution.getScaledHeight() * 2;
 		for (ICoolDown cd : cool_downs) {
 			float cd_per = Math.min((float) cd.getResidualCD() / cd.getMaxCD(), 1);
 			if (cd_per <= 0)
@@ -84,35 +89,37 @@ public class HUDManager {
 				sx = Tool.getRandom(-SNAKE, SNAKE);
 				sy = Tool.getRandom(-SNAKE, SNAKE);
 			}
-			
+			x = width - x;
+			y = height - y;
+			System.out.println(x + " - " + y);
 			RenderHelper.pushMatrix();
+			RenderHelper.scale(0.5F, 0.5F, 1F);
 			RenderHelper.translate(sx, sy, 0);
 			RenderHelper.scale(2F, 2F, 1F);
 			glEnable(GL_COLOR_ARRAY);
 			bind(GuiContainer.INVENTORY_BACKGROUND);
 			gui.drawTexturedModalRect(x / 2, y / 2, 141, 166, MC_BG_TEXTURE_SIZE, MC_BG_TEXTURE_SIZE);
 			RenderHelper.scale(0.5F, 0.5F, 1F);
-			
 			bind(CD_BG);
 			int id = cd.getRenderID();
 			if (id > -1)
 				gui.drawTexturedModalRect(x, y, CD_SIZE * (id % ON_ROW), CD_SIZE * (id / ON_ROW), CD_SIZE, CD_SIZE);
 			cd.renderCD(x, y, CD_SIZE, CD_SIZE);
-			
 			glDisable(GL_COLOR_ARRAY);
 			int cd_per_len = (int) ((CD_SIZE - INTERVAL * 2) * cd_per);
-			gui.drawRect(x + INTERVAL, y + (CD_SIZE - INTERVAL * 2 - cd_per_len) + INTERVAL, x + CD_SIZE - INTERVAL, y + CD_SIZE - INTERVAL, 0x99000000);
+			Gui.drawRect(x + INTERVAL, y + (CD_SIZE - INTERVAL * 2 - cd_per_len) + INTERVAL, x + CD_SIZE - INTERVAL, y + CD_SIZE - INTERVAL, 0x99000000);
+			RenderHelper.scale(2F, 2F, 1F);
 			RenderHelper.popMatrix();
 		}
 		RenderHelper.disableAlpha();
 	}
 	
 	public static int getCDXStart(int i) {
-		return Minecraft.getMinecraft().displayWidth - (CD_SIZE + INTERVAL) * (1 + (i % render_num)) + render_cool_down_offset_x;
+		return (CD_SIZE + INTERVAL) * (1 + (i % render_num)) + render_cool_down_offset_x;
 	}
 	
 	public static int getCDYStart(int i) {
-		return Minecraft.getMinecraft().displayHeight - (CD_SIZE + INTERVAL) * (1 + (i / render_num)) + render_cool_down_offset_y;
+		return (CD_SIZE + INTERVAL) * (1 + (i / render_num)) + render_cool_down_offset_y;
 	}
 	
 }

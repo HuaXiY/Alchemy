@@ -40,5 +40,47 @@ public class DynamicNumber<T extends Number> extends Number {
 	public double doubleValue() {
 		return value.doubleValue();
 	}
+	
+	public boolean bigger(T t) {
+		if (value instanceof Long)
+			return value.longValue() > t.longValue();
+		else
+			return value.doubleValue() > t.doubleValue();
+	}
+	
+	public boolean biggerOrEquals(T t) {
+		if (value instanceof Long)
+			return value.longValue() >= t.longValue();
+		else
+			return value.doubleValue() >= t.doubleValue();
+	}
+	
+	public boolean smaller(T t) {
+		if (value instanceof Long)
+			return value.longValue() < t.longValue();
+		else
+			return value.doubleValue() < t.doubleValue();
+	}
+	
+	public boolean smallerOrEquals(T t) {
+		if (value instanceof Long)
+			return value.longValue() <= t.longValue();
+		else
+			return value.doubleValue() <= t.doubleValue();
+	}
+	
+	public T update(T t) {
+		T result = value;
+		set(t);
+		return result;
+	}
+	
+	public void set(T t) {
+		value = t;
+	}
+	
+	public T get() {
+		return value;
+	}
 
 }

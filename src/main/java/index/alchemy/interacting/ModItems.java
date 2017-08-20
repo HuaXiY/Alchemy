@@ -40,14 +40,14 @@ public class ModItems {
 	
 	@ItemTransform("bop$gem")
 	public static final ItemStack
-			bop$gem_amethyst = null,							//  末影紫晶 ---- 空间
-			bop$gem_ruby = null,								//  红宝石 ---- 生命
-			bop$gem_peridot = null,								//  橄榄石 ---- 坚韧
-			bop$gem_topaz = null,								//  黄玉 ---- 守护
-			bop$gem_tanzanite = null,							//  坦桑石 ---- 祝福
-			bop$gem_malachite = null,							//  孔雀石 ---- 生灵
-			bop$gem_sapphire = null,							//  蓝宝石  ---- 净化
-			bop$gem_amber = null;								//  琥珀  ---- 时间
+			bop$gem_amethyst = ItemStack.EMPTY,							//  末影紫晶 ---- 空间
+			bop$gem_ruby = ItemStack.EMPTY,								//  红宝石 ---- 生命
+			bop$gem_peridot = ItemStack.EMPTY,								//  橄榄石 ---- 坚韧
+			bop$gem_topaz = ItemStack.EMPTY,								//  黄玉 ---- 守护
+			bop$gem_tanzanite = ItemStack.EMPTY,							//  坦桑石 ---- 祝福
+			bop$gem_malachite = ItemStack.EMPTY,							//  孔雀石 ---- 生灵
+			bop$gem_sapphire = ItemStack.EMPTY,							//  蓝宝石  ---- 净化
+			bop$gem_amber = ItemStack.EMPTY;								//  琥珀  ---- 时间
 	
 	@Deprecated
 	@Source("biomesoplenty.api.block.BOPBlocks")
@@ -58,40 +58,40 @@ public class ModItems {
 	
 	@ItemTransform( "bop$mushroom")
 	public static final ItemStack
-			bop$mushroom_toadstool = null,						//  毒菌
-			bop$mushroom_portobello = null,						//  双胞蘑菇
-			bop$mushroom_blue_milk_cap = null,					//  蓝牛奶伞菌
-			bop$mushroom_glowshroom = null,						//  夜光菇
-			bop$mushroom_flat_mushroom = null,					//  平菇
-			bop$mushroom_shadow_shroom = null;					//  影菇
+			bop$mushroom_toadstool = ItemStack.EMPTY,						//  毒菌
+			bop$mushroom_portobello = ItemStack.EMPTY,						//  双胞蘑菇
+			bop$mushroom_blue_milk_cap = ItemStack.EMPTY,					//  蓝牛奶伞菌
+			bop$mushroom_glowshroom = ItemStack.EMPTY,						//  夜光菇
+			bop$mushroom_flat_mushroom = ItemStack.EMPTY,					//  平菇
+			bop$mushroom_shadow_shroom = ItemStack.EMPTY;					//  影菇
 	
 	@ItemTransform( "bop$flower_0")
 	public static final ItemStack
-			bop$flower_clover = null,							//  苜蓿 ---- 坚韧
-			bop$flower_swampflower = null,						//  沼泽花 ---- 黑暗
-			bop$flower_deathbloom = null,						//  死亡花 ---- 堕化
-			bop$flower_glowflower = null,						//  闪光花 ---- 光明
-			bop$flower_blue_hydrangea = null,					//  蓝绣球花 ---- 亲和
-			bop$flower_orange_cosmos = null,					//  黄波斯菊 ---- 奇迹
-			bop$flower_pink_daffodil = null,					//  粉水仙 ---- 净化
-			bop$flower_wildflower = null,						//  野花 ---- 时间
-			bop$flower_violet = null,							//  紫罗兰  ---- 牺牲
-			bop$flower_white_anemone = null,					//  银莲花 ---- 包容
-			bop$flower_enderlotus = null,						//  末影莲花 ----空间
-			bop$flower_bromeliad = null,						//  凤梨 --- 破瘴
-			bop$flower_wilted_lily = null,						//  凋零百合 ---- 绝望
-			bop$flower_pink_hibiscus = null,					//  粉木槿 ---- 真理
-			bop$flower_lily_of_the_valley = null,				//  谷百合 ---- 祝福
-			bop$flower_burning_blossom = null;					//  火焰花 ---- 狂暴
+			bop$flower_clover = ItemStack.EMPTY,							//  苜蓿 ---- 坚韧
+			bop$flower_swampflower = ItemStack.EMPTY,						//  沼泽花 ---- 黑暗
+			bop$flower_deathbloom = ItemStack.EMPTY,						//  死亡花 ---- 堕化
+			bop$flower_glowflower = ItemStack.EMPTY,						//  闪光花 ---- 光明
+			bop$flower_blue_hydrangea = ItemStack.EMPTY,					//  蓝绣球花 ---- 亲和
+			bop$flower_orange_cosmos = ItemStack.EMPTY,					//  黄波斯菊 ---- 奇迹
+			bop$flower_pink_daffodil = ItemStack.EMPTY,					//  粉水仙 ---- 净化
+			bop$flower_wildflower = ItemStack.EMPTY,						//  野花 ---- 时间
+			bop$flower_violet = ItemStack.EMPTY,							//  紫罗兰  ---- 牺牲
+			bop$flower_white_anemone = ItemStack.EMPTY,					//  银莲花 ---- 包容
+			bop$flower_enderlotus = ItemStack.EMPTY,						//  末影莲花 ----空间
+			bop$flower_bromeliad = ItemStack.EMPTY,						//  凤梨 --- 破瘴
+			bop$flower_wilted_lily = ItemStack.EMPTY,						//  凋零百合 ---- 绝望
+			bop$flower_pink_hibiscus = ItemStack.EMPTY,					//  粉木槿 ---- 真理
+			bop$flower_lily_of_the_valley = ItemStack.EMPTY,				//  谷百合 ---- 祝福
+			bop$flower_burning_blossom = ItemStack.EMPTY;					//  火焰花 ---- 狂暴
 	
 	@ItemTransform("bop$flower_1")
 	public static final ItemStack
-			bop$flower_lavender = null,							//  熏衣草 ---- 和平
-			bop$flower_goldenrod = null,						//  秋麒麟草 ---- 永恒
-			bop$flower_bluebells = null,						//  蓝铃花 ---- 活性
-			bop$flower_miners_delight = null,					//  乐矿花 ---- 幸运
-			bop$flower_icy_iris = null,							//  冰虹膜花 ----神性
-			bop$flower_rose = null;								//  玫瑰 ---- 爱情
+			bop$flower_lavender = ItemStack.EMPTY,							//  熏衣草 ---- 和平
+			bop$flower_goldenrod = ItemStack.EMPTY,						//  秋麒麟草 ---- 永恒
+			bop$flower_bluebells = ItemStack.EMPTY,						//  蓝铃花 ---- 活性
+			bop$flower_miners_delight = ItemStack.EMPTY,					//  乐矿花 ---- 幸运
+			bop$flower_icy_iris = ItemStack.EMPTY,							//  冰虹膜花 ----神性
+			bop$flower_rose = ItemStack.EMPTY;								//  玫瑰 ---- 爱情
 	
 	//  Botania
 	
@@ -109,12 +109,12 @@ public class ModItems {
 	@Nullable
 	@ItemTransform("botania$livingwood")
 	public static final ItemStack
-			botania$livingwood_log = null,
-			botania$livingwood_plank = null,
-			botania$livingwood_plank_mossy = null,
-			botania$livingwood_plank_framed = null,
-			botania$livingwood_plank_framed_pattern = null,
-			botania$livingwood_plank_glimmering = null;
+			botania$livingwood_log = ItemStack.EMPTY,
+			botania$livingwood_plank = ItemStack.EMPTY,
+			botania$livingwood_plank_mossy = ItemStack.EMPTY,
+			botania$livingwood_plank_framed = ItemStack.EMPTY,
+			botania$livingwood_plank_framed_pattern = ItemStack.EMPTY,
+			botania$livingwood_plank_glimmering = ItemStack.EMPTY;
 	
 	public static void init() throws Exception {
 		AlchemyModLoader.checkInvokePermissions();

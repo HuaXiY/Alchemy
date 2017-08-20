@@ -19,7 +19,7 @@ public class MagicIceScreen extends AlchemyMagic {
 	@Override
 	public void apply(EntityLivingBase src, EntityLivingBase living, float amplify) {
 		int posX = (int) living.posX, posY = (int) living.posY, posZ = (int) living.posZ;
-		World world = living.worldObj;
+		World world = living.world;
 		if (Always.isServer()) {
 			for (int x = -1; x < 2; x++) 
 				for (int y = -1; y < 3; y++) 

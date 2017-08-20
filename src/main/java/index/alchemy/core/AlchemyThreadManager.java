@@ -14,8 +14,6 @@ import com.google.common.collect.Lists;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Omega;
 
-import static index.alchemy.util.FunctionHelper.*;
-
 @Omega
 @ThreadSafe
 public final class AlchemyThreadManager {
@@ -134,15 +132,14 @@ public final class AlchemyThreadManager {
 	}
 	
 	public static Thread runOnNewThread(Runnable runnable) {
-		String name = "Alchemy-" + nextId();
-		Thread thread = new Thread(link(
-				() -> logger.info("Thread[" + name + "] start"),
-				runnable,
-				() -> logger.info("Thread[" + name + "] end"))
-		);
-		thread.setName(name);
-		thread.start();
-		return thread;
+		return new Thread(runnable) {
+			
+			{
+				setName("Alchemy-" + nextId());
+				start();
+			}
+			 
+		};
 	}
 	
 }

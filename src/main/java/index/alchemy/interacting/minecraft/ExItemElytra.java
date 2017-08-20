@@ -1,7 +1,5 @@
 package index.alchemy.interacting.minecraft;
 
-import javax.annotation.Nullable;
-
 import org.lwjgl.input.Keyboard;
 
 import baubles.api.BaubleType;
@@ -48,33 +46,18 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 	}
 	
 	@Override
-	@Nullable
 	public ItemStack getFormLiving(EntityLivingBase living) {
 		return getFormLiving0(living);
 	}
 	
-	@Nullable
 	public static ItemStack getFormLiving0(EntityLivingBase living) {
 		ItemStack item = living.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (item != null && item.getItem() == Items.ELYTRA)
+		if (item.getItem() == Items.ELYTRA)
 			return item;
 		InventoryBauble bauble = living.getCapability(AlchemyCapabilityLoader.bauble, null);
 		if (bauble == null)
-			return null;
+			return ItemStack.EMPTY;
 		return bauble.getItemStackFromSlot(BaubleType.BODY);
-	}
-	
-	@Nullable
-	@Patch.Exception
-	public static ItemStack getInInventoryBauble(EntityLivingBase living) {
-		ItemStack item = living.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (item != null && item.getItem() == Items.ELYTRA)
-			return null;
-		InventoryBauble bauble = living.getCapability(AlchemyCapabilityLoader.bauble, null);
-		if (bauble == null)
-			return null;
-		item = bauble.getItemStackFromSlot(BaubleType.BODY);
-		return item != null && item.getItem() == Items.ELYTRA ? item : null;
 	}
 	
 	// !!!> ClassLoader will throw ClassCircularityError when this logic use hook <!!!
@@ -87,19 +70,20 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 			super(worldIn);
 		}
 		
+		@SuppressWarnings("unused")
 		private void updateElytra() {
 			boolean flag = getFlag(7);
 			if (flag && !onGround && !isRiding()) {
 				ItemStack item = getFormLiving0(this);
-				if (item != null && ItemElytra.isBroken(item)) {
+				if (item.getItem() == Items.ELYTRA && ItemElytra.isUsable(item)) {
 					flag = true;
-					if (!worldObj.isRemote && (ticksElytraFlying + 1) % 20 == 0)
+					if (!world.isRemote && (ticksElytraFlying + 1) % 20 == 0)
 						item.damageItem(1, this);
 				} else
 					flag = false;
 			} else
 				flag = false;
-			if (!worldObj.isRemote)
+			if (!world.isRemote)
 				setFlag(7, flag);
 		}
 		
@@ -111,15 +95,15 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 		@Hook("net.minecraft.network.NetHandlerPlayServer#func_147357_a")
 		public static Hook.Result processEntityAction(NetHandlerPlayServer handler, CPacketEntityAction action) {
 			if (action.getAction() == Action.START_FALL_FLYING) {
-				PacketThreadUtil.checkThreadAndEnqueue(action, handler, handler.playerEntity.getServerWorld());
-				handler.playerEntity.markPlayerActive();
-				if (!handler.playerEntity.onGround && handler.playerEntity.motionY < 0.0D &&
-						!handler.playerEntity.isElytraFlying() && !handler.playerEntity.isInWater()) {
-					ItemStack item = getFormLiving0(handler.playerEntity);
-					if (item != null && ItemElytra.isBroken(item))
-						handler.playerEntity.setElytraFlying();
+				PacketThreadUtil.checkThreadAndEnqueue(action, handler, handler.player.getServerWorld());
+				handler.player.markPlayerActive();
+				if (!handler.player.onGround && handler.player.motionY < 0.0D &&
+						!handler.player.isElytraFlying() && !handler.player.isInWater()) {
+					ItemStack item = getFormLiving0(handler.player);
+					if (item.getItem() == Items.ELYTRA && ItemElytra.isUsable(item))
+						handler.player.setElytraFlying();
 				} else
-					handler.playerEntity.clearElytraFlying();
+					handler.player.clearElytraFlying();
 				return Hook.Result.NULL;
 			}
 			return Hook.Result.VOID;
@@ -135,13 +119,13 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 		
 		@Hook(value = "net.minecraft.client.entity.EntityPlayerSP#func_70636_d", type = Type.TAIL)
 		public static void onLivingUpdate_tail(EntityPlayerSP player) {
-			ItemStack item = getInInventoryBauble(player);
+			ItemStack item = getFormLiving0(player);
 			KeyBinding jump = Minecraft.getMinecraft().gameSettings.keyBindJump;
 			boolean flag = Keyboard.isKeyDown(jump.getKeyCode());
-			if (item != null) {
+			if (item.getItem() == Items.ELYTRA) {
 				if (flag && jump.getKeyConflictContext().isActive() && !HookClient.flag &&
 						player.motionY < 0.0D && !player.isElytraFlying() && !player.capabilities.isFlying)
-					if (ItemElytra.isBroken(item))
+					if (ItemElytra.isUsable(item))
 						player.connection.sendPacket(new CPacketEntityAction(player, CPacketEntityAction.Action.START_FALL_FLYING));
 			}
 			HookClient.flag = flag;
@@ -156,35 +140,41 @@ public class ExItemElytra extends ItemElytra implements IBauble, IBaubleEquipmen
 		@Hook("net.minecraft.client.renderer.entity.layers.LayerCape#func_177141_a")
 		public static Hook.Result doRenderLayer_cape(LayerCape layer, AbstractClientPlayer player, float limbSwing, float limbSwingAmount,
 				float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-			return getFormLiving0(player) != null ? Hook.Result.NULL : Hook.Result.VOID;
+			return getFormLiving0(player).getItem() == Items.ELYTRA ? Hook.Result.NULL : Hook.Result.VOID;
 		}
 		
 		@Hook("net.minecraft.client.renderer.entity.layers.LayerElytra#func_177141_a")
-		public static Hook.Result doRenderLayer_elytra(LayerElytra layer, AbstractClientPlayer player, float limbSwing, float limbSwingAmount,
+		public static Hook.Result doRenderLayer_elytra(LayerElytra layer, EntityLivingBase living, float limbSwing, float limbSwingAmount,
 				float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-			ItemStack item = getInInventoryBauble(player);
-			if (item != null) {
+			ItemStack item = getFormLiving0(living);
+			if (item.getItem() == Items.ELYTRA) {
 				{
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-					GlStateManager.enableBlend();
-					
-					if (player.isPlayerInfoSet() && player.getLocationElytra() != null)
-						layer.renderPlayer.bindTexture(player.getLocationElytra());
-					else if (player.hasPlayerInfo() && player.getLocationCape() != null && player.isWearing(EnumPlayerModelParts.CAPE))
-						layer.renderPlayer.bindTexture(player.getLocationCape());
-					else
-						layer.renderPlayer.bindTexture(LayerElytra.TEXTURE_ELYTRA);
-					
-					GlStateManager.pushMatrix();
-					GlStateManager.translate(0.0F, 0.0F, 0.125F);
-					layer.modelElytra.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, player);
-					layer.modelElytra.render(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+		            GlStateManager.enableBlend();
+		            GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
-					if (item.isItemEnchanted())
-						LayerArmorBase.renderEnchantedGlint(layer.renderPlayer, player, layer.modelElytra, limbSwing, limbSwingAmount,
+		            if (living instanceof AbstractClientPlayer) {
+		                AbstractClientPlayer player = (AbstractClientPlayer) living;
+		                if (player.isPlayerInfoSet() && player.getLocationElytra() != null)
+		                	layer.renderPlayer.bindTexture(player.getLocationElytra());
+		                else if (player.hasPlayerInfo() && player.getLocationCape() != null && player.isWearing(EnumPlayerModelParts.CAPE))
+		                	layer.renderPlayer.bindTexture(player.getLocationCape());
+		                else
+		                	layer.renderPlayer.bindTexture(LayerElytra.TEXTURE_ELYTRA);
+		            } else
+		            	layer.renderPlayer.bindTexture(LayerElytra.TEXTURE_ELYTRA);
+
+		            GlStateManager.pushMatrix();
+		            GlStateManager.translate(0.0F, 0.0F, 0.125F);
+		            layer.modelElytra.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, living);
+		            layer.modelElytra.render(living, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+
+		            if (item.isItemEnchanted())
+						LayerArmorBase.renderEnchantedGlint(layer.renderPlayer, living, layer.modelElytra, limbSwing, limbSwingAmount,
 								partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-					
-					GlStateManager.popMatrix();
+
+		            GlStateManager.disableBlend();
+		            GlStateManager.popMatrix();
 				}
 				return Hook.Result.NULL;
 			}

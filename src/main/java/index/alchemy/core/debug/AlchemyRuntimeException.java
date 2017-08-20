@@ -37,9 +37,9 @@ public class AlchemyRuntimeException extends RuntimeException {
 		return false;
 	}
 	
-	public static void onException(Throwable t) throws RuntimeException {
+	public static AlchemyRuntimeException onException(Throwable t) throws RuntimeException {
 		if (checkException(t))
-			return;
+			return (AlchemyRuntimeException) t;
 		
 		AlchemyRuntimeException ex = new AlchemyRuntimeException(t);
 		
@@ -48,7 +48,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 		AlchemyModLoader.logger.error(error);
 		
 		if (ignore_serious_exceptions)
-			return;
+			return ex;
 		
 		for (StackTraceElement element : ex.getStackTrace())
 			try {
@@ -95,13 +95,10 @@ public class AlchemyRuntimeException extends RuntimeException {
 	@SideOnly(Side.CLIENT)
 	public static class GuiAlchemyRuntimeError extends GuiErrorScreen {
 		
-		private Exception e;
-		private String error, msgs[];
+		private String msgs[];
 		
-		public GuiAlchemyRuntimeError(Exception e, String error) {
+		public GuiAlchemyRuntimeError(String error) {
 			super(null, null);
-			this.e = e;
-			this.error = error;
 			msgs = error.split("\n");
 			msgs[0] = msgs[0].replace(msgs[0].charAt(msgs[0].length() - 1), ' ');
 			for (int i = 1; i < msgs.length; i++)
@@ -120,7 +117,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 		public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 			drawDefaultBackground();
 			String title = "Alchemy-error";
-			drawString(fontRendererObj, title, (width - fontRendererObj.getStringWidth(title)) / 2, 30, 0xFFFFFF);
+			drawString(fontRenderer, title, (width - fontRenderer.getStringWidth(title)) / 2, 30, 0xFFFFFF);
 			int offset = 40;
 			List<String> list = new LinkedList<String>();
 			for (String msg : msgs) {
@@ -128,7 +125,7 @@ public class AlchemyRuntimeException extends RuntimeException {
 				int w = 0;
 				boolean flag = false;
 				for (char c : msg.toCharArray()) {
-					w += fontRendererObj.getCharWidth(c);
+					w += fontRenderer.getCharWidth(c);
 					builder.append(c);
 					if (w > width - 60) {
 						w = 0;
@@ -145,17 +142,17 @@ public class AlchemyRuntimeException extends RuntimeException {
 			}
 			boolean flag = false;
 			for (String msg : list) {
-				if ((offset += fontRendererObj.FONT_HEIGHT) < height - 30)
-					drawString(fontRendererObj, msg, 30, offset, 0xFFFFFF);
+				if ((offset += fontRenderer.FONT_HEIGHT) < height - 30)
+					drawString(fontRenderer, msg, 30, offset, 0xFFFFFF);
 				else {
 					flag = true;
 					break;
 				}
 			}
 			if (flag)
-				drawString(fontRendererObj, "...", 30, offset, 0xFFFFFF);
+				drawString(fontRenderer, "...", 30, offset, 0xFFFFFF);
 			for (int i = 0; i < buttonList.size(); i++)
-				buttonList.get(i).drawButton(this.mc, mouseX, mouseY);
+				buttonList.get(i).drawButton(this.mc, mouseX, mouseY, partialTicks);
 		}
 	}
 	

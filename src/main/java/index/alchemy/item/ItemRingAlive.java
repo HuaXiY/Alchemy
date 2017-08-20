@@ -47,11 +47,13 @@ import index.project.version.annotation.Beta;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -145,7 +147,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 		ItemStack item = getFormLiving(target);
 		if (item != null) {
 			float power = alive_power.get(item) / 2;
-			for (EntityLivingBase living : target.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
+			for (EntityLivingBase living : target.world.getEntitiesWithinAABB(EntityLivingBase.class,
 					AABBHelper.getAABBFromEntity(target, EFFECT_RANDE))) {
 				onAlivePowerEffectiveLiving(living, power);
 				List<Double6IntArrayPackage> d6iaps = Lists.newLinkedList();
@@ -155,7 +157,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 						living.posY,
 						living.posZ + living.width / 2, 0, 0, 0, update));
 				IPhaseRunnable runnable = p -> AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
-						AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iaps);
+						AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.world, d6iaps);
 				runnable.run(AlchemyEventSystem.getPhase());
 				AlchemyEventSystem.addCounterRunnable(runnable, new Counter(20), 5);
 			}
@@ -190,7 +192,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 								living.posY + living.rand.nextFloat() * .5,
 								living.posZ + living.rand.nextGaussian(), 0, 0, 0, update));
 					AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
-							AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iaps);
+							AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.world, d6iaps);
 				}
 			}
 		}
@@ -201,7 +203,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 		if (event.getSource() instanceof EntityDamageSource) {
 			EntityLivingBase living = event.getEntityLiving();
 			EntityDamageSource source = (EntityDamageSource) event.getSource();
-			if (source.getEntity() instanceof EntityLivingBase && ((EntityLivingBase) source.getEntity()).isEntityUndead()) {
+			if (source.getTrueSource() instanceof EntityLivingBase && ((EntityLivingBase) source.getTrueSource()).isEntityUndead()) {
 				ItemStack alive = getFormLiving(living);
 				if (alive != null)
 					event.setAmount(event.getAmount() * (1 - alive_power.get(alive) * DECREASE_COEFFICIENT));
@@ -240,7 +242,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 		
 		@Override
 		public IMessage onMessage(MessageAlivePower message, MessageContext ctx) {
-			AlchemyEventSystem.addDelayedRunnable(p -> type.useAlivePower(ctx.getServerHandler().playerEntity), 0);
+			AlchemyEventSystem.addDelayedRunnable(p -> type.useAlivePower(ctx.getServerHandler().player), 0);
 			return null;
 		}
 		
@@ -253,7 +255,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
 		tooltip.add(String.format("%.2f", alive_power.get(stack)) + " / " + String.format("%.2f", MAX_POWER));
 	}
 	
@@ -265,7 +267,7 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		return isEquipmented(player) ? 
 				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
@@ -279,14 +281,14 @@ public class ItemRingAlive extends AlchemyItemRing implements IInputHandle, IEve
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 

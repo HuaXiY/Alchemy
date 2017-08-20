@@ -24,7 +24,7 @@ public class RenderTileEntityCauldron extends TileEntitySpecialRenderer<TileEnti
 	public static final boolean RENDER_SIDE[] = { true, false, false, false, false, false };
 	
 	@Override
-	public void renderTileEntityAt(TileEntityCauldron te, double tx, double ty, double tz, float partialTicks, int destroyStage) {
+	public void render(TileEntityCauldron te, double tx, double ty, double tz, float partialTicks, int destroyStage, float alpha) {
 		long tick = Always.getClientWorldTime();
 		if (te.getState() == State.OVER && te.getContainer().size() == 1) {
 			ItemStack item = te.getContainer().getFirst();

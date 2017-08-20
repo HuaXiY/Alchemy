@@ -25,8 +25,8 @@ public class MessageOpenGui implements IMessage, IMessageHandler<MessageOpenGui,
 
 	@Override
 	public IMessage onMessage(MessageOpenGui message, MessageContext ctx) {
-		EntityPlayer player = ctx.getServerHandler().playerEntity;
-		AlchemyEventSystem.addDelayedRunnable(p -> player.openGui(AlchemyModLoader.instance(), message.id, player.worldObj,
+		EntityPlayer player = ctx.getServerHandler().player;
+		AlchemyEventSystem.addDelayedRunnable(p -> player.openGui(AlchemyModLoader.instance(), message.id, player.world,
 				(int) player.posX, (int) player.posY, (int) player.posZ), 0);
 		return null;
 	}

@@ -153,9 +153,9 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		};
 		
 		private void update() {
-			if (worldObj != null && pos != null) {
-				worldObj.checkLight(pos);
-				worldObj.updateComparatorOutputLevel(pos, Blocks.CAULDRON);
+			if (world != null && pos != null) {
+				world.checkLight(pos);
+				world.updateComparatorOutputLevel(pos, Blocks.CAULDRON);
 			}
 		}
 		
@@ -239,26 +239,25 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 		FluidStack stack = tank.getFluid();
 		if (Always.isServer()) {
 			// fill with rain
-			if (worldObj.getWorldTime() % 2 == 0 && worldObj.isRainingAt(pos.up())) {
-				int level = getLevel();
+			if (world.getWorldTime() % 2 == 0 && world.isRainingAt(pos.up())) {
 				if (stack == null || stack.getFluid() == FluidRegistry.WATER && stack.amount < tank.getCapacity()) {
 					if (stack == null)
 						tank.setFluid(stack = new FluidStack(FluidRegistry.WATER, 0));
-					stack.amount = Math.min(stack.amount + (int) worldObj.getRainStrength(1), tank.getCapacity());
+					stack.amount = Math.min(stack.amount + (int) world.getRainStrength(1), tank.getCapacity());
 					updateFluidAmount();
 				}
 			}
 			
 			// collect EntityItem
-			List<EntityItem> entitys = worldObj.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).setMaxY(pos.getY() + .35));
+			List<EntityItem> entitys = world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(pos).setMaxY(pos.getY() + .35));
 			for (EntityItem entity : entitys) {
-				ItemStack item = entity.getEntityItem();
-				while (item.stackSize > 0 && container.size() < CONTAINER_MAX_ITEM) {
+				ItemStack item = entity.getItem();
+				while (item.getCount() > 0 && container.size() < CONTAINER_MAX_ITEM) {
 					ItemStack itemStack = item.splitStack(1);
 					container.add(itemStack);
 					onContainerChange();
 				}
-				if (item.stackSize == 0)
+				if (item.getCount() == 0)
 					entity.setDead();
 			}
 			
@@ -268,9 +267,9 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 				onContainerChange();
 				List<Double3Float2Package> d3f2ps = new LinkedList<>();
 				d3f2ps.add(new Double3Float2Package(pos.getX() + .5F, pos.getY() + .8F, pos.getZ() + .5F,
-						.4F, 2F + worldObj.rand.nextFloat() * .4F));
+						.4F, 2F + world.rand.nextFloat() * .4F));
 				AlchemyNetworkHandler.playSound(SoundEvents.ENTITY_GENERIC_BURN, SoundCategory.NEUTRAL,
-						AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getSoundRange()), worldObj, d3f2ps);
+						AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getSoundRange()), world, d3f2ps);
 			}
 			
 			// update alchemy recipe
@@ -281,7 +280,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 			
 			// in alchemy
 			if (recipe != null && state != State.OVER) {
-				if (worldObj.isAirBlock(pos.up()) && Elemix.blockIsHeatSource(worldObj, pos.down()) &&
+				if (world.isAirBlock(pos.up()) && Elemix.blockIsHeatSource(world, pos.down()) &&
 						stack != null && stack.getFluid() == recipe.getAlchemyFluid() &&
 						tank.getFluidAmount() == tank.getCapacity()) {
 					time++;
@@ -292,34 +291,34 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 				}
 				if (state == State.ALCHEMY && time >= recipe.getAlchemyTime()) {
 					container.clear();
-					container.add(recipe.getAlchemyResult(worldObj, pos));
+					container.add(recipe.getAlchemyResult(world, pos));
 					state = State.OVER;
 					tank.setFluid(null);
 					time = 0;
 					flag = true;
-					worldObj.addWeatherEffect(new EntityLightningBolt(worldObj, pos.getX(), pos.getY(), pos.getZ(), true));
+					world.addWeatherEffect(new EntityLightningBolt(world, pos.getX(), pos.getY(), pos.getZ(), true));
 				}
 			}
 		
 			if (flag)
 				updateTracker();
 		} else {
-			if (stack != null && stack.getFluid() == FluidRegistry.LAVA && worldObj.isRainingAt(pos.up()))
-				worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+			if (stack != null && stack.getFluid() == FluidRegistry.LAVA && world.isRainingAt(pos.up()))
+				world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
 							pos.getX() + random.nextDouble(), pos.getY() + 1, pos.getZ() + random.nextDouble(), 0, 0, 0);
 			if (recipe != null) {
-				if (worldObj.getWorldTime() % 3 == 0)
-					worldObj.spawnParticle(FXWisp.Info.type, false,
-							pos.getX() + worldObj.rand.nextFloat(),
-							pos.getY() + 1 + worldObj.rand.nextFloat(),
-							pos.getZ() + worldObj.rand.nextFloat(),
-							worldObj.rand.nextGaussian() * .05, worldObj.rand.nextFloat() * .15, worldObj.rand.nextGaussian() * .05,
-							new int[]{ fx_id_hover, 20, (int) (100 + worldObj.rand.nextFloat() * 50), recipe.getAlchemyColor() });
+				if (world.getWorldTime() % 3 == 0)
+					world.spawnParticle(FXWisp.Info.type, false,
+							pos.getX() + world.rand.nextFloat(),
+							pos.getY() + 1 + world.rand.nextFloat(),
+							pos.getZ() + world.rand.nextFloat(),
+							world.rand.nextGaussian() * .05, world.rand.nextFloat() * .15, world.rand.nextGaussian() * .05,
+							new int[]{ fx_id_hover, 20, (int) (100 + world.rand.nextFloat() * 50), recipe.getAlchemyColor() });
 				if (state == State.ALCHEMY)
-					worldObj.spawnParticle(FXWisp.Info.type, false,
-							pos.getX() + .5 - 2 + worldObj.rand.nextFloat() * 4,
-							pos.getY() + worldObj.rand.nextFloat(),
-							pos.getZ() + .5 - 2 + worldObj.rand.nextFloat() * 4,
+					world.spawnParticle(FXWisp.Info.type, false,
+							pos.getX() + .5 - 2 + world.rand.nextFloat() * 4,
+							pos.getY() + world.rand.nextFloat(),
+							pos.getZ() + .5 - 2 + world.rand.nextFloat() * 4,
 							0, 0, 0, new int[]{ fx_id_gather, 60, 200 });
 			}
 		}
@@ -328,13 +327,13 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	public void checkStateChange(State state) {
 		if (this.state != state) {
 			this.state = state;
-			worldObj.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_STATE, state.ordinal());
+			world.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_STATE, state.ordinal());
 		}
 	}
 	
 	public void updateFluidAmount() {
 		int amount = getTank().getFluid() == null ? 0 : getTank().getFluid().amount;
-		worldObj.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_FLUID, amount);
+		world.addBlockEvent(pos, Blocks.CAULDRON, UPDATE_FLUID, amount);
 	}
 	
 	@Override
@@ -359,7 +358,7 @@ public class TileEntityCauldron extends AlchemyTileEntity implements ITickable {
 	
 	public void onBlockBreak() {
 		for (ItemStack item : container)
-			InventoryHelper.spawnItemStack(worldObj, pos.getX(), pos.getY(), pos.getZ(), item);
+			InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), item);
 	}
 	
 	@Override

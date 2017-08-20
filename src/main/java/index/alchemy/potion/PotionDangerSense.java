@@ -17,14 +17,14 @@ public class PotionDangerSense extends AlchemyPotion {
 	@Override
 	public void performEffect(EntityLivingBase living, int level) {
 		if (Always.isClient())
-			if (living == Minecraft.getMinecraft().thePlayer) {
-				for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
+			if (living == Minecraft.getMinecraft().player) {
+				for (EntityLivingBase oliving : living.world.getEntitiesWithinAABB(EntityLivingBase.class,
 						AABBHelper.getAABBFromEntity(living, RANGE), IMob.VISIBLE_MOB_SELECTOR))
-					if (oliving != Minecraft.getMinecraft().thePlayer) {
+					if (oliving != Minecraft.getMinecraft().player) {
 						oliving.setGlowing(true);
 						oliving.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 2));
 					}
-				for (EntityLivingBase oliving : living.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,
+				for (EntityLivingBase oliving : living.world.getEntitiesWithinAABB(EntityLivingBase.class,
 						AABBHelper.getAABBFromEntity(living, OUT_OF_RANGE), IMob.VISIBLE_MOB_SELECTOR)) {
 					PotionEffect effect = oliving.getActivePotionEffect(MobEffects.GLOWING);
 					if (effect == null || effect.getDuration() == 0)

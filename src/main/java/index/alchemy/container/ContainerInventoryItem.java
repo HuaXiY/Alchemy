@@ -34,12 +34,12 @@ public class ContainerInventoryItem extends Container {
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		return inventory.isUseableByPlayer(player);
+		return inventory.isUsableByPlayer(player);
 	}
 	
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
-		ItemStack copy = null;
+		ItemStack copy = ItemStack.EMPTY;
 		Slot slot = inventorySlots.get(index);
 
 		if (slot != null && slot.getHasStack()) {
@@ -48,12 +48,12 @@ public class ContainerInventoryItem extends Container {
 
 			if (index < row * 9) {
 				if (!mergeItemStack(item, row * 9, inventorySlots.size(), true))
-					return null;
+					return ItemStack.EMPTY;
 			} else if (!mergeItemStack(item, 0, row * 9, false))
-				return null;
+				return ItemStack.EMPTY;
 
-			if (item.stackSize == 0)
-				slot.putStack(null);
+			if (item.getCount() == 0)
+				slot.putStack(ItemStack.EMPTY);
 			else
 				slot.onSlotChanged();
 		}

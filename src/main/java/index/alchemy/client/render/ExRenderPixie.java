@@ -3,8 +3,6 @@ package index.alchemy.client.render;
 import biomesoplenty.common.entities.EntityPixie;
 import biomesoplenty.common.entities.RenderPixie;
 import index.alchemy.api.annotation.Patch;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

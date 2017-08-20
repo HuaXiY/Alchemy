@@ -13,8 +13,8 @@ import index.alchemy.util.Always;
 import net.minecraft.client.renderer.entity.RenderDragon;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MultiPartEntityPart;
 import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -59,7 +59,7 @@ public class EntityMiniDragon extends EntityDragon implements IFollower {
 	@Override
 	public void onLivingUpdate() {
 		prevAnimTime = animTime;
-		float mxz = 0.2F / (MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ) * 10.0F + 1.0F);
+		float mxz = 0.2F / (MathHelper.sqrt(motionX * motionX + motionZ * motionZ) * 10.0F + 1.0F);
 		mxz = mxz * (float) Math.pow(2.0D, motionY);
 		animTime = mxz;
 		rotationYaw = MathHelper.wrapDegrees(rotationYaw);
@@ -130,7 +130,7 @@ public class EntityMiniDragon extends EntityDragon implements IFollower {
         dragonPartNeck.setLocationAndAngles(posX + sinryryv * 5.5F * cosoy, posY + f5 + sinoy * 5.5F, posZ - cosryryv * 5.5F * cosoy, 0.0F, 0.0F);
 
         for (int i = 0; i < 3; i++) {
-            EntityDragonPart part = null;
+        	MultiPartEntityPart part = null;
             if (i == 0)
             	part = dragonPartTail1;
             else if (i == 1)

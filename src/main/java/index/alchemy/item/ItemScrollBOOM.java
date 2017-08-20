@@ -15,10 +15,10 @@ public class ItemScrollBOOM extends ItemScroll {
 	
 	@Override
 	public void useScroll(ItemStack item, World world, EntityPlayer player, int type) {
-		for (EntityLivingBase entity : player.worldObj.getEntitiesWithinAABB(EntityLivingBase.class,  AABBHelper.getAABBFromEntity(player, 300D))) {
+		for (EntityLivingBase entity : player.world.getEntitiesWithinAABB(EntityLivingBase.class,  AABBHelper.getAABBFromEntity(player, 300D))) {
             if(!(entity instanceof EntityPlayer))
                 for (int i = 0; i < 3; i++) {
-                	player.worldObj.createExplosion(player, entity.posX, entity.posY, entity.posZ, 10F, true);
+                	player.world.createExplosion(player, entity.posX, entity.posY, entity.posZ, 10F, true);
                 }
         }
 	}

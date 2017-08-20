@@ -36,13 +36,13 @@ public interface NBTHelper {
 	}
 	
 	static ItemStack getItemStackFormNBT(NBTTagCompound nbt) {
-		return nbt.hasNoTags() ? null : ItemStack.loadItemStackFromNBT(nbt);
+		return nbt.hasNoTags() ? null : new ItemStack(nbt);
 	}
 	
 	static ItemStack[] getItemStacksFormNBTList(NBTTagList list) {
 		ItemStack[] item = new ItemStack[list.tagCount()];
 		for (int i = 0; i < list.tagCount(); i++)
-			item[i] = ItemStack.loadItemStackFromNBT(list.getCompoundTagAt(i));
+			item[i] = new ItemStack(list.getCompoundTagAt(i));
 		return item;
 	}
 	

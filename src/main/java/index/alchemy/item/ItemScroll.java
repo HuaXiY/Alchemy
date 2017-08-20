@@ -1,7 +1,5 @@
 package index.alchemy.item;
 
-import java.util.List;
-
 import index.alchemy.util.Always;
 import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLivingBase;
@@ -64,12 +62,8 @@ public abstract class ItemScroll extends AlchemyItem {
 	}
 	
 	@Override
-	public void addInformation(ItemStack item, EntityPlayer player, List list, boolean flag) {
-		
-	}
-	
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		ItemStack item = player.getHeldItem(hand);
 		if (player.capabilities.isCreativeMode) {
 			if (!sync || Always.isServer()) 
 				useScroll(item, world, player, getType(item));
@@ -94,10 +88,10 @@ public abstract class ItemScroll extends AlchemyItem {
 	public void onUsingTick(ItemStack item, EntityLivingBase living, int time) {
 		item.setItemDamage(time);
 		if (time <= 1) {
-			onPlayerStoppedUsing(item, living.worldObj, living, time);
+			onPlayerStoppedUsing(item, living.world, living, time);
 			if (nextIsMaxUse(item)) 
-				item.stackSize--;
-		}
+				item.setCount(item.getCount() - 1);
+			}
 	}
 	
 	@Override

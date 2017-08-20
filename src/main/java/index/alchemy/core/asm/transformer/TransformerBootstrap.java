@@ -39,7 +39,6 @@ public class TransformerBootstrap implements IAlchemyClassTransformer {
 						if (insn instanceof FieldInsnNode) {
 							FieldInsnNode field = (FieldInsnNode) insn;
 							if (field.getOpcode() == GETSTATIC && field.name.equals(fieldName)) {
-								AbstractInsnNode first = field.getPrevious();
 								AbstractInsnNode next = insn;
 								int i = 0;
 								while (!(next instanceof LabelNode && i++ == 2)) {

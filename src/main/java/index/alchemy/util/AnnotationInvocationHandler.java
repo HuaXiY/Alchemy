@@ -32,7 +32,6 @@ public class AnnotationInvocationHandler implements InvocationHandler {
 	
 	protected AnnotationInvocationHandler(Class<?> clazz, @Nullable Map<String, Object> mapValue,
 			@Nullable Map<String, InvocationHandler> mapProxy) {
-		Class<?>[] interfaces = clazz.getInterfaces();
 		type = findAnnotationClass(clazz);
 		memberValues = mapValue == null ? Maps.newHashMap() : mapValue;
 		memberProxys = mapProxy == null ? Maps.newHashMap() : mapProxy;

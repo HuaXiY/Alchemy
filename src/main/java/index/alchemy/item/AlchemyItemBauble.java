@@ -49,12 +49,13 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		public BaubleType getBaubleType(ItemStack itemstack) { return BaubleType.AMULET; }
 		
 		@Override
-		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+			ItemStack item = player.getHeldItem(hand);
 			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-				if (inventory.getStackInSlot(BaubleType.AMULET.getValidSlots()[0]) == null) {
+				if (inventory.getStackInSlot(BaubleType.AMULET.getValidSlots()[0]).isEmpty()) {
 					inventory.setInventorySlotContents(BaubleType.AMULET.getValidSlots()[0], item.copy());
-					item.stackSize--;
+					item.setCount(item.getCount() - 1);
 					return new ActionResult(EnumActionResult.SUCCESS, item);
 				}
 			}
@@ -78,7 +79,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		
 		@SideOnly(Side.CLIENT)
 		public boolean shouldHandleInput(KeyBinding binding) {
-			IInventory inventory = Minecraft.getMinecraft().thePlayer.getCapability(AlchemyCapabilityLoader.bauble, null);
+			IInventory inventory = Minecraft.getMinecraft().player.getCapability(AlchemyCapabilityLoader.bauble, null);
 			if (binding == key_binding_1)
 				return InventoryHelper.isItem(inventory.getStackInSlot(BaubleType.RING.getValidSlots()[0]), this);
 			if (binding == key_binding_2)
@@ -98,13 +99,14 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		}
 		
 		@Override
-		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+			ItemStack item = player.getHeldItem(hand);
 			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				for (int i = BaubleType.RING.getValidSlots()[0]; i < BaubleType.RING.getValidSlots()[1]; i++)
-					if (inventory.getStackInSlot(i) == null) {
+					if (inventory.getStackInSlot(i).isEmpty()) {
 						inventory.setInventorySlotContents(i, item.copy());
-						item.stackSize--;
+						item.setCount(item.getCount() - 1);
 						return new ActionResult(EnumActionResult.SUCCESS, item);
 					}
 			}
@@ -121,12 +123,13 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		public BaubleType getBaubleType(ItemStack itemstack) { return BaubleType.BELT; }
 		
 		@Override
-		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+			ItemStack item = player.getHeldItem(hand);
 			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-				if (inventory.getStackInSlot(BaubleType.BELT.getValidSlots()[0]) == null) {
+				if (inventory.getStackInSlot(BaubleType.BELT.getValidSlots()[0]).isEmpty()) {
 					inventory.setInventorySlotContents(BaubleType.BELT.getValidSlots()[0], item.copy());
-					item.stackSize--;
+					item.setCount(item.getCount() - 1);
 					return new ActionResult(EnumActionResult.SUCCESS, item);
 				}
 			}
@@ -143,12 +146,13 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		public BaubleType getBaubleType(ItemStack itemstack) { return BaubleType.HEAD; }
 		
 		@Override
-		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+			ItemStack item = player.getHeldItem(hand);
 			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-				if (inventory.getStackInSlot(BaubleType.HEAD.getValidSlots()[0]) == null) {
+				if (inventory.getStackInSlot(BaubleType.HEAD.getValidSlots()[0]).isEmpty()) {
 					inventory.setInventorySlotContents(BaubleType.HEAD.getValidSlots()[0], item.copy());
-					item.stackSize--;
+					item.setCount(item.getCount() - 1);
 					return new ActionResult(EnumActionResult.SUCCESS, item);
 				}
 			}
@@ -165,12 +169,13 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		public BaubleType getBaubleType(ItemStack itemstack) { return BaubleType.BODY; }
 		
 		@Override
-		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+			ItemStack item = player.getHeldItem(hand);
 			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-				if (inventory.getStackInSlot(BaubleType.BODY.getValidSlots()[0]) == null) {
+				if (inventory.getStackInSlot(BaubleType.BODY.getValidSlots()[0]).isEmpty()) {
 					inventory.setInventorySlotContents(BaubleType.BODY.getValidSlots()[0], item.copy());
-					item.stackSize--;
+					item.setCount(item.getCount() - 1);
 					return new ActionResult(EnumActionResult.SUCCESS, item);
 				}
 			}
@@ -187,12 +192,13 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 		public BaubleType getBaubleType(ItemStack itemstack) { return BaubleType.CHARM; }
 		
 		@Override
-		public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+			ItemStack item = player.getHeldItem(hand);
 			if (Always.isServer() && canEquip(item, player)) {
 				IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
-				if (inventory.getStackInSlot(BaubleType.CHARM.getValidSlots()[0]) == null) {
+				if (inventory.getStackInSlot(BaubleType.CHARM.getValidSlots()[0]).isEmpty()) {
 					inventory.setInventorySlotContents(BaubleType.CHARM.getValidSlots()[0], item.copy());
-					item.stackSize--;
+					item.setCount(item.getCount() - 1);
 					return new ActionResult(EnumActionResult.SUCCESS, item);
 				}
 			}
@@ -213,7 +219,7 @@ public abstract class AlchemyItemBauble extends AlchemyItemColor implements IBau
 				if (item != null && item.getItem() == this)
 					return item;
 			}
-		return null;
+		return ItemStack.EMPTY;
 	}
 	
 	@Override

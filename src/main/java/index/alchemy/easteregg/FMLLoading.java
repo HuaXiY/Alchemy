@@ -37,7 +37,7 @@ public class FMLLoading {
 			ResourceLocation loading = new AlchemyResourceLocation("textures/gui/loading/" + i + ".png");
 			if (!alchemyPack.resourceExists(loading))
 				break;
-			textures.add(new SplashProgress.Texture(loading));
+			textures.add(new SplashProgress.Texture(loading, null));
 		}
 		gifs = textures.toArray(new SplashProgress.Texture[textures.size()]);
 	}

@@ -31,7 +31,7 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void performEffect(EntityLivingBase living, int level) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		if (living == player) {
 			if (isCDOver() && player.motionY < 0 &&
 					Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode())) {
@@ -54,7 +54,7 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 		
 		@Override
 		public IMessage onMessage(MessageAlacrityCallback message, MessageContext ctx) {
-			type.callback(ctx.getServerHandler().playerEntity);
+			type.callback(ctx.getServerHandler().player);
 			return null;
 		}
 		
@@ -82,7 +82,7 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		return player.isPotionActive(PotionAlacrity.this) ? 
 				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
@@ -96,14 +96,14 @@ public class PotionAlacrity extends AlchemyPotion implements ICoolDown, INetwork
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 

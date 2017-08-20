@@ -10,7 +10,6 @@ import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import baubles.api.cap.IBaublesItemHandler;
 import index.alchemy.api.AlchemyBaubles;
-import index.alchemy.api.ICache;
 import index.alchemy.api.annotation.Texture;
 import index.alchemy.capability.AlchemyCapabilityLoader;
 import index.alchemy.core.AlchemyEventSystem;
@@ -18,6 +17,7 @@ import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
+import index.alchemy.util.cache.ICache;
 import index.alchemy.util.cache.StdCache;
 import index.project.version.annotation.Beta;
 import net.minecraft.entity.EntityLivingBase;
@@ -26,7 +26,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.WorldServer;
@@ -72,13 +71,18 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		}
 		
 		@Override
+		public ItemStack getStack() {
+			return super.getStack();
+		}
+		
+		@Override
 		public boolean isItemValid(ItemStack item) {
 			return inventory.isItemValidForSlot(getSlotIndex(), item);
 		}
 
 		@Override
 		public boolean canTakeStack(EntityPlayer player) {
-			return getStack() != null &&
+			return getStack().isEmpty() ||
 				   ((IBauble) getStack().getItem()).canUnequip(getStack(), player);
 		}
 		
@@ -114,7 +118,7 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	protected boolean updateTracker(NBTTagCompound data) {
 		if (data != null) {
 			AlchemyEventSystem.addDelayedRunnable(p -> {
-				for (EntityPlayer player : ((WorldServer) living.worldObj).getEntityTracker().getTrackingPlayers(living))
+				for (EntityPlayer player : ((WorldServer) living.world).getEntityTracker().getTrackingPlayers(living))
 					updatePlayer((EntityPlayerMP) player, data);
 				if (living instanceof EntityPlayerMP)
 					updatePlayer((EntityPlayerMP) living, data);
@@ -128,6 +132,11 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		AlchemyNetworkHandler.updateEntityBaubleNBT(living.getEntityId(), data, player);
 	}
 	
+	@Override
+	public boolean isUsableByPlayer(EntityPlayer player) {
+		return living == player;
+	}
+	
 	@Nullable
 	public NBTTagCompound getUpdateNBT() {
 		int index = ArrayUtils.indexOf(changed, true);
@@ -137,7 +146,7 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	@Nullable
 	public NBTTagCompound getUpdateNBT(int index) {
 		ItemStack item = getStackInSlot(index);
-		if (item == null)
+		if (item.isEmpty())
 			return null;
 		NBTTagCompound nbt = new NBTTagCompound(), data = item.getTagCompound();
 		changed[index] = false;
@@ -148,7 +157,7 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	}
 	
 	public void updateItem(int index, ItemStack item) {
-		contents[index] = item;
+		contents.set(index, item);
 	}
 	
 	public void copy(EntityLivingBase living) {
@@ -162,8 +171,8 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
 		ItemStack item = super.removeStackFromSlot(index);
-		if (item != null) {
-			change(item, null);
+		if (!item.isEmpty()) {
+			change(item, ItemStack.EMPTY);
 			setChanged(index, true);
 		}
 		return item;
@@ -172,8 +181,8 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		ItemStack item = super.removeStackFromSlot(index);
-		if (item != null) {
-			change(item, null);
+		if (!item.isEmpty()) {
+			change(item, ItemStack.EMPTY);
 			setChanged(index, true);
 		}
 		return item;
@@ -181,7 +190,7 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 
 	@Override
 	public void setInventorySlotContents(int index, ItemStack item) {
-		ItemStack old = contents[index];
+		ItemStack old = contents.get(index);
 		super.setInventorySlotContents(index, item);
 		if (!InventoryHelper.areItemsMetaEqual(old, item)) {
 			change(old, item);
@@ -195,13 +204,8 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	}
 	
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer living) {
-		return this.living == living;
-	}
-
-	@Override
 	public boolean isItemValidForSlot(int index, ItemStack item) {
-		return item != null && item.getItem() instanceof IBauble &&
+		return !item.isEmpty() && item.getItem() instanceof IBauble &&
 				((IBauble) item.getItem()).getBaubleType(item).hasSlot(index) &&
 				((IBauble) item.getItem()).canEquip(item, living);
 	}
@@ -215,9 +219,9 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	public void change(ItemStack old, ItemStack _new) {
 		if (isEventBlocked())
 			return;
-		if (old !=null)
+		if (!old.isEmpty())
 			((IBauble) old.getItem()).onUnequipped(old, living);
-		if (_new !=null)
+		if (!_new.isEmpty())
 			((IBauble) _new.getItem()).onEquipped(_new, living);
 	}
 
@@ -227,13 +231,10 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 	}
 	
 	@Override
-	public void deserializeNBT(NBTBase nbt) {
+	public void deserializeNBT(NBTTagCompound nbt) {
 		if (!init)
 			setEventBlock(true);
 		super.deserializeNBT(nbt);
-		int size = AlchemyBaubles.getBaublesSize();
-		if (contents.length < size)
-			contents = ArrayUtils.addAll(contents, new ItemStack[size - contents.length]);
 		if (living instanceof EntityPlayer)
 			update(true);
 		if (!init) {
@@ -267,5 +268,5 @@ public class InventoryBauble extends AlchemyInventory implements IBaublesItemHan
 		this.changed[slot] = changed;
 		markDirty();
 	}
-	
+
 }

@@ -7,7 +7,6 @@ import biomesoplenty.api.config.IConfigObj;
 import biomesoplenty.api.generation.BOPGeneratorBase;
 import index.alchemy.api.annotation.Generator;
 import index.alchemy.util.Always;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
@@ -82,7 +81,6 @@ public class GeneratorLakesPass extends BOPGeneratorBase {
 				for (int y = maxHeight; y > minHeight; y--) {
 					BlockPos now = pos.add(x, y, z);
 					IBlockState state = world.getBlockState(now);
-					Block block = state.getBlock();
 					if (mud) {
 						world.setBlockState(now, MUD, 2);
 						break;

@@ -57,22 +57,22 @@ public interface InventoryHelper  {
 		float my = RANDOM.nextFloat() * 0.8F + 0.1F;
 		float mz = RANDOM.nextFloat() * 0.8F + 0.1F;
 
-		while (item.stackSize > 0) {
-			int i = Math.min(RANDOM.nextInt(21) + 10, item.stackSize);
-
-			item.stackSize -= i;
+		while (item.getCount() > 0) {
+			int i = Math.min(RANDOM.nextInt(21) + 10, item.getCount());
+			
+			item.setCount(item.getCount() - i);
 			EntityItem entityitem = new EntityItem(world, x + mx, y + my, z + mz, item.splitStack(i));
 			
 			float f = 0.05F;
 			entityitem.motionX = RANDOM.nextGaussian() * f;
 			entityitem.motionY = RANDOM.nextGaussian() * f + 0.2D;
 			entityitem.motionZ = RANDOM.nextGaussian() * f;
-			world.spawnEntityInWorld(entityitem);
+			world.spawnEntity(entityitem);
 		}
 	}
 	
 	static EntityItem getEntityItem(Entity entity, ItemStack item) {
-		return getEntityItem(entity.worldObj, entity.posX, entity.posY, entity.posZ, item);
+		return getEntityItem(entity.world, entity.posX, entity.posY, entity.posZ, item);
 	}
 	
 	static EntityItem getEntityItem(World world, double x, double y, double z, ItemStack item) {
@@ -91,18 +91,22 @@ public interface InventoryHelper  {
 	}
 	
 	static void addItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {
-		if (!player.capabilities.isCreativeMode && --heldItem.stackSize == 0)
-			player.setHeldItem(hand, item);
-		else if (item != null && !player.inventory.addItemStackToInventory(item))
+		if (!player.capabilities.isCreativeMode) {
+			heldItem.setCount(heldItem.getCount() - 1);
+			if (heldItem.getCount() == 0)
+				player.setHeldItem(hand, item);
+		} else if (item != null && !player.inventory.addItemStackToInventory(item))
 			player.dropItem(item, false);
 	}
 	
 	static void addNonCreativeModeItemStackOrSetToHand(EntityPlayer player, EnumHand hand, ItemStack heldItem, ItemStack item) {
-		if (!player.capabilities.isCreativeMode)
-			if (--heldItem.stackSize == 0)
+		if (!player.capabilities.isCreativeMode) {
+			heldItem.setCount(heldItem.getCount() - 1);
+			if (heldItem.getCount() == 0)
 				player.setHeldItem(hand, item);
 			else if (item != null && !player.inventory.addItemStackToInventory(item))
 				player.dropItem(item, false);
+		}
 	}
 	
 	static boolean canMergeItemStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {

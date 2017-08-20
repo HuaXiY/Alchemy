@@ -38,10 +38,10 @@ public class MessageSound implements IMessage, IMessageHandler<MessageSound, IMe
 		Double3Float2Package d3f2p[] = message.d3f2p;
 		SoundEvent sound = SoundEvent.REGISTRY.getObject(new ResourceLocation(message.id));
 		SoundCategory category = SoundCategory.getByName(message.category);
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		AlchemyEventSystem.addDelayedRunnable(p -> {
 			for (int i = 0; i < d3f2p.length; i++)
-				player.worldObj.playSound(d3f2p[i].x, d3f2p[i].y, d3f2p[i].z, sound, category, d3f2p[i].a, d3f2p[i].b, true);
+				player.world.playSound(d3f2p[i].x, d3f2p[i].y, d3f2p[i].z, sound, category, d3f2p[i].a, d3f2p[i].b, true);
 		}, 1);
 		return null;
 	}

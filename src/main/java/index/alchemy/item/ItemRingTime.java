@@ -1,5 +1,7 @@
 package index.alchemy.item;
 
+import static java.lang.Math.max;
+
 import java.awt.Color;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -50,8 +52,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-
-import static java.lang.Math.*;
 
 @Omega
 @FX.UpdateProvider
@@ -120,7 +120,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 			if (isCDOver()) {
 				AlchemyNetworkHandler.network_wrapper.sendToServer(new MessageTimeLeap());
 				restartCD();
-				timeLeapOnClinet(Minecraft.getMinecraft().thePlayer);
+				timeLeapOnClinet(Minecraft.getMinecraft().player);
 			} else
 				HUDManager.setSnake(this);
 	}
@@ -135,7 +135,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 		
 		@Override
 		public IMessage onMessage(MessageTimeLeap message, MessageContext ctx) {
-			type.timeLeapOnServer(ctx.getServerHandler().playerEntity);
+			type.timeLeapOnServer(ctx.getServerHandler().player);
 			return null;
 		}
 		
@@ -182,12 +182,11 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 				int update[] = FXUpdateHelper.getIntArrayByArgs(FX_KEY_GATHER, 240, 200);
 				for (int i = 0; i < 3; i++)
 					d6iaps.add(new Double6IntArrayPackage(
-							player.posX + player.worldObj.rand.nextGaussian() * 6,
-							player.posY + player.worldObj.rand.nextGaussian() * 6,
-							player.posZ + player.worldObj.rand.nextGaussian() * 6, 0, 0, 0, update));
+							player.posX + player.world.rand.nextGaussian() * 6,
+							player.posY + player.world.rand.nextGaussian() * 6,
+							player.posZ + player.world.rand.nextGaussian() * 6, 0, 0, 0, update));
 				AlchemyNetworkHandler.spawnParticle(FXWisp.Info.type,
-						AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.worldObj, d6iaps);
-				boolean result = false;
+						AABBHelper.getAABBFromEntity(player, AlchemyNetworkHandler.getParticleRange()), player.world, d6iaps);
 				if (iterator.hasNext())
 					iterator.next().updateEntityOnServer(player);
 				if (!iterator.hasNext()) {
@@ -208,7 +207,7 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		return isEquipmented(player) ? 
 				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
@@ -222,14 +221,14 @@ public class ItemRingTime extends AlchemyItemRing implements IInputHandle, INetw
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 

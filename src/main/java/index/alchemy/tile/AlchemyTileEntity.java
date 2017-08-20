@@ -40,9 +40,9 @@ public class AlchemyTileEntity extends TileEntity {
     }
     
     public void updateTracker() {
-    	if (worldObj != null) {
+    	if (world != null) {
 	        SPacketUpdateTileEntity packet = getUpdatePacket();
-	        for (EntityPlayerMP player : worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, 
+	        for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, 
 	                AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getTileEntityUpdateRange())))
 	            updatePlayer(player, packet);
     	}
@@ -65,7 +65,7 @@ public class AlchemyTileEntity extends TileEntity {
             buf.writeBlockPos(blockPosition);
             buf.writeByte(instrument);
             buf.writeInt(pitch);
-            buf.writeVarIntToBuffer(Block.getIdFromBlock(block));
+            buf.writeVarInt(Block.getIdFromBlock(block));
         }
         
         @Override
@@ -73,7 +73,7 @@ public class AlchemyTileEntity extends TileEntity {
             blockPosition = buf.readBlockPos();
             instrument = buf.readUnsignedByte();
             pitch = buf.readInt();
-            block = Block.getBlockById(buf.readVarIntFromBuffer());
+            block = Block.getBlockById(buf.readVarInt());
         }
         
     }

@@ -1,8 +1,5 @@
 package index.alchemy.easteregg;
 
-import com.google.common.base.Function;
-
-import index.alchemy.achievement.AlchemyAchievementLoader;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Patch;
@@ -36,7 +33,7 @@ public class EatDirt extends ItemMultiTexture {
 	
 	// No use, just to compile
 	@Patch.Exception
-	private EatDirt(Block block, Block block2, Function<ItemStack, String> nameFunction) {
+	private EatDirt(Block block, Block block2, Mapper nameFunction) {
 		super(block, block2, nameFunction);
 	}
 	
@@ -50,8 +47,8 @@ public class EatDirt extends ItemMultiTexture {
 	
 	@Override
 	@Patch.Spare
-	public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
-		return super.onItemRightClick(item, world, player, hand);
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		return super.onItemRightClick(world, player, hand);
 	}
 	
 	@Patch.Exception
@@ -89,7 +86,7 @@ public class EatDirt extends ItemMultiTexture {
 	@Hook("net.minecraft.item.ItemMultiTexture#func_77654_b")
 	public static Hook.Result onItemUseFinish(ItemMultiTexture item, ItemStack stack, World world, EntityLivingBase living) {
 		if (item == dirt) {
-			--stack.stackSize;
+			stack.setCount(stack.getCount() - 1);
 			if (living instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) living;
 				world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_PLAYER_BURP,
@@ -97,7 +94,6 @@ public class EatDirt extends ItemMultiTexture {
 				if (Always.isServer()) {
 					player.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 40, 150));
 					player.addStat(StatList.getObjectUseStats(item));
-					player.addStat(AlchemyAchievementLoader.delicious_dirt);
 				}
 			}
 			return new Hook.Result(stack);

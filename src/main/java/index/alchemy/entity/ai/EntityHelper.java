@@ -10,7 +10,7 @@ import net.minecraft.entity.EntityList;
 public class EntityHelper {
 	
 	public static <T extends Entity> T clone(T entity) {
-		T result = (T) EntityList.createEntityFromNBT(entity.serializeNBT(), entity.worldObj);
+		T result = (T) EntityList.createEntityFromNBT(entity.serializeNBT(), entity.world);
 		result.setUniqueId(UUID.randomUUID());
 		return result;
 	}

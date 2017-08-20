@@ -12,7 +12,7 @@ import index.alchemy.util.Always;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +40,7 @@ public abstract class AlchemyFX extends Particle {
 	}
 	
 	@Override
-	public void renderParticle(VertexBuffer worldRenderer, Entity entity, float partialTicks, float rotationX,
+	public void renderParticle(BufferBuilder worldRenderer, Entity entity, float partialTicks, float rotationX,
 			float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
 		if (posSource != null) {
 			float 
@@ -162,13 +162,13 @@ public abstract class AlchemyFX extends Particle {
 	}
 	
 	@Override
-	public void moveEntity(double x, double y, double z) {
-		setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
+	public void move(double x, double y, double z) {
+		boundingBox = boundingBox.offset(x, y, z);
 		resetPositionToBB();
 	}
 	
 	public double getDistanceSq(Vec3d vec3d) {
-		return getDistanceSq(vec3d.xCoord, vec3d.yCoord, vec3d.zCoord);
+		return getDistanceSq(vec3d.x, vec3d.y, vec3d.z);
 	}
 	
 	public double getDistanceSq(double x, double y, double z) {
@@ -194,7 +194,6 @@ public abstract class AlchemyFX extends Particle {
 		this.transparent = transparent;
 	}
 	
-	@Override
 	public boolean isTransparent() {
 		return transparent;
 	}

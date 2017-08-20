@@ -1,6 +1,5 @@
 package index.alchemy.inventory;
 
-import java.util.Arrays;
 import java.util.RandomAccess;
 import java.util.stream.Stream;
 
@@ -10,12 +9,13 @@ import index.alchemy.util.InventoryHelper;
 import index.alchemy.util.NBTHelper;
 import index.project.version.annotation.Omega;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
@@ -27,14 +27,14 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import static java.lang.Math.*;
 
 @Omega
-public abstract class AlchemyInventory implements ICapabilitySerializable, IItemHandlerModifiableInventory, RandomAccess {
+public abstract class AlchemyInventory implements ICapabilitySerializable<NBTTagCompound>, IItemHandlerModifiableInventory, RandomAccess {
 	
 	public static final int LIMIT = 64;
 	public static final String CONTENTS = "contents";
 	
 	protected String name;
 	protected int limit;
-	protected ItemStack[] contents;
+	protected NonNullList<ItemStack> contents;
 	protected boolean dirty;
 	
 	public AlchemyInventory(int size) {
@@ -48,7 +48,7 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IItem
 	public AlchemyInventory(int size, String name, int limit) {
 		this.name = name;
 		this.limit = limit;
-		contents = new ItemStack[size];
+		contents = NonNullList.withSize(size, ItemStack.EMPTY);
 	}
 	
 	public boolean isDirty() {
@@ -65,100 +65,116 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IItem
 		return getSizeInventory();
 	}
 	
-    @Override
-    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-        if (stack == null)
-            return null;
+	@Override
+	public ItemStack getStackInSlot(int slot) {
+		return contents.get(slot);
+	}
 
-        if (!isItemValidForSlot(slot, stack))
-            return stack;
+	@Override
+	public int getSlotLimit(int slot) {
+		return contents.get(slot).getCount();
+	}
 
-        ItemStack stackInSlot = getStackInSlot(slot);
+	@Override
+	public boolean isEmpty() {
+		return !contents.stream().filter(item -> item != ItemStack.EMPTY).findFirst().isPresent();
+	}
 
-        int m;
-        if (stackInSlot != null) {
-            if (!ItemHandlerHelper.canItemStacksStack(stack, stackInSlot))
-                return stack;
+	@Override
+	public boolean isUsableByPlayer(EntityPlayer player) {
+		return true;
+	}
+	
+	protected IInventory getInv() {
+		return this;
+	}
+	
+	@Override
+	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+		if (stack.isEmpty())
+			return ItemStack.EMPTY;
+		ItemStack stackInSlot = getInv().getStackInSlot(slot);
+		int m;
+		if (!stackInSlot.isEmpty()) {
+			if (!ItemHandlerHelper.canItemStacksStack(stack, stackInSlot))
+				return stack;
+			if (!getInv().isItemValidForSlot(slot, stack))
+				return stack;
+			m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot)) - stackInSlot.getCount();
+			if (stack.getCount() <= m) {
+				if (!simulate) {
+					ItemStack copy = stack.copy();
+					copy.grow(stackInSlot.getCount());
+					getInv().setInventorySlotContents(slot, copy);
+					getInv().markDirty();
+				}
+				return ItemStack.EMPTY;
+			} else {
+				// copy the stack to not modify the original one
+				stack = stack.copy();
+				if (!simulate) {
+					ItemStack copy = stack.splitStack(m);
+					copy.grow(stackInSlot.getCount());
+					getInv().setInventorySlotContents(slot, copy);
+					getInv().markDirty();
+					return stack;
+				} else {
+					stack.shrink(m);
+					return stack;
+				}
+			}
+		} else {
+			if (!getInv().isItemValidForSlot(slot, stack))
+				return stack;
+			m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot));
+			if (m < stack.getCount()) {
+				// copy the stack to not modify the original one
+				stack = stack.copy();
+				if (!simulate) {
+					getInv().setInventorySlotContents(slot, stack.splitStack(m));
+					getInv().markDirty();
+					return stack;
+				} else {
+					stack.shrink(m);
+					return stack;
+				}
+			} else {
+				if (!simulate) {
+					getInv().setInventorySlotContents(slot, stack);
+					getInv().markDirty();
+				}
+				return ItemStack.EMPTY;
+			}
+		}
+	}
+	
+	@Override
+	public ItemStack extractItem(int slot, int amount, boolean simulate) {
+		if (amount == 0)
+			return ItemStack.EMPTY;
+		ItemStack stackInSlot = getInv().getStackInSlot(slot);
+		if (stackInSlot.isEmpty())
+			return ItemStack.EMPTY;
+		if (simulate) {
+			if (stackInSlot.getCount() < amount) {
+				return stackInSlot.copy();
+			} else {
+				ItemStack copy = stackInSlot.copy();
+				copy.setCount(amount);
+				return copy;
+			}
+		} else {
+			int m = Math.min(stackInSlot.getCount(), amount);
+			ItemStack decrStackSize = getInv().decrStackSize(slot, m);
+			getInv().markDirty();
+			return decrStackSize;
+		}
+	}
 
-            m = Math.min(stack.getMaxStackSize(), getInventoryStackLimit()) - stackInSlot.stackSize;
-
-            if (stack.stackSize <= m) {
-                if (!simulate) {
-                    ItemStack copy = stack.copy();
-                    copy.stackSize += stackInSlot.stackSize;
-                    setInventorySlotContents(slot, copy);
-                    markDirty();
-                }
-
-                return null;
-            } else {
-                // copy the stack to not modify the original one
-                stack = stack.copy();
-                if (!simulate) {
-                    ItemStack copy = stack.splitStack(m);
-                    copy.stackSize += stackInSlot.stackSize;
-                    setInventorySlotContents(slot, copy);
-                    markDirty();
-                    return stack;
-                } else {
-                    stack.stackSize -= m;
-                    return stack;
-                }
-            }
-        } else {
-            m = Math.min(stack.getMaxStackSize(), getInventoryStackLimit());
-            if (m < stack.stackSize) {
-                // copy the stack to not modify the original one
-                stack = stack.copy();
-                if (!simulate) {
-                    setInventorySlotContents(slot, stack.splitStack(m));
-                    markDirty();
-                    return stack;
-                } else {
-                    stack.stackSize -= m;
-                    return stack;
-                }
-            } else {
-                if (!simulate) {
-                    setInventorySlotContents(slot, stack);
-                    markDirty();
-                }
-                return null;
-            }
-        }
-    }
-    
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (amount == 0)
-            return null;
-
-        ItemStack stackInSlot = getStackInSlot(slot);
-
-        if (stackInSlot == null)
-            return null;
-
-        if (simulate) {
-            if (stackInSlot.stackSize < amount) {
-                return stackInSlot.copy();
-            } else {
-                ItemStack copy = stackInSlot.copy();
-                copy.stackSize = amount;
-                return copy;
-            }
-        } else {
-            int m = Math.min(stackInSlot.stackSize, amount);
-
-            ItemStack decrStackSize = decrStackSize(slot, m);
-            markDirty();
-            return decrStackSize;
-        }
-    }
-
-    @Override
-    public void setStackInSlot(int slot, ItemStack stack) {
-        setInventorySlotContents(slot, stack);
-    }
+	@Override
+	public void setStackInSlot(int slot, ItemStack stack) {
+		setInventorySlotContents(slot, stack);
+	}
 	
 	@Override
 	public void openInventory(EntityPlayer living) { }
@@ -184,7 +200,7 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IItem
 
 	@Override
 	public int getSizeInventory() {
-		return contents.length;
+		return contents.size();
 	}
 	
 	@Override
@@ -202,22 +218,17 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IItem
 	@Override
 	public void setInventorySlotContents(int index, ItemStack item) {
 		markDirty();
-		contents[index] = item;
+		contents.set(index, item);
 	}
 	
 	@Override
 	public ItemStack getInventorySlotContents(int index) {
-		return contents[index];
+		return contents.get(index);
 	}
 
 	@Override
 	public int getInventoryStackLimit() {
 		return limit;
-	}
-
-	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
-		return true;
 	}
 
 	@Override
@@ -228,8 +239,8 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IItem
 	@Override
 	public void clear() {
 		markDirty();
-		for (int i = 0; i < contents.length; i++)
-			contents[i] = null;
+		for (int i = 0; i < contents.size(); i++)
+			contents.set(i, ItemStack.EMPTY);
 	}
 	
 	@Override
@@ -254,47 +265,47 @@ public abstract class AlchemyInventory implements ICapabilitySerializable, IItem
 	@Override
 	public NBTTagCompound serializeNBT() {
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setTag(CONTENTS, NBTHelper.getNBTListFormItemStacks(contents));
+		nbt.setTag(CONTENTS, NBTHelper.getNBTListFormItemStacks(contents.toArray(new ItemStack[contents.size()])));
 		return nbt;
 	}
 
 	@Override
-	public void deserializeNBT(NBTBase nbt) {
+	public void deserializeNBT(NBTTagCompound nbt) {
 		if (nbt instanceof NBTTagCompound) {
 			NBTTagList list = ((NBTTagCompound) nbt).getTagList(CONTENTS, NBT.TAG_COMPOUND);
 			if (!list.hasNoTags())
-				contents = NBTHelper.getItemStacksFormNBTList(list);
+				contents = NonNullList.from(ItemStack.EMPTY, NBTHelper.getItemStacksFormNBTList(list));
 		}
 	}
 	
 	public boolean hasItem() {
 		for (ItemStack item : contents)
-			if (item != null)
+			if (!item.isEmpty())
 				return true;
 		return false;
 	}
 	
 	public void mergeItemStack(ItemStack item) {
-		if (item == null || item.stackSize < 1)
+		if (item.isEmpty() || item.getCount() < 1)
 			return;
 		int limit = min(item.getMaxStackSize(), getInventoryStackLimit()), t;
 		for (int i = 0, len = getSizeInventory(); i < len; i++) {
 			ItemStack current = getStackInSlot(i);
-			if (current == null) {
+			if (current.isEmpty()) {
 				setInventorySlotContents(i, current = item.copy());
-				current.stackSize = 0;
+				item.setCount(0);
 			}
 			if (InventoryHelper.canMergeItemStack(item, current)) {
-				current.stackSize += t = min(limit - current.stackSize, item.stackSize);
-				item.stackSize -= t;
+				current.setCount(current.getCount() + (t = min(limit - current.getCount(), item.getCount())));
+				item.setCount(item.getCount() - t);
 			}
-			if (item.stackSize < 1)
+			if (item.isEmpty())
 				return;
 		}
 	}
 	
 	public Stream<ItemStack> stream() {
-		return Arrays.stream(contents);
+		return contents.stream();
 	}
 	
 }

@@ -38,6 +38,7 @@ import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.asm.transformer.MeowTweaker;
 import index.alchemy.core.asm.transformer.SrgMap;
 import index.alchemy.core.asm.transformer.TransformerInjectOptifine;
+import index.alchemy.core.asm.transformer.TransformerReplace;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.ASMHelper;
@@ -94,6 +95,14 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	   });
 	}
 	
+	static {
+		String libArgs = System.getProperty("index.alchemy.runtime.lib.ext");
+		Set<String> libs = libArgs != null ? Sets.newHashSet(Splitter.on(';').split(libArgs)) : Sets.newHashSet();
+		// Forge hack native libs when startup
+		libs.add("jfxrt");
+		libs.forEach(AlchemyEngine::addRuntimeExtLibFromJRE);
+	}
+	
 	static { /* Java9  Tweaker */ MeowTweaker.Sayaka(); }
 	
 	static { /* JavaFX Tweaker */ MeowTweaker.Kyouko(); }
@@ -104,11 +113,6 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 	
 	static {
 		AlchemyDebug.start(SETUP_CORE);
-		String libArgs = System.getProperty("index.alchemy.runtime.lib.ext");
-		Set<String> libs = libArgs != null ? Sets.newHashSet(Splitter.on(';').split(libArgs)) : Sets.newHashSet();
-		// Forge hack native libs when startup
-		libs.add("jfxrt");
-		libs.forEach(AlchemyEngine::addRuntimeExtLibFromJRE);
 		// Initialization index.alchemy.util.ReflectionHelper
 		Tool.forName("index.alchemy.util.ReflectionHelper");
 		// Initialization index.alchemy.util.JFXHelper
@@ -139,6 +143,8 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 		// Fixed conflict with enderio
 		$(getLaunchClassLoader(), "transformers<<", new ArrayList(2) {
 			
+			{ add(new TransformerReplace()); }
+			
 			{ addAll($(getLaunchClassLoader(), "transformers")); }
 			
 			{ removeIf(MeowTweaker.class::isInstance); }
@@ -162,6 +168,7 @@ public class AlchemyEngine implements IFMLLoadingPlugin {
 			}
 			
 		});
+		Tool.forName("net.minecraftforge.fml.common.eventhandler.Event");
 		AlchemyDebug.end(SETUP_CORE);
 	}
 	

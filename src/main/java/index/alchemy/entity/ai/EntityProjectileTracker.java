@@ -14,7 +14,7 @@ public class EntityProjectileTracker {
 		double dx = target.posX - entity.posX;
 		double dy = target.getEntityBoundingBox().minY + target.height / 3 - entity.posY;
 		double dz = target.posZ - entity.posZ;
-		double dr = sqrt_double(dx * dx + dz * dz);
+		double dr = sqrt(dx * dx + dz * dz);
 		entity.setThrowableHeading(dx, dy + dr * 0.2, dz, 1.6F, 2);
 	}
 

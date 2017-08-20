@@ -23,8 +23,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemEnchantedBook;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -59,12 +61,12 @@ public class Always {
 	
 	@SideOnly(Side.CLIENT)
 	public static final boolean isPlaying() {
-		return Minecraft.getMinecraft().thePlayer != null;
+		return Minecraft.getMinecraft().player != null;
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public static final long getClientWorldTime() {
-		return Minecraft.getMinecraft().theWorld.getWorldTime();
+		return Minecraft.getMinecraft().world.getWorldTime();
 	}
 	
 	public static final boolean runOnClient() {
@@ -112,7 +114,7 @@ public class Always {
 	
 	public static final ItemStack getEnchantmentBook(Enchantment enchantment) {
 		ItemStack book = new ItemStack(Items.BOOK);
-		Items.ENCHANTED_BOOK.addEnchantment(book, new EnchantmentData(enchantment, 1));
+		ItemEnchantedBook.addEnchantment(book, new EnchantmentData(enchantment, 1));
 		return book;
 	}
 	
@@ -123,14 +125,14 @@ public class Always {
 	@Nullable
 	@SideOnly(Side.CLIENT)
 	public static final Entity findEntityFormClientWorld(int id) {
-		World world = Minecraft.getMinecraft().theWorld;
+		World world = Minecraft.getMinecraft().world;
 		if (world != null)
 			return world.getEntityByID(id);
 		return null;
 	}
 	
 	public static final Biome getCurrentBiome(EntityPlayer player) {
-		return getCurrentBiome(player.worldObj, (int) player.posX, (int) player.posZ);
+		return getCurrentBiome(player.world, (int) player.posX, (int) player.posZ);
 	}
 	
 	public static final Biome getCurrentBiome(World world, int x, int z) {
@@ -203,14 +205,14 @@ public class Always {
 		return new IMaterialConsumer() {
 			@Override
 			public boolean treatmentMaterial(List<ItemStack> items) {
-				int need = material.stackSize;
+				int need = material.getCount();
 				for (Iterator<ItemStack> iterator = items.iterator(); iterator.hasNext();) {
 					ItemStack item = iterator.next();
 					if (item.isItemEqualIgnoreDurability(material)) {
-						int change = min(need, item.stackSize);
+						int change = min(need, item.getCount());
 						need -= change;
-						item.stackSize -= change;
-						if (item.stackSize == 0)
+						item.setCount(item.getCount() - change);
+						if (item.getCount() == 0)
 							iterator.remove();
 						if (need < 1)
 							return true;
@@ -226,14 +228,15 @@ public class Always {
 			@Override
 			public boolean treatmentMaterial(List<ItemStack> items) {
 				int need = size;
+				NonNullList<ItemStack> ods = OreDictionary.getOres(material_str);
 				for (Iterator<ItemStack> iterator = items.iterator(); iterator.hasNext();) {
 					ItemStack item = iterator.next();
-					for (ItemStack material : OreDictionary.getOres(material_str))
+					for (ItemStack material : ods)
 						if (item.isItemEqualIgnoreDurability(material)) {
-							int change = min(need, item.stackSize);
+							int change = min(need, item.getCount());
 							need -= change;
-							item.stackSize -= change;
-							if (item.stackSize == 0)
+							item.setCount(item.getCount() - change);
+							if (item.getCount() == 0)
 								iterator.remove();
 							if (need < 1)
 								return true;

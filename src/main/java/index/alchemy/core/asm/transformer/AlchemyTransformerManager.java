@@ -241,7 +241,6 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		if (debug_print)
 			logger.info("loading: " + transformedName);
-		byte[] old = basicClass;
 		for (IClassTransformer transformer : transformers)
 			basicClass = transformer.transform(name, transformedName, basicClass);
 		if (transformers_mapping.containsKey(transformedName))

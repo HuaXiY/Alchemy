@@ -16,12 +16,12 @@ public class TileEntityIceTemp extends TileEntity implements ITickable {
 	@Override
 	public void update() {
 		if (--time == 0) {
-			worldObj.removeTileEntity(pos);
-			worldObj.setBlockState(pos, Blocks.AIR.getDefaultState());
-			worldObj.notifyNeighborsOfStateChange(pos, blockType);
-			worldObj.playSound(null, pos, SoundEvents.BLOCK_GLASS_BREAK,
-					SoundCategory.NEUTRAL, 1.0F, worldObj.rand.nextFloat() * 0.1F + 0.9F);
-			worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, pos.getX(), pos.getY(), pos.getZ(), .5, .5, .5);
+			world.removeTileEntity(pos);
+			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			world.notifyNeighborsOfStateChange(pos, blockType, true);
+			world.playSound(null, pos, SoundEvents.BLOCK_GLASS_BREAK,
+					SoundCategory.NEUTRAL, 1.0F, world.rand.nextFloat() * 0.1F + 0.9F);
+			world.spawnParticle(EnumParticleTypes.WATER_SPLASH, pos.getX(), pos.getY(), pos.getZ(), .5, .5, .5);
 		}
 	}
 	

@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -34,20 +34,20 @@ public class RenderHelper extends GlStateManager {
 	
 	public static void renderBlock(IBlockState state, BlockPos pos) {
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer vertexbuffer = tessellator.getBuffer();
-		vertexbuffer.begin(GL_QUADS, DefaultVertexFormats.BLOCK);
+		BufferBuilder BufferBuilder = tessellator.getBuffer();
+		BufferBuilder.begin(GL_QUADS, DefaultVertexFormats.BLOCK);
 		Minecraft minecraft = Minecraft.getMinecraft();
 		BlockRendererDispatcher dispatcher = minecraft.getBlockRendererDispatcher();
-		dispatcher.renderBlock(state, pos, minecraft.theWorld, vertexbuffer);
+		dispatcher.renderBlock(state, pos, minecraft.world, BufferBuilder);
 		tessellator.draw();
 	}
 	
 	public static void renderBlockFluid(IBlockState state, BlockPos pos, boolean renderSide[]) {
 		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer vertexbuffer = tessellator.getBuffer();
-		vertexbuffer.begin(GL_QUADS, DefaultVertexFormats.BLOCK);
+		BufferBuilder BufferBuilder = tessellator.getBuffer();
+		BufferBuilder.begin(GL_QUADS, DefaultVertexFormats.BLOCK);
 		Minecraft minecraft = Minecraft.getMinecraft();
-		fluidRender.renderFluid(minecraft.theWorld, state, pos, vertexbuffer, renderSide);
+		fluidRender.renderFluid(minecraft.world, state, pos, BufferBuilder, renderSide);
 		tessellator.draw();
 	}
 	
@@ -73,7 +73,7 @@ public class RenderHelper extends GlStateManager {
 	}
 	
 	public static void translateToZero() {
-		Entity view = Tool.isNullOr(Minecraft.getMinecraft().getRenderViewEntity(), () -> Minecraft.getMinecraft().thePlayer);
+		Entity view = Tool.isNullOr(Minecraft.getMinecraft().getRenderViewEntity(), () -> Minecraft.getMinecraft().player);
 		float partialTicks = getRenderPartialTicks();
 		glTranslatef(
 				-calculateRenderOffset((float) view.posX, (float) view.lastTickPosX, partialTicks),

@@ -7,6 +7,7 @@ import index.project.version.annotation.Omega;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,13 +34,15 @@ public class PotionPlague extends AlchemyPotion implements IEventHandle {
 	public void onLivingDeath(LivingDeathEvent event) {
 		if (Always.isServer() && event.getEntityLiving().isPotionActive(this)) {
 			EntityLivingBase living = event.getEntityLiving(), spawn_living = null;
-			if (living instanceof EntityPlayer || living instanceof EntityVillager) {
-				spawn_living = new EntityZombie(living.worldObj);
+			if (living instanceof EntityPlayer) {
+				spawn_living = new EntityZombie(living.world);
 				((EntityZombie) spawn_living).setChild(living.isChild());
-				if (living instanceof EntityVillager)
-					((EntityZombie) spawn_living).setVillagerType(((EntityVillager) living).getProfessionForge());
+			} else if (living instanceof EntityVillager) {
+				spawn_living = new EntityZombieVillager(living.world);
+				((EntityZombie) spawn_living).setChild(living.isChild());
+				((EntityZombieVillager) spawn_living).setForgeProfession(((EntityVillager) living).getProfessionForge());
 			} else if (living instanceof EntityPig) {
-				spawn_living = new EntityPigZombie(living.worldObj);
+				spawn_living = new EntityPigZombie(living.world);
 			}
 			
 			if (spawn_living != null) {
@@ -53,7 +56,7 @@ public class PotionPlague extends AlchemyPotion implements IEventHandle {
 					if (item.getStackInSlot(i) != null)
 						spawn_item.insertItem(i, item.getStackInSlot(i).copy(), true);
 				spawn_living.copyLocationAndAnglesFrom(living);
-				living.worldObj.spawnEntityInWorld(spawn_living);
+				living.world.spawnEntity(spawn_living);
 			}
 		}
 	}

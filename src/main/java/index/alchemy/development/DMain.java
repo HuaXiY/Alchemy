@@ -9,10 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import index.alchemy.api.annotation.DInit;
-import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Lang;
 import index.alchemy.api.annotation.Listener;
-import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;

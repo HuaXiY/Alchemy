@@ -22,8 +22,8 @@ public class ExParticleFirework_Starter extends ParticleFirework.Starter {
 	@Patch.Exception
 	@Hook("net.minecraft.entity.item.EntityFireworkRocket#func_70103_a")
 	public static Hook.Result handleStatusUpdate(EntityFireworkRocket rocket, byte id) {
-		if (id == 17 && rocket.worldObj.isRemote) {
-            ItemStack item = rocket.getDataManager().get(EntityFireworkRocket.FIREWORK_ITEM).orNull();
+		if (id == 17 && rocket.world.isRemote) {
+            ItemStack item = rocket.getDataManager().get(EntityFireworkRocket.FIREWORK_ITEM);
             NBTTagCompound nbt = null;
 
             if (item != null && item.hasTagCompound()) {
@@ -32,7 +32,7 @@ public class ExParticleFirework_Starter extends ParticleFirework.Starter {
             		nbt.setTag("display", item.getTagCompound().getTag("display"));
             }
 
-            rocket.worldObj.makeFireworks(rocket.posX, rocket.posY, rocket.posZ, rocket.motionX, rocket.motionY, rocket.motionZ, nbt);
+            rocket.world.makeFireworks(rocket.posX, rocket.posY, rocket.posZ, rocket.motionX, rocket.motionY, rocket.motionZ, nbt);
         }
 		return Hook.Result.NULL;
 	}
@@ -67,7 +67,7 @@ public class ExParticleFirework_Starter extends ParticleFirework.Starter {
             		SoundEvents.ENTITY_FIREWORK_LARGE_BLAST_FAR : SoundEvents.ENTITY_FIREWORK_BLAST_FAR :
             		large ? SoundEvents.ENTITY_FIREWORK_LARGE_BLAST : SoundEvents.ENTITY_FIREWORK_BLAST;
 
-            worldObj.playSound(posX, posY, posZ, sound, SoundCategory.AMBIENT,
+            world.playSound(posX, posY, posZ, sound, SoundCategory.AMBIENT,
             		20.0F, 0.95F + rand.nextFloat() * 0.1F, true);
         }
 
@@ -129,9 +129,9 @@ public class ExParticleFirework_Starter extends ParticleFirework.Starter {
             float r = (float)((rgb & 16711680) >> 16) / 255.0F;
             float g = (float)((rgb & 65280) >> 8) / 255.0F;
             float b = (float)((rgb & 255) >> 0) / 255.0F;
-            ParticleFirework.Overlay overlay = new ParticleFirework.Overlay(worldObj, posX, posY, posZ);
-            overlay.setRBGColorF(r, b, b);
-            theEffectRenderer.addEffect(overlay);
+            ParticleFirework.Overlay overlay = new ParticleFirework.Overlay(world, posX, posY, posZ);
+            overlay.setRBGColorF(r, g, b);
+            manager.addEffect(overlay);
         }
 
         ++fireworkAge;
@@ -140,7 +140,7 @@ public class ExParticleFirework_Starter extends ParticleFirework.Starter {
             if (twinkle) {
                 boolean far = isFarFromCamera();
                 SoundEvent soundevent = far ? SoundEvents.ENTITY_FIREWORK_TWINKLE_FAR : SoundEvents.ENTITY_FIREWORK_TWINKLE;
-                worldObj.playSound(posX, posY, posZ, soundevent, SoundCategory.AMBIENT,
+                world.playSound(posX, posY, posZ, soundevent, SoundCategory.AMBIENT,
                 		20.0F, 0.9F + rand.nextFloat() * 0.15F, true);
             }
 

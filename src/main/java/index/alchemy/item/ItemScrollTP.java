@@ -27,15 +27,15 @@ public class ItemScrollTP extends ItemScroll {
 			}
 			if (player instanceof EntityPlayerMP) {
 				int id;
-				if (player.worldObj.provider.getDimension() != (id = nbt.getInteger("id")))
+				if (player.world.provider.getDimension() != (id = nbt.getInteger("id")))
 					DimensionManager.getWorld(id).getDefaultTeleporter().placeInExistingPortal(player, player.rotationYaw);
                 player.setPositionAndUpdate(nbt.getDouble("x"), nbt.getDouble("y"), nbt.getDouble("z"));
 			}
 		} else {
 			NBTTagCompound up = new NBTTagCompound(), nbt = new NBTTagCompound();
 			item.setTagCompound(up);
-			nbt.setString("name", player.worldObj.getWorldInfo().getWorldName());
-			nbt.setInteger("id", player.worldObj.provider.getDimension());
+			nbt.setString("name", player.world.getWorldInfo().getWorldName());
+			nbt.setInteger("id", player.world.provider.getDimension());
 			nbt.setDouble("x", player.posX);
 			nbt.setDouble("y", player.posY);
 			nbt.setDouble("z", player.posZ);

@@ -20,7 +20,7 @@ public class FXPosUpdate implements IFXUpdate {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean updateFX(AlchemyFX fx, long tick) {
-		fx.moveEntity(offsetX, offsetY, offsetZ);
+		fx.move(offsetX, offsetY, offsetZ);
 		return true;
 	}
 

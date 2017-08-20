@@ -33,10 +33,10 @@ public class MessageParticle implements IMessage, IMessageHandler<MessageParticl
 	public IMessage onMessage(final MessageParticle message, MessageContext ctx) {
 		AlchemyEventSystem.addDelayedRunnable(p -> {
 			Double6IntArrayPackage d6iaps[] = message.d6iaps;
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayer player = Minecraft.getMinecraft().player;
 			EnumParticleTypes type = EnumParticleTypes.getParticleFromId(message.id);
 			for (int i = 0; i < d6iaps.length; i++)
-				player.worldObj.spawnParticle(type, false, d6iaps[i].x, d6iaps[i].y, d6iaps[i].z,
+				player.world.spawnParticle(type, false, d6iaps[i].x, d6iaps[i].y, d6iaps[i].z,
 						d6iaps[i].ox, d6iaps[i].oy, d6iaps[i].oz, d6iaps[i].args);
 		}, 1);
 		return null;

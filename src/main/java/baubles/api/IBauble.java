@@ -17,6 +17,8 @@ import net.minecraft.item.ItemStack;
 
 public interface IBauble {
 	
+	public static interface SyncBauble { }
+	
 	/**
 	 * This method return the type of bauble this is. 
 	 * Type is used to determine the slots it can go into.
@@ -53,6 +55,6 @@ public interface IBauble {
 	 * Default is off, so override and set to true if you want to auto sync.
 	 * This sync is not instant, but occurs every 10 ticks (.5 seconds).
 	 */
-	default boolean willAutoSync(ItemStack itemstack, EntityLivingBase living) { return false; }
+	default boolean willAutoSync(ItemStack itemstack, EntityLivingBase living) { return this instanceof SyncBauble; }
 	
 }

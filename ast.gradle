@@ -148,7 +148,7 @@ void doAccessTransformer0(List types, AST ast, ASTRewrite rewriter, String name,
                             .iterator(); variableIterator.hasNext();) {
                         VariableDeclarationFragment variable = variableIterator.next()
                         String fieldName = variable.getName().toString()
-                        if (node.owner.equals(name) && node.name.equals(fieldName)) {
+                        if (node.owner.equals(name) && (node.name.equals(fieldName) || node.name.equals("*"))) {
                             result.add(node)
                             size--
                             if (size > 0) {
@@ -168,11 +168,8 @@ void doAccessTransformer0(List types, AST ast, ASTRewrite rewriter, String name,
                                 IExtendedModifier mod = iterator.next()
                                 if (mod.isModifier()) {
                                     Modifier modifier = (Modifier) mod
-                                    if (modifier.isPrivate() || modifier.isProtected() || modifier.isPublic()) {
+                                    if (modifier.isPrivate() || modifier.isProtected() || modifier.isPublic())
                                         iterator.remove()
-                                        if (node.modifier != null)
-                                            newModifier = ast.newModifier(node.modifier)
-                                    }
                                     if (modifier.isFinal())    {
                                         hasFinal = true
                                         if (node.finalFlag == Boolean.FALSE)
@@ -180,6 +177,8 @@ void doAccessTransformer0(List types, AST ast, ASTRewrite rewriter, String name,
                                     }
                                 }
                             }
+							if (node.modifier != null)
+                                newModifier = ast.newModifier(node.modifier)
                             if (newModifier != null)
                                 modifiers.add(0, newModifier)
                             if (!hasFinal && node.finalFlag == Boolean.TRUE)
@@ -191,7 +190,7 @@ void doAccessTransformer0(List types, AST ast, ASTRewrite rewriter, String name,
                 }
             for (MethodDeclaration method : type.bodyDeclarations().stream().filter{ it instanceof MethodDeclaration }.collect(Collectors.toList()))
                 for (AccessNode node : mapping.get(TransformerType.METHOD))
-                    if (node.owner.equals(name) && node.name.equals(method.getName().toString())) {
+                    if (node.owner.equals(name) && (node.name.equals(method.getName().toString()) || node.name.equals("*"))) {
                         result.add(node)
                         List modifiers = method.modifiers()
                         ListRewrite rewrite = rewriter.getListRewrite(method, MethodDeclaration.MODIFIERS2_PROPERTY)

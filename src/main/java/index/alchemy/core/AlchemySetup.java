@@ -64,7 +64,7 @@ public class AlchemySetup implements IFMLCallHook {
 	}
 	
 	public static void injectAccessTransformer(File file, String atName, LaunchClassLoader loader) throws IOException {
-		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled())
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled() || file == null)
 			return;
 		String at = null;
 		try (JarFile jar = new JarFile(file)) {

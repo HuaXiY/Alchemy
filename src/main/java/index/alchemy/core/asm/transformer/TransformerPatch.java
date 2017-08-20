@@ -19,10 +19,10 @@ import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeAnnotationNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -142,6 +142,8 @@ public class TransformerPatch implements IClassTransformer {
 		node.interfaces.addAll(patch.interfaces);
 		node.version = V1_8;
 		node.accept(writer);
+		if (transformedName.endsWith("ForgeRegistry"))
+			Tool.dumpClass(writer.toByteArray(), "d:/b.bytecode");
 		return writer.toByteArray();
 	}
 	
@@ -183,34 +185,41 @@ public class TransformerPatch implements IClassTransformer {
 		methodNode.desc = methodNode.desc.replace(patchName, clazzName);
 		for (Iterator<AbstractInsnNode> iterator = methodNode.instructions.iterator(); iterator.hasNext();) {
 			AbstractInsnNode insn = iterator.next();
-			if (insn instanceof FieldInsnNode) {
+			if (insn instanceof TypeInsnNode) {
+				TypeInsnNode type = (TypeInsnNode) insn;
+				type.desc = replace(type.desc, patchName, clazzName);
+			} else if (insn instanceof FieldInsnNode) {
 				FieldInsnNode field = (FieldInsnNode) insn;
-				field.owner = field.owner.replace(patchName, clazzName);
-			} else if (insn instanceof LdcInsnNode) {
-				LdcInsnNode ldc = (LdcInsnNode) insn;
-				if (ldc.cst instanceof String)
-					ldc.cst = ((String) ldc.cst).replace(patchName, clazzName);
+				field.owner = replace(field.owner, patchName, clazzName);
 			} else if (insn instanceof MethodInsnNode) {
 				MethodInsnNode method = (MethodInsnNode) insn;
 				if (method.owner.equals(patchName) && method.getOpcode() == INVOKEVIRTUAL)
 					method.setOpcode(INVOKESPECIAL);
-				method.owner = method.owner.replace(patchName, clazzName);
+				method.owner = replace(method.owner, patchName, clazzName);
 			} else if (insn instanceof InvokeDynamicInsnNode) {
 				InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
+				String patchDesc = ASMHelper.getClassDesc(patchName), clazzDesc = ASMHelper.getClassDesc(clazzName);
+				dynamic.desc = dynamic.desc.replace(patchDesc, clazzDesc);
 				for (int i = 0; i < dynamic.bsmArgs.length; i++)
 					if (dynamic.bsmArgs[i] instanceof Handle) {
 						Handle handle = (Handle) dynamic.bsmArgs[i];
-						dynamic.bsmArgs[i] = new Handle(handle.getTag(), handle.getOwner().replace(patchName, clazzName),
-								handle.getName(), handle.getDesc());
+						dynamic.bsmArgs[i] = new Handle(handle.getTag(), replace(handle.getOwner(), patchName, clazzName),
+								handle.getName(), handle.getDesc().replace(patchDesc, clazzDesc));
 					}
 			} else if (insn instanceof FrameNode) {
 				FrameNode frame = (FrameNode) insn;
 				if (frame.local != null)
-					frame.local.replaceAll((o -> o instanceof String ? ((String) o).replace(patchName, clazzName) : o));
+					frame.local.replaceAll((o -> o instanceof String ? replace((String) o, patchName, clazzName) : o));
 				if (frame.stack != null)
-					frame.stack.replaceAll((o -> o instanceof String ? ((String) o).replace(patchName, clazzName) : o));
+					frame.stack.replaceAll((o -> o instanceof String ? replace((String) o, patchName, clazzName) : o));
 			}
 		}
+	}
+	
+	public String replace(String src, String patch, String clazz) {
+		if (src.equals(patch))
+			return clazz;
+		return src;
 	}
 	
 	public TransformerPatch(ClassNode patch) {

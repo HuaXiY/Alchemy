@@ -6,8 +6,9 @@ import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Omega
@@ -26,35 +27,35 @@ public interface CraftingHelper {
 	}
 	
 	static void remove(Predicate<ItemStack> predicate) {
-		CraftingManager.getInstance().recipes.removeIf(r -> predicate.test(r.getRecipeOutput()));
+		ForgeHelper.getUnregister(IRecipe.class).unregistryIf((loc, r) -> predicate.test(r.getRecipeOutput()));
 	}
 	
-	static void add(Item item, Object... args) {
-		add(new ItemStack(item), args);
+	static void add(ResourceLocation name, ResourceLocation group, Item item, Object... args) {
+		add(name, group, new ItemStack(item), args);
 	}
 	
-	static void add(Block block, Object... args) {
-		add(new ItemStack(block), args);
+	static void add(ResourceLocation name, ResourceLocation group, Block block, Object... args) {
+		add(name, group, new ItemStack(block), args);
 	}
 	
-	static void add(ItemStack item, Object... args) {
-		GameRegistry.addRecipe(item, args);
+	static void add(ResourceLocation name, ResourceLocation group, ItemStack item, Object... args) {
+		GameRegistry.addShapedRecipe(name, group, item, args);
 	}
 	
 	static void add(IRecipe recipe) {
-		GameRegistry.addRecipe(recipe);
+		GameRegistry.register(recipe);
 	}
 	
-	static void addShapeless(Item item, Object... args) {
-		add(new ItemStack(item), args);
+	static void addShapeless(ResourceLocation name, ResourceLocation group, Item item, Object... args) {
+		add(name, group, new ItemStack(item), args);
 	}
 	
-	static void addShapeless(Block block, Object... args) {
-		add(new ItemStack(block), args);
+	static void addShapeless(ResourceLocation name, ResourceLocation group, Block block, Object... args) {
+		add(name, group, new ItemStack(block), args);
 	}
 	
-	static void addShapeless(ItemStack item, Object... args) {
-		GameRegistry.addShapelessRecipe(item, args);
+	static void addShapeless(ResourceLocation name, ResourceLocation group, ItemStack item, Ingredient... args) {
+		GameRegistry.addShapelessRecipe(name, group, item, args);
 	}
 
 }

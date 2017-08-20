@@ -14,7 +14,7 @@ public class ItemHeadMagicPixie extends ItemHeadFollower {
 	
 	@Override
 	public EntityLiving createFollower(ItemStack item, EntityLivingBase owner) {
-		return new EntityMagicPixie(owner.worldObj);
+		return new EntityMagicPixie(owner.world);
 	}
 
 	public ItemHeadMagicPixie() {

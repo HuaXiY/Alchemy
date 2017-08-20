@@ -6,13 +6,14 @@ import index.alchemy.api.IAlchemyBrewingRecipe;
 import index.alchemy.api.annotation.Lang;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Beta;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 
 import static java.lang.Math.*;
 
@@ -26,8 +27,8 @@ public class ItemMagicSolvent extends AlchemyItemColor implements IAlchemyBrewin
 	protected Type type;
 	
 	@Override
-	public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean advanced) {
-		super.addInformation(item, player, tooltip, advanced);
+	public void addInformation(ItemStack item, World world, List<String> tooltip, ITooltipFlag flag) {
+		super.addInformation(item, world, tooltip, flag);
 		Type type = Type.getType(item);
 		if (type != null)
 			tooltip.add(min(tooltip.size(), 1), type.getTextWithoutFormattingCodes());

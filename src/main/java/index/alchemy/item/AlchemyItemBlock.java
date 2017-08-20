@@ -78,13 +78,14 @@ public class AlchemyItemBlock extends ItemBlock implements IColorItem, IResource
 	}
 	
 	@Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand,
-    		EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand,
+			EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack stack = player.getHeldItem(hand);
         if (block instanceof AlchemyBlockSlab && !((BlockSlab) block).isDouble()) {
-	    	if (stack.stackSize != 0 && playerIn.canPlayerEdit(pos.offset(facing), facing, stack)) {
+	    	if (stack.getCount() != 0 && player.canPlayerEdit(pos.offset(facing), facing, stack)) {
 	    		BlockSlab singleSlab = (BlockSlab) block;
 	            Comparable<?> comparable = singleSlab.getTypeForItem(stack);
-	            IBlockState iblockstate = worldIn.getBlockState(pos);
+	            IBlockState iblockstate = world.getBlockState(pos);
 	            if (iblockstate.getBlock() == singleSlab) {
 	                IProperty<?> iproperty = singleSlab.getVariantProperty();
 	                Comparable<?> comparable1 = iblockstate.getValue(iproperty);
@@ -93,23 +94,23 @@ public class AlchemyItemBlock extends ItemBlock implements IColorItem, IResource
 	                		facing == EnumFacing.DOWN && blockslab$enumblockhalf == BlockSlab.EnumBlockHalf.TOP) &&
 	                		comparable1 == comparable) {
 	                    IBlockState iblockstate1 = makeSlabState(iproperty, comparable1);
-	                    AxisAlignedBB axisalignedbb = iblockstate1.getCollisionBoundingBox(worldIn, pos);
-	                    if (axisalignedbb != Block.NULL_AABB && worldIn.checkNoEntityCollision(axisalignedbb.offset(pos)) &&
-	                    		worldIn.setBlockState(pos, iblockstate1, 11)) {
-	                        SoundType soundtype = block.getSoundType(iblockstate1, worldIn, pos,playerIn);
-	                        worldIn.playSound(playerIn, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS,
+	                    AxisAlignedBB axisalignedbb = iblockstate1.getCollisionBoundingBox(world, pos);
+	                    if (axisalignedbb != Block.NULL_AABB && world.checkNoEntityCollision(axisalignedbb.offset(pos)) &&
+	                    		world.setBlockState(pos, iblockstate1, 11)) {
+	                        SoundType soundtype = block.getSoundType(iblockstate1, world, pos,player);
+	                        world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS,
 	                        		(soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-	                        --stack.stackSize;
+	                        stack.setCount(stack.getCount() - 1);
 	                    }
 	                    return EnumActionResult.SUCCESS;
 	                }
 	            }
-	            return tryPlace(playerIn, stack, worldIn, pos.offset(facing), comparable) ? EnumActionResult.SUCCESS :
-	            	super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+	            return tryPlace(player, stack, world, pos.offset(facing), comparable) ? EnumActionResult.SUCCESS :
+	            	super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
 	        } else
 	        	return EnumActionResult.FAIL;
         } else
-        	return super.onItemUse(stack, playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+        	return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
     }
 	
 	@Override
@@ -148,7 +149,7 @@ public class AlchemyItemBlock extends ItemBlock implements IColorItem, IResource
                         SoundType soundtype = singleSlab.getSoundType(iblockstate1, worldIn, pos, player);
                         worldIn.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS,
                         		(soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-                        --stack.stackSize;
+                        stack.setCount(stack.getCount() - 1);
                     }
                     return true;
                 }

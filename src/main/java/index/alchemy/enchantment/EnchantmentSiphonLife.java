@@ -22,8 +22,8 @@ public class EnchantmentSiphonLife extends AlchemyEnchantment implements IEventH
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onLivingHurt(LivingHurtEvent event) {
 		if (event.getSource() instanceof EntityDamageSource && !(event.getSource() instanceof EntityDamageSourceIndirect) &&
-				event.getSource().getEntity() instanceof EntityLivingBase) {
-			EntityLivingBase living = (EntityLivingBase) event.getSource().getEntity();
+				event.getSource().getImmediateSource() instanceof EntityLivingBase) {
+			EntityLivingBase living = (EntityLivingBase) event.getSource().getImmediateSource();
 			int level = EnchantmentHelper.getEnchantmentLevel(this, living.getHeldItemMainhand());
 			if (level > 0)
 				living.heal(event.getAmount() * min(SIPHON_COEFFICIENT * level, 1F));

@@ -15,6 +15,7 @@ import index.alchemy.inventory.InventoryBauble;
 import index.alchemy.util.Always;
 import index.alchemy.util.InventoryHelper;
 import index.project.version.annotation.Beta;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -63,19 +64,19 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 			event.addCapability(RESOURCE, new InventoryBauble((EntityLivingBase) event.getObject()));
 	}
 
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.BOTTOM)
 	public void onLivingUpdate(LivingUpdateEvent event) {
 		InventoryBauble inventory = event.getEntityLiving().getCapability(AlchemyCapabilityLoader.bauble, null);
 		if (inventory != null) {
 			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 				ItemStack item = inventory.getStackInSlot(i);
-				if (item != null && item.getItem() instanceof IBauble)
+				if (!item.isEmpty() && item.getItem() instanceof IBauble)
 					((IBauble) item.getItem()).onWornTick(item, event.getEntityLiving());
 			}
 			if (Always.isServer()) {
 				for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 					ItemStack item = inventory.getStackInSlot(i);
-					if (item != null && item.getItem() instanceof IBauble &&
+					if (!item.isEmpty() && item.getItem() instanceof IBauble &&
 							((IBauble) item.getItem()).willAutoSync(item, event.getEntityLiving()) &&
 							inventory.getCache().equals(i, item.getTagCompound()))
 						inventory.setChanged(i, true);
@@ -94,7 +95,7 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 				return;
 			for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 				ItemStack item = inventory.removeStackFromSlot(i);
-				if (item != null)
+				if (!item.isEmpty())
 					event.getDrops().add(InventoryHelper.getEntityItem(living, item));
 			}
 		}
@@ -103,12 +104,12 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onPlayerDrops(PlayerDropsEvent event) {
 		EntityPlayer player = event.getEntityPlayer();
-		if (!player.worldObj.getGameRules().getBoolean("keepInventory")) {
+		if (!player.world.getGameRules().getBoolean("keepInventory")) {
 			IInventory inventory = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 			if (inventory != null)
 				for (int i = 0, len = inventory.getSizeInventory(); i < len; i++) {
 					ItemStack item = inventory.removeStackFromSlot(i);
-					if (item != null)
+					if (!item.isEmpty())
 						event.getDrops().add(InventoryHelper.getEntityItem(player, item));
 				}
 		}
@@ -126,12 +127,31 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 			inventory.updatePlayer((EntityPlayerMP) event.getEntityPlayer(), inventory.serializeNBT());
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.BOTTOM)
 	public void tooltipEvent(ItemTooltipEvent event) {
 		if (event.getItemStack() != null && event.getItemStack().getItem() instanceof IBauble) {
 			BaubleType type = ((IBauble) event.getItemStack().getItem()).getBaubleType(event.getItemStack());
 			event.getToolTip().add(min(event.getToolTip().size(), 1), TextFormatting.GOLD + type.toString());
 		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.client.gui.inventory.GuiInventory#func_73866_w_", type = Hook.Type.TAIL)
+	public static final void initGui(GuiInventory inventory) {
+		updateButtonPos(inventory.recipeButton);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Hook(value = "net.minecraft.client.gui.inventory.GuiInventory#func_146284_a", type = Hook.Type.TAIL)
+	public static final void actionPerformed(GuiInventory inventory, GuiButton button) {
+		if (button.id == 10)
+			updateButtonPos(button);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	protected static final void updateButtonPos(GuiButton button) {
+		button.x += 16 * 2 + 12;
+		button.y -= 16 * 3 + 8;
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -169,8 +189,8 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 		if (tab == CreativeTabs.INVENTORY)
 			for (int len = 8, start = gui.inventorySlots.inventorySlots.size() - len - 1, i = 0; i < len; i++) {
 				Slot slot = gui.inventorySlots.getSlot(start + (i == 4 ? 5 : i == 5 ? 4 : i < 4 ? i == 0 ? 3 : i - 1 : i));
-				slot.xDisplayPosition = (i > 3 ? 91 : 17) + i / 2 * 18;
-				slot.yDisplayPosition = 11 + i % 2 * 18;
+				slot.xPos = (i > 3 ? 91 : 17) + i / 2 * 18;
+				slot.yPos = 11 + i % 2 * 18;
 			}
 	}
 	
@@ -193,11 +213,11 @@ public class CapabilityBauble extends AlchemyCapability<InventoryBauble> impleme
 		if (slot != null && slot.getHasStack()) {
 			ItemStack item = slot.getStack();
 			if (item.getItem() instanceof IBauble && container.mergeItemStack(item, id - AlchemyBaubles.getBaublesSize(), id, false)) {
-				if (item.stackSize == 0)
-					slot.putStack(null);
+				if (item.getCount() == 0)
+					slot.putStack(ItemStack.EMPTY);
 				else
 					slot.onSlotChanged();
-				return Hook.Result.NULL;
+				return new Hook.Result(ItemStack.EMPTY);
 			}
 		}
 		return Hook.Result.VOID;

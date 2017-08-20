@@ -6,7 +6,8 @@ import java.util.function.BiFunction;
 import biomesoplenty.api.block.BlockQueries;
 import biomesoplenty.api.block.IBlockPosQuery;
 import biomesoplenty.api.config.IConfigObj;
-import biomesoplenty.common.world.generator.tree.GeneratorTreeBase;
+import biomesoplenty.common.util.biome.GeneratorUtils.ScatterYMethod;
+import biomesoplenty.common.world.generator.tree.GeneratorBasicTree;
 import index.alchemy.api.annotation.Generator;
 import net.minecraft.block.BlockCocoa;
 import net.minecraft.block.BlockHorizontal;
@@ -17,9 +18,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Generator(identifier = "fruit_tree", builder = GeneratorFruitTree.Builder.class)
-public class GeneratorFruitTree extends GeneratorTreeBase {
+public class GeneratorFruitTree extends GeneratorBasicTree {
 	
-	public static class Builder extends GeneratorTreeBase.InnerBuilder<Builder, GeneratorFruitTree>
+	public static class Builder extends GeneratorBasicTree.InnerBuilder<Builder, GeneratorFruitTree>
 			implements IGeneratorBuilder<GeneratorFruitTree> {
 		
 		protected int minAge, maxAge;
@@ -44,12 +45,15 @@ public class GeneratorFruitTree extends GeneratorTreeBase {
 			hanging = null;
 			trunkFruit = null;
 			altLeaves = null;
+			scatterYMethod = ScatterYMethod.AT_SURFACE;
 		}
 
 		@Override
 		public GeneratorFruitTree create() {
 			return new GeneratorFruitTree(amountPerChunk, placeOn, replace, log, leaves, vine, hanging,
-					trunkFruit, altLeaves, minHeight, maxHeight, minAge, maxAge, fruitAgeHandler);
+					trunkFruit, altLeaves, minHeight, maxHeight, minAge, maxAge, fruitAgeHandler,
+					updateNeighbours, leafLayers, leavesOffset, maxLeavesRadius, leavesLayerHeight,
+					placeVinesOn, hangingChance, scatterYMethod);
 		}
 	}
 	
@@ -58,8 +62,10 @@ public class GeneratorFruitTree extends GeneratorTreeBase {
 	
 	public GeneratorFruitTree(float amountPerChunk, IBlockPosQuery placeOn, IBlockPosQuery replace, IBlockState log, IBlockState leaves,
 			IBlockState vine, IBlockState hanging, IBlockState trunkFruit, IBlockState altLeaves, int minHeight, int maxHeight,
-			int minAge, int maxAge, BiFunction<IBlockState, Integer, IBlockState> fruitAgeHandler) {
-		super(amountPerChunk, placeOn, replace, log, leaves, vine, hanging, trunkFruit, altLeaves, minHeight, maxHeight);
+			int minAge, int maxAge, BiFunction<IBlockState, Integer, IBlockState> fruitAgeHandler, boolean updateNeighbours, int leafLayers, int leavesOffset,
+			int maxLeavesRadius, int leavesLayerHeight, IBlockPosQuery placeVinesOn, float hangingChance, ScatterYMethod scatterYMethod) {
+		super(amountPerChunk, placeOn, replace, log, leaves, vine, hanging, trunkFruit, altLeaves, minHeight, maxHeight, updateNeighbours,
+				leafLayers, leavesOffset, maxLeavesRadius, leavesLayerHeight, placeVinesOn, hangingChance, scatterYMethod);
 		this.minAge = minAge;
 		this.maxAge = maxAge;
 		this.fruitAgeHandler = fruitAgeHandler;
@@ -112,7 +118,7 @@ public class GeneratorFruitTree extends GeneratorTreeBase {
 	protected void generateTrunkFruit(World world, int age, BlockPos pos, EnumFacing direction) {
 		IBlockState newFruit = fruitAgeHandler.apply(trunkFruit, age);
 		if (newFruit != null) {
-			if (trunkFruit.getPropertyNames().contains(BlockHorizontal.FACING))
+			if (trunkFruit.getPropertyKeys().contains(BlockHorizontal.FACING))
 				trunkFruit = trunkFruit.withProperty(BlockCocoa.FACING, direction.getOpposite());
 			setTrunkFruit(world, pos);
 		}

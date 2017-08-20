@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -62,16 +63,16 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements IEventHandle,
 						d6iap.add(new Double6IntArrayPackage(living.posX - 1 + living.rand.nextDouble() * 2, living.posY + 1,
 								living.posZ - 1 + living.rand.nextDouble() * 2, 0D, 0D, 0D));
 					AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.WATER_SPLASH, AABBHelper.getAABBFromEntity(living,
-							AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iap);
+							AlchemyNetworkHandler.getParticleRange()), living.world, d6iap);
 					living.getEntityData().setInteger(NBT_KEY_CD, living.ticksExisted);
-					if (living instanceof EntityPlayerMP)
+					if (living instanceof EntityPlayerMP && !(living instanceof FakePlayer))
 						AlchemyNetworkHandler.network_wrapper.sendTo(new MessagePurifyCallback(), (EntityPlayerMP) living);
 				}
 			}
 		living.setAir(MAX_AIR);
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.BOTTOM)
 	public void onEntityJoinWorld(EntityJoinWorldEvent event) {
 		event.getEntity().getEntityData().removeTag(NBT_KEY_CD);
 	}
@@ -116,7 +117,7 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements IEventHandle,
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		return isEquipmented(player) ? 
 				max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) : -1;
 	}
@@ -130,14 +131,14 @@ public class ItemAmuletPurify extends AlchemyItemAmulet implements IEventHandle,
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted - (getMaxCD() - cd));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, player.ticksExisted);
 	}
 

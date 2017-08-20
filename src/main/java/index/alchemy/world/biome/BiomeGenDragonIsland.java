@@ -13,8 +13,6 @@ import biomesoplenty.common.block.BlockBOPGrass;
 import biomesoplenty.common.block.BlockBOPLeaves;
 import biomesoplenty.common.block.BlockBOPLilypad;
 import biomesoplenty.common.block.BlockBOPMushroom;
-import biomesoplenty.common.entities.EntityButterfly;
-import biomesoplenty.common.entities.EntitySnail;
 import biomesoplenty.common.fluids.HoneyFluid;
 import biomesoplenty.common.util.block.BlockQuery;
 import biomesoplenty.common.entities.EntityPixie;
@@ -66,15 +64,15 @@ public class BiomeGenDragonIsland extends AlchemyBiome {
 	public BiomeGenDragonIsland() {
 		super("dragon_island", new PropsBuilder("Dragon Island").withTemperature(1.1F).withRainfall(1.0F).withGuiColour(2211330));
 
-		terrainSettings.avgHeight(72).heightVariation(-2, 60).octaves(0, 1, 2, 2, 1, 0).sidewaysNoise(0.2);
+//		terrainSettings.avgHeight(72).heightVariation(-2, 60).octaves(0, 1, 2, 2, 1, 0).sidewaysNoise(0.2);
 		
 		topBlock = BOPBlocks.grass.getDefaultState().withProperty(BlockBOPGrass.VARIANT, BlockBOPGrass.BOPGrassType.DAISY);
 		fillerBlock = Blocks.DIRT.getStateFromMeta(BlockDirt.DirtType.DIRT.getMetadata());
 		//addWeight(BOPClimates.HOT_DESERT, 10);
 		
-		canSpawnInBiome = true;
+//		canSpawnInBiome = true;
 		canGenerateVillages = false;
-		canGenerateRivers = false;
+//		canGenerateRivers = false;
 		
 		skyColor = 0x73D9FF;
 		
@@ -82,8 +80,8 @@ public class BiomeGenDragonIsland extends AlchemyBiome {
 		spawnableMonsterList.clear();
 		
 		spawnableCreatureList.add(new SpawnListEntry(EntityChicken.class, 8, 2, 4));
-		spawnableCreatureList.add(new SpawnListEntry(EntityButterfly.class, 16, 3, 6));
-		spawnableCreatureList.add(new SpawnListEntry(EntitySnail.class, 8, 2, 3));
+//		spawnableCreatureList.add(new SpawnListEntry(EntityButterfly.class, 16, 3, 6));
+//		spawnableCreatureList.add(new SpawnListEntry(EntitySnail.class, 8, 2, 3));
 		spawnableCreatureList.add(new SpawnListEntry(EntityRabbit.class, 4, 4, 6));
 		spawnableCreatureList.add(new SpawnListEntry(EntityPixie.class, 1, 1, 2));
 		
@@ -317,7 +315,7 @@ public class BiomeGenDragonIsland extends AlchemyBiome {
 		// shroom
 		GeneratorWeighted shroomGenerator = new GeneratorWeighted(1F);
 		addGenerator("shroom", GeneratorStage.SHROOM, flowerGenerator);
-		flowerGenerator.add("glow_shroom", 1, new GeneratorFlora.Builder()
+		shroomGenerator.add("glow_shroom", 1, new GeneratorFlora.Builder()
 				.with(BlockBOPMushroom.MushroomType.GLOWSHROOM)
 				.create()
 		);
@@ -334,7 +332,7 @@ public class BiomeGenDragonIsland extends AlchemyBiome {
 				.create()
 		);
 		
-		BiomeDictionary.registerBiomeType(this, Type.HOT, Type.DENSE, Type.WET, Type.MAGICAL, Type.FOREST, Type.MOUNTAIN);
+		BiomeDictionary.addTypes(this, Type.HOT, Type.DENSE, Type.WET, Type.MAGICAL, Type.FOREST, Type.MOUNTAIN);
 	}
 	
 }

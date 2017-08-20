@@ -26,7 +26,6 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.BlockStateMapper;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
@@ -34,6 +33,7 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.GameData;
 
 import static index.alchemy.util.Tool.$;
 
@@ -93,7 +93,7 @@ public class WoodType {
 	};
 	
 	public static void init() {
-		for (IRecipe recipe : CraftingManager.getInstance().getRecipeList()) {
+		for (IRecipe recipe : GameData.getWrapper(IRecipe.class)) {
 			ItemStack output = recipe.getRecipeOutput();
 			List<ItemStack> inputs = Lists.newLinkedList();
 			if (output != null && isOre(output, "plankWood")) {
@@ -103,7 +103,7 @@ public class WoodType {
 							Object array = Tool.setAccessible(field).get(recipe);
 							if (array != null && Array.getLength(array) == 1) {
 								ItemStack item = (ItemStack) Array.get(array, 0);
-								if (item != null && item.stackSize == 1 && isOre(item, "logWood")) {
+								if (item != null && item.getCount() == 1 && isOre(item, "logWood")) {
 									inputs.add(item);
 									break;
 								}
@@ -119,7 +119,7 @@ public class WoodType {
 								if (list != null && list.size() == 1) {
 									if (list.get(0).getClass() == ItemStack.class) {
 										ItemStack item = (ItemStack) list.get(0);
-										if (item != null && item.stackSize == 1 && isOre(item, "logWood")) {
+										if (item != null && item.getCount() == 1 && isOre(item, "logWood")) {
 											inputs.add(item);
 											break;
 										}
@@ -128,7 +128,7 @@ public class WoodType {
 										for (Object obj : list1)
 											if (obj.getClass() == ItemStack.class) {
 												ItemStack item = (ItemStack) obj;
-												if (item != null && item.stackSize == 1 && isOre(item, "logWood"))
+												if (item != null && item.getCount() == 1 && isOre(item, "logWood"))
 													inputs.add(item);
 											}
 									}
@@ -170,6 +170,8 @@ public class WoodType {
 	}
 	
 	public static boolean isOre(ItemStack item, String ore) {
+		if (item.isEmpty())
+			return false;
 		for (int id : OreDictionary.getOreIDs(item))
 			if (ore.equals(OreDictionary.getOreName(id)))
 				return true;

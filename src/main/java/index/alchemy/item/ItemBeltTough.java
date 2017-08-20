@@ -54,7 +54,7 @@ public class ItemBeltTough extends AlchemyItemBelt implements IEventHandle {
 			event.setAmount(event.getAmount() * (1 - (1 - living.getHealth() / living.getMaxHealth()) * BALANCE_COEFFICIENT) - 1);
 	}
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingDeath(LivingDeathEvent event) {
 		EntityLivingBase living = event.getEntityLiving();
 		if (Always.isServer() && isEquipmented(living) && living.rand.nextFloat() > TRIGGER_PROBABILITY) {

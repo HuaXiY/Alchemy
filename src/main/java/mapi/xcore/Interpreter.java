@@ -12,7 +12,7 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.text.TextComponentString;
 
-@SuppressWarnings({ "unchecked", "serial" })
+@SuppressWarnings({ "unchecked", "serial", "unused" })
 public class Interpreter {
 	public static final Interpreter interpreter;
 	public static final Map<String, Class<?>> cls = new HashMap<String, Class<?>>();
@@ -704,18 +704,19 @@ public class Interpreter {
 		}
 	}
 	public Object calculate(ICommandSender sender, String expression) throws InterpretationException {
-		sender.addChatMessage(new TextComponentString(" > " + expression));
+//		sender.addChatMessage(new TextComponentString(" > " + expression));
 		if(expression.charAt(0) == '#'){
 			expression = expression.substring(1);
 			String[] sa = expression.split("->");
 			if(sa.length < 2)throw new InterpretationException("define args < 2.");
 			try {cls.put(sa[0], Class.forName(sa[1]));}
 			catch(Exception e){err(sender, e);}
-			sender.addChatMessage(new TextComponentString(" < #define " + sa[0] + "->Class<" + sa[1] + ">"));
+//			sender.addChatMessage(new TextComponentString(" < #define " + sa[0] + "->Class<" + sa[1] + ">"));
 			return null;
 		}
-		return Oneself.execute(basicsCalculate(sender, expression, null), result -> 
-		sender.addChatMessage(new TextComponentString(" < " + Tool.Objects.isNullOr(result, ""))));
+		return basicsCalculate(sender, expression, null);
+//		return Oneself.execute(basicsCalculate(sender, expression, null), result -> 
+//		sender.addChatMessage(new TextComponentString(" < " + Tool.Objects.isNullOr(result, ""))));
 	}
 	static {
 		interpreter = new Interpreter();
@@ -731,7 +732,7 @@ public class Interpreter {
 	public static final void err(ICommandSender sender, Throwable e){
 		String s = e.getClass().getName();
 		String message = e.getLocalizedMessage();
-		sender.addChatMessage(new TextComponentString(" ! " + (message != null ? s + "\n ^ " + message.replace("\n", "\n ^ ") : s)));
-		sender.addChatMessage(new TextComponentString(AlchemyRuntimeException.getStringFormThrowable(e)));
+//		sender.addChatMessage(new TextComponentString(" ! " + (message != null ? s + "\n ^ " + message.replace("\n", "\n ^ ") : s)));
+//		sender.addChatMessage(new TextComponentString(AlchemyRuntimeException.getStringFormThrowable(e)));
 	}
 }

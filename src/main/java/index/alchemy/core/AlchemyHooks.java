@@ -8,39 +8,18 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.jooq.lambda.tuple.Tuple;
-
-import baubles.client.BaublesRenderLayer;
 import biomesoplenty.api.biome.BOPBiomes;
-import index.alchemy.api.IMaterialContainer;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.core.asm.transformer.TransformerInjectOptifine;
-import index.alchemy.entity.ai.EntityAIEatMeat;
 import index.alchemy.util.ReflectionHelper;
-import index.alchemy.util.Tool;
-import index.alchemy.world.biome.AlchemyBiomeLoader;
 import index.project.version.annotation.Gamma;
 import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.init.Blocks;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.chunk.NibbleArray;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Omega
 @Hook.Provider
@@ -97,7 +76,8 @@ public class AlchemyHooks {
 //	
 	@Gamma
 	public static Biome getBiome() {
-		return /*BOPBiomes.flower_island.get();*/AlchemyBiomeLoader.dragon_island;
+//		return /*BOPBiomes.flower_island.get();*/AlchemyBiomeLoader.dragon_island;
+		return BOPBiomes.flower_island.get();
 	}
 	
 	@Gamma

@@ -128,7 +128,7 @@ public class EntityMagicPixie extends EntityPixie implements IFollower {
 	
 	@SideOnly(Side.CLIENT)
 	public void bindUUID(UUID uuid) {
-		for (Entity entity : Minecraft.getMinecraft().theWorld.getLoadedEntityList())
+		for (Entity entity : Minecraft.getMinecraft().world.getLoadedEntityList())
 			if (entity instanceof EntityLivingBase && entity.getUniqueID().equals(uuid)) {
 				owner = (EntityLivingBase) entity;
 				IFollower.follower.set(owner, this);

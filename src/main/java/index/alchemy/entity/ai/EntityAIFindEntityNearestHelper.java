@@ -51,7 +51,7 @@ public class EntityAIFindEntityNearestHelper {
 	@Nullable
 	public static <T extends EntityLivingBase> T findNearest(EntityLivingBase source, Class<T> type, @Nullable AxisAlignedBB aabb,
 			@Nullable Predicate<T> req) {
-		return source.worldObj.getEntitiesWithinAABB(type, Tool.isNullOr(aabb, () -> getTargetRange(source, getTargetDistance(source))))
+		return source.world.getEntitiesWithinAABB(type, Tool.isNullOr(aabb, () -> getTargetRange(source, getTargetDistance(source))))
 				.stream().filter(Tool.isNullOr(req, () -> l -> true)).sorted(new Sorter(source)).findFirst().orElse(null);
 	}
 

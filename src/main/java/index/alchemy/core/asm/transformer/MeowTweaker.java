@@ -78,7 +78,7 @@ public enum MeowTweaker implements ITweaker, IClassTransformer {
 		@Override
 		public boolean shouldInitialization() {
 			try {
-				Class.forName("javafx.scene.Node");
+				Class.forName("javafx.scene.Node", false, AlchemyEngine.getLaunchClassLoader());
 				return false;
 			} catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError ignore) { return true; }
 		}

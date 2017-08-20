@@ -65,17 +65,17 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 	}
 	
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.TOP)
 	public void onRenderLiving_Pre(RenderLivingEvent.Pre<EntityLivingBase> event) {
 		if (last == event.getEntity())
 			return;
 		Minecraft minecraft = Minecraft.getMinecraft();
-		EntityPlayer player = minecraft.thePlayer;
+		EntityPlayer player = minecraft.player;
 		EntityLivingBase living = event.getEntity();
 		int id = living.getEntityData().getInteger(NBT_KEY_RENDER);
 		if (id != 0) {
 			AlchemyEventSystem.markEventCanceled(event);
-			last = AlchemyEntityManager.getEntityById(AlchemyEntityManager.FRIENDLY_LIVING_LIST, id, minecraft.theWorld);
+			last = AlchemyEntityManager.getEntityById(AlchemyEntityManager.FRIENDLY_LIVING_LIST, id, minecraft.world);
 			float partialTick = minecraft.getRenderPartialTicks();
 			double lx = living.lastTickPosX + (living.posX - living.lastTickPosX) * partialTick;
 			double ly = living.lastTickPosY + (living.posY - living.lastTickPosY) * partialTick;
@@ -122,7 +122,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 				Entity entity = Always.findEntityFormClientWorld(message.id);
 				if (entity != null) {
 					entity.getEntityData().setInteger(NBT_KEY_RENDER, message.render_id);
-					if (entity == Minecraft.getMinecraft().thePlayer)
+					if (entity == Minecraft.getMinecraft().player)
 						if (message.render_id != 0)
 							AlchemyEventSystem.addInputHook(this);
 						else 
@@ -139,10 +139,12 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 		return MessageWitchcraftUpdate.class;
 	}
 
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.TOP)
 	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
-		if (event.getEntityLiving().isPotionActive(this) && event.getEntityLiving() instanceof EntityLiving)
+		if (event.getEntityLiving().isPotionActive(this) && event.getEntityLiving() instanceof EntityLiving) {
 			((EntityLiving) event.getEntityLiving()).attackTarget = null;
+			AlchemyEventSystem.markEventIgnore(event);
+		}
 	}
 	
 	@SubscribeEvent
@@ -156,7 +158,7 @@ public class PotionWitchcraft extends AlchemyPotion implements IEventHandle, INe
 	
 	public void updateTracker(EntityLivingBase living) {
 		int id = living.getEntityData().getInteger(NBT_KEY_RENDER);
-		for (EntityPlayer player : ((WorldServer) living.worldObj).getEntityTracker().getTrackingPlayers(living))
+		for (EntityPlayer player : ((WorldServer) living.world).getEntityTracker().getTrackingPlayers(living))
 			updatePlayer((EntityPlayerMP) player, living, id);
 		if (living instanceof EntityPlayerMP)
 			updatePlayer((EntityPlayerMP) living, living, id);

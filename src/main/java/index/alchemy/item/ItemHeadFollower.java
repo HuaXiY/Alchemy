@@ -40,7 +40,7 @@ public abstract class ItemHeadFollower extends AlchemyItemBauble.AlchemyItemHead
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onKeyInput(KeyInputEvent event) {
 		if (System.currentTimeMillis() - lastTime > 500 && AlchemyEventSystem.isKeyBindingActive(key_follower)) {
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayer player = Minecraft.getMinecraft().player;
 			if (player != null) {
 				InventoryBauble bauble = player.getCapability(AlchemyCapabilityLoader.bauble, null);
 				ItemStack head = bauble.getStackInSlot(BaubleType.HEAD.getValidSlots()[0]);
@@ -70,10 +70,10 @@ public abstract class ItemHeadFollower extends AlchemyItemBauble.AlchemyItemHead
 				IFollower.follower.set(living, newFollower = createFollower(item, living));
 				((IFollower) newFollower).setOwner(living);
 				newFollower.setLocationAndAngles(living.posX, living.posY, living.posZ,
-						MathHelper.wrapDegrees(living.worldObj.rand.nextFloat() * 360.0F), 0.0F);
+						MathHelper.wrapDegrees(living.world.rand.nextFloat() * 360.0F), 0.0F);
 				AlchemyEventSystem.addDelayedRunnable(p -> {
 					if (!newFollower.isDead)
-						newFollower.worldObj.spawnEntityInWorld(newFollower);
+						newFollower.world.spawnEntity(newFollower);
 				}, 3);
 			}
 		}

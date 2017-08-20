@@ -1,6 +1,5 @@
 package index.alchemy.easteregg;
 
-import index.alchemy.achievement.AlchemyAchievementLoader;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Patch;
 import index.project.version.annotation.Beta;
@@ -64,12 +63,11 @@ public class DrinkingLava extends ItemBucket {
 	@Hook("net.minecraft.item.ItemBucket#func_77654_b")
 	public static Hook.Result onItemUseFinish(ItemBucket item, ItemStack stack, World world, EntityLivingBase living) {
 		if (item == Items.LAVA_BUCKET) {
-			living.attackEntityFrom(DamageSource.lava, 10);
+			living.attackEntityFrom(DamageSource.LAVA, 10);
 			living.setFire(30);
-			if (living instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer) living;
-				player.addStat(AlchemyAchievementLoader.tasty_lava);
-			}
+//			if (living instanceof EntityPlayer) {
+//				EntityPlayer player = (EntityPlayer) living;
+//			}
 			return new Hook.Result(new ItemStack(Items.BUCKET));
 		} else
 			return Hook.Result.VOID;

@@ -63,7 +63,7 @@ public class TransformerProxy implements IClassTransformer {
 						adapter.invokeStatic(Type.getType(AlchemyEngine.class), new Method("lookup",
 								"()Ljava/lang/invoke/MethodHandles$Lookup;"));
 						adapter.push(srgName);
-						Type returnType = Type.getReturnType(desc), args[] = Type.getArgumentTypes(desc);
+						Type args[] = Type.getArgumentTypes(desc);
 						adapter.visitFieldInsn(GETSTATIC, "java/lang/Void", "TYPE", "Ljava/lang/Class;");
 						adapter.push(args.length);
 						adapter.newArray(Type.getType(Class.class));

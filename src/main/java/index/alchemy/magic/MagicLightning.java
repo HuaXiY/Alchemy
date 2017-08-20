@@ -16,7 +16,7 @@ public class MagicLightning extends AlchemyMagic {
 	@Override
 	public void apply(EntityLivingBase src, EntityLivingBase living, float amplify) {
 		if (Always.isServer())
-			living.worldObj.addWeatherEffect(new EntityLightningBolt(living.worldObj, living.posX, living.posY, living.posZ, false));
+			living.world.addWeatherEffect(new EntityLightningBolt(living.world, living.posX, living.posY, living.posZ, false));
 	}
 
 }

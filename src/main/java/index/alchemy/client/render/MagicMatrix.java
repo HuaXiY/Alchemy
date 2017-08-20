@@ -38,7 +38,7 @@ public class MagicMatrix {
 	 *    x = 2 => la = lb = 3 / 2√3 , ha = hb * 2 = 1
 	 */
 	public static final float HEXAGRAM_X = 2, HEXAGRAM_R = HEXAGRAM_X / 2, HEXAGRAM_DELTA = 0.2F, 
-			HEXAGRAM_LA = 3 / (2 * sqrt_float(3F)), HEXAGRAM_LB = HEXAGRAM_LA, HEXAGRAM_HA = 1, HEXAGRAM_HB = -HEXAGRAM_HA / 2;
+			HEXAGRAM_LA = 3 / (2 * sqrt(3F)), HEXAGRAM_LB = HEXAGRAM_LA, HEXAGRAM_HA = 1, HEXAGRAM_HB = -HEXAGRAM_HA / 2;
 	
 	public static void renderHexagram() {
 		RenderHelper.disable(GL_TEXTURE_2D, GL_LIGHTING);

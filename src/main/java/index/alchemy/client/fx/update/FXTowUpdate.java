@@ -27,10 +27,10 @@ public class FXTowUpdate implements IFXUpdate {
 		Vec3d src = location.getLocation();
 		Vec3d tra = new Vec3d(fx.getPosX(), fx.getPosY(), fx.getPosZ());
 		
-		double dx = src.xCoord - tra.xCoord;
-		double dy = src.yCoord - tra.yCoord;
-		double dz = src.zCoord - tra.zCoord;
-		double max = sqrt_double(dx * dx + dy * dy + dz * dz);
+		double dx = src.x - tra.x;
+		double dy = src.y - tra.y;
+		double dz = src.z - tra.z;
+		double max = sqrt(dx * dx + dy * dy + dz * dz);
 		
 		fx.setMotionX(dx / max * acceleration);
 		fx.setMotionY(dy / max * acceleration);

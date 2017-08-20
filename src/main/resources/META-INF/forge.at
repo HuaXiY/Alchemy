@@ -36,3 +36,15 @@ public net.minecraftforge.fml.client.SplashProgress$Texture
 
 #index.alchemy.easteregg.FMLLoading
 public net.minecraftforge.fml.client.SplashProgress forgeTexture
+
+#index.alchemy.interacting.forge.ExForgeRegistry
+protected-f net.minecraftforge.registries.ForgeRegistry *
+
+#index.alchemy.interacting.forge.ExForgeRegistry
+protected-d net.minecraftforge.registries.ForgeRegistry <init>(Ljava/lang/Class;Lnet/minecraft/util/ResourceLocation;IILnet/minecraftforge/registries/IForgeRegistry$CreateCallback;Lnet/minecraftforge/registries/IForgeRegistry$AddCallback;Lnet/minecraftforge/registries/IForgeRegistry$ClearCallback;Lnet/minecraftforge/registries/RegistryManager;ZZLnet/minecraftforge/registries/IForgeRegistry$DummyFactory;)V
+
+#index.alchemy.interacting.forge.ExForgeRegistry
+protected net.minecraftforge.registries.ForgeRegistry ForgeRegistry(Ljava/lang/Class;Lnet/minecraft/util/ResourceLocation;IILnet/minecraftforge/registries/IForgeRegistry$CreateCallback;Lnet/minecraftforge/registries/IForgeRegistry$AddCallback;Lnet/minecraftforge/registries/IForgeRegistry$ClearCallback;Lnet/minecraftforge/registries/RegistryManager;ZZLnet/minecraftforge/registries/IForgeRegistry$DummyFactory;)V
+
+#index.alchemy.core.AlchemyInitHook
+public net.minecraftforge.fml.common.registry.GameRegistry register(Ljava/lang/Object;)

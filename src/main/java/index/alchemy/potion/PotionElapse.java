@@ -3,6 +3,7 @@ package index.alchemy.potion;
 import java.util.function.Predicate;
 
 import index.alchemy.api.IEventHandle;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.entity.ai.EntityAIFindEntityNearestHelper;
 import index.project.version.annotation.Alpha;
 import net.minecraft.entity.EntityLiving;
@@ -17,7 +18,7 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 	
 	public static final Predicate<EntityLivingBase> NOT_ACTIVE = l -> !l.isPotionActive(AlchemyPotionLoader.elapse);
 	
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	@SubscribeEvent(priority = EventPriority.TOP)
 	public void onLivingSetAttackTarget(LivingSetAttackTargetEvent event) {
 		if (event.getEntityLiving() instanceof EntityLiving && event.getEntityLiving().isNonBoss()
 			&& event.getTarget() != null && event.getTarget().isPotionActive(this)
@@ -28,6 +29,7 @@ public class PotionElapse extends AlchemyPotion implements IEventHandle {
 			living.attackTarget = EntityAIFindEntityNearestHelper.<EntityLivingBase>findNearest(
 					living.attackTarget, type, null, NOT_ACTIVE
 					.and(l -> EntityAIFindEntityNearestHelper.isSuitableLivingTarget(living, l)));
+			AlchemyEventSystem.markEventIgnore(event);
 		}
 	}
 	

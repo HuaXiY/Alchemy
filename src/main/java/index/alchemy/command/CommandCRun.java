@@ -13,12 +13,12 @@ import net.minecraftforge.fml.relauncher.Side;
 public class CommandCRun extends AlchemyCommandClient {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "crun";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "/crun <java-code>";
 	}
 

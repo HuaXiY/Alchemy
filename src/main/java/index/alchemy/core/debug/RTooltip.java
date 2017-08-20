@@ -51,11 +51,11 @@ public class RTooltip {
 		return new Hook.Result(result);
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.BOTTOM)
 	public static void onItemTooltip(ItemTooltipEvent event) {
-		ItemStack stack = event.getItemStack();
-		Item item = stack.getItem();
 		if (enable_tooltip_debug) {
+			ItemStack stack = event.getItemStack();
+			Item item = stack.getItem();
 			if (item instanceof ItemFood)
 				event.getToolTip().add("Food: " + ((ItemFood) item).getHealAmount(stack) + ", " +
 						((ItemFood) item).getSaturationModifier(stack));
@@ -81,10 +81,10 @@ public class RTooltip {
 				event.getToolTip().add(OreDictionary.getOreName(id));
 			event.getToolTip().add(item.getClass().getName());
 			addNBTToTooltip(stack.serializeNBT(), event.getToolTip(), 1);
+			if (GuiScreen.isCtrlKeyDown() && isKeyDown(KEY_C))
+				GuiScreen.setClipboardString(GuiScreen.isShiftKeyDown() ? Joiner.on('\n').join(event.getToolTip()) :
+					item.getRegistryName().toString());
 		}
-		if (GuiScreen.isCtrlKeyDown() && isKeyDown(KEY_C))
-			GuiScreen.setClipboardString(GuiScreen.isShiftKeyDown() ? Joiner.on('\n').join(event.getToolTip()) :
-				item.getRegistryName().toString());
 	}
 	
 	public static void addNBTToTooltip(NBTTagCompound nbt, List<String> tooltip, int depth) {

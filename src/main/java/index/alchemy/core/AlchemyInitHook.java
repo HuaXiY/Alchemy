@@ -38,8 +38,8 @@ import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.registry.IForgeRegistryEntry.Impl;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.IForgeRegistryEntry.Impl;
 
 @Omega
 public class AlchemyInitHook {

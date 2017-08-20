@@ -18,8 +18,8 @@ import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
+//import net.minecraft.client.renderer.GlStateManager;
+//import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.EnumHelper;
@@ -44,7 +44,7 @@ public class AlchemyFXType {
     private static final Map<FX, Class<?>> fx_mapping = new HashMap<FX, Class<?>>();
     
     @SideOnly(Side.CLIENT)
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.BOTTOM)
     public static void onRenderWorldLast(RenderWorldLastEvent event) {
     	if (true) return;
     	// optifine

@@ -5,12 +5,14 @@ import java.util.Random;
 
 import com.google.common.collect.Maps;
 
-import biomesoplenty.common.biome.overworld.BOPBiome;
+import biomesoplenty.common.biome.BOPBiome;
 import index.alchemy.api.IAlchemyBiome;
 import index.alchemy.api.IGenTerrainBlocks;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.annotation.Listener;
+import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.util.FakeChunkPrimer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -28,6 +30,8 @@ public class AlchemyBiome extends BOPBiome implements IAlchemyBiome, IRegister {
 	
 	protected static final ThreadLocal<Boolean> resting = ThreadLocal.withInitial(Boolean.TRUE::booleanValue);
 	
+	protected boolean canGenerateVillages;
+	
 	public Map<String, IGenTerrainBlocks> getTerrainGenerators() {
 		return terrainGenerators;
 	}
@@ -37,20 +41,20 @@ public class AlchemyBiome extends BOPBiome implements IAlchemyBiome, IRegister {
 		return canGenerateVillages;
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.TOP)
 	public static void onPopulateChunk_Populate(PopulateChunkEvent.Populate event) {
 		Biome biome = event.getWorld().getBiome(new BlockPos(event.getChunkX() * 16, 1, event.getChunkZ() * 16));
 		if (biome instanceof AlchemyBiome) {
 			if (event.getType() == PopulateChunkEvent.Populate.EventType.LAKE ||
 				event.getType() == PopulateChunkEvent.Populate.EventType.LAVA)
-				event.setResult(Result.DENY);
+					AlchemyEventSystem.markEventIgnore(event, Result.DENY);
 		}
 	}
 	
-	@SubscribeEvent(priority = EventPriority.LOWEST)
+	@SubscribeEvent(priority = EventPriority.TOP)
 	public static void onDecorateBiome_Decorate(DecorateBiomeEvent.Decorate event) {
 		if (event.getWorld().getBiome(event.getPos()) instanceof AlchemyBiome)
-			event.setResult(Result.DENY);
+			AlchemyEventSystem.markEventIgnore(event, Result.DENY);
 	}
 	
 	@Override
@@ -68,6 +72,11 @@ public class AlchemyBiome extends BOPBiome implements IAlchemyBiome, IRegister {
 		super(name, defaultBuilder);
 		setRegistryName(name);
 		register();
+	}
+
+	@Override
+	public ResourceLocation getBeachLocation() {
+		return null;
 	}
 
 }

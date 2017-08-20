@@ -4,7 +4,6 @@ import index.alchemy.api.IEventHandle;
 import index.alchemy.item.AlchemyItemBauble.AlchemyItemRing;
 import index.project.version.annotation.Alpha;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -18,8 +17,7 @@ public class ItemRingBlessing extends AlchemyItemRing implements IEventHandle {
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onLivingHurt(LivingHurtEvent event) {
-		EntityLivingBase living = event.getEntityLiving();
-		Entity source = event.getSource().getSourceOfDamage();
+		Entity source = event.getSource().getTrueSource();
 		if (source != null && source instanceof EntityPlayer &&
 				event.getSource().getDamageType().equals(DAMAGETYPE) && isEquipmented((EntityPlayer) source))
 			event.setAmount(event.getAmount() + Math.max(event.getEntityLiving().getMaxHealth() * HURT_PERCENTAGE, HURT_MIN_VALUE));

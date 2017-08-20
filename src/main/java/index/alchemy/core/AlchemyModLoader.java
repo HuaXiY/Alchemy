@@ -53,7 +53,6 @@ import net.minecraftforge.fml.common.event.FMLEvent;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLModDisabledEvent;
 import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;	
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -87,7 +86,7 @@ import static index.alchemy.util.FunctionHelper.*;
 		modid = MOD_ID,
 		name = MOD_NAME,
 		version = MOD_VERSION,
-		dependencies = REQUIRED_AFTER + BOP_ID + "@[5.0.0,);" + REQUIRED_AFTER + "Forge@[12.18.3.2185,);after:*;"
+		dependencies = REQUIRED_AFTER + BOP_ID + "@[7.0.0,);" + REQUIRED_AFTER + "forge@[14.21.1,);after:*;"
 )
 public enum AlchemyModLoader {
 	
@@ -250,6 +249,9 @@ public enum AlchemyModLoader {
 		String main = System.getProperty("sun.java.command");
 		try {
 			Process process = Runtime.getRuntime().exec("java " + Joiner.on(' ').join(args) + " -cp " + cp + " " + main);
+			process.getInputStream().close();
+			process.getOutputStream().close();
+			process.getErrorStream().close();
 			FMLCommonHandler.instance().exitJava(0x0, false);
 		} catch (IOException e) { AlchemyRuntimeException.onException(e); }
 	}
@@ -261,7 +263,7 @@ public enum AlchemyModLoader {
 			mod_path = AlchemyEngine.getAlchemyCoreLocation();
 		else try {
 			String offset = AlchemyModLoader.class.getName().replace('.', '/') + ".class";
-			URL src = AlchemyModLoader.class.getResource("/" + offset);
+			URL src = AlchemyModLoader.class.getProtectionDomain().getCodeSource().getLocation();
 			if (src.getProtocol().equals("jar"))
 				mod_path = new File(((JarURLConnection) src.openConnection()).getJarFileURL().getFile());
 			else if (src.getProtocol().equals("file"))
@@ -442,11 +444,6 @@ public enum AlchemyModLoader {
 		onFMLEvent(event);
 	}
 
-	@EventHandler
-	public void onFMLMissingMappings(FMLMissingMappingsEvent event) {
-		onFMLEvent(event);
-	}
-	
 	@EventHandler
 	public void onFMLModDisabled(FMLModDisabledEvent event) {
 		onFMLEvent(event);

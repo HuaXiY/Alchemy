@@ -75,7 +75,7 @@ public interface FunctionHelper {
 	
 	@FunctionalInterface interface ExFunction<A, B> { B apply(A a) throws Throwable; }
 	
-	static <A, B> Function<A, B> onThrowable(ExFunction<A, B> function, Function<Throwable, B> handle) {
+	static <A, B> Function<A, B> onThrowable1(ExFunction<A, B> function, Function<Throwable, B> handle) {
 		return o -> { try { return function.apply(o); } catch (Throwable t) { return handle.apply(t); } };
 	}
 	

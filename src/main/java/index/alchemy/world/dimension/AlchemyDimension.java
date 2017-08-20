@@ -21,16 +21,6 @@ public abstract class AlchemyDimension extends WorldProvider {
 	}
 	
 	@Override
-	public String getWelcomeMessage() {
-		return "";
-	}
-	
-	@Override
-	public String getDepartMessage() {
-		return "";
-	}
-	
-	@Override
 	public double getMovementFactor() {
 		return movement;
 	}

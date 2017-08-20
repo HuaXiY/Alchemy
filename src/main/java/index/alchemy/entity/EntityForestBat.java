@@ -86,7 +86,7 @@ public class EntityForestBat extends EntityBat implements IFollower {
 	            motionX *= 0.95D;
 	            motionY *= 0.95D;
 	            motionZ *= 0.95D;
-	            moveEntity(motionX, motionY, motionZ);
+//	            moveEntity(motionX, motionY, motionZ);
 				AlchemyNetworkHandler.network_wrapper.sendToServer(new SingleProjection.MessageSingleProjection(this));
 			}
 		}
@@ -123,7 +123,7 @@ public class EntityForestBat extends EntityBat implements IFollower {
 	
 	@SideOnly(Side.CLIENT)
 	public void bindUUID(UUID uuid) {
-		for (Entity entity : Minecraft.getMinecraft().theWorld.getLoadedEntityList())
+		for (Entity entity : Minecraft.getMinecraft().world.getLoadedEntityList())
 			if (entity instanceof EntityLivingBase && entity.getUniqueID().equals(uuid)) {
 				owner = (EntityLivingBase) entity;
 				IFollower.follower.set(owner, this);

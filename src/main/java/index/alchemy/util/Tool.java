@@ -199,6 +199,14 @@ public abstract class Tool {
 		return "";
 	}
 	
+	public static final List<String> getAll(String str, @RegEx String key) {
+		Matcher matcher = Pattern.compile(key).matcher(str);
+		List<String> resutlt = Lists.newLinkedList();
+		while (matcher.find())
+			resutlt.add(matcher.group(1));
+		return resutlt;
+	}
+	
 	public static final String decode(String str) {
 		try {
 			return URLDecoder.decode(str, "UTF-8");
@@ -650,7 +658,6 @@ public abstract class Tool {
 	}
 	
 	public static final String upperTo_(String str) {
-		boolean lower = false;
 		StringBuilder builder = new StringBuilder();
 		for (char c : str.toCharArray())
 			if (Character.isLowerCase(c)) {
@@ -754,13 +761,17 @@ public abstract class Tool {
 	public static final void printClass(String name) {
 		try {
 			new ClassReader(name).accept(new TraceClassVisitor(new PrintWriter(System.out)), 0);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} catch (IOException e) { e.printStackTrace(); }
 	}
 	
 	public static final void printClass(byte[] code) {
 		new ClassReader(code).accept(new TraceClassVisitor(new PrintWriter(System.out)), 0);
+	}
+	
+	public static final void dumpClass(String name, String path) {
+		try {
+			new ClassReader(name).accept(new TraceClassVisitor(new PrintWriter(getPrintWriter(path))), 0);
+		} catch (IOException e) { e.printStackTrace(); }
 	}
 	
 	public static final void dumpClass(byte[] code, String path) {

@@ -17,7 +17,7 @@ public interface IFollower {
 	@SideOnly(Side.CLIENT)
 	@Hook("net.minecraft.network.play.server.SPacketEntity#func_149065_a")
 	public static Hook.Result getEntity(SPacketEntity packet, World world) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		if (player != null) {
 			IFollower follower = (IFollower) IFollower.follower.get(player);
 			if (follower != null && follower.getProjectionState() && world.getEntityByID(packet.entityId) == follower)

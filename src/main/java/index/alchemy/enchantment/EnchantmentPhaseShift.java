@@ -17,12 +17,13 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static org.lwjgl.opengl.GL11.*;
-import static net.minecraft.util.math.MathHelper.*;
 import static java.lang.Math.*;
+import static net.minecraft.util.math.MathHelper.*;
 
 @Omega
 public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputHandle, ICoolDown {
@@ -50,7 +51,7 @@ public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputH
 	public void onKeyMove(KeyBinding binding) {
 		int key_code = binding.getKeyCode();
 		GameSettings settings = Minecraft.getMinecraft().gameSettings;
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		if (Keyboard.isKeyDown(settings.keyBindSprint.getKeyCode())
 				&& System.currentTimeMillis() - player.getEntityData().getLong(NBT_KEY_LAST) > PHASE_SHIFT_INTERVAL) {
 			if (isCDOver()) {
@@ -85,20 +86,20 @@ public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputH
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getResidualCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		if (EnchantmentHelper.getEnchantmentLevel(this, player.inventory.armorInventory[0]) > 0) {
+		EntityPlayer player = Minecraft.getMinecraft().player;
+		if (EnchantmentHelper.getEnchantmentLevel(this, player.inventory.armorInventory.get(0)) > 0) {
 			int cd = max(0, getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD)));
-			return max(ceil((double) cd / PHASE_SHIFT_CD) == 0 ? 0 : 1, cd % PHASE_SHIFT_CD);
+			return max(MathHelper.ceil((double) cd / PHASE_SHIFT_CD) == 0 ? 0 : 1, cd % PHASE_SHIFT_CD);
 		} else
 			return -1;
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public int getNumber() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		if (EnchantmentHelper.getEnchantmentLevel(this, player.inventory.armorInventory[0]) <= 0)
+		EntityPlayer player = Minecraft.getMinecraft().player;
+		if (EnchantmentHelper.getEnchantmentLevel(this, player.inventory.armorInventory.get(0)) <= 0)
 			return -1;
-		return PHASE_SHIFT_CD_NUM - (int) ceil((double) max(0,
+		return PHASE_SHIFT_CD_NUM - (int) MathHelper.ceil((double) max(0,
 				getMaxCD() - (player.ticksExisted - player.getEntityData().getInteger(NBT_KEY_CD))) / PHASE_SHIFT_CD);
 	}
 	
@@ -111,14 +112,14 @@ public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputH
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void setResidualCD(int cd) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, cd);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void restartCD() {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		player.getEntityData().setInteger(NBT_KEY_CD, getNumber() == PHASE_SHIFT_CD_NUM ? player.ticksExisted :
 			player.getEntityData().getInteger(NBT_KEY_CD) + getMaxCD());
 		player.getEntityData().setLong(NBT_KEY_LAST, System.currentTimeMillis());
@@ -133,10 +134,9 @@ public class EnchantmentPhaseShift extends AlchemyEnchantment implements IInputH
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void renderCD(int x, int y, int w, int h) {
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		int num = getNumber();
 		GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
-		FontRenderer renderer = Minecraft.getMinecraft().fontRendererObj;
+		FontRenderer renderer = Minecraft.getMinecraft().fontRenderer;
 		String text = String.valueOf(num);
 		glScalef(FONT_SIZE, FONT_SIZE, 1F);
 		gui.drawString(renderer, text, (x + w - renderer.getStringWidth(text) * FONT_SIZE - 3) / FONT_SIZE,

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import index.alchemy.api.ICache;
 import index.alchemy.util.Always;
 import net.minecraftforge.fml.relauncher.Side;
 

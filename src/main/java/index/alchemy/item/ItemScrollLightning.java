@@ -16,7 +16,7 @@ public class ItemScrollLightning extends ItemScroll {
 	
 	@Override
 	public void useScroll(ItemStack item, World world, EntityPlayer player, int type) {
-		for (EntityLivingBase entity : player.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(player, 30D))) {
+		for (EntityLivingBase entity : player.world.getEntitiesWithinAABB(EntityLivingBase.class, AABBHelper.getAABBFromEntity(player, 30D))) {
             if(!(entity instanceof EntityPlayer))
             	world.addWeatherEffect(new EntityLightningBolt(world, entity.posX, entity.posY, entity.posZ, false));
         }

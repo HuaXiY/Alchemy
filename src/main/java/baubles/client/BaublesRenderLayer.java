@@ -32,7 +32,7 @@ public final class BaublesRenderLayer implements LayerRenderer<EntityPlayer> {
 	@Override
 	public void doRenderLayer(@Nonnull EntityPlayer player, float limbSwing, float limbSwingAmount,
 				float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-		if(player.getActivePotionEffect(MobEffects.INVISIBILITY) != null)
+		if(player.isPotionActive(MobEffects.INVISIBILITY))
 			return;
 
 		IBaublesItemHandler inv = BaublesApi.getBaublesHandler(player);
@@ -54,7 +54,7 @@ public final class BaublesRenderLayer implements LayerRenderer<EntityPlayer> {
 	private void dispatchRenders(IBaublesItemHandler inv, EntityPlayer player, RenderType type, float partialTicks) {
 		for(int i = 0; i < inv.getSlots(); i++) {
 			ItemStack stack = inv.getStackInSlot(i);
-			if(stack != null) {
+			if(!stack.isEmpty()) {
 				Item item = stack.getItem();
 				if(item instanceof IRenderBauble) {
 					GlStateManager.pushMatrix();

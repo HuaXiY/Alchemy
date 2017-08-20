@@ -42,7 +42,7 @@ public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityIt
 	
 	@Override
 	public boolean apply(EntityItem input) {
-		return input.getEntityItem().getItem() instanceof ItemFood && ((ItemFood) input.getEntityItem().getItem()).isWolfsFavoriteMeat();
+		return input.getItem().getItem() instanceof ItemFood && ((ItemFood) input.getItem().getItem()).isWolfsFavoriteMeat();
 	}
 	
 	@Override
@@ -51,7 +51,7 @@ public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityIt
 			living.getEntityData().setInteger(NBT_KEY_LAST_MEAL, -Time.DAY);
 		PathNavigate navigate = living.getNavigator();
 		if (living.getHealth() < living.getMaxHealth() || living.ticksExisted - living.getEntityData().getInteger(NBT_KEY_LAST_MEAL) > Time.DAY) {
-			List<EntityItem> list = living.worldObj.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(living, 32), this);
+			List<EntityItem> list = living.world.getEntitiesWithinAABB(EntityItem.class, AABBHelper.getAABBFromEntity(living, 32), this);
 			list.sort(this);
 			for (int i = list.size() - 1; i > -1; i--) {
 				EntityItem item = list.get(i);
@@ -59,7 +59,7 @@ public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityIt
 				Path path = navigate.getPath();
 				if (path != null) {
 					PathPoint point = path.getFinalPathPoint();
-					if (item.getPosition().distanceSq(new Vec3i(point.xCoord, point.yCoord, point.zCoord)) < 2) {
+					if (item.getPosition().distanceSq(new Vec3i(point.x, point.y, point.z)) < 2) {
 						meat = item;
 						return true;
 					}
@@ -73,8 +73,9 @@ public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityIt
 	public void updateTask() {
 		if (!meat.isDead & Math.pow(living.posX - meat.posX, 2) + Math.pow(living.posZ - meat.posZ, 2) < 32 * 32 &&
 				meat.getPosition().distanceSq(living.getPosition()) < 2 && apply(meat)) {
-			ItemStack food = meat.getEntityItem();
-			if (--food.stackSize < 1)
+			ItemStack food = meat.getItem();
+			food.setCount(food.getCount() - 1);
+			if (food.getCount() < 1)
 				meat.setDead();
 			living.heal(((ItemFood) food.getItem()).getHealAmount(food));
 			living.getEntityData().setInteger(NBT_KEY_LAST_MEAL, living.ticksExisted);
@@ -86,7 +87,7 @@ public class EntityAIEatMeat extends EntityAIBase implements Comparator<EntityIt
 						living.posZ + (living.rand.nextFloat() * living.width * 2.0F) - living.width,
 						living.rand.nextGaussian() * 0.02D, living.rand.nextGaussian() * 0.02D, living.rand.nextGaussian() * 0.02D));
 			AlchemyNetworkHandler.spawnParticle(EnumParticleTypes.HEART,
-					AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.worldObj, d6iaps);
+					AABBHelper.getAABBFromEntity(living, AlchemyNetworkHandler.getParticleRange()), living.world, d6iaps);
 		}
 	}
 	

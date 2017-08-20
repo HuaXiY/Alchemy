@@ -16,12 +16,12 @@ public interface IMaterialContainer {
 	
 	@Hook("net.minecraft.world.World#func_72875_a")
 	static Hook.Result isMaterialInBB(World world, AxisAlignedBB bb, Material material) {
-		int minX = MathHelper.floor_double(bb.minX);
-		int maxX = MathHelper.ceiling_double_int(bb.maxX);
-		int minY = MathHelper.floor_double(bb.minY);
-		int maxY = MathHelper.ceiling_double_int(bb.maxY);
-		int minZ = MathHelper.floor_double(bb.minZ);
-		int maxZ = MathHelper.ceiling_double_int(bb.maxZ);
+		int minX = MathHelper.floor(bb.minX);
+		int maxX = MathHelper.ceil(bb.maxX);
+		int minY = MathHelper.floor(bb.minY);
+		int maxY = MathHelper.ceil(bb.maxY);
+		int minZ = MathHelper.floor(bb.minZ);
+		int maxZ = MathHelper.ceil(bb.maxZ);
 		BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
 		for (int x = minX; x < maxX; x++)
 			for (int y = minY; y < maxY; y++)
