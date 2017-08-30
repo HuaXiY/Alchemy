@@ -142,8 +142,6 @@ public class TransformerPatch implements IClassTransformer {
 		node.interfaces.addAll(patch.interfaces);
 		node.version = V1_8;
 		node.accept(writer);
-		if (transformedName.endsWith("ForgeRegistry"))
-			Tool.dumpClass(writer.toByteArray(), "d:/b.bytecode");
 		return writer.toByteArray();
 	}
 	
@@ -199,12 +197,12 @@ public class TransformerPatch implements IClassTransformer {
 			} else if (insn instanceof InvokeDynamicInsnNode) {
 				InvokeDynamicInsnNode dynamic = (InvokeDynamicInsnNode) insn;
 				String patchDesc = ASMHelper.getClassDesc(patchName), clazzDesc = ASMHelper.getClassDesc(clazzName);
-				dynamic.desc = dynamic.desc.replace(patchDesc, clazzDesc);
+				dynamic.desc = replace(dynamic.desc, patchDesc, clazzDesc);
 				for (int i = 0; i < dynamic.bsmArgs.length; i++)
 					if (dynamic.bsmArgs[i] instanceof Handle) {
 						Handle handle = (Handle) dynamic.bsmArgs[i];
 						dynamic.bsmArgs[i] = new Handle(handle.getTag(), replace(handle.getOwner(), patchName, clazzName),
-								handle.getName(), handle.getDesc().replace(patchDesc, clazzDesc));
+								handle.getName(), replace(handle.getDesc(), patchDesc, clazzDesc), handle.isInterface());
 					}
 			} else if (insn instanceof FrameNode) {
 				FrameNode frame = (FrameNode) insn;
