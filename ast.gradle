@@ -1,0 +1,366 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.google.guava:guava:+'
+		classpath 'org.eclipse.osgi:org.eclipse.osgi:+'
+		classpath 'org.eclipse.jdt:org.eclipse.jdt.core:+'
+	}
+}
+
+import java.util.HashMap
+import java.util.Iterator
+import java.util.LinkedList
+import java.util.List
+import java.util.Map
+import java.util.stream.Collectors
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+import com.google.common.collect.BiMap
+import com.google.common.collect.HashBiMap
+import com.google.common.collect.Maps
+
+import org.eclipse.jdt.core.JavaModelException
+import org.eclipse.jdt.core.dom.AST
+import org.eclipse.jdt.core.dom.ASTNode
+import org.eclipse.jdt.core.dom.ASTParser
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration
+import org.eclipse.jdt.core.dom.CompilationUnit
+import org.eclipse.jdt.core.dom.EnumDeclaration
+import org.eclipse.jdt.core.dom.FieldDeclaration
+import org.eclipse.jdt.core.dom.IExtendedModifier
+import org.eclipse.jdt.core.dom.MethodDeclaration
+import org.eclipse.jdt.core.dom.Modifier
+import org.eclipse.jdt.core.dom.TypeDeclaration
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment
+import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite
+import org.eclipse.jface.text.BadLocationException
+import org.eclipse.jface.text.Document
+import org.eclipse.jface.text.IDocument
+import org.eclipse.text.edits.MalformedTreeException
+import org.eclipse.text.edits.TextEdit
+
+class SrgMap {
+	
+	//<String, String>
+	Map func = Maps.newHashMap()
+	Map field = Maps.newHashMap()
+	
+	//<String, String>
+	BiMap clazz = HashBiMap.create()
+	BiMap inverse_clazz
+	
+	SrgMap(String srg_mcp) {
+		String[] maps = srg_mcp.split('\n')
+		for (int index = 0; index < maps.length; index++) {
+			String str = maps[index]
+			if (str.length() < 3) 
+				continue
+			String[] sa = str.split(' ')
+			String src, to
+			if (str.startsWith('CL:')) {
+				src = sa[1]
+				to = sa[2]
+				if (!src.equals(to)) 
+					clazz.put(src, to)
+			} else if (str.startsWith('MD:')) {
+				src = get(sa[1], '.*/(.*)')
+				to = get(sa[sa.length - 2], '.*/(.*)')
+				if (!src.equals(to)) 
+					func.put(src, to)
+			} else if (str.startsWith('FD:')) {
+				src = get(sa[1], '.*/(.*)')
+				to = get(sa[2], '.*/(.*)')
+				if (!src.equals(to)) 
+					field.put(src, to)
+			}
+		}
+		inverse_clazz = clazz.inverse()
+	}
+
+	String unmapType(String typeName) {
+		return isNullOr(inverse_clazz.get(typeName), typeName)
+	}
+
+	String mapType(String typeName) {
+		return isNullOr(clazz.get(typeName), typeName)
+	}
+
+	String mapMethodName(String owner, String name, String desc) {
+		def result = isNullOr(func.get(name), name)
+		if (!'*'.equals(name))
+			println name + ' -> ' + result
+		return result
+	}
+
+	String mapFieldName(String owner, String name, String desc) {
+		def result = isNullOr(field.get(name), name)
+		if (!'*'.equals(name))
+			println name + ' -> ' + result
+		return result
+	}
+	
+	String isNullOr(String t, String or) {
+		return t == null ? or : t
+	}
+	
+	String get(String str, String key) {
+		Matcher matcher = Pattern.compile(key).matcher(str)
+		if (matcher.find())
+			return matcher.group(1)
+		return null
+	}
+	
+}
+
+ext.srgMap = null
+
+enum TransformerType { CLASS, FIELD, METHOD }
+
+class AccessNode {
+	
+	TransformerType type
+	String owner, name
+	Modifier.ModifierKeyword modifier
+	boolean runtime
+	Boolean finalFlag
+	
+	AccessNode(String[] args, SrgMap srgMap) {
+		if (args.length == 2)
+			type = TransformerType.CLASS
+		else if (args[2].contains('('))
+			type = TransformerType.METHOD
+		else
+			type = TransformerType.FIELD
+		owner = args[1]
+		if (type == TransformerType.METHOD) {
+			int index = args[2].indexOf('(')
+			name = args[2].substring(0, index)
+			name = srgMap.mapMethodName(null, name, null)
+		} else if (args.length > 2) {
+			name = args[2]
+			name = srgMap.mapFieldName(null, name, null)
+		}
+		if (args[0].startsWith('private'))
+			modifier = Modifier.ModifierKeyword.PRIVATE_KEYWORD
+		else if (args[0].startsWith('protected'))
+			modifier = Modifier.ModifierKeyword.PROTECTED_KEYWORD
+		else if (args[0].startsWith('public'))
+			modifier = Modifier.ModifierKeyword.PUBLIC_KEYWORD
+		if (args[0].endsWith('+f'))
+			finalFlag = Boolean.TRUE
+		else if (args[0].endsWith('-f'))
+			finalFlag = Boolean.FALSE
+		runtime = args[0].contains('-d')
+	}
+	
+	String toString() {
+		return '[' + type + ', ' + owner + ', ' + name + ', ' + modifier + ', ' + finalFlag + ']'
+	}
+	
+}
+
+def getAccessNode = {
+	String line ->
+	if (line.startsWith('#'))
+		return null
+	String[] args = line.split(' ')
+	if (args.length < 2 || 'private'.equals(args[0]))
+		return null
+	if (srgMap == null)
+		srgMap = new SrgMap(rootProject.ext.config.srg_mcp.text)
+	return new AccessNode(args, srgMap)
+}
+
+// <TransformerType, List<AccessNode>>
+def getMapping = {
+	String str ->
+	Map mapping = new HashMap()
+	for (String line : str.split('\n')) {
+		AccessNode node = getAccessNode(line)
+		if (node != null) {
+			// <AccessNode>
+			List list = mapping.get(node.type)
+			if (list == null)
+				mapping.put(node.type, list = new LinkedList())
+			list.add(node)
+		}
+	}
+	return mapping
+}
+
+void doAccessTransformer0(List types, AST ast, ASTRewrite rewriter, String name, boolean flag, Map mapping, List result) {
+	def srcName = name
+	for (AbstractTypeDeclaration absType : types) {
+		name = srcName
+		if (absType instanceof TypeDeclaration || absType instanceof EnumDeclaration) {
+			def typeFlag = absType instanceof TypeDeclaration
+			def type = absType
+			if (flag)
+				name += '\$' + type.getName().toString()
+			doAccessTransformer0(type.bodyDeclarations().stream().filter{ it instanceof AbstractTypeDeclaration }.collect(Collectors.toList()),
+					ast, rewriter, name, true, mapping, result)
+			for (AccessNode node : mapping.get(TransformerType.CLASS))
+				if (node.owner.equals(name)) {
+					result.add(node)
+					List modifiers = type.modifiers()
+					ListRewrite rewrite = rewriter.getListRewrite(type, typeFlag ? TypeDeclaration.MODIFIERS2_PROPERTY : EnumDeclaration.MODIFIERS2_PROPERTY)
+					boolean hasFinal = false
+					Boolean removed
+					for (Iterator iterator = modifiers.iterator(); iterator.hasNext();) {
+						IExtendedModifier mod = iterator.next()
+						if (mod.isModifier()) {
+							Modifier modifier = (Modifier) mod
+							if (modifier.isPrivate() || modifier.isProtected() || modifier.isPublic())
+								removed = fixModifier(rewriter, modifier, node)
+							else if (modifier.isFinal()) {
+								hasFinal = true
+								if (node.finalFlag == Boolean.FALSE)
+									rewrite.remove(modifier, null)
+							}
+						}
+					}
+					if ((removed == null ? node.modifier != Modifier.ModifierKeyword.PRIVATE_KEYWORD : removed) && node.modifier != null)
+						rewrite.insertFirst(ast.newModifier(node.modifier), null)
+					if (!hasFinal && node.finalFlag == Boolean.TRUE)
+						rewrite.insertLast(ast.newModifier(Modifier.ModifierKeyword.FINAL_KEYWORD), null)
+				}
+			for (FieldDeclaration field : type.bodyDeclarations().stream().filter{ it instanceof FieldDeclaration }.collect(Collectors.toList()))
+				for (AccessNode node : mapping.get(TransformerType.FIELD)) {
+					int size = field.fragments().size()
+					// <VariableDeclarationFragment>
+					for (Iterator variableIterator = ((List) field.fragments())
+							.iterator(); variableIterator.hasNext();) {
+						VariableDeclarationFragment variable = variableIterator.next()
+						String fieldName = variable.getName().toString()
+						if (node.owner.equals(name) && (node.name.equals(fieldName) || node.name.equals('*'))) {
+							result.add(node)
+							boolean zero = false
+							size--
+							if (size > 0) {
+								ListRewrite rewrite = rewriter.getListRewrite(field, FieldDeclaration.FRAGMENTS_PROPERTY)
+								rewrite.remove(variable, null)
+							} else {
+								ListRewrite rewrite = rewriter.getListRewrite(type, typeFlag ? TypeDeclaration.BODY_DECLARATIONS_PROPERTY : EnumDeclaration.BODY_DECLARATIONS_PROPERTY)
+								// rewrite.remove(field, null)
+								zero = true
+							}
+							FieldDeclaration newField = (FieldDeclaration) ASTNode.copySubtree(ast, field)
+							newField.fragments().clear()
+							newField.fragments().add(ASTNode.copySubtree(ast, variable))
+							List modifiers = newField.modifiers()
+							boolean hasFinal = false
+							Boolean removed
+							Modifier newModifier = null
+							for (Iterator iterator = modifiers.iterator(); iterator.hasNext();) {
+								IExtendedModifier mod = iterator.next()
+								if (mod.isModifier()) {
+									Modifier modifier = (Modifier) mod
+									if (modifier.isPrivate() || modifier.isProtected() || modifier.isPublic()) {
+										removed = fixModifier(null, modifier, node)
+										if (removed)
+											iterator.remove()
+									} else if (modifier.isFinal()) {
+										hasFinal = true
+										if (node.finalFlag == Boolean.FALSE)
+											iterator.remove()
+									}
+								}
+							}
+							if ((removed == null ? node.modifier != Modifier.ModifierKeyword.PRIVATE_KEYWORD : removed) && node.modifier != null)
+								newModifier = ast.newModifier(node.modifier)
+							if (newModifier != null)
+								modifiers.add(0, newModifier)
+							if (!hasFinal && node.finalFlag == Boolean.TRUE)
+								modifiers.add(ast.newModifier(Modifier.ModifierKeyword.FINAL_KEYWORD))
+							ListRewrite typeRewrite = rewriter.getListRewrite(type, typeFlag ? TypeDeclaration.BODY_DECLARATIONS_PROPERTY : EnumDeclaration.BODY_DECLARATIONS_PROPERTY)
+							if (zero)
+								typeRewrite.replace(field, newField, null)
+							else
+								typeRewrite.insertAfter(newField, field, null)
+						}
+					}
+				}
+			for (MethodDeclaration method : type.bodyDeclarations().stream().filter{ it instanceof MethodDeclaration }.collect(Collectors.toList()))
+				for (AccessNode node : mapping.get(TransformerType.METHOD))
+					if (node.owner.equals(name) && (node.name.equals(method.getName().toString()) || node.name.equals('*'))) {
+						result.add(node)
+						List modifiers = method.modifiers()
+						ListRewrite rewrite = rewriter.getListRewrite(method, MethodDeclaration.MODIFIERS2_PROPERTY)
+						boolean hasFinal = false
+						Boolean removed
+						for (Iterator iterator = modifiers.iterator(); iterator.hasNext();) {
+							IExtendedModifier mod = iterator.next()
+							if (mod.isModifier()) {
+								Modifier modifier = (Modifier) mod
+								if (modifier.isPrivate() || modifier.isProtected() || modifier.isPublic())
+									removed = fixModifier(rewriter, modifier, node)
+								else if (modifier.isFinal()) {
+									hasFinal = true
+									if (node.finalFlag == Boolean.FALSE)
+										rewrite.remove(modifier, null)
+								}
+							}
+						}
+						if ((removed == null ? node.modifier != Modifier.ModifierKeyword.PRIVATE_KEYWORD : removed) && node.modifier != null)
+							rewrite.insertFirst(ast.newModifier(node.modifier), null)
+						if (!hasFinal && node.finalFlag == Boolean.TRUE)
+							rewrite.insertLast(ast.newModifier(Modifier.ModifierKeyword.FINAL_KEYWORD), null)
+					}
+		}
+	}
+}
+
+boolean fixModifier(ASTRewrite rewrite, Modifier modifier, AccessNode node) {
+	if (modifier.isPrivate()) {
+		if (node.modifier != Modifier.ModifierKeyword.PRIVATE_KEYWORD) {
+			if (rewrite != null)
+				rewrite.remove(modifier, null)
+			return true
+		}
+	} else if (modifier.isProtected()) {
+		if (node.modifier == Modifier.ModifierKeyword.PUBLIC_KEYWORD) {
+			if (rewrite != null)
+				rewrite.remove(modifier, null)
+			return true
+		}
+	}
+	return false
+}
+
+// <TransformerType, List<AccessNode>>
+def doAccessTransformer = {
+	String src, String name, Map mapping, List result ->
+	ASTParser parser = ASTParser.newParser(AST.JLS8)
+	parser.setKind(ASTParser.K_COMPILATION_UNIT)
+	
+	// <String, String>
+	Map compilerOptions = org.eclipse.jdt.internal.core.JavaModelManager.getJavaModelManager().getOptions()
+	compilerOptions.put('org.eclipse.jdt.core.compiler.compliance', '1.8')
+	compilerOptions.put('org.eclipse.jdt.core.compiler.codegen.targetPlatform', '1.8')
+	compilerOptions.put('org.eclipse.jdt.core.compiler.source', '1.8')
+	parser.setCompilerOptions(compilerOptions)
+
+	IDocument document = new Document(src)
+	parser.setSource(src.toCharArray())
+
+	CompilationUnit unit = (CompilationUnit) parser.createAST(null)
+	AST ast = unit.getAST()
+	ASTRewrite rewriter = ASTRewrite.create(ast)
+	
+	doAccessTransformer0(unit.types(), ast, rewriter, name, false, mapping, result)	
+	
+	TextEdit edits = rewriter.rewriteAST(document, null)
+	edits.apply(document)
+	return document.get()
+}
+
+ext {
+	VERConsts = [
+		getMapping: getMapping,
+		doAccessTransformer: doAccessTransformer
+	]
+}
