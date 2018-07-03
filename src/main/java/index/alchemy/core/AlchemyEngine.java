@@ -31,6 +31,8 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -187,11 +189,13 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 		logger.info("Try to redefine the bytecodes: " + target.getName());
 		instrumentation().redefineClasses(new ClassDefinition(target, runTransformers(
 				ASMHelper.getClassSrcName(DeobfuscatingRemapper.instance().unmapType(ASMHelper.getClassName(target.getName()))),
-				target.getName(), getLaunchClassLoader().getClassBytes(target.getName()))));
+				target.getName(), ASMHelper.getClassData(target.getName()))));
 	}
 	
 	static {
 		logger.info(AlchemyEngine.class.getName() + " loaded from classloader: " + AlchemyEngine.class.getClassLoader() );
+		if ($(SystemUtils.class, "JAVA_SPECIFICATION_VERSION_AS_ENUM") == null)
+			$(SystemUtils.class, "JAVA_SPECIFICATION_VERSION_AS_ENUM<", JavaVersion.JAVA_RECENT);
 		if (AlchemyEngine.class.getClassLoader().getClass() == LaunchClassLoader.class) {
 			logger.info("Try to redefine the bytecodes: " + LaunchClassLoader.class.getName());
 			LaunchClassLoader lcl = (LaunchClassLoader) AlchemyEngine.class.getClassLoader();

@@ -16,6 +16,15 @@ import index.project.version.annotation.Beta;
 
 @Beta
 public abstract class ReflectionHelper {
+	
+	public static final long OVERRIDE_OFFSET;
+	
+	static {
+		try {
+			Field override = AccessibleObject.class.getDeclaredField("override");
+			OVERRIDE_OFFSET = AlchemyEngine.unsafe().objectFieldOffset(override);
+		} catch (Exception e) { throw new RuntimeException(e); }
+	}
 
 	static { resetReflection(); }
 	
@@ -32,7 +41,8 @@ public abstract class ReflectionHelper {
 	}
 	
 	public static final void resetReflection() {
-		for(Field f : (Field[]) invoke(getMethod(Class.class, "getDeclaredFields0", boolean.class), jdk.internal.reflect.Reflection.class, false))
+		for(Field f : (Field[]) invoke(setAccessible(getMethod(Class.class, "getDeclaredFields0", boolean.class)),
+				jdk.internal.reflect.Reflection.class, false))
 			if (f.getType() == Map.class)
 				set(setAccessible(f), jdk.internal.reflect.Reflection.class, Maps.newHashMap());
 	}
@@ -53,15 +63,6 @@ public abstract class ReflectionHelper {
 	
 	public static final void setClassLoader(Class<?> clazz, ClassLoader loader) {
 		set(classLoader, clazz, loader);
-	}
-	
-	public static final long OVERRIDE_OFFSET;
-	
-	static {
-		try {
-			Field override = AccessibleObject.class.getDeclaredField("override");
-			OVERRIDE_OFFSET = AlchemyEngine.unsafe().objectFieldOffset(override);
-		} catch (Exception e) { throw new RuntimeException(e); }
 	}
 	
 	public static final <T extends AccessibleObject> T setAccessible(T accessible) {

@@ -110,7 +110,10 @@ public class WindowsVirtualMachine extends HotSpotVirtualMachine {
                 String message = readErrorMessage(is);
                 // special case the load command so that the right exception is thrown
                 if (cmd.equals("load")) {
-                    throw new AgentLoadException("Failed to load agent library");
+                	String msg = "Failed to load agent library";
+                    if (!message.isEmpty())
+                        msg += ": " + message;
+                    throw new AgentLoadException(msg);
                 } else {
                     if (message == null) {
                         throw new AttachOperationFailedException("Command failed in target VM");

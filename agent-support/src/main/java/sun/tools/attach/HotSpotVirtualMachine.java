@@ -294,7 +294,9 @@ public abstract class HotSpotVirtualMachine extends VirtualMachine {
 
         int value;
         try {
-            value = Integer.parseInt(sb.toString());
+        	String result = sb.toString();
+        	result = result.replaceAll("[^0-9.]", "");
+            value = Integer.parseInt(result);
         } catch (NumberFormatException x) {
             throw new IOException("Non-numeric value found - int expected");
         }

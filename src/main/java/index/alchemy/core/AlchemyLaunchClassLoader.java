@@ -110,7 +110,8 @@ public class AlchemyLaunchClassLoader extends URLClassLoader {
 	}
 
 	public void registerTransformer(String transformerClassName) {
-		if ("net.minecraftforge.fml.common.asm.transformers.TerminalTransformer".equals(transformerClassName))
+		if ("net.minecraftforge.fml.common.asm.transformers.TerminalTransformer".equals(transformerClassName) ||
+			"net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer".equals(transformerClassName))
 			return;
 		LogWrapper.log(Level.INFO, "Register Transformer: %s", transformerClassName);
 		try {
@@ -278,7 +279,7 @@ public class AlchemyLaunchClassLoader extends URLClassLoader {
 							transformer.getClass().getName() : $(wrapper, "getCoreMod") + "|" + $(wrapper, "getParentClass"));
 				}
 			} catch (Throwable t) {
-				if (t.getCause() != null && t.getCause().getMessage().contains("invalid side"))
+				if (t.getCause() != null && t.getCause().getMessage() != null && t.getCause().getMessage().contains("invalid side"))
 					continue;
 				ASMTransformerWrapper.TransformerWrapper wrapper = null;
 				if (transformer instanceof ASMTransformerWrapper.TransformerWrapper)

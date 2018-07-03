@@ -29,12 +29,10 @@ public final class TransformerHook implements IClassTransformer {
 	
 	protected static final String
 		HOOK_RESULT_NAME = ASMHelper.getClassName("index.alchemy.api.annotation.Hook$Result"),
-		TOOL_NAME = ASMHelper.getClassName("index.alchemy.util.Tool"),
 		VOID_NAME = ASMHelper.getClassName("java.lang.Void"),
 		MAP_NAME = ASMHelper.getClassDesc("java.util.Map");
 	protected static final Type
 		TYPE_HOOK_RESULT = Type.getObjectType(HOOK_RESULT_NAME),
-		TYPE_TOOL = Type.getObjectType(TOOL_NAME),
 		TYPE_VOID = Type.getObjectType(VOID_NAME),
 		TYPE_MAP = Type.getObjectType(MAP_NAME);
 	protected static final Method
@@ -43,7 +41,7 @@ public final class TransformerHook implements IClassTransformer {
 	
 	protected final MethodNode hookMethod;
 	protected final String hookSrc, srgName;
-	protected final boolean isStatic, stackFlag;
+	protected final boolean isStatic, stackFlag, itf;
 	protected final Hook.Type type;
 	
 	@Override
@@ -93,21 +91,21 @@ public final class TransformerHook implements IClassTransformer {
 										generator.loadArg(i);
 										generator.checkCast(args[i]);
 									} else
-										generator.loadVoid();
+										generator.pushNull();
 								}
 						} else {
 							if (!isStatic)
 								generator.loadThis();
 							generator.loadArgs();
 						}
-						generator.invokeStatic(Type.getObjectType(hookSrc), new Method(hookMethod.name, hookMethod.desc));
-						if (Type.getReturnType(hookMethod.desc).equals(Type.getType(Hook.Result.class))) {
+						generator.invokeStatic(Type.getObjectType(hookSrc), new Method(hookMethod.name, hookMethod.desc), itf);
+						if (Type.getReturnType(hookMethod.desc).equals(TYPE_HOOK_RESULT)) {
 							generator.dup();
-							generator.getField(TYPE_HOOK_RESULT, "result", ASMHelper.TYPE_OBJECT);
 							generator.dup();
-							generator.getStatic(TYPE_TOOL, "VOID", TYPE_VOID);
+							generator.getStatic(TYPE_HOOK_RESULT, "VOID", TYPE_HOOK_RESULT);
 							Label label = generator.newLabel();
 							generator.ifZCmp(IF_ACMPEQ, label);
+							generator.getField(TYPE_HOOK_RESULT, "result", ASMHelper.TYPE_OBJECT);
 							switch (returnOpcode) {
 								case IRETURN:
 								case LRETURN:
@@ -203,13 +201,14 @@ public final class TransformerHook implements IClassTransformer {
 		return false;
 	}
 
-	public TransformerHook(MethodNode hookMethod, String hookSrc, String srgName, boolean isStatic, Hook.Type type) {
+	public TransformerHook(MethodNode hookMethod, String hookSrc, String srgName, boolean isStatic, boolean itf, Hook.Type type) {
 		hookMethod.accept(this.hookMethod = new MethodNode(hookMethod.access, hookMethod.name, hookMethod.desc,
 				hookMethod.signature, hookMethod.exceptions.toArray(new String[hookMethod.exceptions.size()])));
 		this.hookSrc = hookSrc;
 		this.srgName = srgName;
 		this.isStatic = isStatic;
 		this.stackFlag = shouldMarkStack(hookMethod);
+		this.itf = itf;
 		this.type = type;
 	}
 

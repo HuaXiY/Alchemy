@@ -487,10 +487,12 @@ public class TransformerRemote implements IClassTransformer {
 				} else {
 					generator.loadArg(0);
 					generator.swap();
-					generator.invokeStatic(Type.getObjectType(name), new Method("toBytes_" + clazz.getName().replace('.', '_'), Type.VOID_TYPE, new Type[] { TYPE_BYTE_BUF, type }));
+					generator.invokeStatic(Type.getObjectType(name), new Method("toBytes_" + clazz.getName().replace('.', '_'),
+							Type.VOID_TYPE, new Type[] { TYPE_BYTE_BUF, type }));
 					if (!types.contains(clazz)) {
 						types.add(clazz);
-						ASMHelper.MethodGenerator subGenerator = ASMHelper.MethodGenerator.visitMethod(visitor, ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC, "toBytes_" + clazz.getName().replace('.', '_'),
+						ASMHelper.MethodGenerator subGenerator = ASMHelper.MethodGenerator.visitMethod(visitor,
+								ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC, "toBytes_" + clazz.getName().replace('.', '_'),
 								Type.getMethodDescriptor(Type.VOID_TYPE, TYPE_BYTE_BUF, type), null, null);
 						subGenerator.loadArg(1);
 						for (Field field : clazz.getDeclaredFields()) {
@@ -556,7 +558,8 @@ public class TransformerRemote implements IClassTransformer {
 		this.args = args;
 		messageSrcType = Type.getObjectType(ASMHelper.getClassName(getUniqueName(ownerType.getClassName(), remoteNode.name, "NetworkMessage")));
 		messageType = Type.getObjectType(ASMHelper.getClassName(AlchemyEngine.ASMClassLoader.DYNAMIC_PACKAGE_NAME + messageSrcType.getClassName()));
-		AlchemyModLoader.addFMLEventCallback(FMLPreInitializationEvent.class, FunctionHelper.onThrowableRunnable(this::registerMessage, FunctionHelper::rethrow));
+		AlchemyModLoader.addFMLEventCallback(FMLPreInitializationEvent.class, FunctionHelper.onThrowableRunnable(this::registerMessage,
+				FunctionHelper::rethrow));
 	}
 
 }

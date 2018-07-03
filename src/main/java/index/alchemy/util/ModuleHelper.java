@@ -19,7 +19,7 @@ public interface ModuleHelper {
 	static MethodHandle getImplAddOpensToAllUnnamedMethodHandle() {
 		openModuleJavaBase();
 		try {
-			return AlchemyEngine.lookup().findVirtual(Module.class, "implAddOpensToAllUnnamed", MethodType.methodType(Void.class, String.class));
+			return AlchemyEngine.lookup().findVirtual(Module.class, "implAddOpensToAllUnnamed", MethodType.methodType(void.class, String.class));
 		} catch (Exception e) { throw new RuntimeException(e); }
 	}
 	

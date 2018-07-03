@@ -20,7 +20,7 @@ import static org.objectweb.asm.Opcodes.*;
 public class TransformerProxy implements IClassTransformer {
 	
 	protected final int opcode;
-	protected final boolean useHandle;
+	protected final boolean useHandle, itf;
 	protected final String target, srgName, desc;
 	protected final MethodNode proxyMethod;
 
@@ -46,7 +46,7 @@ public class TransformerProxy implements IClassTransformer {
 							node.fields.add(generator.findStaticAndInvoke(owner, target, targetMethod, generator::loadArgs));
 						else {
 							generator.loadArgs();
-							generator.invokeStatic(target, targetMethod);
+							generator.invokeStatic(target, targetMethod, itf);
 						}
 						break;
 					case INVOKEVIRTUAL:
@@ -62,7 +62,7 @@ public class TransformerProxy implements IClassTransformer {
 							node.fields.add(generator.findSpecialAndInvoke(owner, target, targetMethod, generator::loadArgs));
 						else {
 							generator.loadArgs();
-							generator.invokeSpecial(target, targetMethod);
+							generator.invokeSpecial(target, targetMethod, itf);
 						}
 						break;
 					case INVOKEINTERFACE:
@@ -94,11 +94,12 @@ public class TransformerProxy implements IClassTransformer {
 		return writer.toByteArray();
 	}
 	
-	public TransformerProxy(MethodNode proxyMethod, int opcode, boolean useHandle, String target, String srgName) {
+	public TransformerProxy(MethodNode proxyMethod, int opcode, boolean useHandle, boolean itf, String target, String srgName) {
 		proxyMethod.accept(this.proxyMethod = new MethodNode(proxyMethod.access, proxyMethod.name, proxyMethod.desc,
 				proxyMethod.signature, proxyMethod.exceptions.toArray(new String[proxyMethod.exceptions.size()])));
 		this.opcode = opcode;
 		this.useHandle = useHandle;
+		this.itf = itf;
 		this.target = target;
 		this.srgName = srgName;
 		this.desc = getDesc(opcode, proxyMethod.desc);

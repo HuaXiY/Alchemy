@@ -19,4 +19,6 @@ public @interface Proxy {
 	
 	boolean useHandle() default false;
 	
+	boolean itf() default false;
+	
 }

@@ -213,9 +213,7 @@ public abstract class Tool {
 	
 	public static final String get(String str, @RegEx String key) {
 		Matcher matcher = Pattern.compile(key).matcher(str);
-		if (matcher.find())
-			return matcher.group(1);
-		return "";
+		return matcher.find() ? matcher.group(1) : "";
 	}
 	
 	public static final List<String> getAll(String str, @RegEx String key) {

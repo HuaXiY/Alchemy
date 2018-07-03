@@ -210,7 +210,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 										String args[] = hook.value().split("#");
 										if (args.length == 2)
 											transformers_mapping.get(args[0]).add(new TransformerHook(methodNode, node.name,
-													args[1], hook.isStatic(), hook.type()));
+													args[1], hook.isStatic(), (node.access & ACC_INTERFACE) != 0, hook.type()));
 										else
 											AlchemyRuntimeException.onException(new RuntimeException("@Hook method -> split(\"#\") != 2"));
 									}
@@ -229,11 +229,11 @@ public class AlchemyTransformerManager implements IClassTransformer {
 						if (checkSideOnly(methodNode) && methodNode.visibleAnnotations != null)
 							for (AnnotationNode ann : methodNode.visibleAnnotations)
 								if (ann.desc.equals(PROXY_ANNOTATION_DESC)) {
-									Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values, "useHandle", false);
+									Proxy proxy = Tool.makeAnnotation(Proxy.class, ann.values, "useHandle", false, "itf", false);
 									String args[] = proxy.target().split("#");
 									if (args.length == 2)
 										transformers_mapping.get(name).add(new TransformerProxy(
-												methodNode, proxy.opcode(), proxy.useHandle(), args[0], args[1]));
+												methodNode, proxy.opcode(), proxy.useHandle(), proxy.itf(), args[0], args[1]));
 									else
 										AlchemyRuntimeException.onException(new RuntimeException("@Proxy method -> split(\"#\") != 2"));
 								}

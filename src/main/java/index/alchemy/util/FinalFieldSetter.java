@@ -22,7 +22,10 @@ public class FinalFieldSetter {
     
     @Unsafe(Unsafe.UNSAFE_API)
     public void set(Object obj, Field field, Object value) throws Exception {
-        unsafe.putObject(obj, unsafe.objectFieldOffset(field), value);
+    	if (obj == null)
+    		setStatic(field, value);
+    	else
+    		unsafe.putObject(obj, unsafe.objectFieldOffset(field), value);
     }
 
     @Unsafe(Unsafe.UNSAFE_API)

@@ -207,7 +207,7 @@ public class AlchemyDLCLoader {
 				if (file.getName().endsWith(".dlc"))
 					addDLCFile(file);
 		
-		GUICheckDLCLoader.show(dlc_mapping.values());
+//		GUICheckDLCLoader.show(dlc_mapping.values());
 		
 		dlc_mapping.values().stream()
 			.filter(IDLCInfo::shouldLoad)

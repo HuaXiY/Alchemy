@@ -533,10 +533,6 @@ public interface ASMHelper {
 			invokeStatic(TYPE_REFLECTION_HELPER, METHOD_ALLOCATE_INSTANCE);
 		}
 		
-		public void loadVoid() {
-			getStatic(TYPE_TOOL, "VOID", TYPE_VOID);
-		}
-		
 		public void loadUnsafe() {
 			invokeStatic(TYPE_REFLECTION_HELPER, UNSAFE);
 		}
@@ -546,8 +542,12 @@ public interface ASMHelper {
 			mv.visitMethodInsn(opcode, owner, method.getName(), method.getDescriptor(), itf);
 		}
 		
-		public void invokeSpecial(Type type, Method method) {
-			invokeInsn(Opcodes.INVOKESPECIAL, type, method, false);
+		public void invokeSpecial(Type type, Method method, boolean itf) {
+			invokeInsn(Opcodes.INVOKESPECIAL, type, method, itf);
+		}
+		
+		public void invokeStatic(Type type, Method method, boolean itf) {
+			invokeInsn(Opcodes.INVOKESTATIC, type, method, itf);
 		}
 		
 		public void invokeLambda(String name, String ifaceMethodDesc, Type lambdaMethod, Handle lambdaHandle) {
@@ -941,7 +941,7 @@ public interface ASMHelper {
 			ClassNode result = new ClassNode();
 			reader.accept(result, 0);
 			return result;
-		} catch (Exception e) { return null; }
+		} catch (Exception e) { e.printStackTrace(); return null; }
 	}
 	
 	@Nullable
