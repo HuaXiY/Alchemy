@@ -178,7 +178,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 	
 	public static final java.lang.instrument.Instrumentation instrumentation() { return INSTRUMENTATION; }
 	
-	protected static final MethodHandle runTransformers = FunctionHelper.onThrowableSupplier(() ->lookup().findVirtual(LaunchClassLoader.class,
+	protected static final MethodHandle runTransformers = FunctionHelper.onThrowableSupplier(() -> lookup().findVirtual(LaunchClassLoader.class,
 			"runTransformers", MethodType.methodType(byte[].class, String.class, String.class, byte[].class)), FunctionHelper::rethrowVoid).get();
 	
 	public static byte[] runTransformers(String name, String transformedName, byte[] basicClass) throws Throwable {
@@ -300,7 +300,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 					instType = Type.getObjectType(ASMHelper.getClassName(instName)),
 					callType = Type.getObjectType(ASMHelper.getClassName(callName));
 			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, name, null, ASMHelper.OBJECT_NAME, new String[]{ HANDLER_NAME });
-			cw.visitSource("AlchemyEngine.java:228", "invoke: " + instName + handleName + handleDesc);
+			cw.visitSource("AlchemyEngine.java:303", "invoke: " + instName + handleName + handleDesc);
 			{
 				if (!isStatic)
 					cw.visitField(ACC_PUBLIC | ACC_SYNTHETIC, HANDLER_INSTANCE_NAME, ASMHelper.OBJECT_DESC, null, null).visitEnd();
@@ -383,7 +383,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 			String uniqueName = getUniqueName(callback),
 					name = ASMHelper.getClassName(uniqueName);
 			cw.visit(V1_6, ACC_PUBLIC | ACC_SUPER | ACC_SYNTHETIC, name, null, ASMHelper.OBJECT_NAME, new String[]{ HANDLER_NAME });
-			cw.visitSource("AlchemyEngine.java:291", "invoke: " + callback.name + callback.desc);
+			cw.visitSource("AlchemyEngine.java:386", "invoke: " + callback.name + callback.desc);
 			{
 				generator = ASMHelper.MethodGenerator.visitMethod(cw, ACC_PUBLIC | ACC_SYNTHETIC, ASMHelper._INIT_,
 						ASMHelper.VOID_METHOD_DESC, null, null);
