@@ -33,7 +33,7 @@ public abstract class EnumHelper extends net.minecraftforge.common.util.EnumHelp
 		if (field == null)
 			AlchemyRuntimeException.onException(new NullPointerException("values"));
 		try {
-			FinalFieldSetter.instance().setStatic(field, args);
+			FinalFieldHelper.setStatic(field, args);
 		} catch (Exception e) { AlchemyRuntimeException.onException(e); }
 	}
 

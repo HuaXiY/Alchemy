@@ -331,7 +331,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 			transformerExceptions = $(AlchemyEngine.getLaunchClassLoader(), "transformerExceptions");
 	
 	public static boolean shouldRedefine(Class<?> clazz) {
-		return loadedClass.contains(clazz) || inPackage(clazz.getName());
+		return clazz != null && (loadedClass.contains(clazz) || inPackage(clazz.getName()));
 	}
 	
 	protected static boolean inPackage(String name) {

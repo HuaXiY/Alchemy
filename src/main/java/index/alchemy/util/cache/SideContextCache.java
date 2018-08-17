@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class SideContextCache<V> extends Cache<Side, V> implements ICache.ContextCache<Side, V> {
@@ -15,6 +15,6 @@ public class SideContextCache<V> extends Cache<Side, V> implements ICache.Contex
 	public Map<Side, V> getCacheMap() { return mapping; }
 	
 	@Override
-	public Side getContext() { return Always.getSide(); }
+	public Side getContext() { return SideHelper.side(); }
 
 }

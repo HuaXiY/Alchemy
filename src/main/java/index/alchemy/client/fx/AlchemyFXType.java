@@ -14,7 +14,7 @@ import index.alchemy.api.annotation.Loading;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.$;
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
@@ -69,7 +69,7 @@ public class AlchemyFXType {
 	public static EnumParticleTypes registerParticleTypes(String name, Class<?> factory, boolean ignoreRange) throws Exception {
 		AlchemyModLoader.checkState();
 		int id = EnumParticleTypes.values().length;
-		if (Always.runOnClient())
+		if (SideHelper.runOnClient())
 			if ($.isInstance(IParticleFactory.class, factory))
 				registerParticle(id, factory);
 			else 

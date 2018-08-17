@@ -8,6 +8,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -123,7 +124,7 @@ public enum AlchemyModLoader {
 	
 	public static List<String> getClassList() { return ImmutableList.copyOf(class_list); }
 	
-	public static void addClass(List<String> classes) {
+	public static void addClass(Collection<String> classes) {
 		checkInvokePermissions();
 		checkState();
 		for (String clazz : classes)

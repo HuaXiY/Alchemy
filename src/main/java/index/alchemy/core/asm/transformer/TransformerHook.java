@@ -47,6 +47,7 @@ public final class TransformerHook implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		if (basicClass == null) return basicClass;
 		String srgName = AlchemyEngine.isRuntimeDeobfuscationEnabled() ? this.srgName : DeobfuscatingRemapper.instance().mapMethodName(transformedName, this.srgName, "");
 		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_FRAMES);
 		ClassNode node = ASMHelper.newClassNode(basicClass);

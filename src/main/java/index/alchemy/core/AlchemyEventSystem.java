@@ -47,9 +47,9 @@ import index.alchemy.core.AlchemyInitHook.InitHookEvent;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.entity.control.SingleProjection;
 import index.alchemy.util.$;
-import index.alchemy.util.Always;
 import index.alchemy.util.Counter;
 import index.alchemy.util.FunctionHelper;
+import index.alchemy.util.SideHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
@@ -250,14 +250,14 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onPlayerTick(PlayerTickEvent event) {
 		String flag = "0";
-		if (Always.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+		if (SideHelper.isClient() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
 				
 			}
 			System.setProperty("index.alchemy.runtime.debug.player", flag);
 		}
-		if (Always.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
+		if (SideHelper.isServer() && !System.getProperty("index.alchemy.runtime.debug.player", "").equals(flag)) {
 			// runtime do some thing
 			{
 				
@@ -269,7 +269,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static void addDelayedRunnable(IPhaseRunnable runnable, int tick) {
-		addDelayedRunnable(Always.getSide(), runnable, tick);
+		addDelayedRunnable(SideHelper.side(), runnable, tick);
 	}
 	
 	public static void addDelayedRunnable(Side side, IPhaseRunnable runnable, int tick) {
@@ -290,7 +290,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static void addCounterRunnable(IPhaseRunnable runnable, Counter counter, int total) {
-		addCounterRunnable(Always.getSide(), runnable, counter, total);
+		addCounterRunnable(SideHelper.side(), runnable, counter, total);
 	}
 	
 	public static void addCounterRunnable(Side side, IPhaseRunnable runnable, Counter counter, int total) {
@@ -311,7 +311,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static void addContinuedRunnable(IIndexRunnable runnable, int tick) {
-		addContinuedRunnable(Always.getSide(), runnable, tick);
+		addContinuedRunnable(SideHelper.side(), runnable, tick);
 	}
 	
 	public static void addContinuedRunnable(Side side, IIndexRunnable runnable, int tick) {
@@ -329,7 +329,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static void addContinuedRunnable(IContinuedRunnable runnable) {
-		addContinuedRunnable(Always.getSide(), runnable);
+		addContinuedRunnable(SideHelper.side(), runnable);
 	}
 	
 	public static void addContinuedRunnable(Side side, IContinuedRunnable runnable) {
@@ -353,7 +353,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 	}
 	
 	public static Phase getPhase() {
-		return phase_mapping.get(Always.getSide());
+		return phase_mapping.get(SideHelper.side());
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -628,7 +628,7 @@ public enum AlchemyEventSystem implements IGuiHandler, IInputHandle {
 				}
 			}	
 		}
-		if (Always.isClient()) {
+		if (SideHelper.isClient()) {
 			Texture texture = clazz.getAnnotation(Texture.class);
 			if (texture != null)
 				if (texture.value() != null)

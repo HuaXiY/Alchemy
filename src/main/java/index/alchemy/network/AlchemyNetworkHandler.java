@@ -20,7 +20,7 @@ import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.core.AlchemyInitHook;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.Minecraft;
@@ -128,7 +128,7 @@ public class AlchemyNetworkHandler {
 	}
 	
 	public static void sendMessage(Stream<EntityPlayer> players, IMessage message) {
-		if (Always.isClient())
+		if (SideHelper.isClient())
 			sendToServer(message);
 		else
 			sendToClient(players, message);
@@ -136,7 +136,7 @@ public class AlchemyNetworkHandler {
 	
 	@Deprecated
 	public static Stream<EntityPlayer> getPlayerFromContext(MessageContext context) {
-		if (Always.isClient())
+		if (SideHelper.isClient())
 			return Stream.of(Minecraft.getMinecraft().player);
 		else
 			return Stream.of(context.getServerHandler().player);

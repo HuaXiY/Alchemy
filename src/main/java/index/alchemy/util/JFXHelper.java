@@ -2,12 +2,10 @@ package index.alchemy.util;
 
 import java.util.concurrent.CountDownLatch;
 
-import index.alchemy.core.AlchemyThreadManager;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.project.version.annotation.Omega;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
 
 import static index.alchemy.util.FunctionHelper.*;
 
@@ -22,15 +20,23 @@ public interface JFXHelper {
 		return Platform.isSupported(ConditionalFeature.GRAPHICS) && Platform.isSupported(ConditionalFeature.CONTROLS);
 	}
 	
+	static void startup( ) {
+		try { Platform.startup(() -> {}); }
+		catch (IllegalStateException e) { }
+	}
+	
 	static void runLater(Runnable runnable) {
-		if (isSupported())
-			AlchemyThreadManager.runOnNewThread(link(JFXPanel::new, () -> Platform.runLater(runnable)));
+		if (isSupported()) {
+			startup();
+			Platform.runLater(runnable);
+		}
 	}
 	
 	static void runAndWait(Runnable runnable) {
 		if (isSupported()) {
+			startup();
 			CountDownLatch latch = new CountDownLatch(1);
-			AlchemyThreadManager.runOnNewThread(link(JFXPanel::new, () -> Platform.runLater(link(runnable, latch::countDown))));
+			Platform.runLater(link(runnable, latch::countDown));
 			FunctionHelper.onThrowableRunnable(latch::await, AlchemyRuntimeException::onException).run();
 		}
 	}

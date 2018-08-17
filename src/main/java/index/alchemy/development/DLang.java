@@ -17,7 +17,7 @@ import index.alchemy.core.AlchemyConstants;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.$;
-import index.alchemy.util.FinalFieldSetter;
+import index.alchemy.util.FinalFieldHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Alpha;
 import net.minecraft.block.Block;
@@ -55,7 +55,7 @@ public class DLang {
 		for (Field field : DLang.class.getDeclaredFields())
 			if (field.getType() == Map.class)
 				try {
-					FinalFieldSetter.instance().setStatic(field, new LinkedHashMap<>());
+					FinalFieldHelper.setStatic(field, new LinkedHashMap<>());
 				} catch (Exception e) {
 					AlchemyRuntimeException.onException(e);
 				}

@@ -7,7 +7,7 @@ import index.alchemy.api.IItemMeshProvider;
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.block.AlchemyBlockSlab;
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.project.version.annotation.Beta;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
@@ -165,7 +165,7 @@ public class AlchemyItemBlock extends ItemBlock implements IColorItem, IResource
 
 	public AlchemyItemBlock(Block block) {
 		super(block);
-		if (Always.runOnClient()) {
+		if (SideHelper.runOnClient()) {
 			setCreativeTab(block.getCreativeTabToDisplayOn());
 			if (block instanceof IColorItem)
 				color = ((IColorItem) block).getItemColor();

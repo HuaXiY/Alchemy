@@ -439,7 +439,7 @@ public interface ASMHelper {
 				"metafactory", Type.getMethodDescriptor(TYPE_CALL_SITE, TYPE_LOOKUP, TYPE_STRING, TYPE_METHOD_TYPE, TYPE_METHOD_TYPE,
 				TYPE_METHOD_HANDLE, TYPE_METHOD_TYPE), false);
 		
-		protected static final sun.misc.Unsafe unsafe = AlchemyEngine.unsafe();
+		protected static final sun.misc.Unsafe unsafe = $.unsafe();
 		
 		protected final Type methodType;
 		

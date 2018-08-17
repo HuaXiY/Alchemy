@@ -10,6 +10,7 @@ import index.alchemy.api.annotation.Remote;
 import index.alchemy.api.annotation.SuppressFBWarnings;
 import index.alchemy.core.AlchemyEventSystem;
 import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.project.version.annotation.Alpha;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -115,7 +116,7 @@ public class SingleProjection {
 	@SideOnly(Side.CLIENT)
 	public static void projectionFollower(EntityLivingBase follower) {
 		if (follower instanceof IFollower) {
-			if (Always.isClient()) {
+			if (SideHelper.isClient()) {
 				SingleProjection.follower = follower;
 				setProjectionState(true);
 				projectionCamera(follower);

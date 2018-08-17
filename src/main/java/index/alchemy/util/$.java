@@ -19,10 +19,11 @@ import com.google.common.collect.Maps;
 
 import index.alchemy.api.annotation.Unsafe;
 
-
 public class $ {
 	
 	private static sun.misc.Unsafe unsafe;
+	
+	public static sun.misc.Unsafe unsafe() { return unsafe; }
 	
 	private static long overrideOffset;
 	
@@ -40,36 +41,6 @@ public class $ {
 			} catch (Exception e) { throw new RuntimeException(e); }
 		}
 	}
-	
-//	public static void unnameClassLoader(ClassLoader classLoader) {
-//		unnameModule(classLoader.getUnnamedModule());
-//	}
-//	
-//	public static void unnamePackage(Package pkg) {
-//		unnameModule($(pkg, "module"));
-//	}
-//	
-//	public static void unnameModule(Module module) {
-////		$(module, "implAddReadsAllUnnamed");
-////		$(module, "name<", null);
-////		final Module EVERYONE_MODULE = $(Module.class, "EVERYONE_MODULE");
-////		final Map<String, Set<Module>>
-////				openPackages = $.<Map<String, Set<Module>>>$(module, "openPackages"),
-////				exportedPackages = $.<Map<String, Set<Module>>>$(module, "exportedPackages");
-//		module.getPackages().forEach(packageName -> {
-//			$(module, "implAddOpens", packageName);
-////			unnameModule(packageName, openPackages, EVERYONE_MODULE);
-////			unnameModule(packageName, exportedPackages, EVERYONE_MODULE);
-//		});
-//	}
-//	
-//	public static void unnameModule(String packageName, Map<String, Set<Module>> packageMapping, Module target) {
-//		Set<Module> modules = packageMapping.get(packageName);
-//		if (modules == null)
-//			packageMapping.put(packageName, Sets.newHashSet(target));
-//		else
-//			packageMapping.put(packageName, Sets.newHashSet(target));
-//	}
 	
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPING = Maps.newHashMap();
 	static {
@@ -222,10 +193,7 @@ public class $ {
 								clazz.getDeclaredField(((String) args[1]).replace("<", "")) :
 									searchField(clazz, ((String) args[1]).replace("<", "")));
 						if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
-							if (object == null)
-								FinalFieldSetter.instance().setStatic(field, args[2]);
-							else
-								FinalFieldSetter.instance().set(object, field, args[2]);
+							FinalFieldHelper.set(object, field, args[2]);
 						else
 							field.set(object, args[2]);
 						return (T) args[2];

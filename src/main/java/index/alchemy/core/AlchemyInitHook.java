@@ -21,7 +21,7 @@ import index.alchemy.client.color.AlchemyColorLoader;
 import index.alchemy.client.render.HUDManager;
 import index.alchemy.item.AlchemyItemBlock;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.alchemy.util.Tool;
 import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
@@ -116,7 +116,7 @@ public class AlchemyInitHook {
 				BiomeManager.addVillageBiome((Biome) biome, true);
 		}
 		
-		if (Always.isClient()) {
+		if (SideHelper.isClient()) {
 			
 			if (obj instanceof Item) {
 				

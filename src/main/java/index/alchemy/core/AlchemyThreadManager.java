@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import com.google.common.collect.Lists;
 
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -141,19 +141,18 @@ public final class AlchemyThreadManager {
 	}
 	
 	public static Thread runOnNewThread(Runnable runnable) {
-		return runOnNewThread(runnable, null, Always.getSide());
+		return runOnNewThread(runnable, null, SideHelper.side());
 	}
 	
 	public static Thread runOnNewThread(Runnable runnable, String name) {
-		return runOnNewThread(runnable, name, Always.getSide());
+		return runOnNewThread(runnable, name, SideHelper.side());
 	}
 	
 	public static Thread runOnNewThread(Runnable runnable, @Nullable String name, Side side) {
-		return new Thread(runnable) {
+		return new Thread(SideHelper.mapSideThreadGroup(side), runnable) {
 			
 			{
 				setName(Optional.ofNullable(name).orElse(AlchemyConstants.MOD_NAME) + "-" + nextId());
-				Always.markSide(side);
 				start();
 			}
 			 

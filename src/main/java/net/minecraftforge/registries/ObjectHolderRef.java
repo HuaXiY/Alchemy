@@ -177,7 +177,7 @@ class ObjectHolderRef
 //            Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, field, false);
 //            fieldAccessorSet.invoke(fieldAccessor, instance, thing);
         	try {
-				index.alchemy.util.FinalFieldSetter.instance().set(instance, field, thing);
+				index.alchemy.util.FinalFieldHelper.set(instance, field, thing);
 			} catch (Exception e) { throw new ReflectiveOperationException(e); }
         }
     }

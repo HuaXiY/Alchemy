@@ -218,7 +218,7 @@ public class EnumHelper
 //        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 //        Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, field, false);
 //        fieldAccessorSet.invoke(fieldAccessor, target, value);
-    	index.alchemy.util.FinalFieldSetter.instance().set(target, field, value);
+    	index.alchemy.util.FinalFieldHelper.set(target, field, value);
     }
 
     private static void blankField(Class<?> enumClass, String fieldName) throws Exception

@@ -52,10 +52,6 @@ public class Always {
 	
 	public static int maxHeight = 256;
 	
-	private static boolean isClient = $.forName("net.minecraft.client.Minecraft", false) != null;
-	
-	public static final ThreadContextCache<Side> SIDE_CONTEXT = new ThreadContextCache<Side>().setOnMissGet(FMLCommonHandler.instance()::getEffectiveSide);
-	
 	public static final boolean isAlchemyModLoaded() {
 		return Loader.isModLoaded(AlchemyConstants.MOD_ID);
 	}
@@ -80,22 +76,6 @@ public class Always {
 		return Minecraft.getMinecraft().world.getWorldTime();
 	}
 	
-	public static final boolean runOnClient() {
-		return isClient;
-	}
-	
-	public static final void markSide(Side side) {
-		markSide(Thread.currentThread(), side);
-	}
-	
-	public static final void markSide(Thread target, Side side) {
-		SIDE_CONTEXT.add(target, side);
-	}
-	
-	public static final Side getSide() {
-		return SIDE_CONTEXT.get();
-	}
-	
 	@Nullable
 	public static final UUID getUUIDFromPlayerName(String name) {
 		return UsernameCache.getMap()
@@ -116,16 +96,8 @@ public class Always {
 			return null;
 	}
 	
-	public static final boolean isServer() {
-		return getSide().isServer();
-	}
-	
-	public static final boolean isClient() {
-		return getSide().isClient();
-	}
-	
 	public static final void changeHeldItemIndex(EntityPlayer player, int index) {
-		if (Always.isClient())
+		if (SideHelper.isClient())
 			player.inventory.currentItem = index;
 		else if (player instanceof EntityPlayerMP)
 			((EntityPlayerMP) player).connection.sendPacket(new SPacketHeldItemChange(index));

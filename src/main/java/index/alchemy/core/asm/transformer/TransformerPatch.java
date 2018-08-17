@@ -50,6 +50,7 @@ public class TransformerPatch implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		if (basicClass == null) return basicClass;
 		AlchemyTransformerManager.transform("<patch>" + name + "|" + transformedName + "\n->  " + patch.name.replace('/', '.'));
 		ClassWriter writer = ASMHelper.newClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
 		ClassNode node = ASMHelper.newClassNode(basicClass), patch = ASMHelper.newClassNode(this.patch);

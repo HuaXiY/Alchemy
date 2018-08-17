@@ -43,7 +43,7 @@ public class TransformerGenericEvent implements IClassTransformer {
 	@Override
 	@Unsafe(Unsafe.ASM_API)
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		if (!transformedName.startsWith(MOD_PACKAGE))
+		if (basicClass == null || !transformedName.startsWith(MOD_PACKAGE))
 			return basicClass;
 		boolean flag = false;
 		ClassNode node = ASMHelper.newClassNode(basicClass, ClassReader.EXPAND_FRAMES);

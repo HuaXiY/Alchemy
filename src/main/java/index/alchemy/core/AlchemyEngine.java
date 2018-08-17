@@ -99,10 +99,12 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 	@FunctionalInterface
 	public static interface IClassFileTransformer extends ClassFileTransformer {
 		
+		Set<Thread> THREADS = Sets.newHashSet();
+		
 		@Override
 		default byte[] transform(ClassLoader loader, String className, @Nullable Class<?> classBeingRedefined,
 				ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-			return doTransform(null, loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
+			return transform(null, loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 		}
 		
 		@Override
@@ -187,9 +189,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 	
 	public static final void redefineClass(@Nonnull Class<?> target) throws Throwable {
 		logger.info("Try to redefine the bytecodes: " + target.getName());
-		instrumentation().redefineClasses(new ClassDefinition(target, runTransformers(
-				ASMHelper.getClassSrcName(DeobfuscatingRemapper.instance().unmapType(ASMHelper.getClassName(target.getName()))),
-				target.getName(), ASMHelper.getClassData(target.getName()))));
+		instrumentation().redefineClasses(new ClassDefinition(target, ASMHelper.getClassData(target.getName())));
 	}
 	
 	static {
@@ -206,9 +206,8 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 				try {
 					if (target != null && name != null && !"net/minecraft/launchwrapper/LaunchClassLoader".equals(name)) {
 						logger.info("Redefine: " + loader + "<" + target + ">" + (domain == null ? "(null)" : domain.getCodeSource()));
-						buffer = runTransformers(
-								ASMHelper.getClassSrcName(DeobfuscatingRemapper.instance()
-										.unmapType(name = ASMHelper.getClassSrcName(name))), name, buffer);
+						buffer = runTransformers(ASMHelper.getClassSrcName(DeobfuscatingRemapper.instance().unmapType(name)),
+								ASMHelper.getClassSrcName(name), buffer);
 					}
 					return buffer;
 				} catch (Throwable t) {
@@ -228,6 +227,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 				throw exception;
 			}
 		}
+		System.out.println("fixInstrumentation");
 		String libArgs = System.getProperty("index.alchemy.runtime.lib.ext");
 		Set<String> libs = libArgs != null ? Sets.newHashSet(Splitter.on(';').split(libArgs)) : Sets.newHashSet();
 		// Forge hack native libs when startup
@@ -537,8 +537,8 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 		Tool.checkInvokePermissions(3, AlchemyEngine.class);
 	}
 	
-	public static List<String> findClassFromURL(URL url) throws Exception {
-		List<String> result = Lists.newLinkedList();
+	public static Set<String> findClassFromURL(URL url) throws Exception {
+		Set<String> result = Sets.newLinkedHashSet();
 		ClassLoader loader = new URLClassLoader(new URL[]{ url }, null);
 		ClassPath path = ClassPath.from(loader);
 		for (ClassInfo info : path.getAllClasses())

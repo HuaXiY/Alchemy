@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.project.version.annotation.Omega;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -15,7 +15,7 @@ public class SideCache<K, V> extends Cache<K, V> {
 	protected final Map<Side, Map<K, V>> mapping = Maps.newEnumMap(Side.class);
 	
 	@Override
-	public Map<K, V> getCacheMap() { return mapping.get(Always.getSide()); }
+	public Map<K, V> getCacheMap() { return mapping.get(SideHelper.side()); }
 	
 	public SideCache() {
 		for (Side side : Side.values())

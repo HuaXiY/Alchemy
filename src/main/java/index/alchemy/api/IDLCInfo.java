@@ -1,7 +1,7 @@
 package index.alchemy.api;
 
 import java.net.URL;
-import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PropertyKey;
 
@@ -18,7 +18,9 @@ public interface IDLCInfo extends DLC {
 	
 	DLCContainer getDLCContainer();
 	
-	List<String> getDLCAllClass();
+	Set<String> getDLCAllClass();
+	
+	Set<String> getDLCAllPackage();
 	
 	URL getDLCURL();
 	

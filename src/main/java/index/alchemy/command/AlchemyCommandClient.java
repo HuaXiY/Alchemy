@@ -1,7 +1,7 @@
 package index.alchemy.command;
 
 import index.alchemy.api.annotation.Hook;
-import index.alchemy.util.Always;
+import index.alchemy.util.SideHelper;
 import index.project.version.annotation.Omega;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class AlchemyCommandClient extends AlchemyCommand {
 
 	public AlchemyCommandClient() {
-		if (Always.isClient())
+		if (SideHelper.isClient())
 			ClientCommandHandler.instance.registerCommand(this);
 	}
 	

@@ -10,9 +10,7 @@ public class Pointer<V> {
 	
 	public Pointer() { }
 	
-	public Pointer(V value) {
-		this.value = value;
-	}
+	public Pointer(V value) { this.value = value; }
 	
 	public static final <V> Pointer<V> as(V value) { return new Pointer<>(value); }
 	
