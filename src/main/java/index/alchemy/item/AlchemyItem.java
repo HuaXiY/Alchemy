@@ -63,7 +63,7 @@ public abstract class AlchemyItem extends Item implements IResourceLocation, IRe
 		if (icon != null)
 			icon_name = new AlchemyResourceLocation(icon);
 		if (name != null) {
-			setUnlocalizedName(name);
+			setTranslationKey(name);
 			setRegistryName(name);
 		}
 		register();

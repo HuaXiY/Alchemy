@@ -29,10 +29,6 @@ public interface IAsyncThreadListener extends IThreadListener {
 	Thread asyncThread();
 	
 	default ListenableFuture<Object> addScheduledTask(Runnable runnable) {
-		return addScheduledTask(runnable, false);
-	}
-	
-	default ListenableFuture<Object> addScheduledTask(Runnable runnable, boolean priority) {
 		final Runnable srcRunnable = runnable;
 		runnable = () -> {
 			try {
@@ -44,10 +40,8 @@ public interface IAsyncThreadListener extends IThreadListener {
 		};
 		Callable<Object> callable = Executors.callable(runnable);
 		try {
-			if (!isCallingFromMinecraftThread() && (asyncThread() == null || asyncThread().isAlive()) && running().get()) {
+			if (!isCallingFromMinecraftThread()) {
 				ListenableFutureTask<Object> futureTask = ListenableFutureTask.create(callable);
-//				if (priority)
-//					runnables().add(e)
 				runnables().add(futureTask::run);
 				return futureTask;
 			} else
@@ -57,7 +51,7 @@ public interface IAsyncThreadListener extends IThreadListener {
 					return Futures.immediateFailedCheckedFuture(e);
 				}
 		} catch (Exception e) {
-			System.out.println(asyncThread() + " - " + running() + " - " + running().get());
+			LOGGER.error(asyncThread() + " - " + running() + " - " + running().get());
 			throw new RuntimeException(e);
 		}
 	}

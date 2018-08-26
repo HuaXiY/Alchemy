@@ -30,7 +30,7 @@ public class AlchemyBlockColor extends AlchemyBlock implements IColorBlock {
 	}
 	
 	@Override
-	public BlockRenderLayer getBlockLayer() {
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT_MIPPED;
 	}
 	

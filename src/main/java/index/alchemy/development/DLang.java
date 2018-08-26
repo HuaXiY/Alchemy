@@ -143,7 +143,7 @@ public class DLang {
 			String key = $(item, "displayName");
 			miscMap.put(key, getName(key, 1));
 		} else if (!(item instanceof ItemBlock))
-			itemMap.put(item.getUnlocalizedName() + ".name", getName(item.getUnlocalizedName()));
+			itemMap.put(item.getTranslationKey() + ".name", getName(item.getTranslationKey()));
 	}
 	
 	public static void init(CreativeTabs tab) {
@@ -151,7 +151,7 @@ public class DLang {
 	}
 	
 	public static void init(Block block) {
-		blockMap.put(block.getUnlocalizedName() + ".name", getName(block.getUnlocalizedName()));
+		blockMap.put(block.getTranslationKey() + ".name", getName(block.getTranslationKey()));
 	}
 	
 	public static void init(Potion potion) {

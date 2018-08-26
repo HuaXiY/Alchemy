@@ -36,7 +36,7 @@ public interface NBTHelper {
 	}
 	
 	static ItemStack getItemStackFormNBT(NBTTagCompound nbt) {
-		return nbt.hasNoTags() ? null : new ItemStack(nbt);
+		return nbt.isEmpty() ? null : new ItemStack(nbt);
 	}
 	
 	static ItemStack[] getItemStacksFormNBTList(NBTTagList list) {

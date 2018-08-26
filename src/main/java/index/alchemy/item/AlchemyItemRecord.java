@@ -40,7 +40,7 @@ public class AlchemyItemRecord extends ItemRecord implements IRegister, IResourc
 	public AlchemyItemRecord(String name, SoundEvent sound, int color) {
 		super(name, sound);
 		this.color = color;
-		setUnlocalizedName("record");
+		setTranslationKey("record");
 		setRegistryName("record_" + name);
 		register();
 	}

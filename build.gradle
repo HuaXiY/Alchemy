@@ -183,7 +183,7 @@ task dlc {
             destinationDir = file("build/classes/${name}")
             sourceCompatibility = '1.8'
             targetCompatibility = '1.8'
-            dependencyCacheDir = file("build/classes/${name}")
+            //dependencyCacheDir = file("build/classes/${name}")
             classpath = tasks['compileJava'].classpath + files('build/classes/main')
 			dirList('dlcs').each { classpath = classpath + files("dlcs/${it.name}/src/main/java") }
             println classpath

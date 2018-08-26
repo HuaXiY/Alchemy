@@ -69,7 +69,7 @@ public class AlchemyItemBlock extends ItemBlock implements IColorItem, IResource
 	}
 	
 	public String getUnlocalizedName(ItemStack stack) {
-        return block instanceof BlockSlab ? (((BlockSlab) block).getUnlocalizedName(stack.getMetadata())) : super.getUnlocalizedName(stack);
+        return block instanceof BlockSlab ? (((BlockSlab) block).getTranslationKey(stack.getMetadata())) : super.getTranslationKey(stack);
     }
 	
 	@Override
@@ -166,7 +166,7 @@ public class AlchemyItemBlock extends ItemBlock implements IColorItem, IResource
 	public AlchemyItemBlock(Block block) {
 		super(block);
 		if (SideHelper.runOnClient()) {
-			setCreativeTab(block.getCreativeTabToDisplayOn());
+			setCreativeTab(block.getCreativeTab());
 			if (block instanceof IColorItem)
 				color = ((IColorItem) block).getItemColor();
 		}

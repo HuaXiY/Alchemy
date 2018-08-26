@@ -3,6 +3,7 @@ package index.alchemy.interacting.minecraft;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.event.PlayerDropItemEvent;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -56,7 +57,7 @@ public class Patch$NetHandlerPlayServer extends NetHandlerPlayServer {
                 double d1 = player.posY - ((double)blockpos.getY() + 0.5D) + 1.5D;
                 double d2 = player.posZ - ((double)blockpos.getZ() + 0.5D);
                 double d3 = d0 * d0 + d1 * d1 + d2 * d2;
-                double dist = player.interactionManager.getBlockReachDistance() + 1;
+                double dist = player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue() + 1;
                 dist *= dist;
                 if (d3 > dist)
                     return;

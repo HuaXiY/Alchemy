@@ -274,7 +274,7 @@ public abstract class AlchemyInventory implements ICapabilitySerializable<NBTTag
 	public void deserializeNBT(NBTTagCompound nbt) {
 		if (nbt instanceof NBTTagCompound) {
 			NBTTagList list = ((NBTTagCompound) nbt).getTagList(CONTENTS, NBT.TAG_COMPOUND);
-			if (!list.hasNoTags()) {
+			if (!list.isEmpty()) {
 				ItemStack items[] = NBTHelper.getItemStacksFormNBTList(list);
 				contents = NonNullList.withSize(items.length, ItemStack.EMPTY);
 				for (int i = 0; i < items.length; i++)

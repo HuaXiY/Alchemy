@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import index.alchemy.api.ILocationProvider;
 import index.alchemy.api.IMaterialConsumer;
 import index.alchemy.core.AlchemyConstants;
-import index.alchemy.util.cache.ThreadContextCache;
 import index.project.version.annotation.Beta;
 import index.project.version.annotation.Omega;
 import net.minecraft.block.Block;
@@ -36,7 +35,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.UsernameCache;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -138,7 +136,7 @@ public class Always {
 			public Vec3d getLocation() {
 				AxisAlignedBB aabb = entity.getEntityBoundingBox();
 				return entity.getPositionVector()
-						.addVector((aabb.maxX - aabb.minX) / 2, offsetY * (aabb.maxY - aabb.minY) / 2, (aabb.maxZ - aabb.minZ) / 2);
+						.add((aabb.maxX - aabb.minX) / 2, offsetY * (aabb.maxY - aabb.minY) / 2, (aabb.maxZ - aabb.minZ) / 2);
 			}
 		};
 	}

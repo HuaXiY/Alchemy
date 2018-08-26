@@ -29,7 +29,7 @@ public abstract class AlchemyBlockSlab extends BlockSlab implements IRegister {
 	public AlchemyBlockSlab(Material material, String name) {
 		super(material);
 		int index = name.lastIndexOf(':');
-		setUnlocalizedName(index == -1 ? name : name.substring(index + 1));
+		setTranslationKey(index == -1 ? name : name.substring(index + 1));
 		setRegistryName(name);
 		setCreativeTab(getCreativeTab());
 		setLightOpacity(isDouble() ? 255 : 0);
@@ -41,14 +41,17 @@ public abstract class AlchemyBlockSlab extends BlockSlab implements IRegister {
 	public abstract Block getDoubleBlock();
 
 	@Nullable
+	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		return Item.getItemFromBlock(getHalfBlock());
 	}
 
+	@Override
 	public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
 		return new ItemStack(getHalfBlock());
 	}
 
+	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		IBlockState iblockstate = this.getDefaultState().withProperty(VARIANT, Variant.DEFAULT);
 		if (!this.isDouble())
@@ -56,6 +59,7 @@ public abstract class AlchemyBlockSlab extends BlockSlab implements IRegister {
 		return iblockstate;
 	}
 
+	@Override
 	public int getMetaFromState(IBlockState state) {
 		int i = 0;
 		if (!this.isDouble() && state.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP)
@@ -63,26 +67,31 @@ public abstract class AlchemyBlockSlab extends BlockSlab implements IRegister {
 		return i;
 	}
 	
-	public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+	@Override
+	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
 		IBlockState iblockstate = getStateFromMeta(meta);
 		if (!isDouble())
 			iblockstate = iblockstate.withProperty(HALF, BlockSlab.EnumBlockHalf.BOTTOM);
 		return this.isDouble() ? iblockstate : (facing != EnumFacing.DOWN && (facing == EnumFacing.UP || (double)hitY <= 0.5D) ? iblockstate : iblockstate.withProperty(HALF, BlockSlab.EnumBlockHalf.TOP));
 	}
-
+	
+	@Override
 	protected BlockStateContainer createBlockState() {
 		return this.isDouble() ? new BlockStateContainer(this, new IProperty[]{ VARIANT }) :
 			new BlockStateContainer(this, new IProperty[]{ HALF, VARIANT });
 	}
 
-	public String getUnlocalizedName(int meta) {
-		return getUnlocalizedName();
+	@Override
+	public String getTranslationKey(int meta) {
+		return getTranslationKey(meta);
 	}
 
+	@Override
 	public IProperty<?> getVariantProperty() {
 		return VARIANT;
 	}
 
+	@Override
 	public Comparable<?> getTypeForItem(ItemStack stack) {
 		return AlchemyBlockSlab.Variant.DEFAULT;
 	}

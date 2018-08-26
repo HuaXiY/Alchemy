@@ -81,7 +81,7 @@ public class BlockOre extends AlchemyBlockColor implements IOreDictionary, IEven
 	
 	@Override
 	public String getNameInOreDictionary() {
-		return Tool._ToUpper(getRegistryName().getResourcePath());
+		return Tool._ToUpper(getRegistryName().getPath());
 	}
 	
 	public void generate(Random random, int chunkX, int chunkZ, World world) {

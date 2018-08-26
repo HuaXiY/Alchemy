@@ -38,9 +38,9 @@ public class AlchemyBlock extends Block implements IResourceLocation, IRegister 
 			icon_name = new AlchemyResourceLocation(icon);
 		if (hasCreativeTab())
 			setCreativeTab(getCreativeTab());
-		if (getUnlocalizedName() == null || getUnlocalizedName().equals("tile.null")) {
+		if (getTranslationKey() == null || getTranslationKey().equals("tile.null")) {
 			int index = name.lastIndexOf(':');
-			setUnlocalizedName(index == -1 ? name : name.substring(index + 1));
+			setTranslationKey(index == -1 ? name : name.substring(index + 1));
 		}
 		setRegistryName(name);
 		register();

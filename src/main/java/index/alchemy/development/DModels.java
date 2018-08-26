@@ -39,10 +39,10 @@ public class DModels {
 			item.getRegistryName();
 		if (name == null)
 			return;
-		File file = new File(models_dir + "/item", name.getResourcePath() + SUFFIX);
+		File file = new File(models_dir + "/item", name.getPath() + SUFFIX);
 		if (!file.exists())
 			try {
-				Tool.save(file, default_item_json.replace("${name}", name.getResourcePath()));
+				Tool.save(file, default_item_json.replace("${name}", name.getPath()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -53,10 +53,10 @@ public class DModels {
 			block.getRegistryName();
 		if (name == null)
 			return;
-		File file = new File(models_dir + "/block", name.getResourcePath() + SUFFIX);
+		File file = new File(models_dir + "/block", name.getPath() + SUFFIX);
 		if (!file.exists())
 			try {
-				Tool.save(file, default_block_json.replace("${name}", name.getResourcePath()));
+				Tool.save(file, default_block_json.replace("${name}", name.getPath()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

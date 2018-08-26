@@ -30,10 +30,10 @@ public class DBlockState {
 				((Block) obj).getRegistryName();
 			if (name == null)
 				return;
-			File file = new File(states_dir, name.getResourcePath() + SUFFIX);
+			File file = new File(states_dir, name.getPath() + SUFFIX);
 			if (!file.exists())
 				try {
-					Tool.save(file, default_json.replace("${name}", name.getResourcePath()));
+					Tool.save(file, default_json.replace("${name}", name.getPath()));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
