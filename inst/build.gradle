@@ -17,4 +17,7 @@ tasks.withType(JavaCompile) {
 }
 jar {
     archivesBaseName = "Alchemy-Inst"
+    manifest {
+        attributes 'Premain-Class': 'com.github.charlie.alchemy.Patcher'
+    }
 }
