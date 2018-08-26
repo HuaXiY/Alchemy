@@ -47,6 +47,13 @@ apply from: 'ast.gradle'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
+subprojects {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+    version = config.mod_version
+    group= "com.github.mickeyxiami.alchemy"
+}
+
 version = config.mod_version
 group= "com.github.mickeyxiami.alchemy" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Alchemy-${config.show_version}"

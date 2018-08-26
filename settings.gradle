@@ -1,0 +1,4 @@
+rootProject.name = 'Alchemy'
+rootProject.buildFileName = 'build.gradle'
+
+include 'inst'

@@ -1,0 +1,20 @@
+plugins {
+    id "java"
+}
+
+sourceCompatibility = targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+jar {
+    archivesBaseName = "Alchemy-Inst"
+}
