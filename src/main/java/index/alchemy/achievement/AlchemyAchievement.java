@@ -1,7 +1,7 @@
 //package index.alchemy.achievement;
 //
 //import index.alchemy.api.IRegister;
-//import index.project.version.annotation.Omega;
+//import Omega;
 //import net.minecraft.block.Block;
 //import net.minecraft.item.Item;
 //import net.minecraft.item.ItemStack;

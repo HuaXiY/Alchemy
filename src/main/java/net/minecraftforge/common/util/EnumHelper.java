@@ -19,15 +19,9 @@
 
 package net.minecraftforge.common.util;
 
-import java.lang.reflect.*;
-import java.util.*;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-
-import net.minecraft.entity.passive.IAnimals;
-import net.minecraftforge.fml.common.EnhancedRuntimeException;
-import net.minecraftforge.fml.common.FMLLog;
+import index.alchemy.util.FinalFieldHelper;
 import net.minecraft.block.BlockPressurePlate.Sensitivity;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnumEnchantmentType;
@@ -35,6 +29,7 @@ import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.item.EntityPainting.EnumArt;
 import net.minecraft.entity.passive.HorseArmorType;
+import net.minecraft.entity.passive.IAnimals;
 import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.EnumRarity;
@@ -47,9 +42,16 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.gen.structure.StructureStrongholdPieces.Stronghold.Door;
 import net.minecraftforge.classloading.FMLForgePlugin;
+import net.minecraftforge.fml.common.EnhancedRuntimeException;
+import net.minecraftforge.fml.common.FMLLog;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class EnumHelper
@@ -168,8 +170,7 @@ public class EnumHelper
 
         try
         {
-            Method getReflectionFactory = Class.forName("jdk.internal.reflect.ReflectionFactory").getDeclaredMethod("getReflectionFactory");
-            reflectionFactory      = getReflectionFactory.invoke(null);
+            reflectionFactory      = Class.forName("jdk.internal.reflect.ReflectionFactory").getDeclaredMethod("getReflectionFactory", new Class[]{}).invoke(null);
             newConstructorAccessor = Class.forName("jdk.internal.reflect.ReflectionFactory").getDeclaredMethod("newConstructorAccessor", Constructor.class);
             newInstance            = Class.forName("jdk.internal.reflect.ConstructorAccessor").getDeclaredMethod("newInstance", Object[].class);
             newFieldAccessor       = Class.forName("jdk.internal.reflect.ReflectionFactory").getDeclaredMethod("newFieldAccessor", Field.class, boolean.class);
@@ -218,7 +219,7 @@ public class EnumHelper
 //        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 //        Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, field, false);
 //        fieldAccessorSet.invoke(fieldAccessor, target, value);
-    	index.alchemy.util.FinalFieldHelper.set(target, field, value);
+    	FinalFieldHelper.set(target, field, value);
     }
 
     private static void blankField(Class<?> enumClass, String fieldName) throws Exception

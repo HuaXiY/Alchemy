@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -30,16 +29,11 @@ import java.util.jar.Manifest;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.util.TraceClassVisitor;
 
 import index.alchemy.api.annotation.SuppressFBWarnings;
-import index.alchemy.util.Tool;
-import index.alchemy.util.cache.ThreadContextCache;
 import net.minecraft.launchwrapper.IClassNameTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.launchwrapper.LogWrapper;
 import net.minecraftforge.fml.common.asm.ASMTransformerWrapper;
 

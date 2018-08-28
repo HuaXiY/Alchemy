@@ -10,13 +10,9 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +27,7 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import index.alchemy.util.UnsafeHelper;
 import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -129,23 +126,8 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 			syserr = new PrintStream(new FileOutputStream(FileDescriptor.err));
 	
 	public static final Logger logger = LogManager.getLogger(AlchemyEngine.class.getSimpleName());
-	
-	private static final sun.misc.Unsafe unsafe = FunctionHelper.onThrowableSupplier(AlchemyEngine::getUnsafe, FunctionHelper::rethrowVoid).get();
-	
-	private static sun.misc.Unsafe getUnsafe() throws PrivilegedActionException {
-		return AccessController.doPrivileged(new PrivilegedExceptionAction<sun.misc.Unsafe>() {
-			
-			@Override
-			public sun.misc.Unsafe run() throws Exception {
-				Field theUnsafe = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-				theUnsafe.setAccessible(true);
-				return (sun.misc.Unsafe) theUnsafe.get(null);
-			}
-			
-	   });
-	}
-	
-	public static final sun.misc.Unsafe unsafe() { return unsafe; }
+
+	public static final sun.misc.Unsafe unsafe() { return UnsafeHelper.unsafe(); }
 	
 	static { markUnsafe(unsafe()); }
 	

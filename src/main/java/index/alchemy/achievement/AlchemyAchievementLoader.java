@@ -10,7 +10,7 @@
 //import index.alchemy.core.AlchemyModLoader;
 //import index.alchemy.core.AlchemyConstants;
 //import index.alchemy.item.AlchemyItemLoader;
-//import index.project.version.annotation.Omega;
+//import Omega;
 //
 //@Omega
 //@Init(state = ModState.POSTINITIALIZED)

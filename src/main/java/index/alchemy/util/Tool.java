@@ -1,17 +1,23 @@
 package index.alchemy.util;
 
-import java.io.BufferedReader;
-import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import index.alchemy.api.annotation.SuppressFBWarnings;
+import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.AlchemyEngine;
+import index.alchemy.core.AlchemyInitHook;
+import index.alchemy.core.AlchemyModLoader;
+import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.project.version.annotation.Omega;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.apache.commons.compress.utils.IOUtils;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.TraceClassVisitor;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.RegEx;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -21,38 +27,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.RegEx;
-
-import org.apache.commons.compress.utils.IOUtils;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.util.TraceClassVisitor;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import index.alchemy.api.annotation.SuppressFBWarnings;
-import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyEngine;
-import index.alchemy.core.AlchemyInitHook;
-import index.alchemy.core.AlchemyModLoader;
-import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.project.version.annotation.Omega;
-import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import static index.alchemy.util.$.*;
 

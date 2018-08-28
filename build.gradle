@@ -21,6 +21,7 @@ configurations {
     compile.extendsFrom shade
 }
 dependencies {
+    compile project(":internal-utils")
     ecj 'org.eclipse.jdt:ecj:+'
     compile fileTree(dir: 'mods', include: ['*.jar'])
     // shade 'org.jooq:jool:+'
@@ -36,22 +37,21 @@ configFile.withReader {
     prop.load(it)
     project.ext.config = new ConfigSlurper().parse prop
     def mcpVersion = project.config.mappings_version.replace('snapshot_', '')
-    config.srgDir = file(System.getProperty('user.home') +
-        "/.gradle/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/")
+    config.srgDir = file("${project.gradle.gradleUserHomeDir}/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/")
 	config.mcp_srg = new File(config.srgDir, 'mcp-srg.srg')
 	config.srg_mcp = new File(config.srgDir, 'srg-mcp.srg')
 }
 
 apply from: 'ast.gradle'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '10'
+targetCompatibility = '10'
 
 subprojects {
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = '10'
+    targetCompatibility = '10'
     version = config.mod_version
-    group= "com.github.mickeyxiami.alchemy"
+    group = "com.github.mickeyxiami.alchemy"
 }
 
 version = config.mod_version
@@ -87,38 +87,6 @@ recompileMc {
     }
 }
 
-void doAccessTransformer(File at, File input) {
-    if (!at.exists())
-    	return
-    println "Find at: ${at.path}"
-    def lines = com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(new FileInputStream(at)))
-    def mapping = VERConsts['getMapping'](lines)
-    mapping.values().forEach { it.forEach { println it } }
-    def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${input.path}"))
-    def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${input.path}".replace('.jar', '-fixed.jar')))
-    def result = new java.util.LinkedList()
-    for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
-        zos.putNextEntry(entry)
-        if (entry.name.endsWith(".java")) {
-        def name = entry.name.replace('/', '.').replace('.java', '')
-        org.apache.commons.io.IOUtils.write(VERConsts['doAccessTransformer'](
-            com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(zis)), name, mapping, result),
-            zos, "utf-8")
-        } else
-        org.apache.commons.io.IOUtils.copy(zis, zos)
-    }
-    zis.close()
-    zos.finish()
-    zos.close()
-    def flag
-    println "------------------------------------------------------------------------------------------------------------------"
-    mapping.values().forEach { it.stream().filter { !result.contains(it) && !it.runtime }.forEach { flag = true; println it } }
-    if (flag)
-        throw new RuntimeException("At is not working properly")
-    input.delete()
-    file(input.path.replace(".jar", "-fixed.jar")).renameTo(input)
-}
-
 task sourcesJar(type: Jar) {
     baseName = "${archivesBaseName}-core"
     from 'src/main/java/'
@@ -128,8 +96,8 @@ task sourcesJar(type: Jar) {
 }
 
 compileJava {
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = '10'
+    targetCompatibility = '10'
     
     options.encoding = 'utf-8'
     options.fork = true
@@ -172,10 +140,10 @@ task dlc {
     dirList('dlcs').each { File dlc ->
         def name = dlc.name
         println "Found DLC -> ${name}"
-		
+
 		file("dlcs/${name}/src/main/java").mkdirs();
 		file("dlcs/${name}/src/main/resources").mkdirs();
-        
+
         task "sourcesDLC-${name}"(type: Jar, dependsOn: sourcesJar) {
             baseName = "${archivesBaseName}-dlc-${name}"
             version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
@@ -184,12 +152,12 @@ task dlc {
             classifier = 'sources'
         }
         artifacts.add('archives', tasks["sourcesDLC-${name}"])
-        
+
         task "compileDLC-${name}"(type: JavaCompile) {
             source = fileTree(dir: "dlcs/${name}/src/main/java", include: '**/*.java')
             destinationDir = file("build/classes/${name}")
-            sourceCompatibility = '1.8'
-            targetCompatibility = '1.8'
+            sourceCompatibility = '10'
+            targetCompatibility = '10'
             //dependencyCacheDir = file("build/classes/${name}")
             classpath = tasks['compileJava'].classpath + files('build/classes/main')
 			dirList('dlcs').each { classpath = classpath + files("dlcs/${it.name}/src/main/java") }
@@ -213,7 +181,7 @@ task dlc {
 				dirList("build/classes/${name}/index/alchemy/dlcs").toList().stream().filter { !it.name.toLowerCase().equals(name.toLowerCase()) } .each { delete(it) }
 			}
         }
-        
+
         task "jarDLC-${name}"(type: Jar, dependsOn: "compileDLC-${name}") {
             baseName = "${archivesBaseName}-dlc-${name}"
             version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
@@ -223,7 +191,7 @@ task dlc {
             classifier = 'deobf'
         }
         artifacts.add('archives', tasks["jarDLC-${name}"])
-        
+
         task "reobfDLC-${name}"(dependsOn: "jarDLC-${name}") << {
             def inputName = "${archivesBaseName}-dlc-${name}-${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}-deobf.jar"
             reobfDLC(inputName, tasks["compileDLC-${name}"].classpath)

@@ -9,39 +9,20 @@ buildscript {
 	}
 }
 
-import java.util.HashMap
-import java.util.Iterator
-import java.util.LinkedList
-import java.util.List
-import java.util.Map
-import java.util.stream.Collectors
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.Maps
-
-import org.eclipse.jdt.core.JavaModelException
-import org.eclipse.jdt.core.dom.AST
-import org.eclipse.jdt.core.dom.ASTNode
-import org.eclipse.jdt.core.dom.ASTParser
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration
-import org.eclipse.jdt.core.dom.CompilationUnit
-import org.eclipse.jdt.core.dom.EnumDeclaration
-import org.eclipse.jdt.core.dom.FieldDeclaration
-import org.eclipse.jdt.core.dom.IExtendedModifier
-import org.eclipse.jdt.core.dom.MethodDeclaration
-import org.eclipse.jdt.core.dom.Modifier
-import org.eclipse.jdt.core.dom.TypeDeclaration
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment
+import org.eclipse.jdt.core.dom.*
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite
-import org.eclipse.jface.text.BadLocationException
 import org.eclipse.jface.text.Document
 import org.eclipse.jface.text.IDocument
-import org.eclipse.text.edits.MalformedTreeException
 import org.eclipse.text.edits.TextEdit
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.util.stream.Collectors
 
 class SrgMap {
 	
@@ -356,6 +337,38 @@ def doAccessTransformer = {
 	TextEdit edits = rewriter.rewriteAST(document, null)
 	edits.apply(document)
 	return document.get()
+}
+
+void doAccessTransformer(File at, File input) {
+	if (!at.exists())
+		return
+	println "Find at: ${at.path}"
+	def lines = com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(new FileInputStream(at)))
+	def mapping = VERConsts['getMapping'](lines)
+	mapping.values().forEach { it.forEach { println it } }
+	def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${input.path}"))
+	def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${input.path}".replace('.jar', '-fixed.jar')))
+	def result = new java.util.LinkedList()
+	for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
+		zos.putNextEntry(entry)
+		if (entry.name.endsWith(".java")) {
+			def name = entry.name.replace('/', '.').replace('.java', '')
+			org.apache.commons.io.IOUtils.write(VERConsts['doAccessTransformer'](
+					com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(zis)), name, mapping, result),
+					zos, "utf-8")
+		} else
+			org.apache.commons.io.IOUtils.copy(zis, zos)
+	}
+	zis.close()
+	zos.finish()
+	zos.close()
+	def flag
+	println "------------------------------------------------------------------------------------------------------------------"
+	mapping.values().forEach { it.stream().filter { !result.contains(it) && !it.runtime }.forEach { flag = true; println it } }
+	if (flag)
+		throw new RuntimeException("At is not working properly")
+	input.delete()
+	file(input.path.replace(".jar", "-fixed.jar")).renameTo(input)
 }
 
 ext {

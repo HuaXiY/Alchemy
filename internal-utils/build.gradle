@@ -1,0 +1,18 @@
+plugins {
+    id "java"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+dependencies {
+    compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    compileOnly group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+    compileOnly group: 'com.google.guava', name: 'guava', version: '21.0'
+}

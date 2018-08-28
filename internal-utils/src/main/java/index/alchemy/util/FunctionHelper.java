@@ -1,14 +1,9 @@
 package index.alchemy.util;
 
-import java.util.Arrays;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import index.project.version.annotation.Omega;
+
+import java.util.Arrays;
+import java.util.function.*;
 
 @Omega
 public interface FunctionHelper {

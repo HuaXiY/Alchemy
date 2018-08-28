@@ -1,27 +1,6 @@
 package index.alchemy.core.asm.transformer;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.Method;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-
 import com.google.common.collect.Lists;
-
 import index.alchemy.api.IByteBufSerializable;
 import index.alchemy.api.IShareableSerializable;
 import index.alchemy.api.annotation.Unsafe;
@@ -29,17 +8,27 @@ import index.alchemy.core.AlchemyEngine;
 import index.alchemy.core.AlchemyModLoader;
 import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.network.AlchemyNetworkHandler;
-import index.alchemy.util.$;
 import index.alchemy.util.ASMHelper;
-import index.alchemy.util.FunctionHelper;
 import index.alchemy.util.Tool;
 import index.alchemy.util.TypeResolver;
+import index.alchemy.util.$;
+import index.alchemy.util.FunctionHelper;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.objectweb.asm.*;
+import org.objectweb.asm.commons.Method;
+import org.objectweb.asm.tree.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.commons.GeneratorAdapter.*;
