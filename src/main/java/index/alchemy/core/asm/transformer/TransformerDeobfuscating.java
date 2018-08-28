@@ -1,25 +1,18 @@
 package index.alchemy.core.asm.transformer;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.AlchemyEngine;
-import index.alchemy.util.$;
 import index.alchemy.util.ASMHelper;
+import index.alchemy.util.$;
 import index.project.version.annotation.Omega;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.*;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 @Omega
 public class TransformerDeobfuscating implements IClassTransformer {

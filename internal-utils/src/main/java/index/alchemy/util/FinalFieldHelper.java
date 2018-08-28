@@ -1,17 +1,15 @@
 package index.alchemy.util;
 
-import java.lang.reflect.Field;
+import index.alchemy.api.annotation.Unsafe;
+import index.project.version.annotation.Omega;
 
 import javax.annotation.Nullable;
-
-import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.AlchemyEngine;
-import index.project.version.annotation.Omega;
+import java.lang.reflect.Field;
 
 @Omega
 public interface FinalFieldHelper {
 
-	static final sun.misc.Unsafe unsafe = AlchemyEngine.unsafe();
+	static final sun.misc.Unsafe unsafe = $.unsafe();
 
 	@Unsafe(Unsafe.UNSAFE_API)
 	static void set(@Nullable Object obj, Field field, @Nullable Object value) throws Exception {

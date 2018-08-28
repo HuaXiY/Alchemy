@@ -4,7 +4,7 @@
 //
 //import index.alchemy.api.IEventHandle;
 //import index.alchemy.util.InventoryHelper;
-//import index.project.version.annotation.Omega;
+//import Omega;
 //import net.minecraft.entity.player.EntityPlayer;
 //import net.minecraft.item.Item;
 //import net.minecraft.item.ItemStack;

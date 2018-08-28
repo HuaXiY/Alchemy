@@ -1,4 +1,4 @@
-package com.github.charlie.alchemy;
+package index.alchemy.support.agent;
 
 import javassist.*;
 import javassist.bytecode.*;
@@ -88,6 +88,8 @@ public class Transformer implements ClassFileTransformer {
     private static final String SYSTEM_UTILS_NAME = "org/apache/commons/lang3/SystemUtils";
     private static final String ASM_TRANSFORMER_WRAPPER_NAME = "net/minecraftforge/fml/common/asm/ASMTransformerWrapper$TransformerWrapper";
     private static final String LAUNCH_NAME = "net/minecraft/launchwrapper/Launch";
+    private static final String FINAL_HELPER_NAME = "net/minecraftforge/registries/ObjectHolderRef$FinalFieldHelper";
+    private static final String ENUM_HELPER_NAME = "net/minecraftforge/common/util/EnumHelper";
     @Override
     public byte[] transform(ClassLoader loader,
                             String className,
@@ -96,17 +98,23 @@ public class Transformer implements ClassFileTransformer {
                             byte[] classfileBuffer) {
         switch (className) {
             case CLASS_READER_NAME:
-                System.err.println("[" + Instant.now() + "] [Alchemy-Instrumentation] Patching " + CLASS_READER_NAME + ".");
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + CLASS_READER_NAME + ".");
                 return patchClassReader(loader, classfileBuffer);
             case LAUNCH_NAME:
-                System.err.println("[" + Instant.now() + "] [Alchemy-Instrumentation] Patching " + LAUNCH_NAME + ".");
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + LAUNCH_NAME + ".");
                 return decompress(LAUNCH);
             case ASM_TRANSFORMER_WRAPPER_NAME:
-                System.err.println("[" + Instant.now() + "] [Alchemy-Instrumentation] Patching " + ASM_TRANSFORMER_WRAPPER_NAME + ".");
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + ASM_TRANSFORMER_WRAPPER_NAME + ".");
                 return patchASMTransformerWrapper(loader, classfileBuffer);
             case SYSTEM_UTILS_NAME:
-                System.err.println("[" + Instant.now() + "] [Alchemy-Instrumentation] Patching " + SYSTEM_UTILS_NAME + ".");
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + SYSTEM_UTILS_NAME + ".");
                 return patchSystemUtils(loader, classfileBuffer);
+            case FINAL_HELPER_NAME:
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + FINAL_HELPER_NAME + ".");
+                return patchFinalHelper(loader, classfileBuffer);
+            case ENUM_HELPER_NAME:
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + ENUM_HELPER_NAME + ".");
+                return patchEnumHelper(loader, classfileBuffer);
             default:
                 return null;
         }
@@ -145,7 +153,8 @@ public class Transformer implements ClassFileTransformer {
             classPool.appendClassPath(new LoaderClassPath(loader));
             CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
             CtMethod ctMethod = ctClass.getMethod("transform", "(Ljava/lang/String;Ljava/lang/String;[B)[B");
-            ctMethod.insertBefore("if(name.startsWith(\"net.minecraftforge.fml.asm.ASM\") || name.startsWith(\"org.apache.commons.\") || name.startsWith(\"sun.\")) return basicClass;");
+            ctMethod.insertBefore("if($1.startsWith(\"net.minecraftforge.fml.asm.ASM\") || $1.startsWith(\"org.apache.commons.\") || $1.startsWith(\"sun.\")) return $3;");
+            ctMethod.insertBefore("if($1.startsWith(\"net.minecraftforge.fml.asm.ASM\") || $1.startsWith(\"org.apache.commons.\") || $1.startsWith(\"sun.\")) return $3;");
 
             return ctClass.toBytecode();
         } catch (IOException | NotFoundException | CannotCompileException e) {
@@ -180,6 +189,52 @@ public class Transformer implements ClassFileTransformer {
             }
             return ctClass.toBytecode();
         } catch (IOException | CannotCompileException | BadBytecode e) {
+            // this should never happen
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private byte[] patchFinalHelper(ClassLoader loader, byte[] classfileBuffer) {
+        try {
+            ClassPool classPool = new ClassPool();
+            classPool.appendClassPath(new LoaderClassPath(loader));
+            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+
+            CtMethod ctMethod = ctClass.getMethod("makeWritable", "(Ljava/lang/reflect/Field;)Ljava/lang/reflect/Field;");
+            ctMethod.setBody("return $1;");
+
+            ctMethod = ctClass.getMethod("setField", "(Ljava/lang/reflect/Field;Ljava/lang/Object;Ljava/lang/Object;)V");
+            ctMethod.setBody("try { index.alchemy.util.FinalFieldHelper.set($2, $1, $3); } catch (Exception e) { throw new ReflectiveOperationException(e); }");
+
+            return ctClass.toBytecode();
+        } catch (IOException | NotFoundException | CannotCompileException e) {
+            // this should never happen
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private byte[] patchEnumHelper(ClassLoader loader, byte[] classfileBuffer) {
+        try {
+            ClassPool classPool = new ClassPool();
+            classPool.appendClassPath(new LoaderClassPath(loader));
+            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+
+            CtMethod ctMethod = ctClass.getMethod("setFailsafeFieldValue", "(Ljava/lang/reflect/Field;Ljava/lang/Object;Ljava/lang/Object;)V");
+            ctMethod.setBody("try { index.alchemy.util.FinalFieldHelper.set($2, $1, $3); } catch (Exception e) { throw new ReflectiveOperationException(e); }");
+
+            ctMethod = ctClass.getMethod("setup", "()V");
+            ctMethod.setBody("{if(isSetup)return;" +
+                    "try{reflectionFactory=Class.forName(\"jdk.internal.reflect.ReflectionFactory\").getDeclaredMethod(\"getReflectionFactory\",new Class[0]).invoke(null,new Class[0]);\n" +
+                    "newConstructorAccessor=Class.forName(\"jdk.internal.reflect.ReflectionFactory\").getDeclaredMethod(\"newConstructorAccessor\",new Class[]{java.lang.reflect.Constructor.class});\n" +
+                    "newInstance=Class.forName(\"jdk.internal.reflect.ConstructorAccessor\").getDeclaredMethod(\"newInstance\",new Class[]{Object[].class});\n" +
+                    "newFieldAccessor=Class.forName(\"jdk.internal.reflect.ReflectionFactory\").getDeclaredMethod(\"newFieldAccessor\",new Class[]{java.lang.reflect.Field.class,boolean.class});\n" +
+                    "fieldAccessorSet=Class.forName(\"jdk.internal.reflect.FieldAccessor\").getDeclaredMethod(\"set\",new Class[]{Object.class,Object.class});}" +
+                    "catch(Exception e) { net.minecraftforge.fml.common.FMLLog.log.error(\"Error setting up EnumHelper.\", e); } isSetup=true;}");
+
+            return ctClass.toBytecode();
+        } catch (IOException | NotFoundException | CannotCompileException e) {
             // this should never happen
             e.printStackTrace();
             return null;

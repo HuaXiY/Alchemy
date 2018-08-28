@@ -2,14 +2,14 @@ plugins {
     id "java"
 }
 
-sourceCompatibility = targetCompatibility = 1.8
-
 repositories {
     mavenCentral()
     jcenter()
 }
 
 dependencies {
+    compile project(':internal-utils')
+
     compile group: 'org.javassist', name: 'javassist', version: '3.23.1-GA'
     // edit the line below to the forge build on your computer for debug purpose.
     //testCompile files("C:\\Users\\cqjjj\\AppData\\Roaming\\.minecraft\\libraries\\net\\minecraftforge\\forge\\1.12.2-14.23.4.2758\\forge-1.12.2-14.23.4.2758.jar")
@@ -19,10 +19,10 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 jar {
-    archivesBaseName = "Alchemy-Inst"
+    archivesBaseName = "Alchemy-Agent"
 
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {
-        attributes 'Premain-Class': 'com.github.charlie.alchemy.Patcher'
+        attributes 'Premain-Class': 'index.alchemy.support.agent.Patcher'
     }
 }

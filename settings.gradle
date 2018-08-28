@@ -1,4 +1,5 @@
 rootProject.name = 'Alchemy'
 rootProject.buildFileName = 'build.gradle'
 
-include 'inst'
+include 'internal-utils'
+include 'alchemy-agent'
