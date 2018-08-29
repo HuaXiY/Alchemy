@@ -50,7 +50,6 @@ targetCompatibility = '10'
 subprojects {
     sourceCompatibility = '10'
     targetCompatibility = '10'
-    version = config.mod_version
     group = "com.github.mickeyxiami.alchemy"
 }
 
