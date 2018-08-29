@@ -2,6 +2,8 @@ package index.alchemy.support.agent;
 
 import javassist.*;
 import javassist.bytecode.*;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -90,6 +92,8 @@ public class Transformer implements ClassFileTransformer {
     private static final String LAUNCH_NAME = "net/minecraft/launchwrapper/Launch";
     private static final String FINAL_HELPER_NAME = "net/minecraftforge/registries/ObjectHolderRef$FinalFieldHelper";
     private static final String ENUM_HELPER_NAME = "net/minecraftforge/common/util/EnumHelper";
+    private static final String ITEM_STACK_HOLDER_REF_NAME = "net/minecraftforge/fml/common/registry/ItemStackHolderRef";
+    private static final String ASM_EVENT_HANDLER_NAME = "net/minecraftforge/fml/common/eventhandler/ASMEventHandler";
     @Override
     public byte[] transform(ClassLoader loader,
                             String className,
@@ -115,17 +119,19 @@ public class Transformer implements ClassFileTransformer {
             case ENUM_HELPER_NAME:
                 System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + ENUM_HELPER_NAME + ".");
                 return patchEnumHelper(loader, classfileBuffer);
+            case ITEM_STACK_HOLDER_REF_NAME:
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + ITEM_STACK_HOLDER_REF_NAME + ".");
+                return patchItemStackHolderRef(loader, classfileBuffer);
+            case ASM_EVENT_HANDLER_NAME:
+                System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Patching " + ASM_EVENT_HANDLER_NAME + ".");
+                return patchASMEventHandler(loader, classfileBuffer);
             default:
                 return null;
         }
     }
 
     private byte[] patchClassReader(ClassLoader loader, byte[] classfileBuffer) {
-        try {
-            ClassPool classPool = new ClassPool();
-            classPool.appendClassPath(new LoaderClassPath(loader));
-            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-
+        return patchUsingCtClass(loader, classfileBuffer, ctClass -> {
             MethodInfo info = ctClass.getConstructor("([BII)V").getMethodInfo();
 
             CodeAttribute attr = info.getCodeAttribute();
@@ -138,37 +144,18 @@ public class Transformer implements ClassFileTransformer {
                     break;
                 }
             }
-
-            return ctClass.toBytecode();
-        } catch (IOException | BadBytecode | CannotCompileException | NotFoundException e) {
-            // this should never happen
-            e.printStackTrace();
-            return null;
-        }
+        });
     }
 
     private byte[] patchASMTransformerWrapper(ClassLoader loader, byte[] classfileBuffer) {
-        try {
-            ClassPool classPool = new ClassPool();
-            classPool.appendClassPath(new LoaderClassPath(loader));
-            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+        return patchUsingCtClass(loader, classfileBuffer, ctClass -> {
             CtMethod ctMethod = ctClass.getMethod("transform", "(Ljava/lang/String;Ljava/lang/String;[B)[B");
             ctMethod.insertBefore("if($1.startsWith(\"net.minecraftforge.fml.asm.ASM\") || $1.startsWith(\"org.apache.commons.\") || $1.startsWith(\"sun.\")) return $3;");
-            ctMethod.insertBefore("if($1.startsWith(\"net.minecraftforge.fml.asm.ASM\") || $1.startsWith(\"org.apache.commons.\") || $1.startsWith(\"sun.\")) return $3;");
-
-            return ctClass.toBytecode();
-        } catch (IOException | NotFoundException | CannotCompileException e) {
-            // this should never happen
-            e.printStackTrace();
-            return null;
-        }
+        });
     }
 
     private byte[] patchSystemUtils(ClassLoader loader, byte[] classfileBuffer) {
-        try {
-            ClassPool classPool = new ClassPool();
-            classPool.appendClassPath(new LoaderClassPath(loader));
-            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+        return patchUsingCtClass(loader, classfileBuffer, ctClass -> {
             ClassFile classFile = ctClass.getClassFile();
             ConstPool constPool = classFile.getConstPool();
 
@@ -187,40 +174,21 @@ public class Transformer implements ClassFileTransformer {
                     iter.write16bit(constPool.addFieldrefInfo(constPool.addClassInfo("org/apache/commons/lang3/JavaVersion"), "JAVA_RECENT", "Lorg/apache/commons/lang3/JavaVersion;"), pos2 + 1);
                 }
             }
-            return ctClass.toBytecode();
-        } catch (IOException | CannotCompileException | BadBytecode e) {
-            // this should never happen
-            e.printStackTrace();
-            return null;
-        }
+        });
     }
 
     private byte[] patchFinalHelper(ClassLoader loader, byte[] classfileBuffer) {
-        try {
-            ClassPool classPool = new ClassPool();
-            classPool.appendClassPath(new LoaderClassPath(loader));
-            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-
+        return patchUsingCtClass(loader, classfileBuffer, ctClass -> {
             CtMethod ctMethod = ctClass.getMethod("makeWritable", "(Ljava/lang/reflect/Field;)Ljava/lang/reflect/Field;");
             ctMethod.setBody("return $1;");
 
             ctMethod = ctClass.getMethod("setField", "(Ljava/lang/reflect/Field;Ljava/lang/Object;Ljava/lang/Object;)V");
             ctMethod.setBody("try { index.alchemy.util.FinalFieldHelper.set($2, $1, $3); } catch (Exception e) { throw new ReflectiveOperationException(e); }");
-
-            return ctClass.toBytecode();
-        } catch (IOException | NotFoundException | CannotCompileException e) {
-            // this should never happen
-            e.printStackTrace();
-            return null;
-        }
+        });
     }
 
     private byte[] patchEnumHelper(ClassLoader loader, byte[] classfileBuffer) {
-        try {
-            ClassPool classPool = new ClassPool();
-            classPool.appendClassPath(new LoaderClassPath(loader));
-            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-
+        return patchUsingCtClass(loader, classfileBuffer, ctClass -> {
             CtMethod ctMethod = ctClass.getMethod("setFailsafeFieldValue", "(Ljava/lang/reflect/Field;Ljava/lang/Object;Ljava/lang/Object;)V");
             ctMethod.setBody("try { index.alchemy.util.FinalFieldHelper.set($2, $1, $3); } catch (Exception e) { throw new ReflectiveOperationException(e); }");
 
@@ -232,6 +200,61 @@ public class Transformer implements ClassFileTransformer {
                     "newFieldAccessor=Class.forName(\"jdk.internal.reflect.ReflectionFactory\").getDeclaredMethod(\"newFieldAccessor\",new Class[]{java.lang.reflect.Field.class,boolean.class});\n" +
                     "fieldAccessorSet=Class.forName(\"jdk.internal.reflect.FieldAccessor\").getDeclaredMethod(\"set\",new Class[]{Object.class,Object.class});}" +
                     "catch(Exception e) { net.minecraftforge.fml.common.FMLLog.log.error(\"Error setting up EnumHelper.\", e); } isSetup=true;}");
+        });
+    }
+
+    private byte[] patchItemStackHolderRef(ClassLoader loader, byte[] classfileBuffer) {
+        return patchUsingCtClass(loader, classfileBuffer, ctClass -> {
+            CtMethod ctMethod = ctClass.getMethod("makeWritable", "(Ljava/lang/reflect/Field;)V");
+            ctMethod.setBody("{}");
+
+            ctMethod = ctClass.getMethod("apply", "()V");
+            ctMethod.setBody("{Object is;\n" +
+                    "try\n" +
+                    "{\n" +
+                    "    is = index.alchemy.util.$.$(new Object[]{\"Lnet.minecraftforge.fml.common.registry.GameRegistry\", \"makeItemStack\", itemName, new Integer(meta), new Integer(1), serializednbt});\n" +
+                    "} catch (RuntimeException e)\n" +
+                    "{\n" +
+                    "    net.minecraftforge.fml.common.FMLLog.log.error(\"Caught exception processing itemstack {},{},{} in annotation at {}.{}\", itemName, Integer.toString(meta), serializednbt,field.getClass().getName(),field.getName());\n" +
+                    "    throw e;\n" +
+                    "}\n" +
+                    "try\n" +
+                    "{\n" +
+                    "\tindex.alchemy.util.FinalFieldHelper.setStatic(field, is);\n" +
+                    "}\n" +
+                    "catch (Exception e)\n" +
+                    "{\n" +
+                    "    net.minecraftforge.fml.common.FMLLog.log.warn(\"Unable to set {} with value {},{},{}\", this.field, this.itemName, Integer.toString(this.meta), this.serializednbt);\n" +
+                    "}}");
+        });
+    }
+
+    private byte[] patchASMEventHandler(ClassLoader loader, byte[] classfileBuffer) {
+        return patchUsingCtClass(loader, classfileBuffer, ctClass -> {
+            ExprEditor editor = new ExprEditor() {
+                @Override
+                public void edit(MethodCall m) throws CannotCompileException {
+                    super.edit(m);
+                    if (m.getMethodName().equals("visitMethodInsn") && m.getClassName().equals("org.objectweb.asm.MethodVisitor")) {
+                        m.replace("{if($1 == 184)" +
+                                "{$5 = Class.forName(instType.replace('/','.')).isInterface();}" +
+                                "$_ = $proceed($$);}");
+                    } else if (m.getMethodName().equals("visit") && m.getClassName().equals("org.objectweb.asm.ClassWriter")) {
+                        m.replace("{$1=52;$_ = $proceed($$);}");
+                    }
+                }
+            };
+            ctClass.getMethod("createWrapper", "(Ljava/lang/reflect/Method;)Ljava/lang/Class;").instrument(editor);
+        });
+    }
+
+    private byte[] patchUsingCtClass(ClassLoader loader, byte[] classfileBuffer, ExceptionConsumer action) {
+        try {
+            ClassPool classPool = new ClassPool();
+            classPool.appendClassPath(new LoaderClassPath(loader));
+            CtClass ctClass = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+
+            action.apply(ctClass);
 
             return ctClass.toBytecode();
         } catch (Exception e) {
@@ -258,5 +281,9 @@ public class Transformer implements ClassFileTransformer {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private interface ExceptionConsumer {
+        void apply(CtClass ctClass) throws Exception;
     }
 }
