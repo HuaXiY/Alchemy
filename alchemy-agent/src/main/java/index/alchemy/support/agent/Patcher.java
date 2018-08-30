@@ -9,7 +9,10 @@ import java.security.PrivilegedExceptionAction;
 import java.time.Instant;
 
 public class Patcher {
+    private static Instrumentation INSTRUMENTATION = null;
     public static void premain(String agentArgs, Instrumentation inst) throws PrivilegedActionException {
+        INSTRUMENTATION = inst;
+
         AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
             ModuleHelper.openAllModule();
             return null;
@@ -18,5 +21,9 @@ public class Patcher {
 
         inst.addTransformer(new Transformer());
         System.err.println("[" + Instant.now() + "] [Alchemy-Agent] Transformer added!");
+    }
+
+    public static Instrumentation getInstrumentation() {
+        return INSTRUMENTATION;
     }
 }
