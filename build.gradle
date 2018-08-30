@@ -1,34 +1,3 @@
-
-// For those who want the bleeding edge
-buildscript {
-    repositories {
-        jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
-}
-apply plugin: 'net.minecraftforge.gradle.forge'
-sourceJar.enabled = false
-
-apply plugin: 'maven'
-apply plugin: 'java'
-
-configurations {
-    ecj
-    shade
-    compile.extendsFrom shade
-}
-dependencies {
-    compile project(":internal-utils")
-    ecj 'org.eclipse.jdt:ecj:+'
-    compile fileTree(dir: 'mods', include: ['*.jar'])
-    // shade 'org.jooq:jool:+'
-}
-
-def jdt = configurations.ecj.asPath
-
 ext.configFile = file 'build.properties'
 
 configFile.withReader {
@@ -38,212 +7,30 @@ configFile.withReader {
     project.ext.config = new ConfigSlurper().parse prop
     def mcpVersion = project.config.mappings_version.replace('snapshot_', '')
     config.srgDir = file("${project.gradle.gradleUserHomeDir}/caches/minecraft/de/oceanlabs/mcp/mcp_snapshot/${mcpVersion}/${config.minecraft_version}/srgs/")
-	config.mcp_srg = new File(config.srgDir, 'mcp-srg.srg')
-	config.srg_mcp = new File(config.srgDir, 'srg-mcp.srg')
+    config.mcp_srg = new File(config.srgDir, 'mcp-srg.srg')
+    config.srg_mcp = new File(config.srgDir, 'srg-mcp.srg')
 }
 
-apply from: 'ast.gradle'
-
-sourceCompatibility = '10'
-targetCompatibility = '10'
-
 subprojects {
-    sourceCompatibility = '10'
-    targetCompatibility = '10'
+    project.ext.config = rootProject.ext.config
     group = "com.github.mickeyxiami.alchemy"
 }
 
-version = config.mod_version
-group= "com.github.mickeyxiami.alchemy" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Alchemy-${config.show_version}"
-
-version = "${config.minecraft_version}-${config.mod_version}.${config.dev_version}"
-config.build_number = config.dev_version
-
-minecraft {
-    version = config.minecraft_version + "-" + config.forge_version
-    runDir = "run"
-    
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not allways work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = project.config.mappings_version
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    def buildnum = (config.build_number != "") ? config.build_number : "?"
-    replace '@MOD_VERSION@', config.mod_version + '.' + buildnum
-    replace '@DEV_VERSION@', buildnum
-    replaceIn 'AlchemyConstants.java'
-    
-}
-
-recompileMc {
-    doFirst {
-        def at = 'src/main/resources/META-INF/at.cfg';
-        doAccessTransformer(file(at), getInSources())
-        dirList('dlcs').each { File dlc -> doAccessTransformer(new File(dlc, at), getInSources()) }
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
     }
-}
 
-task sourcesJar(type: Jar) {
-    baseName = "${archivesBaseName}-core"
-    from 'src/main/java/'
-    classifier = 'sources'
-    
-    from 'LICENSE.txt'
-}
-
-compileJava {
-    sourceCompatibility = '10'
-    targetCompatibility = '10'
-    
-    options.encoding = 'utf-8'
-    options.fork = true
-    doFirst {
-        options.forkOptions.with {
-            executable = 'java'
-            def lib = new java.util.TreeSet(sourceSets.main.compileClasspath.getFiles())
-            sourceSets.main.compileClasspath = new org.gradle.api.internal.file.UnionFileCollection(lib)
-            def toSort = { it.toString().contains("forgeSrc-") ? -1 : 0 }
-            lib.sort { a, b -> toSort(a) - toSort(b) }
-            println "Main Compile Class Path: "
-            sourceSets.main.compileClasspath.each { println it }
-			sourceSets.main.java.srcDir(sourceSets.agent_support.java)
-			sourceSets.main.resources.srcDir(sourceSets.agent_support.resources)
-            source = sourceSets.main.java.exclude { checkPackageName(it.getFile().toString().replace("\\", ".").replace("/", ".")) }
-            println "Main Compile Path: "
-            source.each { println it }
-            println "JDT-ECJ lib path: " + jdt
-            jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
-        }
+    configurations {
+        ecj
     }
-}
 
-boolean checkPackageName(String packageName) {
-    return packageName.contains("index.alchemy.core.run") || packageName.contains("index.alchemy.ztest") || packageName.contains("index.alchemy.development")
-}
-
-sourceSets {
-	agent_support {
-		java {
-            srcDir 'agent-support/src/main/java'
-        }
-		resources {
-            srcDir 'agent-support/src/main/resources'
-        }
-	}
-}
-
-task dlc {
-    dirList('dlcs').each { File dlc ->
-        def name = dlc.name
-        println "Found DLC -> ${name}"
-
-		file("dlcs/${name}/src/main/java").mkdirs();
-		file("dlcs/${name}/src/main/resources").mkdirs();
-
-        task "sourcesDLC-${name}"(type: Jar, dependsOn: sourcesJar) {
-            baseName = "${archivesBaseName}-dlc-${name}"
-            version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
-            from "dlcs/${name}/src/main/java"
-            from 'dlcs/LICENSE.txt'
-            classifier = 'sources'
-        }
-        artifacts.add('archives', tasks["sourcesDLC-${name}"])
-
-        task "compileDLC-${name}"(type: JavaCompile) {
-            source = fileTree(dir: "dlcs/${name}/src/main/java", include: '**/*.java')
-            destinationDir = file("build/classes/${name}")
-            sourceCompatibility = '10'
-            targetCompatibility = '10'
-            //dependencyCacheDir = file("build/classes/${name}")
-            classpath = tasks['compileJava'].classpath + files('build/classes/java/main')
-			dirList('dlcs').each { classpath = classpath + files("dlcs/${it.name}/src/main/java") }
-            println classpath
-            options.encoding = 'utf-8'
-            options.fork = true
-            doFirst {
-                options.forkOptions.with {
-                    executable = 'java'
-                    def lib = new java.util.TreeSet(classpath.getFiles())
-                    classpath = new org.gradle.api.internal.file.UnionFileCollection(lib)
-                    def toSort = { it.toString().contains("forgeSrc-") ? -1 : 0 }
-                    lib.sort { a, b -> toSort(a) - toSort(b) }
-					lib.each { println it }
-                    println "DLC-${name} Compile List: "
-                    source.each { println it }
-                    jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
-                }
-             }
-			 doLast {
-				dirList("build/classes/${name}/index/alchemy/dlcs").toList().stream().filter { !it.name.toLowerCase().equals(name.toLowerCase()) } .each { delete(it) }
-			}
-        }
-
-        task "jarDLC-${name}"(type: Jar, dependsOn: "compileDLC-${name}") {
-            baseName = "${archivesBaseName}-dlc-${name}"
-            version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
-            from "build/classes/${name}"
-            from "dlcs/${name}/src/main/resources"
-            from 'dlcs/README.txt'
-            classifier = 'deobf'
-        }
-        artifacts.add('archives', tasks["jarDLC-${name}"])
-
-        task "reobfDLC-${name}"(dependsOn: "jarDLC-${name}") << {
-            def inputName = "${archivesBaseName}-dlc-${name}-${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}-deobf.jar"
-            reobfDLC(inputName, tasks["compileDLC-${name}"].classpath)
-        }
-        tasks["jarDLC-${name}"].finalizedBy tasks["reobfDLC-${name}"]
+    dependencies {
+        ecj 'org.eclipse.jdt.core.compiler:ecj:+'
     }
-}
 
-void reobfDLC(String inputName, org.gradle.api.internal.file.UnionFileCollection classpath) {
-    def outputName = inputName.replace('deobf', 'universal')
-    def mapping = new net.md_5.specialsource.JarMapping()
-    def inputFile = file("build/libs/${inputName}")
-    def outputFile = file("build/libs/${outputName}")
-    def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
-    def inputJar = net.md_5.specialsource.Jar.init(inputFile)
-    def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
-    inheritanceProviders.add(getProvider(inputFile, classpath))
-    mapping.loadMappings(config.mcp_srg)
-    mapping.setFallbackInheritanceProvider(inheritanceProviders)
-    remapper.remapJar(inputJar, outputFile)
-}
-
-void deobf(String inputName) {
-    def outputName = inputName.replace('dev', 'deobf')
-    def mapping = new net.md_5.specialsource.JarMapping()
-    def inputFile = file("deobf/${inputName}")
-    def outputFile = file("deobf/${outputName}")
-    def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
-    def inputJar = net.md_5.specialsource.Jar.init(inputFile)
-    def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
-    def jarProvider = new net.md_5.specialsource.provider.JarProvider(inputJar)
-    inheritanceProviders.add(jarProvider)
-    mapping.loadMappings(config.srg_mcp)
-    mapping.setFallbackInheritanceProvider(inheritanceProviders)
-    remapper.remapJar(inputJar, outputFile)
-}
-
-net.md_5.specialsource.provider.ClassLoaderProvider getProvider(File input, org.gradle.api.internal.file.UnionFileCollection classpath) {
-    def set = new HashSet()
-	set.addAll(classpath.getFiles())
-    set.addAll(Arrays.asList(fileList("build/libs/")))
-    def urls = set.stream().filter { it.getName().endsWith(".jar") && !it.getName().contains("-sources") && (it.getName().contains("-deobf") || 
-            it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) ||
-            it.getName().contains("ToughAsNails-") || it.getName().contains("mobends-") }
-            .map { it.toURI() }.map { it.toURL() }.toArray { new URL[it] }
-    println "ReobfDLC class path: "
-    urls.each { println it }
-    def classLoader = new java.net.URLClassLoader(urls)
-    return new net.md_5.specialsource.provider.ClassLoaderProvider(classLoader)
-}
-
-task deobf << {
-    fileList('deobf').each { deobf(it.name) }
+    def jdt = configurations.ecj.asPath
 }
 
 File[] fileList(String dir) {
@@ -254,53 +41,10 @@ File[] dirList(String dir) {
     file(dir).listFiles({ file -> file.isDirectory() } as FileFilter).sort()
 }
 
-task rename << {
-    fileList('build/libs').each { File f ->
-        def name = f.name
-        if (name.contains('-dlc') && name.contains('-universal'))
-            f.renameTo(file(f.parent + '/' + name.replace('.jar', '.dlc')))
-        else if (name.contains('-sources'))
-            f.renameTo(file(f.parent + '/' + name.replace('.jar', '.zip')))
-    }
-}
+version = "${config.minecraft_version}-${config.mod_version}.${config.dev_version}"
+config.build_number = config.dev_version
 
-build.finalizedBy rename
-
-def commonManifest = {
-    attributes 'FMLAT' : 'alchemy_at.cfg',
-               'FMLCorePlugin': 'index.alchemy.core.AlchemyEngine', 
-               'FMLCorePluginContainsFMLMod': 'true'
-}
-
-jar {
-    baseName = "${archivesBaseName}-core"
-    manifest commonManifest
-    classifier = 'universal'
-    
-    from 'README.txt'
-	
-	configurations.shade.each { dep ->
-        from(project.zipTree(dep)){
-            exclude 'META-INF', 'META-INF/**'
-        }
-    }
-}
-
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.9'
+    distributionType = Wrapper.DistributionType.ALL
 }

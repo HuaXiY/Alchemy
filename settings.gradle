@@ -1,5 +1,17 @@
 rootProject.name = 'Alchemy'
 rootProject.buildFileName = 'build.gradle'
 
+include 'core'
 include 'internal-utils'
 include 'alchemy-agent'
+
+include 'dlcs'
+
+dirList('dlcs').each { File dlc ->
+    if (dlc.name != "dlcs")
+        include ':dlcs:' + dlc.name
+}
+
+File[] dirList(String dir) {
+    file(dir).listFiles({ file -> file.isDirectory() } as FileFilter).sort()
+}

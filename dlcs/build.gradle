@@ -1,0 +1,83 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url = "http://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+plugins {
+    id "java"
+}
+
+subprojects {
+    apply plugin: 'java'
+    sourceCompatibility = '10'
+    targetCompatibility = '10'
+
+    archivesBaseName = "Alchemy-${config.show_version}"
+    task sourcesZip(type: Zip, dependsOn: ':core:sourcesZip') {
+        baseName = "${archivesBaseName}-dlc-${name}"
+        from fileTree(dir: 'src/main/java/')
+        include '**/'
+        classifier = 'sources'
+        from 'LICENSE'
+        destinationDir jar.destinationDir
+    }
+
+    jar {
+        baseName = "${archivesBaseName}-dlc-${name}"
+        version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
+        from "build/classes/${name}"
+        from "dlcs/${name}/src/main/resources"
+        from 'dlcs/README.txt'
+        classifier = 'deobf'
+    }
+
+    task reobf(dependsOn: jar) << {
+        def inputName = "${archivesBaseName}-dlc-${name}-${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}-deobf.jar"
+        reobfDLC(inputName, compileJava.classpath)
+    }
+    jar.finalizedBy reobf
+
+    compileJava {
+        sourceCompatibility = '10'
+        targetCompatibility = '10'
+        options.encoding = 'utf-8'
+        options.fork = true
+        doFirst {
+            options.forkOptions.with {
+                executable = 'java'
+                println "DLC-${name} Compile List: "
+                source.each { println it }
+                jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
+            }
+        }
+    }
+
+    task rename << {
+        fileList('build/libs').each { File f ->
+            def name = f.name
+            if (name.contains('-dlc') && name.contains('-universal'))
+                f.renameTo(file(f.parent + '/' + name.replace('.jar', '.dlc')))
+        }
+    }
+
+    build.finalizedBy rename
+}
+
+void reobfDLC(String inputName, org.gradle.api.internal.file.UnionFileCollection classpath) {
+    def outputName = inputName.replace('deobf', 'universal')
+    def mapping = new net.md_5.specialsource.JarMapping()
+    def inputFile = file("build/libs/${inputName}")
+    def outputFile = file("build/libs/${outputName}")
+    def remapper = new net.md_5.specialsource.JarRemapper(null, mapping)
+    def inputJar = net.md_5.specialsource.Jar.init(inputFile)
+    def inheritanceProviders = new net.md_5.specialsource.provider.JointProvider()
+    inheritanceProviders.add(getProvider(inputFile, classpath))
+    mapping.loadMappings(config.mcp_srg)
+    mapping.setFallbackInheritanceProvider(inheritanceProviders)
+    remapper.remapJar(inputJar, outputFile)
+}
