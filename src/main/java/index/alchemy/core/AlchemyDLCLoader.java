@@ -171,7 +171,7 @@ public class AlchemyDLCLoader {
 		
 	}
 	
-	public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID, DEV_DLCS_BIN = "/dlcs-bin/";
+	public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID, DEV_DLCS_BIN = "/bin/";
 	
 	private static final Logger logger = LogManager.getLogger(AlchemyDLCLoader.class.getSimpleName());
 	
@@ -206,7 +206,7 @@ public class AlchemyDLCLoader {
 		else 
 			logger.info("index.alchemy.dlcs.bin is EMPTY");
 		
-		{
+		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
 			File dlcs = new File(mc_dir + DEV_DLCS_BIN);
 			if (!dlcs.exists())
 				dlcs.mkdirs();

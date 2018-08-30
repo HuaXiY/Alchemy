@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,6 +49,7 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
 import index.alchemy.agent.support.AgentSupport;
+import index.alchemy.api.IDLCInfo;
 import index.alchemy.api.annotation.Alchemy;
 import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.SuppressFBWarnings;
@@ -149,10 +151,10 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 				AgentSupport.loadAgent(Tool.createTempFile(AgentLoader.class.getResourceAsStream("/agent.jar"),
 						WordUtils.initials("Index-Alchemy-Agent.", '-'), ".jar").getPath());
 				logger.info("Successfully loaded agent!");
-			} catch (Throwable t) {
-				RuntimeException exception = new RuntimeException("Load agent failed!", t);
-				logger.fatal(exception);
-				throw exception;
+			} catch (Throwable throwable) {
+				logger.error("Load agent failed!");
+				logger.error(throwable);
+				throw new RuntimeException(throwable);
 			}
 		}
 		
@@ -527,6 +529,13 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 			if (!info.getName().matches(".*\\$[0-9]+") && !info.getName().contains("$$"))
 				result.add(info.getName());
 		return result;
+	}
+	
+	public static ClassLoader makeDomainClassLoader() {
+		List<URL> urls = Lists.newLinkedList();
+		urls.add(AlchemyEngine.class.getProtectionDomain().getCodeSource().getLocation());
+		urls.addAll(AlchemyDLCLoader.stream().filter(IDLCInfo::shouldLoad).map(IDLCInfo::getDLCURL).collect(Collectors.toList()));
+		return new URLClassLoader(urls.stream().toArray(URL[]::new));
 	}
 	
 	private static File alchemyCoreLocation;

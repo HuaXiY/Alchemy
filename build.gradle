@@ -158,7 +158,7 @@ task dlc {
             sourceCompatibility = '10'
             targetCompatibility = '10'
             //dependencyCacheDir = file("build/classes/${name}")
-            classpath = tasks['compileJava'].classpath + files('build/classes/main')
+            classpath = tasks['compileJava'].classpath + files('build/classes/java/main')
 			dirList('dlcs').each { classpath = classpath + files("dlcs/${it.name}/src/main/java") }
             println classpath
             options.encoding = 'utf-8'
@@ -229,7 +229,8 @@ void deobf(String inputName) {
 }
 
 net.md_5.specialsource.provider.ClassLoaderProvider getProvider(File input, org.gradle.api.internal.file.UnionFileCollection classpath) {
-    def set = classpath.getFiles()
+    def set = new HashSet()
+	set.addAll(classpath.getFiles())
     set.addAll(Arrays.asList(fileList("build/libs/")))
     def urls = set.stream().filter { it.getName().endsWith(".jar") && !it.getName().contains("-sources") && (it.getName().contains("-deobf") || 
             it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) ||

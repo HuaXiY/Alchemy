@@ -239,7 +239,7 @@ public enum AlchemyModLoader {
 		AlchemyDebug.start(BOOTSTRAP);
 		class_list.addAll(0, AlchemyEngine.findClassFromURL(mod_path.toURI().toURL()));
 		
-		AlchemyDLCLoader.stream().map(IDLCInfo::getDLCAllClass).forEach(AlchemyModLoader::addClass);
+		AlchemyDLCLoader.stream().filter(IDLCInfo::shouldLoad).map(IDLCInfo::getDLCAllClass).forEach(AlchemyModLoader::addClass);
 		
 		Side side = AlchemyEngine.runtimeSide();
 		ClassLoader loader = AlchemyEngine.getLaunchClassLoader();

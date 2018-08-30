@@ -3,10 +3,13 @@ package net.minecraft.launchwrapper;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import net.minecraftforge.gradle.GradleStartCommon;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.Level;
-
-import index.alchemy.util.$;
 
 public class Launch {
     private static final String DEFAULT_TWEAK = "net.minecraft.launchwrapper.VanillaTweaker";
@@ -33,9 +34,26 @@ public class Launch {
     public static LaunchClassLoader classLoader;
 
     private Launch() {
-        classLoader = new LaunchClassLoader($.<jdk.internal.loader.URLClassPath>$(GradleStartCommon.class.getClassLoader(), "ucp").getURLs());
-        blackboard = new HashMap<String,Object>();
-        Thread.currentThread().setContextClassLoader(classLoader);
+    	try {
+    		AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
+
+				@Override
+				public Void run() throws Exception {
+					Field ucp = Launch.class.getClassLoader().getClass().getDeclaredField("ucp");
+					ucp.setAccessible(true);
+	    			Object object = ucp.get(Launch.class.getClassLoader());
+	    			Method getURLs = object.getClass().getDeclaredMethod("getURLs");
+	    			getURLs.setAccessible(true);
+	    			classLoader = new LaunchClassLoader((URL[]) getURLs.invoke(object));
+	    	        blackboard = new HashMap<String,Object>();
+	    	        Thread.currentThread().setContextClassLoader(classLoader);
+	    	        return null;
+				}
+    			
+    		});
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
     }
 
     private void launch(String[] args) {

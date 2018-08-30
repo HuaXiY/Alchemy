@@ -148,8 +148,7 @@ public class AlchemyTransformerManager implements IClassTransformer {
 	
 	@Unsafe(Unsafe.ASM_API)
 	public static void loadAllProvider() throws Exception {
-		ClassPath path = ClassPath.from(AlchemyTransformerManager.class.getClassLoader());
-		for (ClassInfo info : path.getAllClasses())
+		for (ClassInfo info : ClassPath.from(AlchemyEngine.makeDomainClassLoader()).getAllClasses())
 			if (info.getName().startsWith(MOD_PACKAGE)) {
 				ClassNode node = ASMHelper.newClassNode(IOUtils.toByteArray(info.url().openStream()));
 				if (checkSideOnly(node))

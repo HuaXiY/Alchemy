@@ -16,13 +16,14 @@ import index.alchemy.core.debug.AlchemyRuntimeException;
 import index.alchemy.util.$;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.LoaderState.ModState;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 @Loading
 @Proxy.Provider
 @Init(state = ModState.INITIALIZED)
-public class AlchemyEntity {
+public abstract class AlchemyEntity extends Entity {
 	
 	@Proxy(opcode = Opcodes.INVOKESPECIAL, target = "net.minecraft.entity.EntityLivingBase#func_70636_d", useHandle = true)
 	public static native void onLivingUpdate(EntityLivingBase living);
@@ -49,5 +50,7 @@ public class AlchemyEntity {
 		entity_mapping.forEach((clazz, mapping) -> EntityRegistry.registerModEntity(new AlchemyResourceLocation(mapping.value()), (Class<? extends Entity>) clazz,
 				mapping.value(), nextId(), AlchemyModLoader.instance(), 80, 3, true));
 	}
+	
+	public AlchemyEntity(World world) { super(world); }
 
 }
