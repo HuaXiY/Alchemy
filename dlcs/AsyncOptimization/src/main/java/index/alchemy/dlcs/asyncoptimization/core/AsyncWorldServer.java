@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -33,8 +34,9 @@ import index.alchemy.util.SideHelper;
 import index.alchemy.util.cache.ICache;
 import index.alchemy.util.cache.StdCache;
 import index.alchemy.util.observer.ObserverWrapperFieldContainer;
-import io.netty.channel.ChannelPromise;
+import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.IntIterator;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
@@ -42,22 +44,29 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.NetworkSystem;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.ThreadQuickExitException;
 import net.minecraft.network.play.server.SPacketChangeGameState;
+import net.minecraft.network.play.server.SPacketCustomPayload;
 import net.minecraft.network.play.server.SPacketDisconnect;
 import net.minecraft.network.play.server.SPacketEntityEffect;
 import net.minecraft.network.play.server.SPacketEntityProperties;
+import net.minecraft.network.play.server.SPacketHeldItemChange;
+import net.minecraft.network.play.server.SPacketJoinGame;
 import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.network.play.server.SPacketRespawn;
+import net.minecraft.network.play.server.SPacketServerDifficulty;
 import net.minecraft.network.play.server.SPacketSetExperience;
 import net.minecraft.network.play.server.SPacketSpawnPosition;
 import net.minecraft.network.play.server.SPacketTimeUpdate;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.DemoPlayerInteractionManager;
 import net.minecraft.server.management.PlayerInteractionManager;
@@ -76,15 +85,24 @@ import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.MinecraftException;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.chunkio.ChunkIOExecutor;
+import net.minecraftforge.common.chunkio.ChunkIOProvider;
+import net.minecraftforge.common.chunkio.QueuedChunk;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.FMLLog;
@@ -104,22 +122,22 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 		
 	}
 	
-	@Patch("io.netty.channel.ChannelOutboundBuffer")
-	public static class Patch$ChannelOutboundBuffer {
-		
-		public void addMessage(Object msg, int size, ChannelPromise promise) {
-			synchronized (this) { addMessage(msg, size, promise); }
-		}
-		
-		public void addFlush() {
-			synchronized (this) { addFlush(); }
-		}
-		
-//		private void removeEntry(ChannelOutboundBuffer.Entry e) {
-//			synchronized (this) { removeEntry(e); }
+//	@Patch("io.netty.channel.ChannelOutboundBuffer")
+//	public static class Patch$ChannelOutboundBuffer {
+//		
+//		public void addMessage(Object msg, int size, ChannelPromise promise) {
+//			synchronized (this) { addMessage(msg, size, promise); }
 //		}
-		
-	}
+//		
+//		public void addFlush() {
+//			synchronized (this) { addFlush(); }
+//		}
+//		
+////		private void removeEntry(ChannelOutboundBuffer.Entry e) {
+////			synchronized (this) { removeEntry(e); }
+////		}
+//		
+//	}
 	
 	@Patch("net.minecraft.server.MinecraftServer")
 	public static abstract class Patch$MinecraftServer extends MinecraftServer {
@@ -161,7 +179,9 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 						}
 						net.minecraftforge.fml.common.FMLCommonHandler.instance().onPostWorldTick(world);
 						world.getEntityTracker().tick();
-						worldTickTimes.get(id)[tickCounter % 100] = System.nanoTime() - nano;
+						long timings[] = worldTickTimes.get(id);
+						if (timings != null)
+							timings[tickCounter % 100] = System.nanoTime() - nano;
 					});
 				}
 			}
@@ -182,8 +202,8 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 	public static class Patch$PlayerList extends PlayerList {
 		
 		@Patch.Replace
-		public Patch$PlayerList(MinecraftServer server) {
-			super(server);
+		public Patch$PlayerList(MinecraftServer sourceServer) {
+			super(sourceServer);
 			bannedPlayers = new UserListBans(FILE_PLAYERBANS);
 			bannedIPs = new UserListIPBans(FILE_IPBANS);
 			ops = new UserListOps(FILE_OPS);
@@ -192,11 +212,110 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 			uuidToPlayerMap = Collections.synchronizedMap(Maps.newHashMap());
 			playerEntityList= Collections.synchronizedList(Lists.newArrayList());
 			advancements = Collections.synchronizedMap(Maps.newHashMap());
-			this.server = server;
+			server = sourceServer;
 			bannedPlayers.setLanServer(false);
 			bannedIPs.setLanServer(false);
 			maxPlayers = 8;
 		}
+		
+		@Override
+		public void initializeConnectionToPlayer(NetworkManager manager, EntityPlayerMP player, NetHandlerPlayServer handler) {
+			GameProfile profile = player.getGameProfile();
+			PlayerProfileCache cache = server.getPlayerProfileCache();
+			GameProfile profileWithCache = cache.getProfileByUUID(profile.getId());
+			String name = profileWithCache == null ? profile.getName() : profileWithCache.getName();
+			cache.addEntry(profile);
+			NBTTagCompound nbt = readPlayerDataFromFile(player);
+			player.setWorld(server.getWorld(player.dimension));
+			WorldServer playerWorld = server.getWorld(player.dimension);
+			if (playerWorld == null) {
+				player.dimension = 0;
+				playerWorld = server.getWorld(0);
+				BlockPos spawnPoint = playerWorld.provider.getRandomizedSpawnPoint();
+				player.setPosition(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ());
+			}
+			WorldServer world = playerWorld;
+			IAsyncThreadListener.class.cast(world).syncCall(() -> {
+				player.setWorld(world);
+				player.interactionManager.setWorld((WorldServer) player.world);
+				String address = "local";
+				if (manager.getRemoteAddress() != null)
+					address = manager.getRemoteAddress().toString();
+				LOGGER.info("{}[{}] logged in with entity id {} at ({}, {}, {}, {})", player.getName(), address,
+						player.getEntityId(), player.dimension, player.posX, player.posY, player.posZ);
+				WorldInfo info = world.getWorldInfo();
+				setPlayerGameTypeBasedOnOther(player, null, world);
+				player.connection = handler;
+				net.minecraftforge.fml.common.FMLCommonHandler.instance().fireServerConnectionEvent(manager);
+				handler.sendPacket(new SPacketJoinGame(player.getEntityId(), player.interactionManager.getGameType(),
+						info.isHardcoreModeEnabled(), world.provider.getDimension(), world.getDifficulty(), getMaxPlayers(),
+						info.getTerrainType(), world.getGameRules().getBoolean("reducedDebugInfo")));
+				handler.sendPacket(new SPacketCustomPayload("MC|Brand", new PacketBuffer(Unpooled.buffer())
+						.writeString(getServerInstance().getServerModName())));
+				handler.sendPacket(new SPacketServerDifficulty(info.getDifficulty(), info.isDifficultyLocked()));
+				handler.sendPacket(new SPacketPlayerAbilities(player.capabilities));
+				handler.sendPacket(new SPacketHeldItemChange(player.inventory.currentItem));
+				updatePermissionLevel(player);
+				player.getStatFile().markAllDirty();
+				player.getRecipeBook().init(player);
+				sendScoreboard((ServerScoreboard) world.getScoreboard(), player);
+				server.refreshStatusNextTick();
+				TextComponentTranslation text = player.getName().equalsIgnoreCase(name) ?
+						new TextComponentTranslation("multiplayer.player.joined", new Object[] {player.getDisplayName()}) :
+						new TextComponentTranslation("multiplayer.player.joined.renamed", new Object[] {player.getDisplayName(), name});
+				text.getStyle().setColor(TextFormatting.YELLOW);
+				sendMessage(text);
+				playerLoggedIn(player);
+				handler.setPlayerLocation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+				updateTimeAndWeatherForPlayer(player, world);
+				if (!server.getResourcePackUrl().isEmpty())
+					player.loadResourcePack(server.getResourcePackUrl(), server.getResourcePackHash());
+				for (PotionEffect effect : player.getActivePotionEffects())
+					handler.sendPacket(new SPacketEntityEffect(player.getEntityId(), effect));
+				if (nbt != null && nbt.hasKey("RootVehicle", 10)) {
+					NBTTagCompound vehicleNbt = nbt.getCompoundTag("RootVehicle");
+					Entity vehicleEntity = AnvilChunkLoader.readWorldEntity(vehicleNbt.getCompoundTag("Entity"), world, true);
+					if (vehicleEntity != null) {
+						UUID uuid = vehicleNbt.getUniqueId("Attach");
+						if (vehicleEntity.getUniqueID().equals(uuid))
+							player.startRiding(vehicleEntity, true);
+						else
+							for (Entity entity : vehicleEntity.getRecursivePassengers())
+								if (entity.getUniqueID().equals(uuid)) {
+									player.startRiding(entity, true);
+									break;
+								}
+						if (!player.isRiding()) {
+							LOGGER.warn("Couldn't reattach entity to player");
+							world.removeEntityDangerously(vehicleEntity);
+							for (Entity entity : vehicleEntity.getRecursivePassengers())
+								world.removeEntityDangerously(entity);
+						}
+					}
+				}
+				player.addSelfToInternalCraftingInventory();
+				net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerLoggedIn(player);
+			});
+		}
+		
+		@Override
+		public void preparePlayer(EntityPlayerMP player, @Nullable WorldServer oldWorld) {
+	        WorldServer newWorld = player.getServerWorld();
+	        if (oldWorld != null)
+	        	IAsyncThreadListener.class.cast(oldWorld).syncCall(() -> {
+	        		oldWorld.getPlayerChunkMap().removePlayer(player);
+	        		CriteriaTriggers.CHANGED_DIMENSION.trigger(player, oldWorld.provider.getDimensionType(),
+	        				newWorld.provider.getDimensionType());
+    	            if (oldWorld.provider.getDimensionType() == DimensionType.NETHER &&
+    	            		player.world.provider.getDimensionType() == DimensionType.OVERWORLD &&
+    	            				player.getEnteredNetherPosition() != null)
+    	                CriteriaTriggers.NETHER_TRAVEL.trigger(player, player.getEnteredNetherPosition());
+	        	});
+	        IAsyncThreadListener.class.cast(newWorld).syncCall(() -> {
+	        	newWorld.getPlayerChunkMap().addPlayer(player);
+		        newWorld.getChunkProvider().provideChunk((int) player.posX >> 4, (int) player.posZ >> 4);
+	        });
+	    }
 		
 		@Override
 		public void transferPlayerToDimension(EntityPlayerMP player, int targetDimension, net.minecraftforge.common.util.ITeleporter teleporter) {
@@ -210,11 +329,16 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 				updatePermissionLevel(player);
 				oldWorld.removeEntityDangerously(player);
 				player.isDead = false;
+				System.out.println("pos: " + player.getPosition());
 				transferEntityToWorld(player, dimension, oldWorld, newWorld, teleporter);
+				System.out.println("pos: " + player.getPosition());
+				preparePlayer(player, oldWorld);
+				System.out.println("pos: " + player.getPosition());
 			});
 			IAsyncThreadListener.class.cast(newWorld).syncCall(() -> {
-				preparePlayer(player, oldWorld);
+				System.out.println("pos: " + player.getPosition());
 				player.connection.setPlayerLocation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+				System.out.println("pos: " + player.getPosition());
 				player.interactionManager.setWorld(newWorld);
 				player.connection.sendPacket(new SPacketPlayerAbilities(player.capabilities));
 				updateTimeAndWeatherForPlayer(player, newWorld);
@@ -412,10 +536,13 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 	}
 	
 	@Patch("net.minecraftforge.common.chunkio.ChunkIOProvider")
-	public static class Patch$ChunkIOProvider {
+	public static class Patch$ChunkIOProvider extends ChunkIOProvider {
 		
-		private Chunk chunk;
-		
+		@Patch.Exception
+		protected Patch$ChunkIOProvider(QueuedChunk chunk, AnvilChunkLoader loader, ChunkProviderServer provider) {
+			super(chunk, loader, provider);
+		}
+
 		public void syncCallback() {
 			if (chunk == null) {
 				syncCallback();
@@ -427,7 +554,23 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 			else
 				listener.addScheduledTask(this::syncCallback);
 		}
+	
+	}
+	
+	@Patch("net.minecraftforge.common.chunkio.ChunkIOExecutor")
+	public static class Patch$ChunkIOExecutor extends ChunkIOExecutor {
 		
+		public static void dropQueuedChunkLoad(World world, int x, int z, Runnable runnable) {
+			QueuedChunk key = new QueuedChunk(x, z, world);
+			ChunkIOProvider task = tasks.get(key);
+			if (task == null)
+				return;
+			task.removeCallback(runnable);
+			if (!task.hasCallback()) {
+				tasks.remove(key);
+				pool.remove(task);
+			}
+		}
 	}
 	
 	@Patch("net.minecraftforge.common.DimensionManager")
@@ -528,7 +671,7 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 					runnables.take().run();
 				} catch (InterruptedException e) { break; }
 			asyncThread = null;
-		}, "AsyncWorld-" + provider.getDimensionType().getName() + "-" + provider.getDimension());
+		}, "AsyncWorld[" + provider.getDimensionType().getName() + "](" + provider.getDimension() + ")");
 		if (result != null)
 			asyncThread = result;
 	}
@@ -571,10 +714,10 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 	{
 		for (Entity entity : Lists.newArrayList(entityCollection))
 		{
-			if (this.canAddEntity(entity) && !net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.EntityJoinWorldEvent(entity, this)))
+			if (canAddEntity(entity) && !net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.EntityJoinWorldEvent(entity, this)))
 			{
-				this.loadedEntityList.add(entity);
-				this.onEntityAdded(entity);
+				loadedEntityList.add(entity);
+				onEntityAdded(entity);
 			}
 		}
 	}
@@ -590,13 +733,13 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 		{
 			UUID uuid = entityIn.getUniqueID();
 
-			if (this.entitiesByUuid.containsKey(uuid))
+			if (entitiesByUuid.containsKey(uuid))
 			{
-				Entity entity = this.entitiesByUuid.get(uuid);
+				Entity entity = entitiesByUuid.get(uuid);
 
-				if (this.unloadedEntityList.contains(entity))
+				if (unloadedEntityList.contains(entity))
 				{
-					this.unloadedEntityList.remove(entity);
+					unloadedEntityList.remove(entity);
 				}
 				else
 				{
@@ -611,7 +754,7 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 					WorldServer.LOGGER.warn("Force-added player with duplicate UUID {}", (Object)uuid.toString());
 				}
 
-				this.removeEntityDangerously(entity);
+				removeEntityDangerously(entity);
 			}
 
 			return true;

@@ -40,7 +40,7 @@ public interface IAsyncThreadListener extends IThreadListener {
 		};
 		Callable<Object> callable = Executors.callable(runnable);
 		try {
-			if (!isCallingFromMinecraftThread()) {
+			if (!isCallingFromMinecraftThread() || asyncThread().isInterrupted()) {
 				ListenableFutureTask<Object> futureTask = ListenableFutureTask.create(callable);
 				runnables().add(futureTask::run);
 				return futureTask;
@@ -57,9 +57,11 @@ public interface IAsyncThreadListener extends IThreadListener {
 	}
 	
 	default void syncCall(Runnable runnable) {
+		Thread.currentThread().interrupt();
 		try {
 			addScheduledTask(runnable).get();
 		} catch (Exception e) { throw new RuntimeException(e); }
+		Thread.interrupted();
 	}
 
 }
