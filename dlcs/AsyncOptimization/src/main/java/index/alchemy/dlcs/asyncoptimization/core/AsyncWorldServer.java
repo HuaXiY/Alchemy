@@ -1,18 +1,5 @@
 package index.alchemy.dlcs.asyncoptimization.core;
 
-import java.io.File;
-import java.net.Proxy;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.annotation.Nullable;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -20,7 +7,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-
 import index.alchemy.api.IFieldContainer;
 import index.alchemy.api.annotation.Config;
 import index.alchemy.api.annotation.Hook;
@@ -45,53 +31,21 @@ import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.NetworkSystem;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.ThreadQuickExitException;
-import net.minecraft.network.play.server.SPacketChangeGameState;
-import net.minecraft.network.play.server.SPacketCustomPayload;
-import net.minecraft.network.play.server.SPacketDisconnect;
-import net.minecraft.network.play.server.SPacketEntityEffect;
-import net.minecraft.network.play.server.SPacketEntityProperties;
-import net.minecraft.network.play.server.SPacketHeldItemChange;
-import net.minecraft.network.play.server.SPacketJoinGame;
-import net.minecraft.network.play.server.SPacketPlayerAbilities;
-import net.minecraft.network.play.server.SPacketRespawn;
-import net.minecraft.network.play.server.SPacketServerDifficulty;
-import net.minecraft.network.play.server.SPacketSetExperience;
-import net.minecraft.network.play.server.SPacketSpawnPosition;
-import net.minecraft.network.play.server.SPacketTimeUpdate;
+import net.minecraft.network.*;
+import net.minecraft.network.play.server.*;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.DemoPlayerInteractionManager;
-import net.minecraft.server.management.PlayerInteractionManager;
-import net.minecraft.server.management.PlayerList;
-import net.minecraft.server.management.PlayerProfileCache;
-import net.minecraft.server.management.UserListBans;
-import net.minecraft.server.management.UserListIPBans;
-import net.minecraft.server.management.UserListOps;
-import net.minecraft.server.management.UserListWhitelist;
-import net.minecraft.util.IProgressUpdate;
-import net.minecraft.util.IThreadListener;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.Util;
+import net.minecraft.server.management.*;
+import net.minecraft.util.*;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.MinecraftException;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.*;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.gen.ChunkProviderServer;
@@ -109,6 +63,14 @@ import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.server.FMLServerHandler;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.net.Proxy;
+import java.util.*;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Listener
 @Hook.Provider
@@ -652,7 +614,7 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 		return Hook.Result.NULL;
 	}
 	
-	protected LinkedBlockingQueue<Runnable> runnables = new LinkedBlockingQueue<>();
+	protected LinkedBlockingDeque<Runnable> runnables = new LinkedBlockingDeque<>();
 	protected Thread asyncThread;
 	protected IFieldContainer<Boolean> running = new ObserverWrapperFieldContainer<>(new FieldContainer<>(Boolean.TRUE), (old, _new) -> {
 		if (asyncThread != Thread.currentThread() && asyncThread != null && asyncThread.isAlive())
@@ -678,10 +640,10 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 	
 	public IFieldContainer<Boolean> running() { return running; }
 	
-	public BlockingQueue<Runnable> runnables() { return runnables; }
+	public BlockingDeque<Runnable> runnables() { return runnables; }
 
 	public Thread asyncThread() { return asyncThread; }
-	
+
 	public AsyncWorldServer(MinecraftServer server, ISaveHandler saveHandler, WorldInfo info, int dimensionId, Profiler profilerIn) {
 		super(server, saveHandler, info, dimensionId, profilerIn);	
 	}
