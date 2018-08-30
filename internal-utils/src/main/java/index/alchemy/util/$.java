@@ -158,6 +158,25 @@ public class $ {
 		} catch (ClassNotFoundException e) { return null; }
 	}
 
+	/**
+	 * JQuery for Java.
+	 * <red>You're not expected to understand this.</red>
+	 * First it will determine what the first argument is.
+	 * If it's a Class object or a String starts with 'L', it will be regarded as the class being operated, and you're assumed to access static field/method,
+	 * or it will be the object being operated, and the class will be the object's class.
+	 * Then: 1. If the 2nd arg does not exist, then the Class object is returned(just like a {@code java.lang.Class.forName()} invocation.);
+	 *       2. If the 2nd arg is *NOT* started with '>', it is considered as a field name.
+	 *              (1) If the 3rd arg is absent, then the value in the field will be read and returned(if the 1st arg is a Class then the field must be static.);
+	 *              (2) If the 3rd arg is present: if the 2nd arg is ends '<', the field search will be only performed in the class,
+	 *                  or if it is ends with '<<' then the field will be searched in the class's parent classes.
+	 *                  And the 3rd arg will be written to the field, and then the 3rd arg will be returned.
+	 *       3. If the 2nd arg is started with '>', or the field search failed, or the 2nd arg is neither started with > nor ends with <,
+	 *          it will be considered as a method invocation. The 3rd and later args will be the arguments(if present), and the invocation result will be returned.
+	 *
+	 * @param args See above.
+	 * @param <T> See above.
+	 * @return See above.
+	 */
 	@Nullable
 	@Unsafe(Unsafe.REFLECT_API)
 	@SuppressWarnings("unchecked")
@@ -179,14 +198,14 @@ public class $ {
 				return (T) clazz;
 			String name = (String) args[1];
 			Object object = args[0].getClass() == clazz ? args[0] : null;
-			if (!name.startsWith(">"))
+			if (!name.startsWith(">")) {
 				try {
 					if (args.length == 2)
 						return (T) setAccessible(searchField(clazz, (String) args[1])).get(object);
 					if (args.length == 3 && ((String) args[1]).endsWith("<")) {
 						Field field = setAccessible(((String) args[1]).endsWith("<<") ?
 								clazz.getDeclaredField(((String) args[1]).replace("<", "")) :
-									searchField(clazz, ((String) args[1]).replace("<", "")));
+								searchField(clazz, ((String) args[1]).replace("<", "")));
 						if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()))
 							FinalFieldHelper.set(object, field, args[2]);
 						else
@@ -194,6 +213,7 @@ public class $ {
 						return (T) args[2];
 					}
 				} catch (NoSuchFieldException e) { }
+			}
 			name = name.replace(">", "");
 			args = ArrayUtils.subarray(args, 2, args.length);
 			if (name.equals("new")) {
