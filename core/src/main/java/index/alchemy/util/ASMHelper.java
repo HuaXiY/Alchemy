@@ -1,63 +1,33 @@
 package index.alchemy.util;
 
-import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Spliterators;
-import java.util.Stack;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.ClassRemapper;
-import org.objectweb.asm.commons.GeneratorAdapter;
-import org.objectweb.asm.commons.Method;
-import org.objectweb.asm.commons.Remapper;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import index.alchemy.api.annotation.Unsafe;
 import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Omega;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.objectweb.asm.*;
+import org.objectweb.asm.commons.ClassRemapper;
+import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.commons.Method;
+import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.tree.*;
+
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -283,7 +253,7 @@ public interface ASMHelper {
 			TYPE_VOID = Type.getType(Void.class),
 			TYPE_ENUM = Type.getType(Enum.class);
 	
-	static class DynamicVarInsnNode extends VarInsnNode {
+	class DynamicVarInsnNode extends VarInsnNode {
 
 		public DynamicVarInsnNode(int opcode, int var) {
 			super(opcode, var);
@@ -307,7 +277,7 @@ public interface ASMHelper {
 	}
 	
 	@NotThreadSafe
-	static final class OffsetCalculator implements Cloneable {
+	final class OffsetCalculator implements Cloneable {
 		
 		protected final List<Type> types;
 		protected boolean isStatic;
@@ -380,7 +350,7 @@ public interface ASMHelper {
 				return lastOffset > 1 ? offset - 1 : offset;
 			} else {
 				for (int min = index+ n; index > min; index--)
-					offset -= lastOffset = types.get(index - 1).getSize();
+					offset -= types.get(index - 1).getSize();
 				return offset;
 			}
 		}
@@ -407,7 +377,7 @@ public interface ASMHelper {
 		
 	}
 	
-	static class MethodGenerator extends GeneratorAdapter {
+	class MethodGenerator extends GeneratorAdapter {
 		
 		protected static final String LAMBDA_META_FACTORY_NAME = ASMHelper.getClassName("java.lang.invoke.LambdaMetafactory");
 		
@@ -624,7 +594,7 @@ public interface ASMHelper {
 		
 	}
 	
-	static class StaticDeobfClassWriter extends ClassWriter {
+	class StaticDeobfClassWriter extends ClassWriter {
 
 		public StaticDeobfClassWriter(int flags) {
 			super(flags);
@@ -648,7 +618,7 @@ public interface ASMHelper {
 		
 	}
 	
-	static class ClassNameRemapper extends Remapper {
+	class ClassNameRemapper extends Remapper {
 		
 		protected final String srcName, newName;
 		
@@ -671,7 +641,7 @@ public interface ASMHelper {
 	}
 	
 	@NotThreadSafe
-	static class NodeCopier {
+	class NodeCopier {
 		
 		protected final Map<LabelNode, LabelNode> labelMap = new HashMap<LabelNode, LabelNode>() {
 			
@@ -706,9 +676,10 @@ public interface ASMHelper {
 		}
 		
 	}
+	// <Map<Type, Type>, Map.Entry<Class<?>, Class<?>>>
 	
 	BiMap<Type, Type> PRIMITIVE_MAPPING = ImmutableBiMap.<Type, Type>builder().putAll($.getPrimitiveMapping().entrySet().stream()
-			.collect(Collectors.toMap(FunctionHelper.map(Map.Entry::getKey, Type::getType), FunctionHelper.map(Map.Entry::getValue, Type::getType),
+			.collect(Collectors.<Map.Entry<Class<?>, Class<?>>, Type, Type, Map<Type, Type>>toMap(e -> Type.getType(e.getKey()), e -> Type.getType(e.getValue()),
 					FunctionHelper.end(), Maps::newHashMap))).build();
 	
 	static boolean isUnboxType(Type type) {
