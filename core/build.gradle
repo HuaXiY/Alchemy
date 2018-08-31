@@ -1,3 +1,4 @@
+import org.gradle.plugins.ide.idea.model.IdeaModel
 
 // For those who want the bleeding edge
 buildscript {
@@ -10,6 +11,14 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+def ideaConv = (IdeaModel) project.getExtensions().getByName("idea")
+ideaConv.module.scopes.get("RUNTIME").get("plus").remove(project.configurations.forgeGradleGradleStart)
+ideaConv.module.scopes.get("COMPILE").get("plus").add(project.configurations.forgeGradleGradleStart)
+
+def javaConv = (JavaPluginConvention) project.convention.plugins.get("java")
+def m = javaConv.sourceSets.main
+m.compileClasspath += configurations.forgeGradleGradleStart
+
 sourceJar.enabled = false
 
 apply plugin: 'maven'
