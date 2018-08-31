@@ -18,10 +18,12 @@ apply plugin: 'java'
 configurations {
     shade
     compile.extendsFrom shade
+    compileOnly.extendsFrom(runtime)
 }
 dependencies {
     compile project(":internal-utils")
     compile fileTree(dir: 'mods', include: ['*.jar'])
+    //compileOnly files(project.configurations.forgeGradleGradleStart.getResolvedConfiguration().files)
     // shade 'org.jooq:jool:+'
 }
 

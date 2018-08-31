@@ -1,7 +1,5 @@
 package index.alchemy.block;
 
-import java.util.Random;
-
 import index.alchemy.api.IRegister;
 import index.alchemy.api.IResourceLocation;
 import index.alchemy.core.AlchemyResourceLocation;
@@ -10,6 +8,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.Random;
 
 @Omega
 public class AlchemyBlock extends Block implements IResourceLocation, IRegister {

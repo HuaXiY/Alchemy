@@ -1,5 +1,52 @@
 package index.alchemy.core;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
+import index.alchemy.api.IDLCInfo;
+import index.alchemy.api.annotation.Alchemy;
+import index.alchemy.api.annotation.Hook;
+import index.alchemy.api.annotation.SuppressFBWarnings;
+import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
+import index.alchemy.core.asm.transformer.MeowTweaker;
+import index.alchemy.core.asm.transformer.SrgMap;
+import index.alchemy.core.asm.transformer.TransformerReplace;
+import index.alchemy.core.debug.AlchemyDebug;
+import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.*;
+import index.project.version.annotation.Omega;
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraftforge.fml.common.DummyModContainer;
+import net.minecraftforge.fml.common.LoadController;
+import net.minecraftforge.fml.common.ModContainerFactory;
+import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.asm.ASMTransformerWrapper.TransformerWrapper;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.Name;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
+import net.minecraftforge.fml.relauncher.Side;
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.Method;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -14,78 +61,12 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import index.alchemy.util.UnsafeHelper;
-import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.Method;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.VarInsnNode;
-
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
-import com.google.common.reflect.ClassPath;
-import com.google.common.reflect.ClassPath.ClassInfo;
-
-import index.alchemy.agent.support.AgentSupport;
-import index.alchemy.api.IDLCInfo;
-import index.alchemy.api.annotation.Alchemy;
-import index.alchemy.api.annotation.Hook;
-import index.alchemy.api.annotation.SuppressFBWarnings;
-import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
-import index.alchemy.core.asm.transformer.MeowTweaker;
-import index.alchemy.core.asm.transformer.SrgMap;
-import index.alchemy.core.asm.transformer.TransformerReplace;
-import index.alchemy.core.debug.AlchemyDebug;
-import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.util.$;
-import index.alchemy.util.ASMHelper;
-import index.alchemy.util.DeobfuscatingRemapper;
-import index.alchemy.util.FunctionHelper;
-import index.alchemy.util.JFXHelper;
-import index.alchemy.util.ModuleHelper;
-import index.alchemy.util.Tool;
-import index.project.version.annotation.Omega;
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.launchwrapper.Launch;
-import net.minecraft.launchwrapper.LaunchClassLoader;
-import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.ModContainerFactory;
-import net.minecraftforge.fml.common.ModMetadata;
-import net.minecraftforge.fml.common.asm.ASMTransformerWrapper.TransformerWrapper;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.Name;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
-
-import static org.objectweb.asm.Opcodes.*;
 import static index.alchemy.core.AlchemyConstants.*;
+import static org.objectweb.asm.Opcodes.*;
 
 @Omega
 @Hook.Provider
@@ -146,16 +127,16 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 	protected static final class AgentLoader {
 		
 		public static void loadAgent() {
-			logger.info("Loading agent ...");
+			/*logger.info("Loading agent ...");
 			try {
-				AgentSupport.loadAgent(Tool.createTempFile(AgentLoader.class.getResourceAsStream("/agent.jar"),
-						WordUtils.initials("Index-Alchemy-Agent.", '-'), ".jar").getPath());
+				//AgentSupport.loadAgent(Tool.createTempFile(AgentLoader.class.getResourceAsStream("/agent.jar"),
+						//WordUtils.initials("Index-Alchemy-Agent.", '-'), ".jar").getPath());
 				logger.info("Successfully loaded agent!");
 			} catch (Throwable throwable) {
 				logger.error("Load agent failed!");
 				logger.error(throwable);
 				throw new RuntimeException(throwable);
-			}
+			}*/
 		}
 		
 	}

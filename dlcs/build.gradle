@@ -13,6 +13,13 @@ subprojects {
     sourceCompatibility = '10'
     targetCompatibility = '10'
 
+    dependencies {
+        compileOnly project(path: ':core')
+        compileOnly files(project(":core").configurations.forgeGradleMc.resolve())
+        compileOnly files(project(":core").configurations.forgeGradleMcDeps.resolve())
+        compileOnly files(project(":core").configurations.forgeGradleMcDepsClient.resolve())
+    }
+
     archivesBaseName = "Alchemy-${config.show_version}"
     task sourcesZip(type: Zip, dependsOn: ':core:sourcesZip') {
         baseName = "${archivesBaseName}-dlc-${name}"
@@ -51,6 +58,7 @@ subprojects {
                 jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
             }
         }
+
     }
 
     task rename << {
