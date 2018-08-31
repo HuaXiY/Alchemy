@@ -28,7 +28,7 @@ allprojects {
     }
 
     dependencies {
-        ecj 'org.eclipse.jdt.core.compiler:ecj:+'
+        ecj 'org.eclipse.jdt:ecj:+'
     }
 
     def jdt = configurations.ecj.asPath
