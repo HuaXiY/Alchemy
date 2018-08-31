@@ -133,7 +133,7 @@ compileJava {
             println "Main Compile Path: "
             source.each { println it }
             println "JDT-ECJ lib path: " + jdt
-            jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
+            jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn', '--add-modules', 'jdk.unsupported', '--add-exports', 'java.base/jdk.internal.reflect=ALL-UNNAMED' ]
         }
     }
 }
