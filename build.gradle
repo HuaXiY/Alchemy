@@ -17,6 +17,7 @@ subprojects {
 }
 
 allprojects {
+    apply plugin: 'java'
     repositories {
         mavenCentral()
         jcenter()
@@ -31,6 +32,9 @@ allprojects {
     }
 
     def jdt = configurations.ecj.asPath
+
+    sourceCompatibility = '10'
+    targetCompatibility = '10'
 }
 
 File[] fileList(String dir) {

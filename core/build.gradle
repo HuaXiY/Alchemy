@@ -16,7 +16,6 @@ apply plugin: 'maven'
 apply plugin: 'java'
 
 configurations {
-    ecj
     shade
     compile.extendsFrom shade
 }
@@ -55,10 +54,43 @@ minecraft {
 
 recompileMc {
     doFirst {
-        def at = 'src/main/resources/META-INF/at.cfg';
+        System.setProperty("java.ext.dirs", "")
+        def at = 'src/main/resources/META-INF/at.cfg'
         doAccessTransformer(file(at), getInSources())
-        dirList('../dlcs').each { File dlc -> doAccessTransformer(new File(dlc, at), getInSources()) }
+        dirList('dlcs').each { File dlc -> doAccessTransformer(new File(dlc, at), getInSources()) }
     }
+}
+
+void doAccessTransformer(File at, File input) {
+    if (!at.exists())
+        return
+    println "Find at: ${at.path}"
+    def lines = com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(new FileInputStream(at)))
+    def mapping = VERConsts['getMapping'](lines)
+    mapping.values().forEach { it.forEach { println it } }
+    def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${input.path}"))
+    def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${input.path}".replace('.jar', '-fixed.jar')))
+    def result = new java.util.LinkedList()
+    for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
+        zos.putNextEntry(entry)
+        if (entry.name.endsWith(".java")) {
+            def name = entry.name.replace('/', '.').replace('.java', '')
+            org.apache.commons.io.IOUtils.write(VERConsts['doAccessTransformer'](
+                    com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(zis)), name, mapping, result),
+                    zos, "utf-8")
+        } else
+            org.apache.commons.io.IOUtils.copy(zis, zos)
+    }
+    zis.close()
+    zos.finish()
+    zos.close()
+    def flag
+    println "------------------------------------------------------------------------------------------------------------------"
+    mapping.values().forEach { it.stream().filter { !result.contains(it) && !it.runtime }.forEach { flag = true; println it } }
+    if (flag)
+        throw new RuntimeException("At is not working properly")
+    input.delete()
+    file(input.path.replace(".jar", "-fixed.jar")).renameTo(input)
 }
 
 task sourcesZip(type: Zip) {
@@ -78,6 +110,7 @@ compileJava {
     options.fork = true
     doFirst {
         options.forkOptions.with {
+            def jdt = configurations.ecj.asPath
             executable = 'java'
             def lib = new java.util.TreeSet(sourceSets.main.compileClasspath.getFiles())
             sourceSets.main.compileClasspath = new org.gradle.api.internal.file.UnionFileCollection(lib)
@@ -85,8 +118,6 @@ compileJava {
             lib.sort { a, b -> toSort(a) - toSort(b) }
             println "Main Compile Class Path: "
             sourceSets.main.compileClasspath.each { println it }
-			sourceSets.main.java.srcDir(sourceSets.agent_support.java)
-			sourceSets.main.resources.srcDir(sourceSets.agent_support.resources)
             source = sourceSets.main.java.exclude { checkPackageName(it.getFile().toString().replace("\\", ".").replace("/", ".")) }
             println "Main Compile Path: "
             source.each { println it }

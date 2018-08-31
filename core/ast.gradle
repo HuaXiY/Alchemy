@@ -339,38 +339,6 @@ def doAccessTransformer = {
 	return document.get()
 }
 
-void doAccessTransformer(File at, File input) {
-	if (!at.exists())
-		return
-	println "Find at: ${at.path}"
-	def lines = com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(new FileInputStream(at)))
-	def mapping = VERConsts['getMapping'](lines)
-	mapping.values().forEach { it.forEach { println it } }
-	def zis = new java.util.zip.ZipInputStream(new java.io.FileInputStream("${input.path}"))
-	def zos = new java.util.zip.ZipOutputStream(new java.io.FileOutputStream("${input.path}".replace('.jar', '-fixed.jar')))
-	def result = new java.util.LinkedList()
-	for (java.util.zip.ZipEntry entry; (entry = zis.nextEntry) != null;) {
-		zos.putNextEntry(entry)
-		if (entry.name.endsWith(".java")) {
-			def name = entry.name.replace('/', '.').replace('.java', '')
-			org.apache.commons.io.IOUtils.write(VERConsts['doAccessTransformer'](
-					com.google.common.base.Joiner.on('\n').join(org.apache.commons.io.IOUtils.readLines(zis)), name, mapping, result),
-					zos, "utf-8")
-		} else
-			org.apache.commons.io.IOUtils.copy(zis, zos)
-	}
-	zis.close()
-	zos.finish()
-	zos.close()
-	def flag
-	println "------------------------------------------------------------------------------------------------------------------"
-	mapping.values().forEach { it.stream().filter { !result.contains(it) && !it.runtime }.forEach { flag = true; println it } }
-	if (flag)
-		throw new RuntimeException("At is not working properly")
-	input.delete()
-	file(input.path.replace(".jar", "-fixed.jar")).renameTo(input)
-}
-
 ext {
 	VERConsts = [
 		getMapping: getMapping,
