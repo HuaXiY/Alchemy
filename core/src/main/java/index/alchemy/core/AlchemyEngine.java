@@ -125,23 +125,18 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 	public static Side runtimeSide() { return FMLLaunchHandler.side(); }
 	
 	protected static final class AgentLoader {
-		
-		public static void loadAgent() {
-			/*logger.info("Loading agent ...");
-			try {
-				//AgentSupport.loadAgent(Tool.createTempFile(AgentLoader.class.getResourceAsStream("/agent.jar"),
-						//WordUtils.initials("Index-Alchemy-Agent.", '-'), ".jar").getPath());
-				logger.info("Successfully loaded agent!");
-			} catch (Throwable throwable) {
-				logger.error("Load agent failed!");
-				logger.error(throwable);
-				throw new RuntimeException(throwable);
-			}*/
+
+		public static void checkAgent() {
+			Objects.requireNonNull(instrumentation());
 		}
-		
+
 	}
 	
-	protected static final java.lang.instrument.Instrumentation INSTRUMENTATION = null;
+	protected static final java.lang.instrument.Instrumentation INSTRUMENTATION =
+			    $(
+                        $(getLaunchClassLoader().getClass().getClassLoader(), "loadClass", "index.alchemy.support.agent.Patcher"),
+                        "getInstrumentation"
+                );
 	
 	public static final java.lang.instrument.Instrumentation instrumentation() { return INSTRUMENTATION; }
 	
@@ -166,7 +161,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 			LaunchClassLoader lcl = (LaunchClassLoader) AlchemyEngine.class.getClassLoader();
 			lcl.addClassLoaderExclusion("com.sun.");
 			lcl.addClassLoaderExclusion("javafx.");
-			AgentLoader.loadAgent();
+			AgentLoader.checkAgent();
 			instrumentation().addTransformer(IClassFileTransformer.of((module, loader, name, target, domain, buffer) -> {
 				try {
 					if (target != null && name != null && !"net/minecraft/launchwrapper/LaunchClassLoader".equals(name)) {
