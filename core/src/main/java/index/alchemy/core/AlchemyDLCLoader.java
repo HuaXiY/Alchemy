@@ -157,7 +157,8 @@ public class AlchemyDLCLoader {
         
     }
     
-    public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID, DEV_DLCS_DIR = "/dlc/";
+    public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID,
+            DEV_DLCS_DIR = System.getProperty("index.alcs.", "/dlcs_out/");
     
     private static final Logger logger = LogManager.getLogger(AlchemyDLCLoader.class.getSimpleName());
     
@@ -200,10 +201,8 @@ public class AlchemyDLCLoader {
             File files[] = dlcs.listFiles();
             if (files != null)
                 for (File dir : files)
-                    if (dir.isDirectory()) {
-//                        dir =
+                    if (dir.isDirectory())
                         addDLCFile(dir);
-                    }
         }
         
         {

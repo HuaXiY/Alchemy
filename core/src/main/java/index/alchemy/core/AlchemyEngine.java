@@ -64,8 +64,6 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
-import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -158,8 +156,6 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
     
     static {
         logger.info(AlchemyEngine.class.getName() + " loaded from classloader: " + AlchemyEngine.class.getClassLoader());
-        if ($(SystemUtils.class, "JAVA_SPECIFICATION_VERSION_AS_ENUM") == null)
-            $(SystemUtils.class, "JAVA_SPECIFICATION_VERSION_AS_ENUM<", JavaVersion.JAVA_RECENT);
         if (AlchemyEngine.class.getClassLoader().getClass() == LaunchClassLoader.class) {
             logger.info("Try to redefine the bytecodes: " + LaunchClassLoader.class.getName());
             LaunchClassLoader lcl = (LaunchClassLoader) AlchemyEngine.class.getClassLoader();
@@ -191,7 +187,6 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
                 throw exception;
             }
         }
-        System.out.println("fixInstrumentation");
         String libArgs = System.getProperty("index.alchemy.runtime.lib.ext");
         Set<String> libs = libArgs != null ? Sets.newHashSet(Splitter.on(';').split(libArgs)) : Sets.newHashSet();
         // Forge hack native libs when startup
@@ -201,7 +196,9 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
     
     static { /* JavaFX Tweaker */ MeowTweaker.Kyouko(); }
     
-    private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.isDeobf");
+    public static final String RUNTIME_IS_DEOBF = "index.alchemy.runtime.isDeobf";
+    
+    private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean(RUNTIME_IS_DEOBF);
     
     public static boolean isRuntimeDeobfuscationEnabled() { return runtimeDeobfuscationEnabled; }
     
@@ -217,7 +214,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
         
         protected static final Logger logger = LogManager.getLogger(ASMClassLoader.class.getSimpleName());
         
-        static { getLaunchClassLoader().addTransformerExclusion(DYNAMIC_PACKAGE_NAME); }
+        static { getLaunchClassLoader().addTransformerExclusion(DYNAMIC_PACKAGE_NAME);}
         
         private int id = -1;
         

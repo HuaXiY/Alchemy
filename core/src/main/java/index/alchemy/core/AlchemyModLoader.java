@@ -64,7 +64,7 @@ public enum AlchemyModLoader {
     
     public static final Logger logger = LogManager.getLogger(MOD_NAME);
     
-    public static final Stack<String> log_stack = new Stack<String>();
+    public static final Stack<String> log_stack = new Stack<>();
     
     public static void updateStack(String prefix) {
         int index = log_stack.indexOf(prefix);
@@ -269,7 +269,7 @@ public enum AlchemyModLoader {
                         instance_map.get(instance.value()).add(clazz);
                     else
                         AlchemyRuntimeException.onException(new NullPointerException(clazz + " -> @InitInstance.value()"));
-            } catch (ClassNotFoundException | NoClassDefFoundError e) { continue; }
+            } catch (ClassNotFoundException | NoClassDefFoundError e) { }
         
         AlchemyDebug.end(BOOTSTRAP);
         log_stack.clear();
@@ -277,7 +277,7 @@ public enum AlchemyModLoader {
         init(ModState.LOADED);
     }
     
-    public static void tryBootstrap() throws IOException {
+    public static void tryBootstrap() {
         try {
             bootstrap();
         } catch (Throwable e) {
