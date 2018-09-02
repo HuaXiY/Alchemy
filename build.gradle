@@ -31,8 +31,6 @@ allprojects {
         ecj 'org.eclipse.jdt:ecj:+'
     }
 
-    def jdt = configurations.ecj.asPath
-
     sourceCompatibility = '10'
     targetCompatibility = '10'
 }

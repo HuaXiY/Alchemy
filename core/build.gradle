@@ -3,7 +3,7 @@ import org.gradle.plugins.ide.idea.model.IdeaModel
 // For those who want the bleeding edge
 buildscript {
     repositories {
-        flatDir { dirs 'deps' }
+        flatDir { dirs '../deps' }
         jcenter()
         //maven { url = "http://files.minecraftforge.net/maven" }
     }
@@ -158,20 +158,6 @@ void deobf(String inputName) {
     mapping.loadMappings(config.srg_mcp)
     mapping.setFallbackInheritanceProvider(inheritanceProviders)
     remapper.remapJar(inputJar, outputFile)
-}
-
-net.md_5.specialsource.provider.ClassLoaderProvider getProvider(File input, org.gradle.api.internal.file.UnionFileCollection classpath) {
-    def set = new HashSet()
-	set.addAll(classpath.getFiles())
-    set.addAll(Arrays.asList(fileList("build/libs/")))
-    def urls = set.stream().filter { it.getName().endsWith(".jar") && !it.getName().contains("-sources") && (it.getName().contains("-deobf") || 
-            it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) ||
-            it.getName().contains("ToughAsNails-") || it.getName().contains("mobends-") }
-            .map { it.toURI() }.map { it.toURL() }.toArray { new URL[it] }
-    println "ReobfDLC class path: "
-    urls.each { println it }
-    def classLoader = new java.net.URLClassLoader(urls)
-    return new net.md_5.specialsource.provider.ClassLoaderProvider(classLoader)
 }
 
 task deobf << {

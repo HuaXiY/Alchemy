@@ -165,7 +165,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 			instrumentation().addTransformer(IClassFileTransformer.of((module, loader, name, target, domain, buffer) -> {
 				try {
 					if (target != null && name != null && !"net/minecraft/launchwrapper/LaunchClassLoader".equals(name)) {
-						logger.info("Redefine: " + loader + "<" + target + ">" + (domain == null ? "(null)" : domain.getCodeSource()));
+						//logger.info("Redefine: " + loader + "<" + target + ">" + (domain == null ? "(null)" : domain.getCodeSource()));
 						buffer = runTransformers(ASMHelper.getClassSrcName(DeobfuscatingRemapper.instance().unmapType(name)),
 								ASMHelper.getClassSrcName(name), buffer);
 					}

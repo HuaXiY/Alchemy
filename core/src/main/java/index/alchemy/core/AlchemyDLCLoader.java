@@ -1,5 +1,9 @@
 package index.alchemy.core;
 
+import static index.alchemy.core.AlchemyConstants.MOD_ID;
+import static index.alchemy.core.AlchemyConstants.MOD_NAME;
+import static index.alchemy.util.$.$;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -25,15 +29,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.google.common.eventbus.EventBus;
 
 import index.alchemy.api.IDLCInfo;
@@ -41,11 +37,7 @@ import index.alchemy.api.annotation.DLC;
 import index.alchemy.api.annotation.Init;
 import index.alchemy.api.annotation.Unsafe;
 import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.util.$;
-import index.alchemy.util.AnnotationInvocationHandler;
-import index.alchemy.util.JFXHelper;
-import index.alchemy.util.Pointer;
-import index.alchemy.util.Tool;
+import index.alchemy.util.*;
 import index.project.version.annotation.Alpha;
 import index.project.version.annotation.Beta;
 import javafx.beans.property.BooleanProperty;
@@ -57,25 +49,18 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.LoaderState.ModState;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.ModMetadata;
-
-import static index.alchemy.core.AlchemyConstants.*;
-import static index.alchemy.util.$.$;
 
 @Alpha
 @Init(state = ModState.AVAILABLE)
 public class AlchemyDLCLoader {
-	
+
 	@Beta
-	public static class DLCContainer extends DummyModContainer  {
-		
+	public static class DLCContainer extends DummyModContainer {
+
 		public final IDLCInfo info;
-		
+
 		public DLCContainer(IDLCInfo info) {
 			super(new ModMetadata());
 			ModMetadata metadata = getMetadata();
@@ -86,7 +71,7 @@ public class AlchemyDLCLoader {
 			metadata.parent = MOD_ID;
 			this.info = info;
 		}
-		
+
 		@Unsafe(Unsafe.REFLECT_API)
 		protected void injectLoader() {
 			List<ModContainer> mods = $(Loader.instance(), "mods");
@@ -103,21 +88,22 @@ public class AlchemyDLCLoader {
 			activeModList = Lists.newArrayList(activeModList);
 			activeModList.add(this);
 			$(modController, "activeModList<", activeModList);
-			ImmutableMap<String,EventBus> eventChannels = $(modController, "eventChannels");
-			$(modController, "eventChannels<", ImmutableMap.builder().putAll(eventChannels).put(getModId(), new EventBus()).build());
+			ImmutableMap<String, EventBus> eventChannels = $(modController, "eventChannels");
+			$(modController, "eventChannels<",
+					ImmutableMap.builder().putAll(eventChannels).put(getModId(), new EventBus()).build());
 		}
-		
+
 		@Override
 		public boolean registerBus(EventBus bus, LoadController controller) {
 			return true;
 		}
-		
+
 		@Override
 		public File getSource() {
 			String path = info.getDLCURL().getFile();
 			return path != null ? new File(path) : null;
 		}
-		
+
 		@Override
 		public Object getMod() {
 			return info;
@@ -125,25 +111,25 @@ public class AlchemyDLCLoader {
 
 		@Override
 		public Class<?> getCustomResourcePackClass() {
-			return getSource().isDirectory() ?
-					$.forName("net.minecraftforge.fml.client.FMLFolderResourcePack", true) :
-					$.forName("net.minecraftforge.fml.client.FMLFileResourcePack", true);
+			return getSource().isDirectory()
+					? $.forName("net.minecraftforge.fml.client.FMLFolderResourcePack", true)
+					: $.forName("net.minecraftforge.fml.client.FMLFileResourcePack", true);
 		}
-		
+
 		@Override
 		public String toString() {
 			return MOD_NAME + " DLC: " + info.name();
 		}
-		
+
 		@Override
 		public Disableable canBeDisabled() {
 			return Disableable.RESTART;
 		}
 
 	}
-	
+
 	public static class GUICheckDLCLoader {
-		
+
 		public static void show(Collection<IDLCInfo> dlcInfos) {
 			JFXHelper.runAndWait(() -> {
 				ListView<IDLCInfo> listView = new ListView<>();
@@ -168,44 +154,52 @@ public class AlchemyDLCLoader {
 				alert.showAndWait();
 			});
 		}
-		
+
 	}
-	
-	public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID, DEV_DLCS_BIN = "/bin/";
-	
+
+	public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID,
+			DEV_DLCS_BIN = "/bin/";
+
 	private static final Logger logger = LogManager.getLogger(AlchemyDLCLoader.class.getSimpleName());
-	
+
 	private static final String mc_dir = AlchemyEngine.getMinecraftDir().getPath();
-	
+
 	private static final Map<String, IDLCInfo> dlc_mapping = Maps.newHashMap();
-	
+
 	@Nullable
-	public static IDLCInfo findDLC(String id) { return dlc_mapping.get(id); }
-	
-	public static boolean isDLCLoaded(String id) { return findDLC(id) != null; }
-	
-	public static Stream<IDLCInfo> stream() { return dlc_mapping.values().stream(); }
-	
-	protected static void injectLoader() {
-		dlc_mapping.values().stream()
-			.filter(IDLCInfo::shouldInjectLoader)
-			.map(IDLCInfo::getDLCContainer)
-			.forEach(DLCContainer::injectLoader);
+	public static IDLCInfo findDLC(String id) {
+		return dlc_mapping.get(id);
 	}
-	
-	public static void init() { injectLoader(); }
-	
+
+	public static boolean isDLCLoaded(String id) {
+		return findDLC(id) != null;
+	}
+
+	public static Stream<IDLCInfo> stream() {
+		return dlc_mapping.values().stream();
+	}
+
+	protected static void injectLoader() {
+		dlc_mapping.values().stream().filter(IDLCInfo::shouldInjectLoader).map(IDLCInfo::getDLCContainer)
+				.forEach(DLCContainer::injectLoader);
+	}
+
+	public static void init() {
+		injectLoader();
+	}
+
 	public static void setup() {
 		AlchemyEngine.checkInvokePermissions();
 		logger.info("Setup: " + AlchemyDLCLoader.class.getName());
-		
-		String val = System.getProperty("index.alchemy.dlcs.bin", ""), mc_dir = ".".equals(AlchemyDLCLoader.mc_dir) ? ".." : AlchemyDLCLoader.mc_dir;
+
+		String val = System.getProperty("index.alchemy.dlcs.bin", ""),
+				mc_dir = ".".equals(AlchemyDLCLoader.mc_dir) ? ".." : AlchemyDLCLoader.mc_dir;
 		if (!val.isEmpty())
 			for (String path : val.split(";"))
 				addDLCFile(new File(path.replace("$mc_dir", mc_dir)));
-		else 
+		else
 			logger.info("index.alchemy.dlcs.bin is EMPTY");
-		
+
 		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
 			File dlcs = new File(mc_dir + DEV_DLCS_BIN);
 			if (!dlcs.exists())
@@ -216,7 +210,7 @@ public class AlchemyDLCLoader {
 					if (dir.isDirectory())
 						addDLCFile(dir);
 		}
-		
+
 		{
 			File dlcs = new File(mc_dir + DLCS_PATH);
 			if (!dlcs.exists())
@@ -227,15 +221,14 @@ public class AlchemyDLCLoader {
 					if (file.getName().endsWith(".dlc"))
 						addDLCFile(file);
 		}
-		
+
 		GUICheckDLCLoader.show(dlc_mapping.values());
-		
-		dlc_mapping.values().stream()
-			.filter(IDLCInfo::shouldLoad)
-			.peek(dlc -> Tool.addURLToClassLoader(AlchemyDLCLoader.class.getClassLoader(), dlc.getDLCURL()))
-			.forEach(dlc -> logger.info("Load dlc: " + dlc));
+
+		dlc_mapping.values().stream().filter(IDLCInfo::shouldLoad)
+				.peek(dlc -> Tool.addURLToClassLoader(AlchemyDLCLoader.class.getClassLoader(), dlc.getDLCURL()))
+				.forEach(dlc -> logger.info("Load dlc: " + dlc));
 	}
-	
+
 	private static void addDLCFile(File file) {
 		if (!file.exists()) {
 			logger.error("The specified file does not exist: " + file.getPath());
@@ -252,10 +245,9 @@ public class AlchemyDLCLoader {
 				AnnotationInvocationHandler invocationHandler = AnnotationInvocationHandler.asOneOfUs(dlc);
 				invocationHandler.memberValues.put("getDLCContainer", new DLCContainer(dlc));
 				invocationHandler.memberValues.put("getDLCAllClass", ImmutableSet.copyOf(classSet));
-				invocationHandler.memberValues.put("getDLCAllPackage", ImmutableSet.copyOf(classSet.stream()
-						.map(clazz -> Tool.get(clazz, "(.*)\\."))
-						.filter(Sets.newHashSet()::add)
-						.collect(Collectors.toList())));
+				invocationHandler.memberValues.put("getDLCAllPackage",
+						ImmutableSet.copyOf(classSet.stream().map(clazz -> Tool.get(clazz, "(.*)\\."))
+								.filter(Sets.newHashSet()::add).collect(Collectors.toList())));
 				invocationHandler.memberValues.put("getDLCURL", url);
 				dlc_mapping.put(dlc.id(), dlc);
 				logger.info("Successfully loaded DLC: " + file.getPath());
@@ -266,7 +258,7 @@ public class AlchemyDLCLoader {
 			logger.warn("Failed to load DLC: " + file.getPath(), e);
 		}
 	}
-	
+
 	@Nullable
 	private static IDLCInfo checkFileIsDLC(File file) throws Exception {
 		List<IDLCInfo> result = Lists.newLinkedList();
@@ -278,14 +270,15 @@ public class AlchemyDLCLoader {
 		} else
 			try (ZipInputStream input = new ZipInputStream(new FileInputStream(file))) {
 				for (ZipEntry entry; (entry = input.getNextEntry()) != null;)
-					if (!entry.isDirectory() && entry.getName().endsWith(".class") && (dlc = checkClassIsDLC(input)) != null)
+					if (!entry.isDirectory() && entry.getName().endsWith(".class")
+							&& (dlc = checkClassIsDLC(input)) != null)
 						result.add(dlc);
 			}
 		if (result.size() > 1)
 			AlchemyRuntimeException.onException(new RuntimeException("This file(" + file + ") has multiple DLC"));
 		return Tool.getSafe(result, 0);
 	}
-	
+
 	@Nullable
 	private static IDLCInfo checkClassIsDLC(InputStream input) throws Exception {
 		try {
@@ -295,15 +288,16 @@ public class AlchemyDLCLoader {
 			if (node.visibleAnnotations != null)
 				for (AnnotationNode annotation : node.visibleAnnotations)
 					if (DESCRIPTOR.equals(annotation.desc))
-						return Tool.makeAnnotation(IDLCInfo.class, makeHandlerMapping(node.name.replace('/', '.')), annotation.values,
-								"state", new Pointer<>(Boolean.TRUE), "forgeVersion", "*", "description", "");
-		} finally { 
+						return Tool.makeAnnotation(IDLCInfo.class, makeHandlerMapping(node.name.replace('/', '.')),
+								annotation.values, "state", new Pointer<>(Boolean.TRUE), "forgeVersion", "*",
+								"description", "");
+		} finally {
 			if (!(input instanceof ZipInputStream))
 				IOUtils.closeQuietly(input);
 		}
 		return null;
 	}
-	
+
 	private static Map<String, InvocationHandler> makeHandlerMapping(String mainClass) {
 		Map<String, InvocationHandler> result = Maps.newHashMap();
 		result.put("getDLCMainClass", (proxy, method, args) -> $.forName(mainClass, false));
@@ -311,5 +305,5 @@ public class AlchemyDLCLoader {
 		result.put("toString", (proxy, method, args) -> IDLCInfo.class.cast(proxy).getInfo());
 		return result;
 	}
-	
+
 }

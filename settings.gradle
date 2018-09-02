@@ -8,7 +8,7 @@ include 'alchemy-agent'
 include 'dlcs'
 
 dirList('dlcs').each { File dlc ->
-    if (dlc.name != "dlcs")
+    if (dlc.name != "src" && dlc.name != "build" && dlc.name != "out")
         include ':dlcs:' + dlc.name
 }
 

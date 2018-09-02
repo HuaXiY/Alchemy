@@ -1,17 +1,28 @@
+import org.gradle.plugins.ide.idea.model.IdeaModel
+
 buildscript {
     repositories {
+        flatDir { dirs '../deps' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-Alchemy'
     }
+}
+
+plugins {
+    id "com.dorongold.task-tree" version "1.3"
 }
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'idea'
     sourceCompatibility = '10'
     targetCompatibility = '10'
+    version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${project.name}_dev_version"]}"
+
+    def ideaConv = (IdeaModel) project.getExtensions().getByName("idea")
+    ideaConv.module.setOutputDir(file(project.rootDir.canonicalPath + "/dlcs_out/${name}"))
 
     dependencies {
         compileOnly project(path: ':core')
@@ -22,7 +33,7 @@ subprojects {
 
     archivesBaseName = "Alchemy-${config.show_version}"
     task sourcesZip(type: Zip, dependsOn: ':core:sourcesZip') {
-        baseName = "${archivesBaseName}-dlc-${name}"
+        baseName = "${archivesBaseName}-dlc-${project.name}"
         from fileTree(dir: 'src/main/java/')
         include '**/'
         classifier = 'sources'
@@ -31,17 +42,20 @@ subprojects {
     }
 
     jar {
-        baseName = "${archivesBaseName}-dlc-${name}"
-        version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}"
-        from "build/classes/${name}"
-        from "dlcs/${name}/src/main/resources"
+        baseName = "${archivesBaseName}-dlc-${project.name}"
+
+        println("dlc_${project.name}_dev_version")
+        //from "build/classes/${project.name}"
+        //from "dlcs/${name}/src/main/resources"
         from 'dlcs/README.txt'
+
+        destinationDir = project.parent.tasks.jar.destinationDir
         classifier = 'deobf'
     }
 
     task reobf(dependsOn: jar) << {
-        def inputName = "${archivesBaseName}-dlc-${name}-${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}-deobf.jar"
-        reobfDLC(inputName, compileJava.classpath)
+        def inputName = jar.archiveName
+        project.parent.reobfDLC(inputName, compileJava.classpath)
     }
     jar.finalizedBy reobf
 
@@ -50,6 +64,7 @@ subprojects {
         targetCompatibility = '10'
         options.encoding = 'utf-8'
         options.fork = true
+        def jdt = configurations.ecj.asPath
         doFirst {
             options.forkOptions.with {
                 executable = 'java'
@@ -58,7 +73,6 @@ subprojects {
                 jvmArgs = [ '-cp', jdt, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn' ]
             }
         }
-
     }
 
     task rename << {
@@ -72,7 +86,7 @@ subprojects {
     build.finalizedBy rename
 }
 
-void reobfDLC(String inputName, org.gradle.api.internal.file.UnionFileCollection classpath) {
+void reobfDLC(String inputName, FileCollection classpath) {
     def outputName = inputName.replace('deobf', 'universal')
     def mapping = new net.md_5.specialsource.JarMapping()
     def inputFile = file("build/libs/${inputName}")
@@ -84,4 +98,18 @@ void reobfDLC(String inputName, org.gradle.api.internal.file.UnionFileCollection
     mapping.loadMappings(config.mcp_srg)
     mapping.setFallbackInheritanceProvider(inheritanceProviders)
     remapper.remapJar(inputJar, outputFile)
+}
+
+net.md_5.specialsource.provider.ClassLoaderProvider getProvider(File input, FileCollection classpath) {
+    def set = new HashSet()
+    set.addAll(classpath.getFiles())
+    set.addAll(Arrays.asList(project.rootProject.fileList("build/libs/")))
+    def urls = set.stream().filter { it.getName().endsWith(".jar") && !it.getName().contains("-sources") && (it.getName().contains("-deobf") ||
+            it.getName().contains("forgeSrc-") || it.getName().contains("${archivesBaseName}-core") || it.getName().contains("BiomesOPlenty-")) ||
+            it.getName().contains("ToughAsNails-") || it.getName().contains("mobends-") }
+    .map { it.toURI() }.map { it.toURL() }.toArray { new URL[it] }
+    println "ReobfDLC class path: "
+    urls.each { println it }
+    def classLoader = new java.net.URLClassLoader(urls)
+    return new net.md_5.specialsource.provider.ClassLoaderProvider(classLoader)
 }
