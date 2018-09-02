@@ -123,7 +123,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 	public static LaunchClassLoader getLaunchClassLoader() { return Launch.classLoader; }
 
 	public static Side runtimeSide() { return FMLLaunchHandler.side(); }
-	
+
 	protected static final class AgentLoader {
 
 		public static void checkAgent() {
@@ -197,7 +197,7 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
 	
 	static { /* JavaFX Tweaker */ MeowTweaker.Kyouko(); }
 	
-	private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.deobf.disable");
+	private static boolean runtimeDeobfuscationEnabled = !Boolean.getBoolean("index.alchemy.runtime.isDeobf");
 	
 	public static boolean isRuntimeDeobfuscationEnabled() { return runtimeDeobfuscationEnabled; }
 	

@@ -11,6 +11,7 @@ import net.minecraft.util.IThreadListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 
@@ -26,11 +27,13 @@ public interface IAsyncThreadListener extends IThreadListener {
 	
 	Thread asyncThread();
 
-	default ListenableFuture<Object> addScheduledTask(Runnable runnable) {
+	@Nonnull
+	default ListenableFuture<Object> addScheduledTask(@Nonnull Runnable runnable) {
 		return addScheduledTask(runnable, false);
 	}
-	
-	default ListenableFuture<Object> addScheduledTask(Runnable runnable, boolean isSync) {
+
+    @Nonnull
+	default ListenableFuture<Object> addScheduledTask(@Nonnull  Runnable runnable, boolean isSync) {
 		Callable<Object> callable = () -> {
             try {
                 runnable.run();
@@ -77,4 +80,5 @@ public interface IAsyncThreadListener extends IThreadListener {
 			addScheduledTask(runnable, true).get();
 		} catch (Exception e) { throw new RuntimeException(e); }
 	}
+
 }

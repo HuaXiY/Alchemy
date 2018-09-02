@@ -26,7 +26,6 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -45,7 +44,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.*;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.MinecraftException;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.gen.ChunkProviderServer;
@@ -64,13 +66,13 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.net.Proxy;
 import java.util.*;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Listener
 @Hook.Provider
@@ -223,8 +225,8 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 				sendScoreboard((ServerScoreboard) world.getScoreboard(), player);
 				server.refreshStatusNextTick();
 				TextComponentTranslation text = player.getName().equalsIgnoreCase(name) ?
-						new TextComponentTranslation("multiplayer.player.joined", new Object[] {player.getDisplayName()}) :
-						new TextComponentTranslation("multiplayer.player.joined.renamed", new Object[] {player.getDisplayName(), name});
+						new TextComponentTranslation("multiplayer.player.joined", player.getDisplayName()) :
+						new TextComponentTranslation("multiplayer.player.joined.renamed", player.getDisplayName(), name);
 				text.getStyle().setColor(TextFormatting.YELLOW);
 				sendMessage(text);
 				playerLoggedIn(player);
@@ -280,7 +282,7 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 	    }
 		
 		@Override
-		public void transferPlayerToDimension(EntityPlayerMP player, int targetDimension, net.minecraftforge.common.util.ITeleporter teleporter) {
+		public void transferPlayerToDimension(EntityPlayerMP player, int targetDimension, @Nonnull ITeleporter teleporter) {
 			int dimension = player.dimension;
 			WorldServer oldWorld = server.getWorld(player.dimension);
 			player.dimension = targetDimension;
@@ -318,9 +320,8 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 
 
 		@Override
-		public void transferEntityToWorld(Entity entity, int lastDimension, WorldServer oldWorld, WorldServer newWorld, ITeleporter teleporter) {
-			WorldProvider pOld = oldWorld.provider, pNew = newWorld.provider;
-			double moveFactor = pOld.getMovementFactor() / pNew.getMovementFactor();
+		public void transferEntityToWorld(Entity entity, int lastDimension, WorldServer oldWorld, WorldServer newWorld, @Nonnull ITeleporter teleporter) {
+            double moveFactor = oldWorld.provider.getMovementFactor() / newWorld.provider.getMovementFactor();
 			double dx = entity.posX * moveFactor;
 			double dz = entity.posZ * moveFactor;
 			float yaw = entity.rotationYaw;
@@ -355,7 +356,8 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 				});
 			}
 		}
-		
+
+		@Nonnull
 		@Override
 		public EntityPlayerMP recreatePlayerEntity(EntityPlayerMP oldPlayer, int targetDimension, boolean conqueredEnd) {
 			EntityPlayerMP playerMP[] = { null };
@@ -553,7 +555,7 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 				if (world != null)
 					world.addScheduledTask(() -> {
 						// Don't unload the world if the status changed
-						if (world == null || !canUnloadWorld(world)) {
+						if (!canUnloadWorld(world)) {
 							FMLLog.log.debug("Aborting unload for dimension {} as status changed", id);
 							return;
 						}
@@ -588,20 +590,6 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 			throw pointer[0];
 	}
 	
-//	@Patch.Exception
-//	@Hook(value = "net.minecraft.world.chunk.Chunk#<init>", type = Hook.Type.TAIL)
-//	public static void _init_Chunk(Chunk chunk, World world, int x, int z) {
-//		if (SideHelper.isServer()) {
-//			System.out.println(chunk + " - " + x + " - " + z);
-//		}
-//	}
-	
-//	@Patch.Exception
-//	@Hook(value = "net.minecraftforge.common.DimensionManager$Dimension#<init>", type = Hook.Type.TAIL)
-//	public static void _init_(DimensionManager.Dimension dimension, DimensionType type) {
-//		dimension.ticksWaited = -InnerConfig.ticks_waited;
-//	}
-	
 	@Patch.Exception
 	@Hook("net.minecraftforge.fml.server.FMLServerHandler#getWorldThread")
 	public static Hook.Result getWorldThread(FMLServerHandler handler, INetHandler netHandler) {
@@ -623,8 +611,7 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 	}) ;
 	
 	{ startLoop(); }
-	
-	@Nullable
+
 	public void startLoop() {
 		running.set(Boolean.TRUE);
 		Thread result = asyncThread != null && asyncThread.isAlive() ? null : AlchemyThreadManager.runOnNewThread(() -> {
@@ -652,75 +639,18 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
 	public boolean isCallingFromMinecraftThread() {
 		return asyncThread == null || !asyncThread.isAlive() || !running().get() || Thread.currentThread() == asyncThread;
 	}
-	
+
+	@Nonnull
 	@Override
-	public ListenableFuture<Object> addScheduledTask(Runnable runnable) {
+	public ListenableFuture<Object> addScheduledTask(@Nonnull  Runnable runnable) {
 		return IAsyncThreadListener.super.addScheduledTask(runnable);
 	}
-	
-//	@Overrides
-//	@SuppressWarnings("deprecation")
-//	protected void finalize() throws Throwable {
-//		try { running().set(Boolean.FALSE); }
-//		finally { super.finalize(); }
-//	}
 	
 	@Patch.Exception
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onWorldUnload(WorldEvent.Unload event) {
 		if (SideHelper.isServer())
 			IAsyncThreadListener.class.cast(event.getWorld()).running().set(Boolean.FALSE);
-	}
-	
-	public void loadEntities(Collection<Entity> entityCollection)
-	{
-		for (Entity entity : Lists.newArrayList(entityCollection))
-		{
-			if (canAddEntity(entity) && !net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.event.entity.EntityJoinWorldEvent(entity, this)))
-			{
-				loadedEntityList.add(entity);
-				onEntityAdded(entity);
-			}
-		}
-	}
-
-	public boolean canAddEntity(Entity entityIn)
-	{
-		if (entityIn.isDead)
-		{
-			WorldServer.LOGGER.warn("Tried to add entity {} but it was marked as removed already", (Object)EntityList.getKey(entityIn));
-			return false;
-		}
-		else
-		{
-			UUID uuid = entityIn.getUniqueID();
-
-			if (entitiesByUuid.containsKey(uuid))
-			{
-				Entity entity = entitiesByUuid.get(uuid);
-
-				if (unloadedEntityList.contains(entity))
-				{
-					unloadedEntityList.remove(entity);
-				}
-				else
-				{
-//					Thread.dumpStack();
-					System.out.println(entityIn + " - " + getChunk(entityIn.getPosition()));
-					if (!(entityIn instanceof EntityPlayer))
-					{
-						WorldServer.LOGGER.warn("Keeping entity {} that already exists with UUID {}", EntityList.getKey(entity), uuid.toString());
-						return false;
-					}
-
-					WorldServer.LOGGER.warn("Force-added player with duplicate UUID {}", (Object)uuid.toString());
-				}
-
-				removeEntityDangerously(entity);
-			}
-
-			return true;
-		}
 	}
 	
 }

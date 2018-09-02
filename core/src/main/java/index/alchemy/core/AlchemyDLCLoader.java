@@ -1,5 +1,36 @@
 package index.alchemy.core;
 
+import com.google.common.collect.*;
+import com.google.common.eventbus.EventBus;
+import index.alchemy.api.IDLCInfo;
+import index.alchemy.api.annotation.DLC;
+import index.alchemy.api.annotation.Init;
+import index.alchemy.api.annotation.Unsafe;
+import index.alchemy.core.debug.AlchemyRuntimeException;
+import index.alchemy.util.*;
+import index.project.version.annotation.Alpha;
+import index.project.version.annotation.Beta;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ListView;
+import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.image.Image;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+import net.minecraftforge.fml.common.*;
+import net.minecraftforge.fml.common.LoaderState.ModState;
+import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.ClassNode;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -14,57 +45,8 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.annotation.Nullable;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
-
-import index.alchemy.api.IDLCInfo;
-import index.alchemy.api.annotation.DLC;
-import index.alchemy.api.annotation.Init;
-import index.alchemy.api.annotation.Unsafe;
-import index.alchemy.core.debug.AlchemyRuntimeException;
-import index.alchemy.util.$;
-import index.alchemy.util.AnnotationInvocationHandler;
-import index.alchemy.util.JFXHelper;
-import index.alchemy.util.Pointer;
-import index.alchemy.util.Tool;
-import index.project.version.annotation.Alpha;
-import index.project.version.annotation.Beta;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ListView;
-import javafx.scene.control.cell.CheckBoxListCell;
-import javafx.scene.image.Image;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.LoadController;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.LoaderState.ModState;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.ModMetadata;
-
-import static index.alchemy.core.AlchemyConstants.*;
+import static index.alchemy.core.AlchemyConstants.MOD_ID;
+import static index.alchemy.core.AlchemyConstants.MOD_NAME;
 import static index.alchemy.util.$.$;
 
 @Alpha
@@ -171,7 +153,7 @@ public class AlchemyDLCLoader {
 		
 	}
 	
-	public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID, DEV_DLCS_BIN = "/bin/";
+	public static final String DESCRIPTOR = Type.getDescriptor(DLC.class), DLCS_PATH = "/mods/dlcs/" + MOD_ID, DEV_DLCS_DIR = "/dlc/";
 	
 	private static final Logger logger = LogManager.getLogger(AlchemyDLCLoader.class.getSimpleName());
 	
@@ -199,7 +181,8 @@ public class AlchemyDLCLoader {
 		AlchemyEngine.checkInvokePermissions();
 		logger.info("Setup: " + AlchemyDLCLoader.class.getName());
 		
-		String val = System.getProperty("index.alchemy.dlcs.bin", ""), mc_dir = ".".equals(AlchemyDLCLoader.mc_dir) ? ".." : AlchemyDLCLoader.mc_dir;
+		String val = System.getProperty("index.alchemy.dlcs.bin", ""),
+				mc_dir = ".".equals(AlchemyDLCLoader.mc_dir) ? ".." : AlchemyDLCLoader.mc_dir;
 		if (!val.isEmpty())
 			for (String path : val.split(";"))
 				addDLCFile(new File(path.replace("$mc_dir", mc_dir)));
@@ -207,14 +190,16 @@ public class AlchemyDLCLoader {
 			logger.info("index.alchemy.dlcs.bin is EMPTY");
 		
 		if (!AlchemyEngine.isRuntimeDeobfuscationEnabled()) {
-			File dlcs = new File(mc_dir + DEV_DLCS_BIN);
+			File dlcs = new File(mc_dir + DEV_DLCS_DIR);
 			if (!dlcs.exists())
 				dlcs.mkdirs();
 			File files[] = dlcs.listFiles();
 			if (files != null)
 				for (File dir : files)
-					if (dir.isDirectory())
-						addDLCFile(dir);
+					if (dir.isDirectory()) {
+//                        dir =
+                        addDLCFile(dir);
+                    }
 		}
 		
 		{
@@ -242,7 +227,7 @@ public class AlchemyDLCLoader {
 			return;
 		}
 		logger.info("Add DLC: " + file.getPath());
-		IDLCInfo dlc = null;
+		IDLCInfo dlc;
 		try {
 			if ((dlc = checkFileIsDLC(file)) != null) {
 				if (file.isFile())

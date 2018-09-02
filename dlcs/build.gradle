@@ -1,3 +1,5 @@
+import org.gradle.api.internal.file.UnionFileCollection
+
 buildscript {
     repositories {
         jcenter()
@@ -39,9 +41,9 @@ subprojects {
         classifier = 'deobf'
     }
 
-    task reobf(dependsOn: jar) << {
+    task reobf(dependsOn: jar) {
         def inputName = "${archivesBaseName}-dlc-${name}-${config.minecraft_version}-${config.mod_version}.${config["dlc_${name}_dev_version"]}-deobf.jar"
-        reobfDLC(inputName, compileJava.classpath)
+        reobfDLC(inputName, compileJava.classpath as UnionFileCollection)
     }
     jar.finalizedBy reobf
 

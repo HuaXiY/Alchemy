@@ -1,34 +1,10 @@
 package index.alchemy.core;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodType;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Stack;
-import java.util.function.Consumer;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
 import index.alchemy.api.IDLCInfo;
-import index.alchemy.api.annotation.Alchemy;
-import index.alchemy.api.annotation.DLC;
-import index.alchemy.api.annotation.Init;
-import index.alchemy.api.annotation.InitInstance;
-import index.alchemy.api.annotation.Loading;
-import index.alchemy.api.annotation.Test;
+import index.alchemy.api.annotation.*;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.debug.AlchemyDebug;
 import index.alchemy.core.debug.AlchemyRuntimeException;
@@ -45,8 +21,21 @@ import net.minecraftforge.fml.common.ProgressManager.ProgressBar;
 import net.minecraftforge.fml.common.event.FMLEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import static index.alchemy.core.AlchemyConstants.*;
+import java.io.File;
+import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.function.Consumer;
+
+import static index.alchemy.core.AlchemyConstants.MOD_NAME;
 
 /* 
  * -----------------------------------------------
@@ -199,19 +188,23 @@ public enum AlchemyModLoader {
 		is_modding = !AlchemyEngine.isRuntimeDeobfuscationEnabled();
 		mc_dir = AlchemyEngine.getMinecraftDir().getPath();
 		config_dir = mc_dir +"/config";
+        System.out.println(AlchemyEngine.getAlchemyCoreLocation());
 		if (AlchemyEngine.getAlchemyCoreLocation() != null)
 			mod_path = AlchemyEngine.getAlchemyCoreLocation();
 		else try {
 			String offset = AlchemyModLoader.class.getName().replace('.', '/') + ".class";
 			URL src = AlchemyModLoader.class.getProtectionDomain().getCodeSource().getLocation();
-			if (src.getProtocol().equals("jar"))
-				mod_path = new File(((JarURLConnection) src.openConnection()).getJarFileURL().getFile());
-			else if (src.getProtocol().equals("file"))
-				mod_path = new File(src.getFile().replace(offset, ""));
-			else {
-				mod_path = null;
-				throw new NullPointerException("mod_path");
-			}
+            switch (src.getProtocol()) {
+                case "jar":
+                    mod_path = new File(((JarURLConnection) src.openConnection()).getJarFileURL().getFile());
+                    break;
+                case "file":
+                    mod_path = new File(src.getFile().replace(offset, ""));
+                    break;
+                default:
+                    mod_path = null;
+                    throw new NullPointerException("mod_path");
+            }
 		} catch (Exception e) {
 			AlchemyRuntimeException.onException(e);
 			throw new RuntimeException(e);
@@ -255,7 +248,7 @@ public enum AlchemyModLoader {
 					logger.info(AlchemyModLoader.class.getName() + " Add -> " + clazz);
 					loading_list.add(AlchemyEngine.lookup().findStatic(clazz, "init", MethodType.methodType(void.class, Class.class)));
 				}
-			} catch (ClassNotFoundException | NoClassDefFoundError e) { continue; }
+			} catch (ClassNotFoundException | NoClassDefFoundError e) { }
 		
 		for (String name : class_list)
 			try {

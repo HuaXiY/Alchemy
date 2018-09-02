@@ -236,6 +236,8 @@ public class $ {
 			} while((clazz = clazz.getSuperclass()) != null);
 			throw new IllegalArgumentException();
 		} catch(Exception e) {
+		    if (e instanceof  InvocationTargetException)
+		        ((InvocationTargetException) e).getTargetException().printStackTrace();
 			throw new RuntimeException("Can't invoke(" + args.length + "): " + Joiner.on(',').useForNull("null").join(args), e);
 		}
 	}

@@ -1,41 +1,28 @@
 package index.alchemy.core;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.security.CodeSigner;
-import java.security.CodeSource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.jar.Attributes;
-import java.util.jar.Attributes.Name;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-
 import index.alchemy.api.annotation.SuppressFBWarnings;
 import net.minecraft.launchwrapper.IClassNameTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LogWrapper;
 import net.minecraftforge.fml.common.asm.ASMTransformerWrapper;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+
+import java.io.*;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.net.URLConnection;
+import java.security.CodeSigner;
+import java.security.CodeSource;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.jar.Attributes;
+import java.util.jar.Attributes.Name;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import static index.alchemy.util.$.$;
 
@@ -259,9 +246,8 @@ public class AlchemyLaunchClassLoader extends URLClassLoader {
 					ASMTransformerWrapper.TransformerWrapper wrapper = null;
 					if (transformer instanceof ASMTransformerWrapper.TransformerWrapper)
 						wrapper = (ASMTransformerWrapper.TransformerWrapper) transformer;
-					LogWrapper.log(Level.WARN, "On transform: %s|%s(%d), transformer: %s", name, transformedName, basicClass == null ?
-							-1 : basicClass.length, wrapper == null ? transformer.getClass().getName() :
-							$(wrapper, "getCoreMod") + "|" + $(wrapper, "getParentClass"));
+					LogWrapper.log(Level.WARN, "On transform: %s|%s(%d), transformer: %s", name, transformedName, -1,
+							wrapper == null ? transformer.getClass().getName() : $(wrapper, "getCoreMod") + "|" + $(wrapper, "getParentClass"));
 				}
 				if (DEBUG_FINER && !Arrays.equals(basicClassCache, basicClass)) {
 					basicClassCache = basicClass;
