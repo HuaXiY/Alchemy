@@ -10,15 +10,15 @@ import net.minecraftforge.fml.relauncher.Side;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Remote {
-	
-	@Target(ElementType.TYPE)
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface Provider { }
-	
-	Side value();
-	
-	boolean always() default true;
-	
-	boolean sync() default true;
-
+    
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Provider { }
+    
+    Side value();
+    
+    boolean always() default true;
+    
+    boolean sync() default true;
+    
 }

@@ -18,30 +18,28 @@
  */
 package net.minecraftforge.fml.common.eventhandler;
 
-public enum EventPriority implements IEventListener
-{
+public enum EventPriority implements IEventListener {
     /*Priority of event listeners, listeners will be sorted with respect to this priority level.
      *
      * Note:
      *   Due to using a ArrayList in the ListenerList,
      *   these need to stay in a contiguous index starting at 0. {Default ordinal}
      */
-	// - Alchemy patch start -
-	TOP,
-	// - Alchemy patch end -
+    // - Alchemy patch start -
+    TOP,
+    // - Alchemy patch end -
     HIGHEST, //First to execute
     HIGH,
     NORMAL,
     LOW,
     LOWEST, //Last to execute
     // - Alchemy patch start -
- 	BOTTOM,
- 	// - Alchemy patch end -
-;
+    BOTTOM,
+    // - Alchemy patch end -
+    ;
 
     @Override
-    public void invoke(Event event)
-    {
+    public void invoke(Event event) {
         event.setPhase(this);
     }
 }

@@ -7,6 +7,7 @@ import index.alchemy.api.annotation.Patch;
 import index.alchemy.network.AlchemyNetworkHandler;
 import index.alchemy.util.AABBHelper;
 import index.project.version.annotation.Omega;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -22,7 +23,7 @@ import net.minecraft.world.World;
 @Omega
 public class AlchemyTileEntity extends TileEntity {
     
-    public static final Random random = new Random(); 
+    public static final Random random = new Random();
     
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
@@ -40,12 +41,12 @@ public class AlchemyTileEntity extends TileEntity {
     }
     
     public void updateTracker() {
-    	if (world != null) {
-	        SPacketUpdateTileEntity packet = getUpdatePacket();
-	        for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class, 
-	                AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getTileEntityUpdateRange())))
-	            updatePlayer(player, packet);
-    	}
+        if (world != null) {
+            SPacketUpdateTileEntity packet = getUpdatePacket();
+            for (EntityPlayerMP player : world.getEntitiesWithinAABB(EntityPlayerMP.class,
+                    AABBHelper.getAABBFromBlockPos(pos, AlchemyNetworkHandler.getTileEntityUpdateRange())))
+                updatePlayer(player, packet);
+        }
     }
     
     public void updatePlayer(EntityPlayerMP player, SPacketUpdateTileEntity packet) {
@@ -77,5 +78,5 @@ public class AlchemyTileEntity extends TileEntity {
         }
         
     }
-
+    
 }

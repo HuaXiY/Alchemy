@@ -8,11 +8,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Dimension {
-	
-	String name();
-	
-	String suffix() default "";
-	
-	boolean load() default false;
-
+    
+    String name();
+    
+    String suffix() default "";
+    
+    boolean load() default false;
+    
 }

@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KeyEvent {
-	
-	String[] value();
-	
-	boolean ignoreHook() default false;
-	
+    
+    String[] value();
+    
+    boolean ignoreHook() default false;
+    
 }

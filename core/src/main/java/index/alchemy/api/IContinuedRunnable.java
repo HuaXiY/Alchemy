@@ -4,7 +4,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
 @FunctionalInterface
 public interface IContinuedRunnable {
-	
-	boolean run(Phase phase);
-
+    
+    boolean run(Phase phase);
+    
 }

@@ -10,11 +10,11 @@ import net.minecraftforge.fml.common.LoaderState.ModState;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Init {
-	
-	ModState state() default ModState.UNLOADED;
-	
-	int index() default 0;
-	
-	boolean enable() default true;
-	
+    
+    ModState state() default ModState.UNLOADED;
+    
+    int index() default 0;
+    
+    boolean enable() default true;
+    
 }
