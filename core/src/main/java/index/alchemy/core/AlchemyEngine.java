@@ -166,19 +166,22 @@ public class AlchemyEngine extends $ implements IFMLLoadingPlugin {
             lcl.addClassLoaderExclusion("com.sun.");
             lcl.addClassLoaderExclusion("javafx.");
             AgentLoader.checkAgent();
-            instrumentation().addTransformer(IClassFileTransformer.of((module, loader, name, target, domain, buffer) -> {
-                try {
-                    if (target != null && name != null && !"net/minecraft/launchwrapper/LaunchClassLoader".equals(name)) {
-                        logger.info("Redefine: " + loader + "<" + target + ">" + (domain == null ? "(null)" : domain.getCodeSource()));
-                        buffer = runTransformers(ASMHelper.getClassSrcName(DeobfuscatingRemapper.instance().unmapType(name)),
-                                ASMHelper.getClassSrcName(name), buffer);
+            instrumentation().addTransformer(new ClassFileTransformer() {
+                @Override
+                public byte[] transform(Module module, ClassLoader loader, String name, Class<?> target, ProtectionDomain domain, byte[] buffer) throws IllegalClassFormatException {
+                    try {
+                        if (target != null && name != null && !"net/minecraft/launchwrapper/LaunchClassLoader".equals(name)) {
+                            logger.info("Redefine: " + loader + "<" + target + ">" + (domain == null ? "(null)" : domain.getCodeSource()));
+                            buffer = runTransformers(ASMHelper.getClassSrcName(DeobfuscatingRemapper.instance().unmapType(name)),
+                                    ASMHelper.getClassSrcName(name), buffer);
+                        }
+                        return buffer;
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                        throw new InternalError(t);
                     }
-                    return buffer;
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    throw new InternalError(t);
                 }
-            }), true);
+            }, true);
             try {
                 instrumentation().redefineClasses(new ClassDefinition(LaunchClassLoader.class, ASMHelper.ClassNameRemapper.changeName(
                         lcl.getClassBytes("index.alchemy.core.AlchemyLaunchClassLoader"),
