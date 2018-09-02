@@ -14,7 +14,6 @@ dependencies {
 
     compile group: 'org.javassist', name: 'javassist', version: '3.23.1-GA'
     // edit the line below to the forge build on your computer for debug purpose.
-    //testCompile files("C:\\Users\\cqjjj\\AppData\\Roaming\\.minecraft\\libraries\\net\\minecraftforge\\forge\\1.12.2-14.23.4.2758\\forge-1.12.2-14.23.4.2758.jar")
 }
 
 tasks.withType(JavaCompile) {
