@@ -8,17 +8,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DLC {
-	
-	String id();
-	
-	String name();
-	
-	String version();
-	
-	String mcVersion();
-	
-	String forgeVersion() default "*";
-	
-	String description() default "";
-	
+    
+    String id();
+    
+    String name();
+    
+    String version();
+    
+    String mcVersion();
+    
+    String forgeVersion() default "*";
+    
+    String description() default "";
+    
 }

@@ -1,0 +1,48 @@
+<code_scheme name="Default" version="173">
+  <option name="FORMATTER_TAGS_ENABLED" value="true" />
+  <JavaCodeStyleSettings>
+    <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
+      <value />
+    </option>
+    <option name="IMPORT_LAYOUT_TABLE">
+      <value>
+        <package name="java" withSubpackages="true" static="false" />
+        <package name="javax" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="javafx" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="index" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="index.alchemy.dlcs" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="org.objectweb.asm" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="com.mojang" withSubpackages="true" static="false" />
+        <package name="net.minecraft" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="net.minecraftforge" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="com.google" withSubpackages="true" static="false" />
+        <package name="org.apache" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="" withSubpackages="true" static="false" />
+        <emptyLine />
+        <package name="" withSubpackages="true" static="true" />
+      </value>
+    </option>
+    <option name="JD_DO_NOT_WRAP_ONE_LINE_COMMENTS" value="true" />
+  </JavaCodeStyleSettings>
+  <codeStyleSettings language="JAVA">
+    <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+    <option name="BLANK_LINES_BEFORE_CLASS_END" value="1" />
+    <option name="ELSE_ON_NEW_LINE" value="true" />
+    <option name="SPACE_WITHIN_BRACES" value="true" />
+    <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />
+    <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
+    <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
+    <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
+    <indentOptions>
+      <option name="KEEP_INDENTS_ON_EMPTY_LINES" value="true" />
+    </indentOptions>
+  </codeStyleSettings>
+</code_scheme>

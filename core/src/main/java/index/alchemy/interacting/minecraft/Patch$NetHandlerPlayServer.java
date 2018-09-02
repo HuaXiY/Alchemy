@@ -2,6 +2,7 @@ package index.alchemy.interacting.minecraft;
 
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.api.event.PlayerDropItemEvent;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -15,19 +16,20 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
+
 import net.minecraftforge.common.MinecraftForge;
 
 @Patch("net.minecraft.network.NetHandlerPlayServer")
 public class Patch$NetHandlerPlayServer extends NetHandlerPlayServer {
-	
-	@Patch.Exception
-	public Patch$NetHandlerPlayServer(MinecraftServer server, NetworkManager networkManagerIn, EntityPlayerMP playerIn) {
-		super(server, networkManagerIn, playerIn);
-	}
-
-	@Override
-	public void processPlayerDigging(CPacketPlayerDigging packetIn) {
-		PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, player.getServerWorld());
+    
+    @Patch.Exception
+    public Patch$NetHandlerPlayServer(MinecraftServer server, NetworkManager networkManagerIn, EntityPlayerMP playerIn) {
+        super(server, networkManagerIn, playerIn);
+    }
+    
+    @Override
+    public void processPlayerDigging(CPacketPlayerDigging packetIn) {
+        PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, player.getServerWorld());
         WorldServer worldserver = server.getWorld(player.dimension);
         BlockPos blockpos = packetIn.getPosition();
         player.markPlayerActive();
@@ -53,9 +55,9 @@ public class Patch$NetHandlerPlayServer extends NetHandlerPlayServer {
             case START_DESTROY_BLOCK:
             case ABORT_DESTROY_BLOCK:
             case STOP_DESTROY_BLOCK:
-                double d0 = player.posX - ((double)blockpos.getX() + 0.5D);
-                double d1 = player.posY - ((double)blockpos.getY() + 0.5D) + 1.5D;
-                double d2 = player.posZ - ((double)blockpos.getZ() + 0.5D);
+                double d0 = player.posX - ((double) blockpos.getX() + 0.5D);
+                double d1 = player.posY - ((double) blockpos.getY() + 0.5D) + 1.5D;
+                double d2 = player.posZ - ((double) blockpos.getZ() + 0.5D);
                 double d3 = d0 * d0 + d1 * d1 + d2 * d2;
                 double dist = player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue() + 1;
                 dist *= dist;
@@ -63,8 +65,7 @@ public class Patch$NetHandlerPlayServer extends NetHandlerPlayServer {
                     return;
                 else if (blockpos.getY() >= server.getBuildLimit())
                     return;
-                else
-                {
+                else {
                     if (packetIn.getAction() == CPacketPlayerDigging.Action.START_DESTROY_BLOCK)
                         if (!server.isBlockProtected(worldserver, blockpos, player) && worldserver.getWorldBorder().contains(blockpos))
                             player.interactionManager.onBlockClicked(blockpos, packetIn.getFacing());
@@ -83,6 +84,6 @@ public class Patch$NetHandlerPlayServer extends NetHandlerPlayServer {
             default:
                 throw new IllegalArgumentException("Invalid player action");
         }
-	}
-
+    }
+    
 }

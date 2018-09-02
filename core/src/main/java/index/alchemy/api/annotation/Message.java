@@ -10,7 +10,7 @@ import net.minecraftforge.fml.relauncher.Side;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Message {
-	
-	Side value();
-
+    
+    Side value();
+    
 }

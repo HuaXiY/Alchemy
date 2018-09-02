@@ -5,28 +5,28 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import org.apache.commons.io.IOUtils;
-
 import net.minecraft.launchwrapper.IClassTransformer;
 
-public class TransformerReplace implements IClassTransformer {
-	
-	protected static final ClassLoader RESOURCES_LOADER =
-			new URLClassLoader(new URL[] { TransformerReplace.class.getProtectionDomain().getCodeSource().getLocation() });
+import org.apache.commons.io.IOUtils;
 
-	@Override
-	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		if (transformedName.startsWith("net.minecraft.") || transformedName.startsWith("net.minecraftforge.")) {
-			InputStream input = RESOURCES_LOADER.getResourceAsStream("/" + transformedName.replace('.', '/') + ".class");
-			try {
-				if (input != null) {
-					byte result[] = IOUtils.toByteArray(input);
-					AlchemyTransformerManager.transform("<replace>" + name + "|" + transformedName);
-					return result;
-				}
-			} catch (IOException e) { e.printStackTrace(); }
-		}
-		return basicClass;
-	}
+public class TransformerReplace implements IClassTransformer {
+
+    protected static final ClassLoader RESOURCES_LOADER =
+            new URLClassLoader(new URL[]{TransformerReplace.class.getProtectionDomain().getCodeSource().getLocation()});
+
+    @Override
+    public byte[] transform(String name, String transformedName, byte[] basicClass) {
+        if (transformedName.startsWith("net.minecraft.") || transformedName.startsWith("net.minecraftforge.")) {
+            InputStream input = RESOURCES_LOADER.getResourceAsStream("/" + transformedName.replace('.', '/') + ".class");
+            try {
+                if (input != null) {
+                    byte result[] = IOUtils.toByteArray(input);
+                    AlchemyTransformerManager.transform("<replace>" + name + "|" + transformedName);
+                    return result;
+                }
+            } catch (IOException e) { e.printStackTrace(); }
+        }
+        return basicClass;
+    }
 
 }
