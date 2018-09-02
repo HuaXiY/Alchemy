@@ -56,7 +56,6 @@ public class AlchemyModContainer implements ModContainer {
     private ModMetadata modMetadata;
     private Map<String, Object> descriptor;
     private boolean enabled = true;
-    private EventBus eventBus;
     private LoadController controller;
     private DefaultArtifactVersion processedVersion;
     
@@ -130,9 +129,8 @@ public class AlchemyModContainer implements ModContainer {
     @Override
     public boolean registerBus(EventBus eventBus, LoadController controller) {
         if (enabled) {
-            this.eventBus = eventBus;
             this.controller = controller;
-            this.eventBus.register(this);
+            eventBus.register(this);
             return true;
         }
         else

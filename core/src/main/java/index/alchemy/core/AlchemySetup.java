@@ -8,6 +8,7 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import index.alchemy.api.IDLCInfo;
+import index.alchemy.api.annotation.Hook;
 import index.alchemy.core.asm.transformer.AlchemyTransformerManager;
 import index.alchemy.core.asm.transformer.TransformerInjectOptifine;
 import index.alchemy.core.asm.transformer.TransformerSide;
@@ -18,6 +19,7 @@ import index.project.version.annotation.Beta;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
+import net.minecraftforge.fml.common.asm.FMLSanityChecker;
 import net.minecraftforge.fml.common.asm.transformers.AccessTransformer;
 import net.minecraftforge.fml.relauncher.IFMLCallHook;
 
@@ -30,7 +32,13 @@ import static index.alchemy.core.AlchemyConstants.MOD_NAME;
 import static index.alchemy.util.$.$;
 
 @Beta
+@Hook.Provider
 public class AlchemySetup implements IFMLCallHook {
+    
+    @Hook(value = "net.minecraftforge.fml.common.asm.FMLSanityChecker#call", disable = AlchemyEngine.RUNTIME_IS_DEOBF)
+    public static  Hook.Result call(FMLSanityChecker checker) {
+        return Hook.Result.NULL;
+    }
     
     protected static final Logger logger = LogManager.getLogger(MOD_NAME);
     
