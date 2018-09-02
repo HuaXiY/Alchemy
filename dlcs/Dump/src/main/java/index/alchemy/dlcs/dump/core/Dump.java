@@ -31,40 +31,40 @@ import static index.alchemy.dlcs.dump.core.Dump.*;
 @Init(state = ModState.AVAILABLE)
 @DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "*")
 public class Dump {
-	
-	public static final String
-			DLC_ID = "dump",
-			DLC_NAME = "Dump",
-			DLC_VERSION = "0.0.1-dev";
-	
-	public static final File dump_dir = new File(AlchemyModLoader.mc_dir, "dump");
-	
-	public static void init() throws IOException {
-		if (!dump_dir.isDirectory())
-			dump_dir.mkdirs();
-		dumpFile(Item.REGISTRY, "item");
-		dumpFile(Block.REGISTRY, "block");
-		dumpFile(Potion.REGISTRY, "potion");
-		dumpFile(Biome.REGISTRY, "biome");
-		dumpFile(Enchantment.REGISTRY, "enchantment");
-		dumpFile(PotionType.REGISTRY, "potiontype");
-		dumpFile(SoundEvent.REGISTRY, "soundevent");
-	}
-	
-	public static Map<Impl, Integer> dumpId(RegistryNamespaced<ResourceLocation, Impl> namespaced) {
-		return StreamSupport.stream(namespaced.spliterator(), false).collect(Maps::newLinkedHashMap,
-				(map, impl) -> map.put(impl, namespaced.getIDForObject(impl)), Map::putAll);
-	}
-	
-	public static void dumpFile(RegistryNamespaced namespaced, String name) throws IOException {
-		File output = new File(dump_dir, name + ".dump");
-		Map<Impl, Integer> map = dumpId(namespaced);
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output)));
-		for (Entry<Impl, Integer> entry : map.entrySet()) {
-			writer.write(entry.getValue() + " - " + entry.getKey().getRegistryName());
-			writer.newLine();
-		}
-		writer.close();
-	}
-
+    
+    public static final String
+            DLC_ID = "dump",
+            DLC_NAME = "Dump",
+            DLC_VERSION = "0.0.1-dev";
+    
+    public static final File dump_dir = new File(AlchemyModLoader.mc_dir, "dump");
+    
+    public static void init() throws IOException {
+        if (!dump_dir.isDirectory())
+            dump_dir.mkdirs();
+        dumpFile(Item.REGISTRY, "item");
+        dumpFile(Block.REGISTRY, "block");
+        dumpFile(Potion.REGISTRY, "potion");
+        dumpFile(Biome.REGISTRY, "biome");
+        dumpFile(Enchantment.REGISTRY, "enchantment");
+        dumpFile(PotionType.REGISTRY, "potiontype");
+        dumpFile(SoundEvent.REGISTRY, "soundevent");
+    }
+    
+    public static Map<Impl, Integer> dumpId(RegistryNamespaced<ResourceLocation, Impl> namespaced) {
+        return StreamSupport.stream(namespaced.spliterator(), false).collect(Maps::newLinkedHashMap,
+                (map, impl) -> map.put(impl, namespaced.getIDForObject(impl)), Map::putAll);
+    }
+    
+    public static void dumpFile(RegistryNamespaced namespaced, String name) throws IOException {
+        File output = new File(dump_dir, name + ".dump");
+        Map<Impl, Integer> map = dumpId(namespaced);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output)));
+        for (Entry<Impl, Integer> entry : map.entrySet()) {
+            writer.write(entry.getValue() + " - " + entry.getKey().getRegistryName());
+            writer.newLine();
+        }
+        writer.close();
+    }
+    
 }
