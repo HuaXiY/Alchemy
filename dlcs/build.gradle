@@ -26,9 +26,11 @@ subprojects {
 
     dependencies {
         compileOnly project(path: ':core')
-        compileOnly files(project(":core").configurations.forgeGradleMc.resolve())
-        compileOnly files(project(":core").configurations.forgeGradleMcDeps.resolve())
-        compileOnly files(project(":core").configurations.forgeGradleMcDepsClient.resolve())
+        try {
+            compileOnly files(project(":core").configurations.forgeGradleMc.resolve())
+            compileOnly files(project(":core").configurations.forgeGradleMcDeps.resolve())
+            compileOnly files(project(":core").configurations.forgeGradleMcDepsClient.resolve())
+        } catch(Ignored) { }
     }
 
     archivesBaseName = "Alchemy-${config.show_version}"
