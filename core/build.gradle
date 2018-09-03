@@ -11,6 +11,10 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-Alchemy'
     }
 }
+
+plugins {
+    id "com.dorongold.task-tree" version "1.3"
+}
 apply plugin: 'net.minecraftforge.gradle.forge'
 def ideaConv = (IdeaModel) project.getExtensions().getByName("idea")
 ideaConv.module.scopes.get("RUNTIME").get("plus").remove(project.configurations.forgeGradleGradleStart)

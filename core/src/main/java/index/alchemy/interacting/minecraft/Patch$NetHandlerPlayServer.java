@@ -19,7 +19,7 @@ import net.minecraft.world.WorldServer;
 
 import net.minecraftforge.common.MinecraftForge;
 
-@Patch("net.minecraft.network.NetHandlerPlayServer")
+//@Patch("net.minecraft.network.NetHandlerPlayServer")
 public class Patch$NetHandlerPlayServer extends NetHandlerPlayServer {
     
     @Patch.Exception

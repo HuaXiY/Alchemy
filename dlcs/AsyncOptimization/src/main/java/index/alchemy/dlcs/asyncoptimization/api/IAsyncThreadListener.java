@@ -2,6 +2,8 @@ package index.alchemy.dlcs.asyncoptimization.api;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import javax.annotation.Nonnull;
 
 import index.alchemy.api.IFieldContainer;
@@ -9,6 +11,7 @@ import index.alchemy.api.IFieldContainer;
 import index.alchemy.dlcs.asyncoptimization.core.AsyncWorldServer;
 import index.alchemy.dlcs.asyncoptimization.core.WaitingRunnable;
 
+import index.alchemy.util.cache.ThreadCache;
 import net.minecraft.network.ThreadQuickExitException;
 import net.minecraft.util.IThreadListener;
 
@@ -19,7 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public interface IAsyncThreadListener extends IThreadListener {
-    
+    WaitableHashMap<Thread, Runnable> WAITING_THREADS = new WaitableHashMap<>();
+
     Logger LOGGER = LogManager.getLogger(AsyncWorldServer.class);
     
     void startLoop();
@@ -32,11 +36,6 @@ public interface IAsyncThreadListener extends IThreadListener {
     
     @Nonnull
     default ListenableFuture<Object> addScheduledTask(@Nonnull Runnable runnable) {
-        return addScheduledTask(runnable, false);
-    }
-    
-    @Nonnull
-    default ListenableFuture<Object> addScheduledTask(@Nonnull Runnable runnable, boolean isSync) {
         Callable<Object> callable = () -> {
             try {
                 runnable.run();
@@ -47,15 +46,9 @@ public interface IAsyncThreadListener extends IThreadListener {
             return null;
         };
         try {
-            if (!isCallingFromMinecraftThread() || asyncThread().isInterrupted()) {
+            if (!isCallingFromMinecraftThread() || asyncThread() == null || asyncThread().isInterrupted()) {
                 ListenableFutureTask<Object> futureTask = ListenableFutureTask.create(callable);
-                if (isSync)
-                    runnables().add(futureTask);
-                else {
-                    // Thread.currentThread is the caller thread, not the queue thread!
-                    asyncThread().interrupt(); // Notify the thread that another thread is waiting for it.
-                    runnables().add(new WaitingRunnable(Thread.currentThread(), runnable));
-                }
+                runnables().add(futureTask);
                 return futureTask;
             }
             else
@@ -72,17 +65,27 @@ public interface IAsyncThreadListener extends IThreadListener {
     
     default void syncCall(Runnable runnable) {
         // Calling from the caller thread, not the queueing thread.
-        if (Thread.interrupted()) { // If a thread is waiting the caller thread, the caller thread should immediately process the request from that thread *before* waiting for next task.
-            for (Runnable r : runnables()) {
-                if (r instanceof WaitingRunnable && ((WaitingRunnable) r).getSourceThread() == Thread.currentThread()) {
-                    r.run();
-                    break; // Only one task possible because we know the source thread is already blocked, so only one task can be submitted
-                }
-            }
+        if (Thread.currentThread() == asyncThread()) {
+            runnable.run();
+            return;
         }
+        var ft = ListenableFutureTask.create(() -> {
+            try {
+                runnable.run();
+            } catch (Throwable t) {
+                if (!(t instanceof ThreadQuickExitException))
+                    LOGGER.catching(t);
+            }
+            return null;
+        });
+        WAITING_THREADS.executeAndClearIfPresentAndRun(Thread.currentThread(), Runnable::run, () -> {
+            WAITING_THREADS.waitAndPut(asyncThread(), ft);
+            asyncThread().interrupt();
+        });
         try {
-            addScheduledTask(runnable, true).get();
-        } catch (Exception e) { throw new RuntimeException(e); }
+            ft.get();
+        } catch (InterruptedException | ExecutionException e) {
+            // IGNORED
+        }
     }
-    
 }

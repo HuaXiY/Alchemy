@@ -19,7 +19,10 @@ subprojects {
     apply plugin: 'idea'
     sourceCompatibility = '10'
     targetCompatibility = '10'
+    if (!config.containsKey("dlc_${project.name}_dev_version"))
+        config["dlc_${project.name}_dev_version"] = 1
     version = "${config.minecraft_version}-${config.mod_version}.${config["dlc_${project.name}_dev_version"]}"
+    println(version)
 
     def ideaConv = (IdeaModel) project.getExtensions().getByName("idea")
     ideaConv.module.setOutputDir(file(project.rootDir.canonicalPath + "/dlcs_out/${name}"))

@@ -14,6 +14,7 @@ import index.alchemy.api.annotation.Hook;
 import index.alchemy.api.annotation.Listener;
 import index.alchemy.api.annotation.Patch;
 import index.alchemy.core.AlchemyThreadManager;
+import index.alchemy.dlcs.asyncoptimization.api.RunnableRunner;
 import index.alchemy.util.FieldContainer;
 import index.alchemy.util.SideHelper;
 import index.alchemy.util.cache.ICache;
@@ -654,12 +655,14 @@ public class AsyncWorldServer extends WorldServer implements IAsyncThreadListene
         Thread result = asyncThread != null && asyncThread.isAlive()
                 ? null
                 : AlchemyThreadManager.runOnNewThread(() -> {
-            while (running.get() || runnables.size() > 0)
+            while (running.get() || runnables.size() > 0) {
                 try {
                     runnables.take().run();
                 } catch (InterruptedException e) {
-                    break;
+                    // IGNORED
                 }
+                WAITING_THREADS.executeAndClearIfPresent(asyncThread, new RunnableRunner());
+            }
             asyncThread = null;
         }, "AsyncWorld[" + provider.getDimensionType().getName() + "](" + provider.getDimension() + ")");
         if (result != null)
