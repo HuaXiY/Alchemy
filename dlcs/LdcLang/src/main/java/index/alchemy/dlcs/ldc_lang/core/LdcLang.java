@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static index.alchemy.dlcs.ldc_lang.core.LdcLang.*;
 
 @Omega
-@DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "[1.12,1.12.1]")
+@DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "*")
 public class LdcLang {
     
     public static final String
