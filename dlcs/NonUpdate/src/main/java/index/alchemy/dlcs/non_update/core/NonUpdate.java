@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 import static index.alchemy.dlcs.non_update.core.NonUpdate.*;
 
 @Omega
-@DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "[1.10.2,1.11.2]")
+@DLC(id = DLC_ID, name = DLC_NAME, version = DLC_VERSION, mcVersion = "*")
 public class NonUpdate {
     
     public static final String
